@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Bootcamp</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="languages_header">Languages</string>
+    <string name="maps_header">Maps</string>
 </resources>

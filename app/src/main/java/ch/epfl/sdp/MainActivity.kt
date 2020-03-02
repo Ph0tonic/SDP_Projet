@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -17,5 +18,10 @@ class MainActivity : AppCompatActivity() {
         val message = editText.text.toString()
         val textView = findViewById<TextView>(R.id.greetingMessage)
         textView.text = "Hello $message!"
+    }
+
+    fun goToSettings(view: View?){
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
     }
 }
