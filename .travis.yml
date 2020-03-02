@@ -9,6 +9,10 @@ android:
     - android-22
     # The system image, to run an emulator during the tests
     - sys-img-armeabi-v7a-android-22
+
+before_install:
+  - chmod +x ./gradlew
+
 before_script:
   # Emulator Management: Create, Start and Wait
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
@@ -20,11 +24,13 @@ before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
+
 script:
   - ./gradlew build connectedCheck jacocoTestReport
+
 after_script:
   # Report test coverage to Code Climate
   - export JACOCO_SOURCE_PATH=app/src/main/java/
-  - ./cc-test-reporter format-coverage ./app/build/reports/coverage/debug/report.xml --input-type jacoco
+  - ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco
   - ./cc-test-reporter upload-coverage
 
