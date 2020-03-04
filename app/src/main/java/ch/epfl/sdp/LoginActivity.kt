@@ -1,9 +1,11 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -31,6 +33,9 @@ class LoginActivity : AppCompatActivity() {
         google_login_btn.setOnClickListener {
             signIn()
         }
+        google_logout_btn.setOnClickListener {
+            signOut()
+        }
     }
 
     private fun signIn() {
@@ -43,7 +48,8 @@ class LoginActivity : AppCompatActivity() {
     private fun signOut() {
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this) {
-                    // Update your UI here
+                    google_logout_btn.visibility = View.GONE
+                    google_login_btn.visibility = View.VISIBLE
                 }
     }
 
@@ -64,6 +70,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        google_login_btn.visibility = View.GONE
+        google_logout_btn.visibility = View.VISIBLE
         try {
             val account = completedTask.getResult(
                     ApiException::class.java

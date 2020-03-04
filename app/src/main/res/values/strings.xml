@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Bootcamp</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="log_out">Log out</string>
 </resources>
