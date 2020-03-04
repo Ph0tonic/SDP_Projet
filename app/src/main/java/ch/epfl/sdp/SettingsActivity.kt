@@ -1,18 +1,8 @@
 package ch.epfl.sdp
 
-import android.content.Intent
-import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.Log
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
-import java.util.*
 
 
 class SettingsActivity : AppCompatActivity(){

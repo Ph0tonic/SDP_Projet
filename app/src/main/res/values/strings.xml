@@ -7,4 +7,6 @@
     <!-- Preference Titles -->
     <string name="languages_header">Languages</string>
     <string name="maps_header">Maps</string>
+
+    <string name="my_pref_string">lang</string>
 </resources>

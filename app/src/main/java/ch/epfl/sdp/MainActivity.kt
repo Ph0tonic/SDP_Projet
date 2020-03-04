@@ -2,7 +2,6 @@ package ch.epfl.sdp
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
