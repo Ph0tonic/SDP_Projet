@@ -1,11 +1,10 @@
 package ch.epfl.sdp
 
 import android.content.Intent
-import android.opengl.Visibility
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -36,6 +35,15 @@ class LoginActivity : AppCompatActivity() {
         google_logout_btn.setOnClickListener {
             signOut()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+
+        account ?: return
+        google_login_btn.visibility = View.GONE
+        google_logout_btn.visibility = View.VISIBLE
     }
 
     private fun signIn() {
