@@ -30,24 +30,20 @@ class LoginActivity : AppCompatActivity() {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        google_login_btn.setOnClickListener {
-            signIn()
-        }
-        google_logout_btn.setOnClickListener {
-            signOut()
-        }
+        updateUI()
+
+        google_login_btn.setOnClickListener { signIn() }
+        google_logout_btn.setOnClickListener { signOut() }
     }
 
     fun updateUI() {
         google_login_btn.visibility = if (loggedIn) View.GONE else View.VISIBLE
         google_logout_btn.visibility = if (!loggedIn) View.GONE else View.VISIBLE
     }
+
     override fun onStart() {
         super.onStart()
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-
-        account ?: return
-        loggedIn = true
+        GoogleSignIn.getLastSignedInAccount(this) ?: false
     }
 
     private fun signIn() {
@@ -68,8 +64,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task)
+            handleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(data))
         }
     }
 
@@ -79,9 +74,8 @@ class LoginActivity : AppCompatActivity() {
             loggedIn = true
             updateUI()
             // Signed in successfully
-            Log.i("Google ID",account?.id ?: "")
+            Log.i("Google ID", account?.id ?: "")
             Log.i("Google First/Last Name", account?.givenName ?: "" + account?.familyName ?: "")
-            Log.i("Google Email", account?.email ?: "")
             Log.i("Google ID Token", account?.idToken ?: "")
         } catch (e: ApiException) {
             // Sign in was unsuccessful
