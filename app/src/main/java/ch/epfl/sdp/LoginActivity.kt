@@ -15,8 +15,9 @@ import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
 
-    lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 9001
+    private var loggedIn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,13 +38,16 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    fun updateUI() {
+        google_login_btn.visibility = if (loggedIn) View.GONE else View.VISIBLE
+        google_logout_btn.visibility = if (!loggedIn) View.GONE else View.VISIBLE
+    }
     override fun onStart() {
         super.onStart()
         val account = GoogleSignIn.getLastSignedInAccount(this)
 
         account ?: return
-        google_login_btn.visibility = View.GONE
-        google_logout_btn.visibility = View.VISIBLE
+        loggedIn = true
     }
 
     private fun signIn() {
@@ -56,58 +60,32 @@ class LoginActivity : AppCompatActivity() {
     private fun signOut() {
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this) {
-                    google_logout_btn.visibility = View.GONE
-                    google_login_btn.visibility = View.VISIBLE
-                }
-    }
-
-    private fun revokeAccess() {
-        mGoogleSignInClient.revokeAccess()
-                .addOnCompleteListener(this) {
-                    // Update your UI here
+                    loggedIn = false
+                    updateUI()
                 }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
-            val task =
-                    GoogleSignIn.getSignedInAccountFromIntent(data)
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             handleSignInResult(task)
         }
     }
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-        google_login_btn.visibility = View.GONE
-        google_logout_btn.visibility = View.VISIBLE
         try {
-            val account = completedTask.getResult(
-                    ApiException::class.java
-            )
+            val account = completedTask.getResult(ApiException::class.java)
+            loggedIn = true
+            updateUI()
             // Signed in successfully
-            val googleId = account?.id ?: ""
-            Log.i("Google ID",googleId)
-
-            val googleFirstName = account?.givenName ?: ""
-            Log.i("Google First Name", googleFirstName)
-
-            val googleLastName = account?.familyName ?: ""
-            Log.i("Google Last Name", googleLastName)
-
-            val googleEmail = account?.email ?: ""
-            Log.i("Google Email", googleEmail)
-
-            val googleProfilePicURL = account?.photoUrl.toString()
-            Log.i("Google Profile Pic URL", googleProfilePicURL)
-
-            val googleIdToken = account?.idToken ?: ""
-            Log.i("Google ID Token", googleIdToken)
-
+            Log.i("Google ID",account?.id ?: "")
+            Log.i("Google First/Last Name", account?.givenName ?: "" + account?.familyName ?: "")
+            Log.i("Google Email", account?.email ?: "")
+            Log.i("Google ID Token", account?.idToken ?: "")
         } catch (e: ApiException) {
             // Sign in was unsuccessful
-            Log.e(
-                    "failed code=", e.statusCode.toString()
-            )
+            Log.e("failed code=", e.statusCode.toString())
         }
     }
 
