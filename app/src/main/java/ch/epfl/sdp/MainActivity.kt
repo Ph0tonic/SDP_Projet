@@ -24,4 +24,10 @@ class MainActivity : AppCompatActivity() {
         val textView = findViewById<TextView>(R.id.greetingMessage)
         textView.text = "Hello $message!"
     }
+
+    fun goToSettings(view: View?){
+        val intent = Intent(this, SettingsActivity::class.java)
+
+        startActivity(intent)
+    }
 }
