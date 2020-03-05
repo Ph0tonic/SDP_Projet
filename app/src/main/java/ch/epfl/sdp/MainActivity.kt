@@ -13,19 +13,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
-    fun login() {
+    fun login(view: View?) {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
     }
 
-    fun greetMessage() {
+    fun greetMessage(view: View?) {
         val editText = findViewById<EditText>(R.id.mainName)
         val message = editText.text.toString()
         val textView = findViewById<TextView>(R.id.greetingMessage)
         textView.text = "Hello $message!"
     }
 
-    fun goToSettings(){
+    fun goToSettings(view: View?){
         val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent)
     }
