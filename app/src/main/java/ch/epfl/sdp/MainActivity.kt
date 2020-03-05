@@ -14,8 +14,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun login(view: View?) {
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, LoginActivity::class.java))
     }
 
     fun greetMessage(view: View?) {
@@ -26,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToSettings(view: View?){
-        val intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, SettingsActivity::class.java))
     }
 }

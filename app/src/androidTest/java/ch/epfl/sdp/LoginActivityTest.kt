@@ -2,8 +2,10 @@ package ch.epfl.sdp
 
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import org.junit.Rule
@@ -17,6 +19,7 @@ class LoginActivityTest {
 
     @Test
     fun testLogin() {
-        //Espresso.onView(ViewMatchers.withId(R.id.google_login_btn)).perform(ViewActions.click())
+        //Espresso.onView(ViewMatchers.withId(R.id.google_login_btn)).perform(click())
+        //Espresso.onView(withText("None of the above")).perform(click());
     }
 }
