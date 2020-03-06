@@ -19,7 +19,10 @@ class LoginActivityTest {
 
     @Test
     fun testLogin() {
-        //Espresso.onView(ViewMatchers.withId(R.id.google_login_btn)).perform(click())
+        Espresso.onView(ViewMatchers.withId(R.id.google_login_btn)).perform(click())
+        Thread.sleep(5000);
+        println("DOne sleeping")
+        //Espresso.pressBack()
         //Espresso.onView(withText("None of the above")).perform(click());
     }
 }
