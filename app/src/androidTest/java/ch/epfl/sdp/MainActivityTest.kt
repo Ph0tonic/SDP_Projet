@@ -27,4 +27,9 @@ class MainActivityTest {
     fun testCanOpenSettings(){
         onView(withId(R.id.settingsButton)).perform(click())
     }
+
+    @Test
+    fun testCanLogin(){
+        onView(withId(R.id.mainLoginButton)).perform(click())
+    }
 }

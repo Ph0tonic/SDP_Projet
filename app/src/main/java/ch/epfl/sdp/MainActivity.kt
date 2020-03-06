@@ -13,6 +13,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
+    fun login(view: View?) {
+        startActivity(Intent(this, LoginActivity::class.java))
+    }
+
     fun greetMessage(view: View?) {
         val editText = findViewById<EditText>(R.id.mainName)
         val message = editText.text.toString()
@@ -21,8 +25,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToSettings(view: View?){
-        val intent = Intent(this, SettingsActivity::class.java)
-
-        startActivity(intent)
+        startActivity(Intent(this, SettingsActivity::class.java))
     }
 }
