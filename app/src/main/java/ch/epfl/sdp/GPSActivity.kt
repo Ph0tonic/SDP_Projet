@@ -11,6 +11,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -40,16 +41,26 @@ class GPSActivity : AppCompatActivity() {
         longitudeValueGPS = findViewById<TextView>(R.id.longitudeValueGPS)
         latitudeValueGPS = findViewById<TextView>(R.id.latitudeValueGPS)
 
-        checkPermission()
+        longitudeGPS = Double.NaN
+        latitudeGPS = Double.NaN
+        runOnUiThread {
+            longitudeValueGPS?.text = longitudeGPS.toString()
+            latitudeValueGPS?.text = latitudeGPS.toString()
+        }
 
-        locationManager?.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 2 * 1000, 10f, locationListenerGPS);
+
+
+        if(checkPermission()){
+            locationManager?.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, locationListenerGPS);
+        }
+
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onResume() {
         super.onResume()
-        checkPermission()
-        checkLocationSetting()
+        checkPermission() && checkLocationSetting()
     }
 
     fun goToMain(view: View?) {
@@ -64,17 +75,42 @@ class GPSActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun checkPermission(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
-            checkPermission()
+    private fun checkPermission(): Boolean {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+        else{
+            requestPermissions()
+            return false
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun requestPermissions(){
+        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
+        Log.d("-----------------------","request permission")
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d("-----------------------","dawufhuiawhfuwh")
         if(requestCode == this.requestCode){
-            
+            val granted: Boolean = grantResults.all { i -> i == PackageManager.PERMISSION_GRANTED}
+            if(grantResults.isNotEmpty() && granted){
+                locationManager?.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER, 2 * 1000, 10f, locationListenerGPS);
+            }
+            else{
+                longitudeGPS = Double.NaN
+                latitudeGPS = Double.NaN
+                runOnUiThread {
+                    longitudeValueGPS?.text = longitudeGPS.toString()
+                    latitudeValueGPS?.text = latitudeGPS.toString()
+                    Toast.makeText(this@GPSActivity, "Please Enable Location", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -100,7 +136,7 @@ class GPSActivity : AppCompatActivity() {
             runOnUiThread {
                 longitudeValueGPS?.text = longitudeGPS.toString()
                 latitudeValueGPS?.text = latitudeGPS.toString()
-                Toast.makeText(this@GPSActivity, "GPS Provider update", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@GPSActivity, "GPS Provider update", Toast.LENGTH_SHORT).show()
             }
         }
 
