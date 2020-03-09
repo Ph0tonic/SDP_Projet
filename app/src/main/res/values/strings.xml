@@ -21,8 +21,8 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_misson_design">Mission design</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_maps_managing">Maps managing</string>
 
     <string name="home_second">Home Second</string>
-    <string name="start_misson_button">Start new mission</string>
+    <string name="start_misson_button">Start mission</string>
 </resources>

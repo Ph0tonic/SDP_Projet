@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.slideshow
+package ch.epfl.sdp.ui.mapsManaging
 
 import android.os.Bundle
 import android.view.LayoutInflater

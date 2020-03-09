@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.slideshow
+package ch.epfl.sdp.ui.mapsManaging
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

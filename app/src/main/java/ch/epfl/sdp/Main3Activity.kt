@@ -1,10 +1,13 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -16,10 +19,16 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.*
+import com.google.android.gms.common.api.ApiException
 
 class Main3Activity : AppCompatActivity() {
 
+    private val RC_SIGN_IN = 9001
+
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +50,14 @@ class Main3Activity : AppCompatActivity() {
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+
+        val gso = GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("100617880241-gngllqsmp0tnbor8r2sr4r396t2hfj42.apps.googleusercontent.com")
+                .requestEmail()
+                .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -59,6 +76,32 @@ class Main3Activity : AppCompatActivity() {
     }
 
     fun login(view: View?) {
-        startActivity(Intent(this, LoginActivity::class.java))
+        startActivityForResult(mGoogleSignInClient.signInIntent, RC_SIGN_IN)
+        //startActivity(Intent(this, LoginActivity::class.java))
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_SIGN_IN) {
+            try {
+                GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+                val account = result.signInAccount
+                updateUserView(account?.displayName, account?.email)
+                //loggedIn = true
+            } catch (e: ApiException) {
+                // Sign in was unsuccessful
+            }
+        }
+    }
+
+    private fun updateUserView(username: String?, userEmail: String?/*, userImage: Drawable*/){
+        val usernameView: TextView = findViewById(R.id.nav_username)
+        val userEmailView: TextView = findViewById(R.id.nav_user_email)
+        val userImageView: ImageView = findViewById(R.id.nav_user_image)
+
+        usernameView.text = username
+        userEmailView.text = userEmail
+        //userImageView.setImageDrawable(userImage)
     }
 }

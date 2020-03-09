@@ -24,7 +24,7 @@ class MissionDesignFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_mission_design, container, false)
         val textView: TextView = root.findViewById(R.id.text_gallery)
         missionDeignViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = "Misson design fragment"
+            textView.text = "Misson design fragment \n (select areas here)"
         })
         return root
     }
