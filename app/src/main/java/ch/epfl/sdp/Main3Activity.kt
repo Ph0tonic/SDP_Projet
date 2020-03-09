@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -90,6 +91,8 @@ class Main3Activity : AppCompatActivity() {
                 updateUserView(account?.displayName, account?.email)
                 //loggedIn = true
             } catch (e: ApiException) {
+                Snackbar.make(findViewById(R.id.main_nav_header), "Could not sign in :(", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show()
                 // Sign in was unsuccessful
             }
         }
