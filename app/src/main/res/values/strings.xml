@@ -5,6 +5,7 @@
     <string name="title_activity_settings">Settings</string>
 
     <string name="settings_button_text">Settings</string>
+    <string name="gps_button_text">GPS</string>
 
     <!-- Preference Titles -->
     <string name="languages_header">Languages</string>

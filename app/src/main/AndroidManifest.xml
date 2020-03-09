@@ -15,6 +15,7 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity">
         </activity>
+        <activity android:name=".GPSActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

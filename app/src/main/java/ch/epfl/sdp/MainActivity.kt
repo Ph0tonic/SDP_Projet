@@ -27,4 +27,9 @@ class MainActivity : AppCompatActivity() {
     fun goToSettings(view: View?){
         startActivity(Intent(this, SettingsActivity::class.java))
     }
+
+    fun goToGPS(view: View?) {
+        val intent = Intent(this,GPSActivity::class.java)
+        startActivity(intent)
+    }
 }
