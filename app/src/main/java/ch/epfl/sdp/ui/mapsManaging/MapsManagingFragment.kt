@@ -10,21 +10,21 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import ch.epfl.sdp.R
 
-class SlideshowFragment : Fragment() {
+class MapsManagingFragment : Fragment() {
 
-    private lateinit var slideshowViewModel: SlideshowViewModel
+    private lateinit var mapsManagingViewModel: MapsManagingViewModel
 
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        slideshowViewModel =
-                ViewModelProviders.of(this).get(SlideshowViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_slideshow, container, false)
+        mapsManagingViewModel =
+                ViewModelProviders.of(this).get(MapsManagingViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_maps_managing, container, false)
         val textView: TextView = root.findViewById(R.id.text_slideshow)
-        slideshowViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
+        mapsManagingViewModel.text.observe(viewLifecycleOwner, Observer {
+            textView.text = "Maps managing fragment\n(get offline maps here)"
         })
         return root
     }
