@@ -5,8 +5,8 @@ import android.location.LocationListener
 import android.os.Bundle
 import java.util.Collections.list
 
-object CentralListenerManager : LocationListener {
-    private var subscribers: List<LocationSubscriber> = emptyList()
+object CentralLocationListener : LocationListener {
+    private var subscribers: Set<LocationSubscriber> = emptySet()
     private lateinit var location: Location
 
     fun subscribe(subscriber: LocationSubscriber){

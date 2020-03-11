@@ -21,9 +21,10 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import java.util.*
+import kotlin.Double.Companion.NaN
 
 
-class GPSActivity : AppCompatActivity() {
+class GPSActivity : AppCompatActivity(), LocationSubscriber {
 
     private var locationManager: LocationManager? = null
     var longitudeGPS = 0.0
@@ -37,30 +38,37 @@ class GPSActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_g_p_s)
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        //locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         longitudeValueGPS = findViewById<TextView>(R.id.longitudeValueGPS)
         latitudeValueGPS = findViewById<TextView>(R.id.latitudeValueGPS)
 
-        longitudeGPS = Double.NaN
-        latitudeGPS = Double.NaN
+        longitudeGPS = NaN
+        latitudeGPS = NaN
         runOnUiThread {
             longitudeValueGPS?.text = longitudeGPS.toString()
             latitudeValueGPS?.text = latitudeGPS.toString()
         }
 
-
-
+        /*
         if(checkPermission()){
             locationManager?.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, locationListenerGPS);
+                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
         }
 
+         */
+        CentralLocationManager.onCreate(this)
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        CentralLocationListener.subscribe(this)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onResume() {
         super.onResume()
-        checkPermission() && checkLocationSetting()
+        //checkPermission() && checkLocationSetting()
     }
 
     fun goToMain(view: View?) {
@@ -80,17 +88,19 @@ class GPSActivity : AppCompatActivity() {
             return true
         }
         else{
-            requestPermissions()
+            //requestPermissions()
             return false
         }
     }
-
+    /*
     @RequiresApi(Build.VERSION_CODES.M)
     private fun requestPermissions(){
         requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
         Log.d("-----------------------","request permission")
 
     }
+
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -100,11 +110,11 @@ class GPSActivity : AppCompatActivity() {
             val granted: Boolean = grantResults.all { i -> i == PackageManager.PERMISSION_GRANTED}
             if(grantResults.isNotEmpty() && granted){
                 locationManager?.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 2 * 1000, 10f, locationListenerGPS);
+                        LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener);
             }
             else{
-                longitudeGPS = Double.NaN
-                latitudeGPS = Double.NaN
+                longitudeGPS = NaN
+                latitudeGPS = NaN
                 runOnUiThread {
                     longitudeValueGPS?.text = longitudeGPS.toString()
                     latitudeValueGPS?.text = latitudeGPS.toString()
@@ -113,6 +123,8 @@ class GPSActivity : AppCompatActivity() {
             }
         }
     }
+
+     */
 
     private fun isLocationEnabled(): Boolean {
         return locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) ?: false
@@ -129,19 +141,19 @@ class GPSActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private val locationListenerGPS: LocationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            longitudeGPS = location.longitude
-            latitudeGPS = location.latitude
-            runOnUiThread {
-                longitudeValueGPS?.text = longitudeGPS.toString()
-                latitudeValueGPS?.text = latitudeGPS.toString()
-                //Toast.makeText(this@GPSActivity, "GPS Provider update", Toast.LENGTH_SHORT).show()
-            }
+    override fun onLocationChanged(location: Location) {
+        longitudeGPS = location.longitude
+        latitudeGPS = location.latitude
+        runOnUiThread {
+            longitudeValueGPS?.text = longitudeGPS.toString()
+            latitudeValueGPS?.text = latitudeGPS.toString()
+            //Toast.makeText(this@GPSActivity, "GPS Provider update", Toast.LENGTH_SHORT).show()
         }
-
-        override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {}
-        override fun onProviderEnabled(s: String) {}
-        override fun onProviderDisabled(s: String) {}
     }
+
+    override fun onStop() {
+        super.onStop()
+        CentralLocationListener.unsubscribe(this)
+    }
+
 }
