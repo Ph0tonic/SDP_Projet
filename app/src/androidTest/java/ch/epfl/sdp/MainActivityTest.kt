@@ -150,7 +150,9 @@ class MainActivityTest {
 
     @Test
     fun clickingTheHamburgerOpensTheDrawer(){
-        mActivityRule.activity.onSupportNavigateUp()
+        runOnUiThread{
+            mActivityRule.activity.onSupportNavigateUp()
+        }
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
     }
 }
