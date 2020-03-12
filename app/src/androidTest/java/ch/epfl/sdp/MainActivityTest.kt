@@ -19,7 +19,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -90,7 +90,10 @@ class MainActivityTest {
                 .requestEmail()
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("com.google.android.gms")))
+        intended(allOf(
+                hasAction(mGoogleSignInClient.signInIntent.action),
+                hasComponent(mGoogleSignInClient.signInIntent.component),
+                hasPackage(mGoogleSignInClient.signInIntent.`package`)))
         //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
@@ -109,7 +112,10 @@ class MainActivityTest {
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
         //intended(hasAction(""))
-        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("com.google.android.gms")))
+        intended(allOf(
+                hasAction(mGoogleSignInClient.signInIntent.action),
+                hasComponent(mGoogleSignInClient.signInIntent.component),
+                hasPackage(mGoogleSignInClient.signInIntent.`package`)))
         //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
@@ -127,7 +133,10 @@ class MainActivityTest {
                 .requestEmail()
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("com.google.android.gms")))
+        intended(allOf(
+                hasAction(mGoogleSignInClient.signInIntent.action),
+                hasComponent(mGoogleSignInClient.signInIntent.component),
+                hasPackage(mGoogleSignInClient.signInIntent.`package`)))
         //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
