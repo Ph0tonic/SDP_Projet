@@ -8,6 +8,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.NavigationViewActions
+import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -18,8 +19,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -89,7 +90,8 @@ class MainActivityTest {
                 .requestEmail()
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
+        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("com.google.android.gms")))
+        //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
 
@@ -106,7 +108,9 @@ class MainActivityTest {
                 .requestEmail()
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
+        //intended(hasAction(""))
+        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("com.google.android.gms")))
+        //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
 
@@ -123,25 +127,8 @@ class MainActivityTest {
                 .requestEmail()
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
-        mUiDevice?.pressBack()
-    }
-
-    @Test
-    fun test(){
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
-
-        onView(withId(R.id.nav_username)).perform(click())
-
-        val gso = GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com")
-                .requestEmail()
-                .build()
-        val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
+        intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("com.google.android.gms")))
+        //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
 
