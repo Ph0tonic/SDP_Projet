@@ -5,6 +5,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
@@ -19,7 +20,7 @@ class LoginActivityTest {
 
     @Test
     fun testLogin() {
-        Espresso.onView(ViewMatchers.withId(R.id.google_login_btn)).perform(click())
+        Espresso.onView(withId(R.id.google_login_btn)).perform(click())
         Thread.sleep(5000);
         println("DOne sleeping")
         //Espresso.pressBack()

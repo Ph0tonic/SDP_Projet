@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
@@ -66,9 +68,11 @@ class LoginActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             try {
                 GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+                Log.d("----------------","Login successful $loggedIn")
                 loggedIn = true
             } catch (e: ApiException) {
-                // Sign in was unsuccessful
+                Log.d("----------------","Could not login $loggedIn ${e.message}")
+
             }
             updateUI()
         }

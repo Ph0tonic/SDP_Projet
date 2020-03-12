@@ -30,13 +30,13 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_misson_design"
         android:name="ch.epfl.sdp.ui.missionDesign.MissionDesignFragment"
         android:label="@string/menu_misson_design"
         tools:layout="@layout/fragment_mission_design" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
+        android:id="@+id/nav_maps_managing"
         android:name="ch.epfl.sdp.ui.mapsManaging.MapsManagingFragment"
         android:label="@string/menu_maps_managing"
         tools:layout="@layout/fragment_maps_managing" />
