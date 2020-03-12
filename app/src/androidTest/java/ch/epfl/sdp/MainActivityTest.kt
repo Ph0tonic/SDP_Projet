@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.content.Context
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
@@ -8,9 +9,9 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.NavigationViewActions
-import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.matcher.IntentMatchers.*
+import androidx.test.espresso.intent.matcher.IntentMatchers.filterEquals
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,8 +20,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import org.hamcrest.CoreMatchers.*
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,95 +39,79 @@ class MainActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
+    private fun getContext(): Context{
+        return InstrumentationRegistry.getInstrumentation().targetContext
+    }
+
     @Test
     fun canOpenSettings(){
-        openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getInstrumentation().targetContext)
+        openActionBarOverflowOrOptionsMenu(getContext())
         onView(withText("Settings")).perform(click())
         intended(hasComponent(SettingsActivity::class.qualifiedName))
     }
 
+    private fun openDrawer(){
+        onView(withId(R.id.drawer_layout))
+                .check(matches(isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
+                .perform(DrawerActions.open())
+    }
+
     @Test
     fun canNavigateToHome(){
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
-
+        openDrawer()
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_home));
     }
 
     @Test
     fun canNavigateToMissionDesign(){
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
-
+        openDrawer()
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design));
     }
 
     @Test
     fun canNavigateToMapsManaging(){
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
-
+        openDrawer()
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing));
     }
 
-    @Test
-    fun clickOnUserProfilePictureOpensLoginMenu(){
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
-
-        onView(withId(R.id.nav_user_image)).perform(click())
-        val gso = GoogleSignInOptions
+    private fun getGSO(): GoogleSignInOptions {
+        return GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com")
                 .requestEmail()
                 .build()
-        val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
+    }
+
+    @Test
+    fun clickOnUserProfilePictureOpensLoginMenu(){
+        openDrawer()
+        onView(withId(R.id.nav_user_image)).perform(click())
+
+        val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
         intended(filterEquals(mGoogleSignInClient.signInIntent))
-        //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
 
     @Test
     fun clickOnUserEmailOpensLoginMenu(){
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
-
+        openDrawer()
         onView(withId(R.id.nav_user_email)).perform(click())
-        val gso = GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com")
-                .requestEmail()
-                .build()
-        val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        //intended(hasAction(""))
+
+        val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
         intended(filterEquals(mGoogleSignInClient.signInIntent))
-        //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
 
     @Test
     fun clickOnUsernameOpensLoginMenu(){
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
-
+        openDrawer()
         onView(withId(R.id.nav_username)).perform(click())
-        val gso = GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com")
-                .requestEmail()
-                .build()
-        val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
+
+        val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
         intended(filterEquals(mGoogleSignInClient.signInIntent))
-        //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
 
@@ -137,9 +120,7 @@ class MainActivityTest {
         val dummyUserName = "dummy_username"
         val dummyEmail = "dummy_email"
 
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Drawer is closed to begin with
-                .perform(DrawerActions.open())
+        openDrawer()
 
         runOnUiThread{
             mActivityRule.activity.updateUserView(dummyUserName, dummyEmail)
