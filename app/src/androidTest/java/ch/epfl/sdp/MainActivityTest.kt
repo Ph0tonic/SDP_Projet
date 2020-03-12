@@ -90,10 +90,7 @@ class MainActivityTest {
                 .requestEmail()
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(
-                hasAction(mGoogleSignInClient.signInIntent.action),
-                hasComponent(mGoogleSignInClient.signInIntent.component),
-                hasPackage(mGoogleSignInClient.signInIntent.`package`)))
+        intended(filterEquals(mGoogleSignInClient.signInIntent))
         //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
@@ -112,10 +109,7 @@ class MainActivityTest {
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
         //intended(hasAction(""))
-        intended(allOf(
-                hasAction(mGoogleSignInClient.signInIntent.action),
-                hasComponent(mGoogleSignInClient.signInIntent.component),
-                hasPackage(mGoogleSignInClient.signInIntent.`package`)))
+        intended(filterEquals(mGoogleSignInClient.signInIntent))
         //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
@@ -133,10 +127,7 @@ class MainActivityTest {
                 .requestEmail()
                 .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(InstrumentationRegistry.getInstrumentation().targetContext, gso)
-        intended(allOf(
-                hasAction(mGoogleSignInClient.signInIntent.action),
-                hasComponent(mGoogleSignInClient.signInIntent.component),
-                hasPackage(mGoogleSignInClient.signInIntent.`package`)))
+        intended(filterEquals(mGoogleSignInClient.signInIntent))
         //intended(allOf(hasAction("com.google.android.gms.auth.GOOGLE_SIGN_IN"), hasPackage("ch.epfl.sdp")))
         mUiDevice?.pressBack()
     }
