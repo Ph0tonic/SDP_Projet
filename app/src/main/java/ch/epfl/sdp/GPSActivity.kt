@@ -69,19 +69,22 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
     override fun onResume() {
         super.onResume()
         //checkPermission() && checkLocationSetting()
+        CentralLocationManager.onResume()
     }
 
     fun goToMain(view: View?) {
         val intent = Intent(this,MainActivity::class.java)
         startActivity(intent)
     }
-
+    /*
     private fun checkLocationSetting(): Boolean {
         if (!isLocationEnabled())
             showAlert()
         return isLocationEnabled()
     }
 
+     */
+    /*
     @RequiresApi(Build.VERSION_CODES.M)
     private fun checkPermission(): Boolean {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -92,6 +95,8 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
             return false
         }
     }
+
+     */
     /*
     @RequiresApi(Build.VERSION_CODES.M)
     private fun requestPermissions(){
@@ -124,7 +129,7 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
         }
     }
 
-     */
+
 
     private fun isLocationEnabled(): Boolean {
         return locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) ?: false
@@ -141,6 +146,8 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
         dialog.show()
     }
 
+     */
+
     override fun onLocationChanged(location: Location) {
         longitudeGPS = location.longitude
         latitudeGPS = location.latitude
@@ -154,6 +161,7 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
     override fun onStop() {
         super.onStop()
         CentralLocationListener.unsubscribe(this)
+        CentralLocationManager.onStop()
     }
 
 }

@@ -52,7 +52,7 @@ object CentralLocationManager {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun checkPermission(): Boolean {
-        if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             return true
         }
         else{
@@ -62,12 +62,12 @@ object CentralLocationManager {
     }
 
     private fun showAlert() {
-        val dialog: AlertDialog.Builder = AlertDialog.Builder(this)
+        val dialog: AlertDialog.Builder = AlertDialog.Builder(activity)
         dialog.setTitle("Enable Location")
                 .setMessage("This part of the app cannot function without location, please enable it")
                 .setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
                     val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    startActivity(myIntent)
+                    activity.startActivity(myIntent)
                 }
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt -> })
         dialog.show()
@@ -83,10 +83,10 @@ object CentralLocationManager {
         if(requestCode == this.requestCode){
             val granted: Boolean = grantResults.all { i -> i == PackageManager.PERMISSION_GRANTED}
             if(grantResults.isNotEmpty() && granted){
-                if (activity.checkSelfPermission( Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                /*if (activity.checkSelfPermission( Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // There's no logical way to reach here
                     return
-                }
+                }*/
                 locationManager?.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener);
             }
