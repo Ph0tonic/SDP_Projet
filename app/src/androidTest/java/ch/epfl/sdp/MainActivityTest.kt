@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.view.Gravity
 import androidx.preference.PreferenceManager
@@ -33,7 +34,7 @@ class MainActivityTest {
     private var mUiDevice: UiDevice? = null
 
     @get:Rule
-    val mActivityRule = IntentsTestRule<MainActivity>(MainActivity::class.java)
+    val mActivityRule = IntentsTestRule(MainActivity::class.java)
 
     @Before
     @Throws(Exception::class)
@@ -87,14 +88,19 @@ class MainActivityTest {
                 .getString("lontitude", null) == null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("zoom", null) == null)
+
         onView(withId(R.id.display_map)).perform(click());
         mUiDevice?.pressBack()
+
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("latitude", null) != null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("longitude", null) != null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("zoom", null) != null)
+
+        //Return on the view as to load the preferences this time
+        onView(withId(R.id.display_map)).perform(click());
     }
 
     private fun getGSO(): GoogleSignInOptions {

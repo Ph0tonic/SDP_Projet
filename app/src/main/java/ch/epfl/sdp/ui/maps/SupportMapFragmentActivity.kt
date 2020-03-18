@@ -17,7 +17,7 @@ import com.mapbox.mapboxsdk.maps.SupportMapFragment
 
 class SupportMapFragmentActivity : AppCompatActivity() {
 
-    private lateinit var mapFragment: SupportMapFragment
+    lateinit var mapFragment: SupportMapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,11 +69,7 @@ class SupportMapFragmentActivity : AppCompatActivity() {
         mapFragment.getMapAsync { mapboxMap ->
             PreferenceManager.getDefaultSharedPreferences(this).edit()
                     .putString("latitude", mapboxMap.cameraPosition.target.latitude.toString())
-                    .apply();
-            PreferenceManager.getDefaultSharedPreferences(this).edit()
                     .putString("longitude", mapboxMap.cameraPosition.target.longitude.toString())
-                    .apply();
-            PreferenceManager.getDefaultSharedPreferences(this).edit()
                     .putString("zoom", mapboxMap.cameraPosition.zoom.toString())
                     .apply();
         }
