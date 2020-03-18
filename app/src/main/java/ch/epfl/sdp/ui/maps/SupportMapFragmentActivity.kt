@@ -17,7 +17,7 @@ import com.mapbox.mapboxsdk.maps.SupportMapFragment
 
 class SupportMapFragmentActivity : AppCompatActivity() {
 
-    lateinit var mapFragment:  SupportMapFragment
+    private lateinit var mapFragment: SupportMapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,16 +29,13 @@ class SupportMapFragmentActivity : AppCompatActivity() {
 
         // Create supportMapFragment
         if (savedInstanceState == null) {
-            Log.e("DEBUG", "V1")
-
             // Create fragment
             val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
 
             // Build mapboxMap
             val options = MapboxMapOptions.createFromAttributes(this, null)
-            //TODO: Code here to load latest location
 
-            //TODO: Default use current localisation if not stored in preferences
+            //TODO: Load latest location
             val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
                     .getString("latitude", null)?.toDouble() ?: -52.6885
             val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
@@ -58,7 +55,6 @@ class SupportMapFragmentActivity : AppCompatActivity() {
             transaction.add(R.id.container, mapFragment, "com.mapbox.map")
             transaction.commit()
         } else {
-            Log.e("DEBUG", "V2")
             mapFragment = supportFragmentManager.findFragmentByTag("com.mapbox.map") as SupportMapFragment
         }
         mapFragment.getMapAsync { mapboxMap ->
@@ -81,6 +77,5 @@ class SupportMapFragmentActivity : AppCompatActivity() {
                     .putString("zoom", mapboxMap.cameraPosition.zoom.toString())
                     .apply();
         }
-
     }
 }

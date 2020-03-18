@@ -30,7 +30,7 @@ class HomeFragment : Fragment() {
             textView.text = it
         })
 
-        val button: Button = root.findViewById(R.id.button3)
+        val button: Button = root.findViewById(R.id.display_map)
         button.setOnClickListener {
             startActivity(Intent(context, SupportMapFragmentActivity::class.java))
         }

@@ -1,7 +1,9 @@
 package ch.epfl.sdp
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.view.Gravity
+import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.click
@@ -71,10 +73,28 @@ class MainActivityTest {
     }
 
     @Test
-    fun canNavigateToMapsManaging(){
+    fun canDisplayAMapAndReloadLocation(){
         openDrawer()
         onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing));
+                .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design));
+    }
+
+    @Test
+    fun canNavigateToMapsManaging(){
+        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("latitude", null) == null)
+        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("lontitude", null) == null)
+        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("zoom", null) == null)
+        onView(withId(R.id.display_map)).perform(click());
+        mUiDevice?.pressBack()
+        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("latitude", null) != null)
+        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("longitude", null) != null)
+        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("zoom", null) != null)
     }
 
     private fun getGSO(): GoogleSignInOptions {
