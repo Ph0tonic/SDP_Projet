@@ -1,8 +1,10 @@
 package ch.epfl.sdp.ui.maps
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
+import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.Mapbox.getInstance
@@ -15,6 +17,8 @@ import com.mapbox.mapboxsdk.maps.SupportMapFragment
 
 class SupportMapFragmentActivity : AppCompatActivity() {
 
+    lateinit var mapFragment:  SupportMapFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_support_map_fragment)
@@ -24,8 +28,8 @@ class SupportMapFragmentActivity : AppCompatActivity() {
         getInstance(this, getString(R.string.mapbox_access_token))
 
         // Create supportMapFragment
-        val mapFragment: SupportMapFragment?
         if (savedInstanceState == null) {
+            Log.e("DEBUG", "V1")
 
             // Create fragment
             val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -33,9 +37,18 @@ class SupportMapFragmentActivity : AppCompatActivity() {
             // Build mapboxMap
             val options = MapboxMapOptions.createFromAttributes(this, null)
             //TODO: Code here to load latest location
+
+            //TODO: Default use current localisation if not stored in preferences
+            val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("latitude", null)?.toDouble() ?: -52.6885
+            val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("longitude", null)?.toDouble() ?: -70.1395
+            val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("zoom", null)?.toDouble() ?: 9.0
+
             options.camera(CameraPosition.Builder()
-                    .target(LatLng(-52.6885, -70.1395))
-                    .zoom(9.0)
+                    .target(LatLng(latitude, longitude))
+                    .zoom(zoom)
                     .build())
 
             // Create map fragment
@@ -45,12 +58,29 @@ class SupportMapFragmentActivity : AppCompatActivity() {
             transaction.add(R.id.container, mapFragment, "com.mapbox.map")
             transaction.commit()
         } else {
-            mapFragment = supportFragmentManager.findFragmentByTag("com.mapbox.map") as SupportMapFragment?
+            Log.e("DEBUG", "V2")
+            mapFragment = supportFragmentManager.findFragmentByTag("com.mapbox.map") as SupportMapFragment
         }
-        mapFragment?.getMapAsync { mapboxMap ->
+        mapFragment.getMapAsync { mapboxMap ->
             mapboxMap.setStyle(Style.MAPBOX_STREETS) {
                 // Map is set up and the style has loaded. Now you can add data or make other map adjustments
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapFragment.getMapAsync { mapboxMap ->
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putString("latitude", mapboxMap.cameraPosition.target.latitude.toString())
+                    .apply();
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putString("longitude", mapboxMap.cameraPosition.target.longitude.toString())
+                    .apply();
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putString("zoom", mapboxMap.cameraPosition.zoom.toString())
+                    .apply();
+        }
+
     }
 }
