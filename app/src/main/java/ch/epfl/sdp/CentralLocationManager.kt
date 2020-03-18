@@ -18,32 +18,33 @@ import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.tasks.OnFailureListener
 
 object CentralLocationManager {
-    var isLive: Boolean = false
+    var live: Boolean = false
     private var locationManager: LocationManager? = null
-    private lateinit var activity: Activity
+    private var activity: Activity? = null
     private const val requestCode = 1011
 
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun onCreate(activity: Activity) {
         this.activity = activity
-        locationManager = this.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        if(checkPermission()){
-            locationManager?.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
-        }
+        locationManager = this.activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        linkToCentralLocationListener()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun onResume(){
-        checkPermission() && checkLocationSetting()
+    fun linkToCentralLocationListener(){
+        if(checkPermission()){
+            if(live){
+                checkLocationSetting()
+            }else{
+                locationManager?.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
+            }
+            live = true
+        }
     }
 
-    fun onStop(){
-
-    }
-
-    private fun checkLocationSetting(): Boolean {
+    fun checkLocationSetting(): Boolean {
         if (!isLocationEnabled())
             showAlert()
         return isLocationEnabled()
@@ -52,12 +53,11 @@ object CentralLocationManager {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun checkPermission(): Boolean {
-        if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            return true
-        }
-        else{
+        return if (activity?.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || activity?.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions()
-            return false
+            false
+        } else {
+            true
         }
     }
 
@@ -67,7 +67,7 @@ object CentralLocationManager {
                 .setMessage("This part of the app cannot function without location, please enable it")
                 .setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
                     val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    activity.startActivity(myIntent)
+                    activity?.startActivity(myIntent)
                 }
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt -> })
         dialog.show()
@@ -75,24 +75,14 @@ object CentralLocationManager {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun requestPermissions(){
-        activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION), requestCode)
+        live = false
+        activity?.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION), requestCode)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if(requestCode == this.requestCode){
-            val granted: Boolean = grantResults.all { i -> i == PackageManager.PERMISSION_GRANTED}
-            if(grantResults.isNotEmpty() && granted){
-                /*if (activity.checkSelfPermission( Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // There's no logical way to reach here
-                    return
-                }*/
-                locationManager?.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener);
-            }
-            else{
-                //onFailure
-            }
+            linkToCentralLocationListener()
         }
     }
 

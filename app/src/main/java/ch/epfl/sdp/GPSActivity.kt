@@ -65,12 +65,6 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
         CentralLocationListener.subscribe(this)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    override fun onResume() {
-        super.onResume()
-        //checkPermission() && checkLocationSetting()
-        CentralLocationManager.onResume()
-    }
 
     fun goToMain(view: View?) {
         val intent = Intent(this,MainActivity::class.java)
@@ -161,7 +155,6 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
     override fun onStop() {
         super.onStop()
         CentralLocationListener.unsubscribe(this)
-        CentralLocationManager.onStop()
     }
 
 }
