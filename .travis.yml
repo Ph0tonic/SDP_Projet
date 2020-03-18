@@ -8,7 +8,8 @@ android:
     # The SDK version used by the system image
     - android-22
     # The system image, to run an emulator during the tests
-    - sys-img-armeabi-v7a-android-22
+    # - sys-img-armeabi-v7a-android-22
+    - sys-img-x86-android-22
 
 before_install:
   - chmod +x ./gradlew
