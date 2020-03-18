@@ -55,7 +55,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.preference:preference:1.1.0-rc01'
+    implementation 'androidx.preference:preference:1.1.0'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.1.0'
@@ -72,11 +72,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.1.1'
     androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    implementation "androidx.core:core-ktx:+"
+    implementation "androidx.core:core-ktx:1.2.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.0.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:4.9.0'
 }
 
 tasks.withType(Test) {
@@ -101,8 +100,4 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
             'outputs/code_coverage/debugAndroidTest/connected/*coverage.ec',
             'jacoco/testDebugUnitTest.exec'
     ]))
-}
-
-repositories {
-    mavenCentral()
 }
