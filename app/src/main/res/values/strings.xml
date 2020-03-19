@@ -25,4 +25,5 @@
 
     <string name="home_second">Home Second</string>
     <string name="start_misson_button">Start mission</string>
+    <string name="gps_refresh_rate_header">GPS refresh rate</string>
 </resources>
