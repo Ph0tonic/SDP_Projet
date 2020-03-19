@@ -9,10 +9,15 @@ android:
     # The SDK version used by the system image
     - android-22
     # The system image, to run an emulator during the tests
-    - sys-img-armeabi-v7a-android-22
+    - sys-img-arm64-v8a-android-22
 
 before_install:
   - chmod +x ./gradlew
+install:
+  - echo y | sdkmanager "ndk-bundle"
+  - echo y | sdkmanager "ndk;20.0.5594570"
+  - echo y | sdkmanager "cmake;3.6.4111459"
+  - echo y | sdkmanager "cmake;3.10.2.4988404"
 # Config cache to accelerate build time
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -24,8 +29,10 @@ cache:
     - $HOME/.android/build-cache
 
 before_script:
+  - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+  - export ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
   # Emulator Management: Create, Start and Wait
-  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - echo no | android create avd --force -n test -t android-22 --abi arm64-v8a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82  
