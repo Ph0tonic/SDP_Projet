@@ -1,6 +1,6 @@
 language: android
 sudo: true
-dist: bionic # ubuntu 18.04
+dist: trusty
 android:
   components:
     # The BuildTools version used by your project (make sure it's exactly the same as in the build.gradle)
