@@ -29,6 +29,6 @@ object CentralLocationListener : LocationListener {
     override fun onProviderEnabled(s: String) {}
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onProviderDisabled(s: String) {
-        CentralLocationManager.linkToCentralLocationListener()
+        CentralLocationManager.checkLocationSetting()
     }
 }

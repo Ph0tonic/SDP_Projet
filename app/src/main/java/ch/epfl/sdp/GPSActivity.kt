@@ -56,7 +56,7 @@ class GPSActivity : AppCompatActivity(), LocationSubscriber {
         }
 
          */
-        CentralLocationManager.onCreate(this)
+        CentralLocationManager.configure(this)
 
     }
 

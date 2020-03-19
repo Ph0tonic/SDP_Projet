@@ -18,42 +18,46 @@ import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.tasks.OnFailureListener
 
 object CentralLocationManager {
-    var live: Boolean = false
     private var locationManager: LocationManager? = null
     private var activity: Activity? = null
+    private var locationDisabledAlert: AlertDialog.Builder? = null
     private const val requestCode = 1011
 
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun onCreate(activity: Activity) {
+    fun configure(activity: Activity) {
         this.activity = activity
         locationManager = this.activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        linkToCentralLocationListener()
-    }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    fun linkToCentralLocationListener(){
+
+        locationDisabledAlert = AlertDialog.Builder(CentralLocationManager.activity)
+        locationDisabledAlert?.setTitle("Enable Location")
+                ?.setMessage("This part of the app cannot function without location, please enable it")
+                ?.setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
+                    val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    activity.startActivity(myIntent)
+                }
+                ?.setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt ->})
+
         if(checkPermission()){
-            if(live){
-                checkLocationSetting()
-            }else{
-                locationManager?.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
-            }
-            live = true
+            locationManager?.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
         }
     }
 
     fun checkLocationSetting(): Boolean {
-        if (!isLocationEnabled())
-            showAlert()
+        if (!isLocationEnabled()){
+            locationDisabledAlert?.show()
+        }
         return isLocationEnabled()
     }
 
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun checkPermission(): Boolean {
-        return if (activity?.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || activity?.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        return if(activity == null) {
+            false
+        } else if (ActivityCompat.checkSelfPermission(activity!!.applicationContext,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || activity?.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions()
             false
         } else {
@@ -61,28 +65,16 @@ object CentralLocationManager {
         }
     }
 
-    private fun showAlert() {
-        val dialog: AlertDialog.Builder = AlertDialog.Builder(activity)
-        dialog.setTitle("Enable Location")
-                .setMessage("This part of the app cannot function without location, please enable it")
-                .setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
-                    val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    activity?.startActivity(myIntent)
-                }
-                .setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt -> })
-        dialog.show()
-    }
-
     @RequiresApi(Build.VERSION_CODES.M)
     private fun requestPermissions(){
-        live = false
         activity?.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION), requestCode)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if(requestCode == this.requestCode){
-            linkToCentralLocationListener()
+        if(requestCode == this.requestCode && checkPermission()){
+            locationManager?.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
         }
     }
 
