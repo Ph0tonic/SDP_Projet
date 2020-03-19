@@ -9,7 +9,7 @@ android:
     # The SDK version used by the system image
     - android-24
     # The system image, to run an emulator during the tests
-    - sys-img-arm64-v8a-android-24
+    - sys-img-arm64-v8a-google_apis-24
 
 before_install:
   - chmod +x ./gradlew
