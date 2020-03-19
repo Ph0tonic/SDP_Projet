@@ -25,7 +25,7 @@ connected_check_task:
     - ./cc-test-reporter before-build
   run_instrumented_tests_script:
     ./gradlew build connectedCheck jacocoTestReport
-  report_codeclimate_results:
+  report_codeclimate_script:
     # Report test coverage to Code Climate
     - export JACOCO_SOURCE_PATH=app/src/main/java/
     - ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco
