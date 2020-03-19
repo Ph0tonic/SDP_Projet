@@ -16,8 +16,8 @@ before_install:
 install:
   - echo y | sdkmanager "ndk-bundle"
   - echo y | sdkmanager "ndk;20.0.5594570"
-  - echo y | sdkmanager "cmake;3.6.4111459"
   - echo y | sdkmanager "cmake;3.10.2.4988404"
+
 # Config cache to accelerate build time
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -29,13 +29,11 @@ cache:
     - $HOME/.android/build-cache
 
 before_script:
-  - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
-  - export ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
   # Emulator Management: Create, Start and Wait
   - echo no | android create avd --force -n test -t android-24 --abi x86
-  - emulator -avd test -no-accel -no-audio -no-window &
+  - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
-  - adb shell input keyevent 82  
+  - adb shell input keyevent 82
   # This should be in the `before_script` entry
   # Set up Code Climate test reporter
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
