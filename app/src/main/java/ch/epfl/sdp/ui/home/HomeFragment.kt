@@ -32,7 +32,7 @@ class HomeFragment : Fragment() {
         val startMissionButton: Button = root.findViewById(R.id.startMissionButton)
         startMissionButton.setOnClickListener {
             val dme = DroneMissionExample.makeDroneMission()
-            dme.startSimpleMission()
+            dme.startMission()
         }
         return root
     }

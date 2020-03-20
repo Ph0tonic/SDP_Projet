@@ -21,7 +21,7 @@ object DroneMissionExample {
         return this
     }
 
-    fun startSimpleMission(){
+    fun startMission(){
        // drone.getAction().arm().subscribe()
         drone.action.arm().andThen(drone.action.takeoff()).subscribe()
         drone.getMission()
@@ -30,30 +30,6 @@ object DroneMissionExample {
                 .andThen(drone.getAction().arm())
                 .andThen(drone.getMission().startMission())
                 .subscribe()
-
-    }
-
-    @SuppressLint("CheckResult")
-    public fun startMission() {
-        drone!!.mission
-                .setReturnToLaunchAfterMission(true)
-                .andThen(drone?.mission?.uploadMission(missionItems))
-                .andThen(drone?.action?.arm())
-                .andThen(drone?.mission?.startMission())
-                .subscribe()
-
-        val latch = CountDownLatch(1)
-        drone!!.mission
-                .missionProgress
-                .filter { progress: Mission.MissionProgress -> progress.currentItemIndex === progress.missionCount }
-                .take(1)
-                .subscribe { ignored: Mission.MissionProgress? -> latch.countDown() }
-
-        try {
-            latch.await()
-        } catch (ignored: InterruptedException) {
-            // This is expected
-        }
 
     }
 
