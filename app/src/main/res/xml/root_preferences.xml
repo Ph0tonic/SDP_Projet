@@ -18,5 +18,12 @@
             android:key="maps"
             android:title="Selected Maps" />
     </PreferenceCategory>
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/gps_refresh_rate_entries"
+        android:entryValues="@array/gps_refresh_rate_values"
+        android:key="gps_refresh_rate"
+        android:title="@string/gps_refresh_rate_header"
+        app:useSimpleSummaryProvider="true" />
 
 </PreferenceScreen>

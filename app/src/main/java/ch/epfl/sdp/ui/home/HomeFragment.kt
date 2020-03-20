@@ -1,5 +1,6 @@
 package ch.epfl.sdp.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import ch.epfl.sdp.DroneMissionExample
 import ch.epfl.sdp.R
+import ch.epfl.sdp.ui.maps.SupportMapFragmentActivity
 
 class HomeFragment : Fragment() {
 
@@ -33,6 +35,11 @@ class HomeFragment : Fragment() {
         startMissionButton.setOnClickListener {
             val dme = DroneMissionExample.makeDroneMission()
             dme.startMission()
+
+        val button: Button = root.findViewById(R.id.display_map)
+        button.setOnClickListener {
+            startActivity(Intent(context, SupportMapFragmentActivity::class.java))
+          
         }
         return root
     }
