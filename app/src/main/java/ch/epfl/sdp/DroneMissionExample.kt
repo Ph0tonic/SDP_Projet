@@ -22,7 +22,15 @@ object DroneMissionExample {
     }
 
     fun startSimpleMission(){
-        drone.getAction().arm().subscribe()
+       // drone.getAction().arm().subscribe()
+        drone.action.arm().andThen(drone.action.takeoff()).subscribe()
+        drone.getMission()
+                .setReturnToLaunchAfterMission(true)
+                .andThen(drone.getMission().uploadMission(missionItems))
+                .andThen(drone.getAction().arm())
+                .andThen(drone.getMission().startMission())
+                .subscribe()
+
     }
 
     @SuppressLint("CheckResult")
