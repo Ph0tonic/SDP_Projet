@@ -9,14 +9,20 @@ import java.util.concurrent.CountDownLatch
 
 object DroneMissionExample {
     //must be IP address where the mavsdk_server is running
-    private val BACKEND_IP_ADDRESS = "127.0.0.1"
+    //private val BACKEND_IP_ADDRESS = "127.0.0.1"
+    private val BACKEND_IP_ADDRESS = "192.168.1.11"
+    //private val BACKEND_IP_ADDRESS = "10.0.2.15"
+
     private val missionItems: ArrayList<Mission.MissionItem> = arrayListOf<Mission.MissionItem>()
-    private var drone: System? = null
+    private var drone = System(BACKEND_IP_ADDRESS, 50020)
 
     fun makeDroneMission(): DroneMissionExample {
-        var drone = System(BACKEND_IP_ADDRESS, 50020)
         addMissionItems()
         return this
+    }
+
+    fun startSimpleMission(){
+        drone.getAction().arm().subscribe()
     }
 
     @SuppressLint("CheckResult")
