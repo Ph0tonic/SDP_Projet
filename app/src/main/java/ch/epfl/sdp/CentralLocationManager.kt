@@ -27,6 +27,7 @@ object CentralLocationManager {
     @RequiresApi(Build.VERSION_CODES.M)
     fun configure(activity: Activity) {
         this.activity = activity
+        Log.d("-----------------------", "Configuring: $activity")
         locationManager = this.activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
 
 
@@ -56,6 +57,7 @@ object CentralLocationManager {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun checkPermission(): Boolean {
         return if(activity == null) {
+            Log.e("-----------------------","Activity null !")
             false
         } else if (ActivityCompat.checkSelfPermission(activity!!.applicationContext,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || activity?.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions()

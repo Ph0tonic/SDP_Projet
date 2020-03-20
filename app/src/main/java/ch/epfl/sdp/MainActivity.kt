@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -58,12 +59,17 @@ class MainActivity : AppCompatActivity() {
                 .requestEmail()
                 .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+
+
     }
 
     override fun onStart() {
         super.onStart()
         val account = GoogleSignIn.getLastSignedInAccount(this)
         //updateUserView(account?.displayName, account?.email)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            CentralLocationManager.configure(this)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
