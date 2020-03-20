@@ -85,7 +85,7 @@ class MainActivityTest {
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("latitude", null) == null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("lontitude", null) == null)
+                .getString("longitude", null) == null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("zoom", null) == null)
 
