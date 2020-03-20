@@ -30,7 +30,6 @@ object DroneMissionExample {
                 .andThen(drone.getAction().arm())
                 .andThen(drone.getMission().startMission())
                 .subscribe()
-
     }
 
     private fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
