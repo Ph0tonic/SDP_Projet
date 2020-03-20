@@ -31,6 +31,12 @@ class HomeFragment : Fragment() {
             textView.text = it
         })
 
+
+        val button: Button = root.findViewById(R.id.display_map)
+        button.setOnClickListener {
+            startActivity(Intent(context, SupportMapFragmentActivity::class.java))
+        }
+
         val startMissionButton: Button = root.findViewById(R.id.startMissionButton)
         startMissionButton.setOnClickListener {
             val dme = DroneMissionExample.makeDroneMission()
@@ -39,7 +45,6 @@ class HomeFragment : Fragment() {
             val button: Button = root.findViewById(R.id.display_map)
             button.setOnClickListener {
                 startActivity(Intent(context, SupportMapFragmentActivity::class.java))
-
             }
         }
         return root

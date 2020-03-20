@@ -1,10 +1,8 @@
 package ch.epfl.sdp
 
-import android.annotation.SuppressLint
 import io.mavsdk.System
 import io.mavsdk.mission.Mission
 import java.util.*
-import java.util.concurrent.CountDownLatch
 
 
 object DroneMissionExample {
@@ -49,5 +47,4 @@ object DroneMissionExample {
         missionItems.add(generateMissionItem(47.397825620791885, 8.5450092830163271))
         missionItems.add(generateMissionItem(47.397832880000003, 8.5455939999999995))
     }
-
 }
