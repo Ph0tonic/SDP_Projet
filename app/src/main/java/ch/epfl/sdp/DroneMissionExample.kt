@@ -8,7 +8,7 @@ import java.util.*
 object DroneMissionExample {
     //must be IP address where the mavsdk_server is running
     //private val BACKEND_IP_ADDRESS = "127.0.0.1"
-    private val BACKEND_IP_ADDRESS = "192.168.1.11"
+    private val BACKEND_IP_ADDRESS = "10.0.2.2"
     //private val BACKEND_IP_ADDRESS = "10.0.2.15"
 
     private val missionItems: ArrayList<Mission.MissionItem> = arrayListOf<Mission.MissionItem>()
@@ -21,13 +21,13 @@ object DroneMissionExample {
 
     fun startMission(){
        // drone.getAction().arm().subscribe()
-        drone.action.arm().andThen(drone.action.takeoff()).subscribe()
         drone.getMission()
                 .setReturnToLaunchAfterMission(true)
                 .andThen(drone.getMission().uploadMission(missionItems))
-                .andThen(drone.getAction().arm())
+                //.andThen(drone.getAction().arm())
                 .andThen(drone.getMission().startMission())
                 .subscribe()
+        drone.action.arm().andThen(drone.action.takeoff()).subscribe()
     }
 
     private fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
