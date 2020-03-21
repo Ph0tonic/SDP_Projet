@@ -24,7 +24,6 @@ object DroneMissionExample {
         drone.getMission()
                 .setReturnToLaunchAfterMission(true)
                 .andThen(drone.getMission().uploadMission(missionItems))
-                //.andThen(drone.getAction().arm())
                 .andThen(drone.getMission().startMission())
                 .subscribe()
         drone.action.arm().andThen(drone.action.takeoff()).subscribe()
