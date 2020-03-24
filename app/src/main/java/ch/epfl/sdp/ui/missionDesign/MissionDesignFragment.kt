@@ -12,18 +12,18 @@ import ch.epfl.sdp.R
 
 class MissionDesignFragment : Fragment() {
 
-    private lateinit var missionDeignViewModel: MissionDeignViewModel
+    private lateinit var missionDesignViewModel: MissionDesignViewModel
 
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        missionDeignViewModel =
-                ViewModelProviders.of(this).get(MissionDeignViewModel::class.java)
+        missionDesignViewModel =
+                ViewModelProviders.of(this).get(MissionDesignViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_mission_design, container, false)
         val textView: TextView = root.findViewById(R.id.text_gallery)
-        missionDeignViewModel.text.observe(viewLifecycleOwner, Observer {
+        missionDesignViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = "Misson design fragment \n (select areas here)"
         })
         return root

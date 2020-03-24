@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +23,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import io.mavsdk.mission.Mission
 
 class MainActivity : AppCompatActivity() {
 
@@ -107,5 +109,34 @@ class MainActivity : AppCompatActivity() {
         usernameView.text = username ?: "default_username"
         userEmailView.text = userEmail ?: "default_email"
         //userImageView.setImageDrawable(userImage)
+    }
+
+    fun goThere(view: View) {
+        val latitudeTV: TextView = findViewById(R.id.targetLatitudeText)
+        val longitudeTV: TextView = findViewById(R.id.targetLongitudeText)
+        val targetLatitude = latitudeTV.text.toString().toDouble()
+        val targetLongitude = longitudeTV.text.toString().toDouble()
+
+        Log.d("--------------------","$targetLatitude")
+        Log.d("--------------------","$targetLongitude")
+
+        val target :Mission.MissionItem = Mission.MissionItem(
+                targetLatitude,
+                targetLongitude,
+                10f,
+                10f,
+                true, Float.NaN, Float.NaN,
+                Mission.MissionItem.CameraAction.NONE, Float.NaN,
+                1.0)
+
+        Drone.instance.mission
+                .uploadMission(listOf(target))
+
+        Drone.instance.mission
+                .setReturnToLaunchAfterMission(true)
+                .andThen(Drone.instance.action.arm())
+                .andThen(Drone.instance.action.takeoff())
+                .andThen(Drone.instance.mission.startMission())
+                .subscribe()
     }
 }
