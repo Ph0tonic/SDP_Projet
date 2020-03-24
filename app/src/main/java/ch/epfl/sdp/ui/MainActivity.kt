@@ -25,6 +25,7 @@ import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
+import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.ui.settings.SettingsActivity
@@ -182,5 +183,9 @@ class MainActivity : AppCompatActivity() {
     fun openDrawer(view: View) {
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         drawerLayout.openDrawer(GravityCompat.START)
+    }
+
+    fun openMapForOfflineDownload (view: View?) {
+        startActivity(Intent(this, OfflineManagerActivity::class.java))
     }
 }
