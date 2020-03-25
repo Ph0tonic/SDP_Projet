@@ -1,7 +1,8 @@
 package ch.epfl.sdp
 
-import io.mavsdk.System
+import android.util.Log
 import io.mavsdk.mission.Mission
+import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 
 
@@ -15,12 +16,12 @@ object DroneMissionExample {
 
     fun startMission(){
         var drone = Drone.instance
-        drone.getMission()
+        drone.mission
                 .setReturnToLaunchAfterMission(true)
-                .andThen(drone.getMission().uploadMission(missionItems))
-                .andThen(drone.getMission().startMission())
+                .andThen(drone.mission.uploadMission(missionItems))
+                .andThen(drone.action.arm())
+                .andThen(drone.mission.startMission())
                 .subscribe()
-        drone.action.arm().andThen(drone.action.takeoff()).subscribe()
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
