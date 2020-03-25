@@ -46,16 +46,16 @@ class DroneMissionExampleTest {
     }
 
     fun missionEquality (m1 : Mission.MissionItem, m2 : Mission.MissionItem) : Boolean{
-        val lat = m1.getLatitudeDeg().equals(m2.getLatitudeDeg())
-        val lon = m1.getLongitudeDeg().equals(m2.getLongitudeDeg())
-        val alt = m1.getRelativeAltitudeM().equals(m2.getRelativeAltitudeM())
-        val spe = m1.getSpeedMS().equals(m2.getSpeedMS())
-        val fly = m1.getIsFlyThrough() == m2.getIsFlyThrough()
-        val gim = m1.getGimbalPitchDeg().equals(m2.getGimbalPitchDeg())
-        val yaw = m1.getGimbalPitchDeg().equals(m2.getGimbalPitchDeg())
-        val cam = m1.getCameraAction() == m2.getCameraAction()
-        val loi = m1.getLoiterTimeS().equals(m2.getLoiterTimeS())
-        val gcpi = m1.getCameraPhotoIntervalS().equals(m2.getCameraPhotoIntervalS())
+        val lat = m1.latitudeDeg.equals(m2.latitudeDeg)
+        val lon = m1.longitudeDeg.equals(m2.longitudeDeg)
+        val alt = m1.relativeAltitudeM.equals(m2.relativeAltitudeM)
+        val spe = m1.speedMS.equals(m2.speedMS)
+        val fly = m1.isFlyThrough == m2.isFlyThrough
+        val gim = m1.gimbalPitchDeg.equals(m2.gimbalPitchDeg)
+        val yaw = m1.gimbalPitchDeg.equals(m2.gimbalPitchDeg)
+        val cam = m1.cameraAction == m2.cameraAction
+        val loi = m1.loiterTimeS.equals(m2.loiterTimeS)
+        val gcpi = m1.cameraPhotoIntervalS.equals(m2.cameraPhotoIntervalS)
         return lat and lon and alt and spe and fly and gim and yaw and cam and loi and gcpi
     }
 }
