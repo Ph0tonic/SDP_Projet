@@ -7,7 +7,6 @@ import java.util.*
 
 object DroneMissionExample {
     private val missionItems: ArrayList<Mission.MissionItem> = arrayListOf<Mission.MissionItem>()
-    private var drone = Drone.instance
 
     fun makeDroneMission(): DroneMissionExample {
         addMissionItems()
@@ -15,7 +14,8 @@ object DroneMissionExample {
     }
 
     fun startMission(){
-       // drone.getAction().arm().subscribe()
+        var drone = Drone.instance
+        // drone.getAction().arm().subscribe()
         drone.getMission()
                 .setReturnToLaunchAfterMission(true)
                 .andThen(drone.getMission().uploadMission(missionItems))
