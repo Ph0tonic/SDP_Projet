@@ -41,4 +41,8 @@ object DroneMissionExample {
         missionItems.add(generateMissionItem(47.397825620791885, 8.5450092830163271))
         missionItems.add(generateMissionItem(47.397832880000003, 8.5455939999999995))
     }
+
+    fun getMissionItems(): ArrayList<Mission.MissionItem> {
+        return missionItems
+    }
 }
