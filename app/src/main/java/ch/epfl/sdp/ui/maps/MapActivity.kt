@@ -1,7 +1,13 @@
 package ch.epfl.sdp.ui.maps
 
+import androidx.preference.PreferenceManager
+import ch.epfl.sdp.drone.Drone
+import com.mapbox.mapboxsdk.camera.CameraPosition
+import com.mapbox.mapboxsdk.maps.Style
+
 import android.R
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,6 +23,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.plugins.annotation.*
+import com.mapbox.mapboxsdk.utils.ColorUtils
 import io.mavsdk.mavsdkserver.MavsdkServer
 
 import io.reactivex.disposables.Disposable
@@ -28,100 +35,135 @@ import io.reactivex.disposables.Disposable
  * 2. Long click on map to add a waypoint
  * 3. Hit play to start mission.
  */
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+
+
+class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    private var mapView: MapView? = null
+    private var mapboxMap: MapboxMap? = null
 
     private var circleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
-    private var mapView: MapView? = null
-    private var map: MapboxMap? = null
-    //private var viewModel: MapsViewModel? = null
     private var currentPositionMarker: Symbol? = null
     private var drone: System? = null
     private val waypoints: MutableList<Circle> = ArrayList()
-    private val disposables: MutableList<Disposable> = ArrayList()
-    private var currentPositionObserver: Observer<LatLng>
-    private var currentMissionPlanObserver: Observer<List<LatLng>>
 
-    init {
-        currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
-        currentMissionPlanObserver = Observer<List<LatLng>> { latLngs: List<LatLng> -> updateMarkers(latLngs) }
-    }
+    private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
+    //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
-    public override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, getString(R.string.access_token))
-        setContentView(R.layout.activity_maps)
+
+        // Mapbox access token is configured here. This needs to be called either in your application
+        // object or in the same activity which contains the mapview.
+        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
+
+        setContentView(R.layout.activity_map)
+
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView?.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+
+        Drone.currentPositionLiveData.observe(this, currentPositionObserver)
+        // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView?.onPause()
+
+        Drone.currentPositionLiveData.removeObserver(currentPositionObserver)
+        //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
+                .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
+                .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
+                .apply();
+        mapView?.onStop()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView?.onSaveInstanceState(outState)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView?.onLowMemory()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapView?.onDestroy()
+    }
+
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        this.mapboxMap = mapboxMap
+        mapboxMap.setStyle(Style.MAPBOX_STREETS)
+
+        mapboxMap.setStyle(Style.LIGHT) { style ->
+            // Add the marker image to map
+//            style.addImage("marker-icon-id",
+//                    BitmapFactory.decodeResource(
+//                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
+            symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
+            symbolManager!!.setIconAllowOverlap(true)
+            circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
+        }
+
+        // Load latest location
+        val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("latitude", null)?.toDouble() ?: -52.6885
+        val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("longitude", null)?.toDouble() ?: -70.1395
+        val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("zoom", null)?.toDouble() ?: 9.0
+
+        mapboxMap.cameraPosition = CameraPosition.Builder()
+                .target(LatLng(latitude, longitude))
+                .zoom(zoom)
+                .build()
+
+
+//        mapboxMap.uiSettings.isRotateGesturesEnabled = false
+//        mapboxMap.uiSettings.isTiltGesturesEnabled = false
+        // Allow to pinpoint
+//        mapboxMap.addOnMapLongClickListener { point: LatLng? ->
+//            viewModel.addWaypoint(point)
+//            true
+//        }
+    }
+
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    public override fun _onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         viewModel = ViewModelProviders.of(this).get(MapsViewModel::class.java)
         val floatingActionButton = findViewById<FloatingActionButton>(R.id.fab)
         floatingActionButton.setOnClickListener { v: View? -> viewModel.startMission(drone) }
     }
 
-    public override fun onStart() {
-        super.onStart()
-        mapView!!.onStart()
-    }
-
-    public override fun onResume() {
-        super.onResume()
-        mapView!!.onResume()
-        viewModel.currentPositionLiveData.observe(this, currentPositionObserver)
-        viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
-        Thread(Runnable {
-            val mavsdkServer = MavsdkServer()
-            mavsdkServer.run("udp://:14540", 50020)
-        }).start()
-        drone = System(BACKEND_IP_ADDRESS, 50020)
-        disposables.add(drone!!.telemetry.flightMode.distinct()
-                .subscribe { flightMode -> Log.d(this.javaClass.simpleName,"flight mode: $flightMode") })
-        disposables.add(drone!!.telemetry.armed.distinct()
-                .subscribe { armed -> Log.d(this.javaClass.simpleName,"armed: $armed") })
-        disposables.add(drone!!.telemetry.position.subscribe { position ->
-            val latLng = LatLng(position.latitudeDeg, position.longitudeDeg)
-            viewModel.currentPositionLiveData.postValue(latLng)
-        })
-    }
-
-    public override fun onPause() {
-        super.onPause()
-        mapView!!.onPause()
-        viewModel.currentPositionLiveData.removeObserver(currentPositionObserver)
-        viewModel.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
-        for (disposable in disposables) {
-            disposable.dispose()
-        }
-        drone?.dispose()
-        drone = null
-    }
-
-    public override fun onStop() {
-        super.onStop()
-        mapView!!.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView!!.onLowMemory()
-    }
-
-    public override fun onDestroy() {
-        super.onDestroy()
-        mapView!!.onDestroy()
-    }
-
-    public override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_maps, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun _onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle item selection
         when (item.getItemId()) {
             R.id.disarm -> drone.getAction().kill().subscribe()
@@ -139,7 +181,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateVehiclePosition(newLatLng: LatLng) {
-        if (newLatLng == null || map == null || symbolManager == null) {
+        if (mapboxMap == null || symbolManager == null) {
             // Not ready
             return
         }
@@ -149,12 +191,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val symbolOptions = SymbolOptions()
             symbolOptions.withLatLng(newLatLng)
             symbolOptions.withIconImage("marker-icon-id")
-            currentPositionMarker = symbolManager.create(symbolOptions)
-            map!!.moveCamera(CameraUpdateFactory.tiltTo(0.0))
-            map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
+            currentPositionMarker = symbolManager!!.create(symbolOptions)
+            mapboxMap!!.moveCamera(CameraUpdateFactory.tiltTo(0.0))
+            mapboxMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
-            currentPositionMarker.setLatLng(newLatLng)
-            symbolManager.update(currentPositionMarker)
+            currentPositionMarker!!.setLatLng(newLatLng)
+            symbolManager!!.update(currentPositionMarker)
         }
     }
 
@@ -165,7 +207,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun updateMarkers(latLngs: List<LatLng>) {
         if (circleManager != null) {
-            circleManager.delete(waypoints)
+            circleManager!!.delete(waypoints)
             waypoints.clear()
         }
         for (latLng in latLngs) {
@@ -176,36 +218,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     .withCircleStrokeWidth(1.0f)
                     .withCircleRadius(12f)
                     .withDraggable(false)
-            circleManager.create(circleOptions)
+            circleManager?.create(circleOptions)
         }
     }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera.
-     */
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        mapboxMap.uiSettings.isRotateGesturesEnabled = false
-        mapboxMap.uiSettings.isTiltGesturesEnabled = false
-        mapboxMap.addOnMapLongClickListener { point: LatLng? ->
-            viewModel.addWaypoint(point)
-            true
-        }
-        mapboxMap.setStyle(Style.LIGHT) { style ->
-            // Add the marker image to map
-            style.addImage("marker-icon-id",
-                    BitmapFactory.decodeResource(
-                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
-            symbolManager = SymbolManager(mapView, map, style)
-            symbolManager.setIconAllowOverlap(true)
-            circleManager = CircleManager(mapView, map, style)
-        }
-        map = mapboxMap
-    }
-
-    companion object {
-        const val BACKEND_IP_ADDRESS = "127.0.0.1"
-    }
-
 }
+
+
