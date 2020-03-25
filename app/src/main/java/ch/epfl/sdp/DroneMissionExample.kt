@@ -15,7 +15,6 @@ object DroneMissionExample {
 
     fun startMission(){
         var drone = Drone.instance
-        // drone.getAction().arm().subscribe()
         drone.getMission()
                 .setReturnToLaunchAfterMission(true)
                 .andThen(drone.getMission().uploadMission(missionItems))

@@ -15,7 +15,6 @@ class DroneMissionExampleTest {
         for (x in 0..n) {
             val randomLatitude = ThreadLocalRandom.current().nextDouble(-90.0, 90.0)
             val randomLongitude = ThreadLocalRandom.current().nextDouble(0.0, 180.0)
-            var latitude = 90 //-90 to 90
             var mission = Mission.MissionItem(
                     randomLatitude,
                     randomLongitude,
@@ -25,7 +24,7 @@ class DroneMissionExampleTest {
                     Mission.MissionItem.CameraAction.NONE, Float.NaN,
                     1.0)
             var expectedMission = DME.generateMissionItem(randomLatitude, randomLongitude)
-            Assert.assertEquals(mission, expectedMission)
+            Assert.assertTrue(missionEquality(expectedMission, mission))
         }
     }
 
@@ -40,6 +39,25 @@ class DroneMissionExampleTest {
         val droneMissionExample =  DME.makeDroneMission()
         val missionsItems = droneMissionExample.getMissionItems()
 
-        Assert.assertEquals(expectedMissionItems, missionsItems)
+        for((i, expectedMission) in expectedMissionItems.withIndex()){
+            Assert.assertTrue(missionEquality(expectedMission, missionsItems[i]))
+        }
+
+    }
+
+    fun missionEquality (m1 : Mission.MissionItem, m2 : Mission.MissionItem) : Boolean{
+        val lat = m1.getLatitudeDeg().equals(m2.getLatitudeDeg())
+        val lon = m1.getLongitudeDeg().equals(m2.getLongitudeDeg())
+        val alt = m1.getRelativeAltitudeM().equals(m2.getRelativeAltitudeM())
+        val spe = m1.getSpeedMS().equals(m2.getSpeedMS())
+        val fly = m1.getIsFlyThrough() == m2.getIsFlyThrough()
+        val gim = m1.getGimbalPitchDeg().equals(m2.getGimbalPitchDeg())
+        val yaw = m1.getGimbalPitchDeg().equals(m2.getGimbalPitchDeg())
+        val cam = m1.getCameraAction() == m2.getCameraAction()
+        val loi = m1.getLoiterTimeS().equals(m2.getLoiterTimeS())
+        val gcpi = m1.getCameraPhotoIntervalS().equals(m2.getCameraPhotoIntervalS())
+        return lat and lon and alt and spe and fly and gim and yaw and cam and loi and gcpi
     }
 }
+
+
