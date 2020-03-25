@@ -164,10 +164,6 @@ class MainActivityTest {
 
     @Test
     fun canStartMission(){
-        try {
-            onView(withId(R.id.startMissionButton)).perform(click())
-        }catch (e : Exception){
-            assert(true)
-        }
+        onView(withId(R.id.startMissionButton)).perform(click())
     }
 }

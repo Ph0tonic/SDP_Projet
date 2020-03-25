@@ -17,7 +17,6 @@ object DroneMissionExample {
     }
 
     fun startMission(){
-
             var drone = Drone.instance
             var isConnectedCompletable = drone.getCore().getConnectionState()
                 .filter{state -> state.getIsConnected()}
@@ -30,15 +29,6 @@ object DroneMissionExample {
                     .andThen(drone.action.arm())
                     .andThen(drone.mission.startMission())
                     .subscribe()
-
-    /*        val connectionState = drone.core.connectionState.blockingFirst().isConnected
-            if (!connectionState) return
-            drone.mission
-                    .setReturnToLaunchAfterMission(true).onErrorComplete()
-                    .andThen(drone.mission.uploadMission(missionItems))
-                    .andThen(drone.action.arm())
-                    .andThen(drone.mission.startMission())
-                    .subscribe()*/
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
