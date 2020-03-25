@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import android.util.Log
 import io.mavsdk.mission.Mission
 import kotlinx.android.synthetic.main.fragment_home.*
+import java.lang.Exception
 import java.util.*
 
 
@@ -15,13 +16,16 @@ object DroneMissionExample {
     }
 
     fun startMission(){
-        var drone = Drone.instance
-        drone.mission
-                .setReturnToLaunchAfterMission(true)
-                .andThen(drone.mission.uploadMission(missionItems))
-                .andThen(drone.action.arm())
-                .andThen(drone.mission.startMission())
-                .subscribe()
+
+            var drone = Drone.instance
+            val connectionState = drone.core.connectionState.blockingFirst().isConnected
+            if (!connectionState) return
+            drone.mission
+                    .setReturnToLaunchAfterMission(true).onErrorComplete()
+                    .andThen(drone.mission.uploadMission(missionItems))
+                    .andThen(drone.action.arm())
+                    .andThen(drone.mission.startMission())
+                    .subscribe()
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
