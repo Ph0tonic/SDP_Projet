@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.util.Log
 import io.mavsdk.mission.Mission
+import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.lang.Exception
 import java.util.*
@@ -18,14 +19,26 @@ object DroneMissionExample {
     fun startMission(){
 
             var drone = Drone.instance
-            val connectionState = drone.core.connectionState.blockingFirst().isConnected
+            var isConnectedCompletable = drone.getCore().getConnectionState()
+                .filter{state -> state.getIsConnected()}
+                .firstOrError()
+                .toCompletable()
+
+            isConnectedCompletable
+                    .andThen(drone.mission.setReturnToLaunchAfterMission(true))
+                    .andThen(drone.mission.uploadMission(missionItems))
+                    .andThen(drone.action.arm())
+                    .andThen(drone.mission.startMission())
+                    .subscribe()
+
+    /*        val connectionState = drone.core.connectionState.blockingFirst().isConnected
             if (!connectionState) return
             drone.mission
                     .setReturnToLaunchAfterMission(true).onErrorComplete()
                     .andThen(drone.mission.uploadMission(missionItems))
                     .andThen(drone.action.arm())
                     .andThen(drone.mission.startMission())
-                    .subscribe()
+                    .subscribe()*/
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
