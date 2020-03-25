@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import ch.epfl.sdp.DroneMissionExample
 import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.maps.MapActivity
 
@@ -28,10 +29,16 @@ class HomeFragment : Fragment() {
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })
-
-        val button: Button = root.findViewById(R.id.display_map) as Button
+      
+        val button: Button = root.findViewById(R.id.display_map)
         button.setOnClickListener {
             startActivity(Intent(context, MapActivity::class.java))
+        }
+
+        val startMissionButton: Button = root.findViewById(R.id.startMissionButton)
+        startMissionButton.setOnClickListener {
+            val dme = DroneMissionExample.makeDroneMission()
+            dme.startMission()
         }
         return root
     }

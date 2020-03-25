@@ -28,7 +28,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
     private var mUiDevice: UiDevice? = null
@@ -161,5 +160,10 @@ class MainActivityTest {
             mActivityRule.activity.onSupportNavigateUp()
         }
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun canStartMission(){
+        onView(withId(R.id.startMissionButton)).perform(click())
     }
 }
