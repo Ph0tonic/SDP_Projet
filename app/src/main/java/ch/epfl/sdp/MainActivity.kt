@@ -67,9 +67,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         val account = GoogleSignIn.getLastSignedInAccount(this)
         //updateUserView(account?.displayName, account?.email)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            CentralLocationManager.configure(this)
-        }
+        CentralLocationManager.configure(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -24,7 +24,6 @@ object CentralLocationManager {
     private const val requestCode = 1011
 
 
-    @RequiresApi(Build.VERSION_CODES.M)
     fun configure(activity: Activity) {
         this.activity = activity
         Log.d("-----------------------", "Configuring: $activity")
@@ -54,12 +53,11 @@ object CentralLocationManager {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun checkPermission(): Boolean {
         return if(activity == null) {
             Log.e("-----------------------","Activity null !")
             false
-        } else if (ActivityCompat.checkSelfPermission(activity!!.applicationContext,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || activity?.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        } else if (ActivityCompat.checkSelfPermission(activity!!.applicationContext,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(activity!!.applicationContext,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions()
             false
         } else {
@@ -67,12 +65,10 @@ object CentralLocationManager {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun requestPermissions(){
-        activity?.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION), requestCode)
+        ActivityCompat.requestPermissions(activity!!,arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION), requestCode)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if(requestCode == this.requestCode && checkPermission()){
             locationManager?.requestLocationUpdates(
