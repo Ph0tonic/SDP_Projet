@@ -24,7 +24,7 @@ object DroneMissionExample {
         drone.action.arm().andThen(drone.action.takeoff()).subscribe()
     }
 
-    private fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
+    fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
         return Mission.MissionItem(
                 latitudeDeg,
                 longitudeDeg,
@@ -35,7 +35,7 @@ object DroneMissionExample {
                 1.0)
     }
 
-    private fun addMissionItems() {
+    fun addMissionItems() {
         missionItems.add(generateMissionItem(47.398039859999997, 8.5455725400000002))
         missionItems.add(generateMissionItem(47.398036222362471, 8.5450146439425509))
         missionItems.add(generateMissionItem(47.397825620791885, 8.5450092830163271))
