@@ -162,4 +162,9 @@ class MainActivityTest {
         }
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
     }
+
+    @Test
+    fun canStartMission(){
+        onView(withId(R.id.startMissionButton)).perform(click())
+    }
 }
