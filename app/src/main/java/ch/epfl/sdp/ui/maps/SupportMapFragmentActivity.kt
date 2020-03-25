@@ -1,19 +1,16 @@
 package ch.epfl.sdp.ui.maps
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.Mapbox.getInstance
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
-
 
 class SupportMapFragmentActivity : AppCompatActivity() {
 
@@ -35,7 +32,7 @@ class SupportMapFragmentActivity : AppCompatActivity() {
             // Build mapboxMap
             val options = MapboxMapOptions.createFromAttributes(this, null)
 
-            //TODO: Load latest location
+            //Load latest location
             val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
                     .getString("latitude", null)?.toDouble() ?: -52.6885
             val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
