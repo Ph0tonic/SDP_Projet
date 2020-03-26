@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuItemCompat.setContentDescription
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.Mapbox.getInstance
@@ -38,7 +39,8 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapView = findViewById(R.id.trajectory_planning_mapView)
         mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+
+        mapView?.contentDescription = "MAP NOT READY"
 
         mapView?.getMapAsync(OnMapReadyCallback { mapboxMap: MapboxMap ->
             mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
@@ -125,6 +127,8 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
                 .target(LatLng(latitude, longitude))
                 .zoom(zoom)
                 .build()
+
+        mapView?.contentDescription = "MAP READY"
     }
 
     fun returnPathToMissionDesign(view: View) {
