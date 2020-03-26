@@ -13,10 +13,11 @@ object MapUtils {
     private const val DEFAULT_ZOOM: Double = 9.0
 
     private fun loadLastMapPositionFromPrefs(context: Context): LatLng{
-        val latitude: Double = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString("latitude", null)?.toDouble() ?: DEFAULT_LATITUDE
-        val longitude: Double = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString("longitude", null)?.toDouble() ?: DEFAULT_LONGITUDE
+        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val latitude: Double = defaultSharedPrefs
+                .getString("latitude", null)?.toDoubleOrNull() ?: DEFAULT_LATITUDE
+        val longitude: Double = defaultSharedPrefs
+                .getString("longitude", null)?.toDoubleOrNull() ?: DEFAULT_LONGITUDE
         return LatLng(latitude,longitude)
     }
 
@@ -33,7 +34,7 @@ object MapUtils {
 
     private fun loadLastMapZoomFromPrefs(context: Context): Double{
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString("zoom", null)?.toDouble() ?: DEFAULT_ZOOM
+                .getString("zoom", null)?.toDoubleOrNull() ?: DEFAULT_ZOOM
     }
 
     /**

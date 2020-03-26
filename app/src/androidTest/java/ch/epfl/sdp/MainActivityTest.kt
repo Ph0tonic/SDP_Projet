@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Context
+import android.content.Intent
 import android.view.Gravity
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
@@ -171,8 +172,9 @@ class MainActivityTest {
     fun goToTrajectoryDesignActuallyOpensTrajectoryDesignActivity(){
         openDrawer()
         onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design));
+                .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design))
         onView(withId(R.id.go_to_trajectory_planning_button)).perform(click())
-        intended(hasComponent(TrajectoryPlanningActivity::class.java.name))
+        val intent = Intent(mActivityRule.activity, TrajectoryPlanningActivity::class.java)
+        intended(filterEquals(intent))
     }
 }
