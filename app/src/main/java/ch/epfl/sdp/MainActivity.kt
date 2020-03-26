@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             try {
                 val account : GoogleSignInAccount? = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
-                updateUserView(account?.displayName ?: "default_username", account?.email ?: "default_email", account?.photoUrl.toString() )
+                updateUserView(account?.displayName, account?.email, account?.photoUrl.toString())
             } catch (e: ApiException) {
                 Snackbar.make(findViewById(R.id.main_nav_header), "Could not sign in :(", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show()
@@ -110,8 +110,8 @@ class MainActivity : AppCompatActivity() {
         val userEmailView: TextView = findViewById(R.id.nav_user_email)
         val userImageView: ImageView = findViewById(R.id.nav_user_image)
 
-        usernameView.text = username
-        userEmailView.text = userEmail
+        usernameView.text = username ?: "default_username"
+        userEmailView.text = userEmail ?: "default_email"
 
         Glide.with(this)
                 .load(userURL)
