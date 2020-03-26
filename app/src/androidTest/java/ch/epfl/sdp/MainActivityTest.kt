@@ -142,13 +142,14 @@ class MainActivityTest {
 
     @Test
     fun updateUserViewUpdatesUserInformationInDrawer(){
-        val dummyUserName = "dummy_username"
-        val dummyEmail = "dummy_email"
+        val dummyUserName : String? = "dummy_username"
+        val dummyEmail : String ? = "dummy_email"
+        val dummyURL : String? = null
 
         openDrawer()
 
         runOnUiThread{
-            mActivityRule.activity.updateUserView(dummyUserName, dummyEmail)
+            mActivityRule.activity.updateUserView(dummyUserName, dummyEmail, dummyURL)
         }
         onView(withId(R.id.nav_username)).check(matches(withText(dummyUserName)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(dummyEmail)))
