@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -53,5 +56,14 @@ class MapActivityTest {
                 assert(mapboxMap.cameraPosition.zoom.toString() == ZOOM_TEST)
             }
         }
+    }
+    @Test
+    fun mapBoxCanAddAndRemoveMarker(){
+        mActivityRule.launchActivity(Intent())
+        onView(withId(R.id.mapView)).perform(click()).perform(click())
+        ;
+
+
+
     }
 }
