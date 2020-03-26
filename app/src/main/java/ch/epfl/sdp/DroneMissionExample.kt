@@ -1,16 +1,11 @@
 package ch.epfl.sdp
 
+import ch.epfl.sdp.drone.Drone
 import io.mavsdk.System
 import io.mavsdk.mission.Mission
 
 object DroneMissionExample {
-    //must be IP address where the mavsdk_server is running
-    //private val BACKEND_IP_ADDRESS = "127.0.0.1"
-    private val BACKEND_IP_ADDRESS = "10.0.2.2"
-    //private val BACKEND_IP_ADDRESS = "10.0.2.15"
-
     private val missionItems = arrayListOf<Mission.MissionItem>()
-    private var drone = System(BACKEND_IP_ADDRESS, 50051)
 
     fun makeDroneMission(): DroneMissionExample {
         addMissionItems()
@@ -19,12 +14,12 @@ object DroneMissionExample {
 
     fun startMission(){
        // drone.getAction().arm().subscribe()
-        drone.getMission()
+        Drone.instance.mission
                 .setReturnToLaunchAfterMission(true)
-                .andThen(drone.getMission().uploadMission(missionItems))
-                .andThen(drone.getMission().startMission())
+                .andThen(Drone.instance.mission.uploadMission(missionItems))
+                .andThen(Drone.instance.mission.startMission())
                 .subscribe()
-        drone.action.arm().andThen(drone.action.takeoff()).subscribe()
+        Drone.instance.action.arm().andThen(Drone.instance.action.takeoff()).subscribe()
     }
 
     private fun addMissionItems() {

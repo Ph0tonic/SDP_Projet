@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ch.epfl.sdp.DroneMissionExample
 import ch.epfl.sdp.R
-import ch.epfl.sdp.ui.maps.MapActivity
+import ch.epfl.sdp.MapActivity
 
 class HomeFragment : Fragment() {
 

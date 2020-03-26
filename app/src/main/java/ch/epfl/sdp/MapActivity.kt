@@ -1,32 +1,23 @@
-package ch.epfl.sdp.ui.maps
+package ch.epfl.sdp
 
-import androidx.preference.PreferenceManager
-import ch.epfl.sdp.drone.Drone
-import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.maps.Style
-
-import android.R
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import io.mavsdk.System;
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.preference.PreferenceManager
+import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import io.mavsdk.mavsdkserver.MavsdkServer
-
-import io.reactivex.disposables.Disposable
 
 
 /**
@@ -35,8 +26,6 @@ import io.reactivex.disposables.Disposable
  * 2. Long click on map to add a waypoint
  * 3. Hit play to start mission.
  */
-
-
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mapView: MapView? = null
@@ -44,8 +33,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var circleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
-    private var currentPositionMarker: Symbol? = null
-    private var drone: System? = null
+    private var currentPositionMarker: Circle? = null
     private val waypoints: MutableList<Circle> = ArrayList()
 
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
@@ -63,6 +51,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
+
+        val button: Button = findViewById(R.id.start_mission_button)
+        button.setOnClickListener {
+            val dme = DroneMissionExample.makeDroneMission()
+            dme.startMission()
+        }
     }
 
     override fun onStart() {
@@ -113,15 +107,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
-        mapboxMap.setStyle(Style.MAPBOX_STREETS)
-
-        mapboxMap.setStyle(Style.LIGHT) { style ->
+        mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             // Add the marker image to map
 //            style.addImage("marker-icon-id",
 //                    BitmapFactory.decodeResource(
 //                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
             symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
-            symbolManager!!.setIconAllowOverlap(true)
+            symbolManager!!.iconAllowOverlap = true
             circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
         }
 
@@ -138,7 +130,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 .zoom(zoom)
                 .build()
 
-
 //        mapboxMap.uiSettings.isRotateGesturesEnabled = false
 //        mapboxMap.uiSettings.isTiltGesturesEnabled = false
         // Allow to pinpoint
@@ -148,32 +139,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 //        }
     }
 
-    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    /** FOR THE MENU IF NEEDED **/
+//    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.menu_maps, menu)
+//        return true
+//    }
 
-    public override fun _onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProviders.of(this).get(MapsViewModel::class.java)
-        val floatingActionButton = findViewById<FloatingActionButton>(R.id.fab)
-        floatingActionButton.setOnClickListener { v: View? -> viewModel.startMission(drone) }
-    }
-
-    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_maps, menu)
-        return true
-    }
-
-    override fun _onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        when (item.getItemId()) {
-            R.id.disarm -> drone.getAction().kill().subscribe()
-            R.id.land -> drone.getAction().land().subscribe()
-            R.id.return_home -> drone.getAction().returnToLaunch().subscribe()
-            R.id.takeoff -> drone.getAction().arm().andThen(drone.getAction().takeoff()).subscribe()
-            else -> return super.onOptionsItemSelected(item)
-        }
-        return true
-    }
+//    override fun _onOptionsItemSelected(item: MenuItem): Boolean {
+//        // Handle item selection
+//        when (item.getItemId()) {
+//            R.id.disarm -> drone.getAction().kill().subscribe()
+//            R.id.land -> drone.getAction().land().subscribe()
+//            R.id.return_home -> drone.getAction().returnToLaunch().subscribe()
+//            R.id.takeoff -> drone.getAction().arm().andThen(drone.getAction().takeoff()).subscribe()
+//            else -> return super.onOptionsItemSelected(item)
+//        }
+//        return true
+//    }
 
     /**
      * Update [currentPositionMarker] position with a new [position].
@@ -188,39 +170,37 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Add a vehicle marker and move the camera
         if (currentPositionMarker == null) {
-            val symbolOptions = SymbolOptions()
-            symbolOptions.withLatLng(newLatLng)
-            symbolOptions.withIconImage("marker-icon-id")
-            currentPositionMarker = symbolManager!!.create(symbolOptions)
+            val circleOptions = CircleOptions()
+            circleOptions.withLatLng(newLatLng)
+            currentPositionMarker = circleManager!!.create(circleOptions)
+
             mapboxMap!!.moveCamera(CameraUpdateFactory.tiltTo(0.0))
             mapboxMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
-            currentPositionMarker!!.setLatLng(newLatLng)
-            symbolManager!!.update(currentPositionMarker)
+            currentPositionMarker!!.latLng = newLatLng
+            circleManager!!.update(currentPositionMarker)
         }
     }
 
-    /**
-     * Update the [map] with the current mission plan waypoints.
-     *
-     * @param latLngs current mission waypoints
-     */
-    private fun updateMarkers(latLngs: List<LatLng>) {
-        if (circleManager != null) {
-            circleManager!!.delete(waypoints)
-            waypoints.clear()
-        }
-        for (latLng in latLngs) {
-            val circleOptions: CircleOptions = CircleOptions()
-                    .withLatLng(latLng)
-                    .withCircleColor(ColorUtils.colorToRgbaString(Color.BLUE))
-                    .withCircleStrokeColor(ColorUtils.colorToRgbaString(Color.BLACK))
-                    .withCircleStrokeWidth(1.0f)
-                    .withCircleRadius(12f)
-                    .withDraggable(false)
-            circleManager?.create(circleOptions)
-        }
-    }
+//    /**
+//     * Update the [map] with the current mission plan waypoints.
+//     *
+//     * @param latLngs current mission waypoints
+//     */
+//    private fun updateMarkers(latLngs: List<LatLng>) {
+//        if (circleManager != null) {
+//            circleManager!!.delete(waypoints)
+//            waypoints.clear()
+//        }
+//        for (latLng in latLngs) {
+//            val circleOptions: CircleOptions = CircleOptions()
+//                    .withLatLng(latLng)
+//                    .withCircleColor(ColorUtils.colorToRgbaString(Color.BLUE))
+//                    .withCircleStrokeColor(ColorUtils.colorToRgbaString(Color.BLACK))
+//                    .withCircleStrokeWidth(1.0f)
+//                    .withCircleRadius(12f)
+//                    .withDraggable(false)
+//            circleManager?.create(circleOptions)
+//        }
+//    }
 }
-
-

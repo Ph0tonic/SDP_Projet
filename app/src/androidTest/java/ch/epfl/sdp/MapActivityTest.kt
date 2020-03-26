@@ -8,7 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
-import ch.epfl.sdp.ui.maps.MapActivity
 import kotlinx.android.synthetic.main.activity_map.*
 import org.junit.Before
 import org.junit.Rule
