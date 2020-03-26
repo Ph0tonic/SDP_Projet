@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -16,7 +17,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -92,8 +95,8 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
             try {
-                val account = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
-                updateUserView(account?.displayName, account?.email)
+                val account : GoogleSignInAccount? = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+                updateUserView(account)
             } catch (e: ApiException) {
                 Snackbar.make(findViewById(R.id.main_nav_header), "Could not sign in :(", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show()
@@ -101,13 +104,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateUserView(username: String?, userEmail: String?/*, userImage: Drawable*/){
+    fun updateUserView(account : GoogleSignInAccount?){    //username: String?, userEmail: String?, userImage: Drawable){
+
         val usernameView: TextView = findViewById(R.id.nav_username)
         val userEmailView: TextView = findViewById(R.id.nav_user_email)
         val userImageView: ImageView = findViewById(R.id.nav_user_image)
 
-        usernameView.text = username ?: "default_username"
-        userEmailView.text = userEmail ?: "default_email"
-        //userImageView.setImageDrawable(userImage)
+        usernameView.text = account?.displayName ?: "default_username"
+        userEmailView.text = account?.email ?: "default_email"
+
+        val imgURL : String? = account?.photoUrl.toString()
+        if(!(imgURL.isNullOrEmpty())) {
+            Glide.with(this).load(imgURL).into(userImageView)
+        }
     }
 }
