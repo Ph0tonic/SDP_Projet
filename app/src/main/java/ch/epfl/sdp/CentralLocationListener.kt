@@ -21,12 +21,10 @@ object CentralLocationListener : LocationListener {
 
     override fun onLocationChanged(location: Location) {
         this.location = location
-        Log.d("-----------------------","Location changed:")
         subscribers.forEach {
             subscriber ->
             run {
                 subscriber.onLocationChanged(location)
-                Log.d("-----------------------",subscriber.toString())
             }
         }
     }
