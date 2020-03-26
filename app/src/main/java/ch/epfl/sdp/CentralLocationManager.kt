@@ -31,12 +31,12 @@ object CentralLocationManager {
 
         locationDisabledAlert = AlertDialog.Builder(this.activity)
         locationDisabledAlert.setTitle("Enable Location")
-                ?.setMessage("This part of the app cannot function without location, please enable it")
-                ?.setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
+                .setMessage("This part of the app cannot function without location, please enable it")
+                .setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
                     val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     activity.startActivity(myIntent)
                 }
-                ?.setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt ->})
+                .setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt ->})
 
         if(checkPermission()){
             locationManager.requestLocationUpdates(
