@@ -153,6 +153,7 @@ class MainActivityTest {
         }
         onView(withId(R.id.nav_username)).check(matches(withText(dummyUserName)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(dummyEmail)))
+        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
     }
 
     @Test
