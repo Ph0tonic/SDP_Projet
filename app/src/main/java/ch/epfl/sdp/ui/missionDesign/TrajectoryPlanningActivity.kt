@@ -40,18 +40,6 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Used to detect when the map is ready in tests
         mapView?.contentDescription = "MAP NOT READY"
-
-        mapView?.getMapAsync(OnMapReadyCallback { mapboxMap: MapboxMap ->
-            mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
-
-                symbolManager = SymbolManager(mapView!!, mapboxMap, style!!)
-                circleManager = CircleManager(mapView!!, mapboxMap, style!!)
-                lineManager = LineManager(mapView!!, mapboxMap, style!!)
-
-                mapboxMap.addOnMapClickListener { position -> onMapClicked(position) }
-
-            }
-        })
     }
 
     fun onMapClicked(position: LatLng): Boolean{
@@ -114,9 +102,16 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
-        mapboxMap.setStyle(Style.MAPBOX_STREETS)
-
         MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
+        mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
+
+            symbolManager = SymbolManager(mapView!!, mapboxMap, style!!)
+            circleManager = CircleManager(mapView!!, mapboxMap, style)
+            lineManager = LineManager(mapView!!, mapboxMap, style)
+
+            mapboxMap.addOnMapClickListener { position -> onMapClicked(position) }
+
+        }
 
         // Used to detect when the map is ready in tests
         mapView?.contentDescription = "MAP READY"

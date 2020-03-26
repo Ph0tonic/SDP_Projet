@@ -128,8 +128,10 @@ class MainActivity : AppCompatActivity() {
                             true, Float.NaN, Float.NaN,
                             Mission.MissionItem.CameraAction.NONE, Float.NaN, 1.0)
                 }).andThen(Drone.instance.mission.setReturnToLaunchAfterMission(true))
-                .andThen(Drone.instance.action.arm()).andThen(Drone.instance.action.takeoff())
-                .andThen(Drone.instance.mission.startMission()).subscribe()
+                .andThen(Drone.instance.action.arm())
+                .andThen(Drone.instance.action.takeoff())
+                .andThen(Drone.instance.mission.startMission())
+                .subscribe()
     }
 }
 
