@@ -3,7 +3,6 @@ package ch.epfl.sdp
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -124,21 +123,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun followWaypoints(view: View) {
-        Drone.instance.mission
-                .uploadMission(waypoints.map { wp ->
-                    Mission.MissionItem(
-                            wp.latitude,
-                            wp.longitude,
-                            10f,
-                            10f,
+        Drone.instance.mission.uploadMission(waypoints.map { wp ->
+                    Mission.MissionItem(wp.latitude, wp.longitude, 10f,10f,
                             true, Float.NaN, Float.NaN,
-                            Mission.MissionItem.CameraAction.NONE, Float.NaN,
-                            1.0)
+                            Mission.MissionItem.CameraAction.NONE, Float.NaN, 1.0)
                 }).andThen(Drone.instance.mission.setReturnToLaunchAfterMission(true))
-                .andThen(Drone.instance.action.arm())
-                .andThen(Drone.instance.action.takeoff())
-                .andThen(Drone.instance.mission.startMission())
-                .subscribe()
+                .andThen(Drone.instance.action.arm()).andThen(Drone.instance.action.takeoff())
+                .andThen(Drone.instance.mission.startMission()).subscribe()
     }
 }
 
