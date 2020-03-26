@@ -5,11 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuItemCompat.setContentDescription
-import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
+import ch.epfl.sdp.ui.maps.MapUtils
 import com.mapbox.mapboxsdk.Mapbox.getInstance
-import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -95,6 +93,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onStop() {
         super.onStop()
+        MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
         mapView?.onStop()
     }
 
@@ -117,18 +116,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS)
 
-        // Load latest location
-        val latitude: Double = 47.39778846550371 /*PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("latitude", null)?.toDouble() ?: -52.6885*/
-        val longitude: Double = 8.545970150745575 /*PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("longitude", null)?.toDouble() ?: -70.1395*/
-        val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("zoom", null)?.toDouble() ?: 9.0
-
-        mapboxMap.cameraPosition = CameraPosition.Builder()
-                .target(LatLng(latitude, longitude))
-                .zoom(zoom)
-                .build()
+        MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
 
         // Used to detect when the map is ready in tests
         mapView?.contentDescription = "MAP READY"
