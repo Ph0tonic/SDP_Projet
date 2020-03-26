@@ -72,6 +72,7 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.1.0-alpha.1'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:0.8.0'
     implementation 'com.google.guava:guava:28.2-android'
+    implementation 'com.github.bumptech.glide:glide:3.8.0'
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -80,6 +81,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.1.1'
     androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+
 }
 
 tasks.withType(Test) {

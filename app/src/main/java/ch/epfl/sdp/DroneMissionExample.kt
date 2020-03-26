@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import ch.epfl.sdp.drone.Drone
-import io.mavsdk.System
 import io.mavsdk.mission.Mission
 
 object DroneMissionExample {
@@ -13,13 +12,18 @@ object DroneMissionExample {
     }
 
     fun startMission(){
-       // drone.getAction().arm().subscribe()
-        Drone.instance.mission
-                .setReturnToLaunchAfterMission(true)
-                .andThen(Drone.instance.mission.uploadMission(missionItems))
-                .andThen(Drone.instance.mission.startMission())
+        var drone = Drone.instance
+        var isConnectedCompletable = drone.getCore().getConnectionState()
+                .filter{state -> state.getIsConnected()}
+                .firstOrError()
+                .toCompletable()
+
+        isConnectedCompletable
+                .andThen(drone.mission.setReturnToLaunchAfterMission(true))
+                .andThen(drone.mission.uploadMission(missionItems))
+                .andThen(drone.action.arm())
+                .andThen(drone.mission.startMission())
                 .subscribe()
-        Drone.instance.action.arm().andThen(Drone.instance.action.takeoff()).subscribe()
     }
 
     private fun addMissionItems() {
@@ -29,7 +33,7 @@ object DroneMissionExample {
         missionItems.add(generateMissionItem(47.397832880000003, 8.5455939999999995))
     }
 
-    private fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
+    fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
         return Mission.MissionItem(
                 latitudeDeg,
                 longitudeDeg,
@@ -38,5 +42,9 @@ object DroneMissionExample {
                 true, Float.NaN, Float.NaN,
                 Mission.MissionItem.CameraAction.NONE, Float.NaN,
                 1.0)
+    }
+
+    fun getMissionItems(): ArrayList<Mission.MissionItem> {
+        return missionItems
     }
 }
