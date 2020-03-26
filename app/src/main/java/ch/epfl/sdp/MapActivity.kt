@@ -119,11 +119,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Load latest location
         val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("latitude", null)?.toDouble() ?: -52.6885
+                .getString("latitude", null)?.toDoubleOrNull() ?: -52.6885
         val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("longitude", null)?.toDouble() ?: -70.1395
+                .getString("longitude", null)?.toDoubleOrNull() ?: -70.1395
         val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("zoom", null)?.toDouble() ?: 9.0
+                .getString("zoom", null)?.toDoubleOrNull() ?: 9.0
 
         mapboxMap.cameraPosition = CameraPosition.Builder()
                 .target(LatLng(latitude, longitude))
