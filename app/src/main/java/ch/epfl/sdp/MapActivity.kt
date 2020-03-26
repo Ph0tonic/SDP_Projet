@@ -163,7 +163,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateVehiclePosition(newLatLng: LatLng) {
-        if (mapboxMap == null || symbolManager == null) {
+        if (mapboxMap == null || circleManager == null) {
             // Not ready
             return
         }

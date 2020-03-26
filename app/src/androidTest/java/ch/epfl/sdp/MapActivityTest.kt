@@ -55,6 +55,7 @@ class MapActivityTest {
             }
 
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
+            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
     }
 }
