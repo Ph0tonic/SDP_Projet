@@ -36,6 +36,11 @@ class LocationTest {
         return InstrumentationRegistry.getInstrumentation().targetContext
     }
 
+    @Test
+    private fun trivialTest(){
+        
+    }
+
 
 }
 
