@@ -12,7 +12,7 @@ object Drone {
     private const val BACKEND_PORT = 50051
 
     private val disposables: MutableList<Disposable> = ArrayList()
-    val currentPositionLiveData = MutableLiveData<LatLng>()
+    val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
 
     val instance : System
 

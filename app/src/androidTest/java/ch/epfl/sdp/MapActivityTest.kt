@@ -8,6 +8,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
+import ch.epfl.sdp.drone.Drone
+import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_map.*
 import org.junit.Before
 import org.junit.Rule
@@ -51,6 +53,8 @@ class MapActivityTest {
                 assert(mapboxMap.cameraPosition.target.longitude.toString() == LONGITUDE_TEST)
                 assert(mapboxMap.cameraPosition.zoom.toString() == ZOOM_TEST)
             }
+
+            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
     }
 }
