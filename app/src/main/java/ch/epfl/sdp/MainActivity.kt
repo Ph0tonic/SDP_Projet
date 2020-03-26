@@ -113,7 +113,10 @@ class MainActivity : AppCompatActivity() {
         usernameView.text = username ?: "default_username"
         userEmailView.text = userEmail ?: "default_email"
 
-        Glide.with(this).load(userURL).error(R.mipmap.ic_launcher_round).into(userImageView)
+        Glide.with(this)
+                .load(userURL)
+                .error(R.mipmap.ic_launcher_round)
+                .into(userImageView)
 
     }
 }
