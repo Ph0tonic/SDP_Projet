@@ -9,7 +9,6 @@ import androidx.annotation.RequiresApi
 
 object CentralLocationListener : LocationListener {
     private val subscribers: MutableSet<LocationSubscriber> = mutableSetOf()
-    private lateinit var location: Location
 
     fun subscribe(subscriber: LocationSubscriber){
         subscribers.add(subscriber)
@@ -20,7 +19,6 @@ object CentralLocationListener : LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
-        this.location = location
         subscribers.forEach {
             subscriber ->
             run {

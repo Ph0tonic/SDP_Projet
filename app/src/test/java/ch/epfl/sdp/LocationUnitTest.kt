@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.location.Location
+import android.os.Bundle
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -55,6 +56,20 @@ class LocationUnitTest {
         CentralLocationListener.subscribe(locationSubscriber)
         CentralLocationListener.onLocationChanged(location1)
         Assert.assertTrue(locationSubscriber.location == location1)
+    }
+
+    @Test
+    fun onStatusChangedDoesNotCrash() = try{
+        CentralLocationListener.onStatusChanged("Test",0, Bundle())
+    }catch (e: Exception) {
+        Assert.fail(e.message)
+    }
+
+    @Test
+    fun onProviderEnabledDoesNotCrash() = try{
+        CentralLocationListener.onProviderEnabled("Test")
+    }catch (e: Exception) {
+        Assert.fail(e.message)
     }
 
 
