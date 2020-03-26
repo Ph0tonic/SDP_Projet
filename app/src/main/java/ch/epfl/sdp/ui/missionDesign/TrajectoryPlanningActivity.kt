@@ -24,7 +24,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
     private var  circleManager: CircleManager? = null
     private var  lineManager: LineManager? = null
 
-    private var waypoints = arrayListOf<LatLng>()
+    var waypoints = arrayListOf<LatLng>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,17 +54,19 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
                     val circleOptions =  CircleOptions()
                             .withLatLng(position)
 
-                    val lineOptions = null
                     if (waypoints.isNotEmpty()){
+                        val linePoints = arrayListOf<LatLng>().apply {
+                            addAll(waypoints)
+                        }
+
                         val lineOptions = LineOptions()
-                                .withLatLngs(waypoints)
+                                .withLatLngs(linePoints)
+
                         lineManager?.deleteAll()
                         lineManager?.create(lineOptions)
                     }
 
-                    val circle = circleManager?.create(circleOptions)
-
-
+                    circleManager?.create(circleOptions)
                     true
                 }
 
@@ -89,11 +91,6 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onStop() {
         super.onStop()
-        PreferenceManager.getDefaultSharedPreferences(this).edit()
-                .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
-                .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
-                .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
-                .apply();
         mapView?.onStop()
     }
 

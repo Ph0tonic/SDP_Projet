@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mGoogleSignInClient: GoogleSignInClient
 
     private val TRAJECTORY_PLANNING_REQUEST_CODE = 42
-    private var waypoints = mutableListOf<LatLng>()
+    var waypoints = mutableListOf<LatLng>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,18 +119,11 @@ class MainActivity : AppCompatActivity() {
         //userImageView.setImageDrawable(userImage)
     }
 
-    fun rgzhuj(){
-        waypoints
-    }
-
     fun goToTrajectoryDesign(view: View) {
         startActivityForResult(Intent(this, TrajectoryPlanningActivity::class.java), 42)
     }
 
     fun followWaypoints(view: View) {
-
-        Log.d("--------------", "$waypoints")
-
         Drone.instance.mission
                 .uploadMission(waypoints.map { wp ->
                     Mission.MissionItem(

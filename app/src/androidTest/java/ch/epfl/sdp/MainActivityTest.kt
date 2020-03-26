@@ -1,8 +1,6 @@
 package ch.epfl.sdp
 
 import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
 import android.view.Gravity
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
@@ -21,12 +19,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.ui.missionDesign.TrajectoryPlanningActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
@@ -165,5 +165,14 @@ class MainActivityTest {
     @Test
     fun canStartMission(){
         onView(withId(R.id.startMissionButton)).perform(click())
+    }
+
+    @Test
+    fun goToTrajectoryDesignActuallyOpensTrajectoryDesignActivity(){
+        openDrawer()
+        onView(withId(R.id.nav_view))
+                .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design));
+        onView(withId(R.id.go_to_trajectory_planning_button)).perform(click())
+        intended(hasComponent(TrajectoryPlanningActivity::class.java.name))
     }
 }

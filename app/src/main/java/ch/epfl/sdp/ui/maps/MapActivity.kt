@@ -41,8 +41,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
 
                 symbolManager = SymbolManager(mapView!!, mapboxMap, style!!)
-                circleManager = CircleManager(mapView!!, mapboxMap, style!!)
-                lineManager = LineManager(mapView!!, mapboxMap, style!!)
+                circleManager = CircleManager(mapView!!, mapboxMap, style)
+                lineManager = LineManager(mapView!!, mapboxMap, style)
 
                 mapboxMap.addOnMapClickListener { position ->
 
@@ -51,7 +51,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val circleOptions =  CircleOptions()
                             .withLatLng(position)
 
-                    val lineOptions = null
                     if (waypoints.isNotEmpty()){
                         val lineOptions = LineOptions()
                                 .withLatLngs(waypoints)
@@ -59,8 +58,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         lineManager?.create(lineOptions)
                     }
 
-                    val circle = circleManager?.create(circleOptions)
-
+                    circleManager?.create(circleOptions)
 
                     true
                 }
