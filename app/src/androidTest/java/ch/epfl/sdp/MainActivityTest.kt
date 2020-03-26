@@ -144,7 +144,7 @@ class MainActivityTest {
     fun updateUserViewUpdatesUserInformationInDrawer(){
         val dummyUserName : String? = "dummy_username"
         val dummyEmail : String ? = "dummy_email"
-        val dummyURL : String? = null
+        val dummyURL : String? = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
 
         openDrawer()
 
@@ -153,6 +153,17 @@ class MainActivityTest {
         }
         onView(withId(R.id.nav_username)).check(matches(withText(dummyUserName)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(dummyEmail)))
+        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun updateUserViewWithNullStringsUpdatesUserInformationInDrawer(){
+        openDrawer()
+        runOnUiThread{
+            mActivityRule.activity.updateUserView(null, null, null)
+        }
+        onView(withId(R.id.nav_username)).check(matches(withText("default_username")))
+        onView(withId(R.id.nav_user_email)).check(matches(withText("default_email")))
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
     }
 
