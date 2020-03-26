@@ -28,7 +28,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
     private var mUiDevice: UiDevice? = null
@@ -63,29 +62,29 @@ class MainActivityTest {
     fun canNavigateToHome(){
         openDrawer()
         onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_home));
+            .perform(NavigationViewActions.navigateTo(R.id.nav_home));
     }
 
     @Test
     fun canNavigateToMissionDesign(){
         openDrawer()
         onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design));
-    }
-
-    @Test
-    fun canDisplayAMapAndReloadLocation(){
-        openDrawer()
-        onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design));
+            .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design));
     }
 
     @Test
     fun canNavigateToMapsManaging(){
+        openDrawer()
+        onView(withId(R.id.nav_view))
+            .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing));
+    }
+
+    @Test
+    fun canDisplayAMapAndReloadLocation(){
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("latitude", null) == null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("lontitude", null) == null)
+                .getString("longitude", null) == null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("zoom", null) == null)
 
@@ -161,5 +160,10 @@ class MainActivityTest {
             mActivityRule.activity.onSupportNavigateUp()
         }
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun canStartMission(){
+        onView(withId(R.id.startMissionButton)).perform(click())
     }
 }
