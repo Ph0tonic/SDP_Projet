@@ -38,8 +38,13 @@ class TrajectoryPlanningActivityTest {
     @Test
     fun clickOnMapAddsWaypoint(){
         assertThat(mActivityRule.activity.waypoints.size,equalTo(0))
-        onView(withId(R.id.trajectory_planning_mapView))
+
+        // Wait for the map to load
+        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000);
+
+        // Add a point
         onView(withId(R.id.trajectory_planning_mapView)).perform(click())
+        
         assertThat(mActivityRule.activity.waypoints.size,equalTo(1))
     }
 
