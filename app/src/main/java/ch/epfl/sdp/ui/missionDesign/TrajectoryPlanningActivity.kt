@@ -37,6 +37,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapView = findViewById(R.id.trajectory_planning_mapView)
         mapView?.onCreate(savedInstanceState)
+        mapView?.getMapAsync(this)
 
         // Used to detect when the map is ready in tests
         mapView?.contentDescription = "MAP NOT READY"
