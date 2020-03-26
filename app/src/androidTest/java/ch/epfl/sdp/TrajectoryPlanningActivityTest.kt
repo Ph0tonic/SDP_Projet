@@ -10,11 +10,14 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.ui.missionDesign.TrajectoryPlanningActivity
+import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Before
 import org.junit.Rule
@@ -43,8 +46,11 @@ class TrajectoryPlanningActivityTest {
         mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000);
 
         // Add a point
-        onView(withId(R.id.trajectory_planning_mapView)).perform(click())
-        
+        //onView(withId(R.id.trajectory_planning_mapView)).perform(click())
+        runOnUiThread{
+            mActivityRule.activity.onMapClicked(LatLng(0.0,0.0))
+        }
+
         assertThat(mActivityRule.activity.waypoints.size,equalTo(1))
     }
 
@@ -59,10 +65,8 @@ class TrajectoryPlanningActivityTest {
         // Leave map
         onView(withId(R.id.mission_design_button_done)).perform(click())
 
-        val wayPoints = mActivityRule.activity.waypoints
-
-        assertThat(mActivityRule.getActivityResult(), hasResultCode(Activity.RESULT_OK))
-        assertThat(mActivityRule.getActivityResult(), hasResultData(IntentMatchers.hasExtraWithKey("waypoints")))
+        assertThat(mActivityRule.activityResult, hasResultCode(Activity.RESULT_OK))
+        assertThat(mActivityRule.activityResult, hasResultData(IntentMatchers.hasExtraWithKey("waypoints")))
     }
 
     @Test
@@ -79,7 +83,7 @@ class TrajectoryPlanningActivityTest {
         // Leave map
         onView(withId(R.id.mission_design_button_done)).perform(click())
 
-        assertThat(mActivityRule.getActivityResult(), hasResultData(IntentMatchers.hasExtra("waypoints", wayPoints)))
+        assertThat(mActivityRule.activityResult, hasResultData(IntentMatchers.hasExtra("waypoints", wayPoints)))
     }
 
     @Test

@@ -40,6 +40,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView = findViewById(R.id.trajectory_planning_mapView)
         mapView?.onCreate(savedInstanceState)
 
+        // Used to detect when the map is ready in tests
         mapView?.contentDescription = "MAP NOT READY"
 
         mapView?.getMapAsync(OnMapReadyCallback { mapboxMap: MapboxMap ->
@@ -49,31 +50,32 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
                 circleManager = CircleManager(mapView!!, mapboxMap, style!!)
                 lineManager = LineManager(mapView!!, mapboxMap, style!!)
 
-                mapboxMap.addOnMapClickListener { position ->
-
-                    waypoints.add(position)
-
-                    val circleOptions =  CircleOptions()
-                            .withLatLng(position)
-
-                    if (waypoints.isNotEmpty()){
-                        val linePoints = arrayListOf<LatLng>().apply {
-                            addAll(waypoints)
-                        }
-
-                        val lineOptions = LineOptions()
-                                .withLatLngs(linePoints)
-
-                        lineManager?.deleteAll()
-                        lineManager?.create(lineOptions)
-                    }
-
-                    circleManager?.create(circleOptions)
-                    true
-                }
+                mapboxMap.addOnMapClickListener { position -> onMapClicked(position) }
 
             }
         })
+    }
+
+    fun onMapClicked(position: LatLng): Boolean{
+        waypoints.add(position)
+
+        val circleOptions = CircleOptions()
+                .withLatLng(position)
+
+        if (waypoints.isNotEmpty()){
+            val linePoints = arrayListOf<LatLng>().apply {
+                addAll(waypoints)
+            }
+
+            val lineOptions = LineOptions()
+                    .withLatLngs(linePoints)
+
+            lineManager?.deleteAll()
+            lineManager?.create(lineOptions)
+        }
+
+        circleManager?.create(circleOptions)
+        return true
     }
 
     override fun onStart() {
@@ -128,6 +130,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
                 .zoom(zoom)
                 .build()
 
+        // Used to detect when the map is ready in tests
         mapView?.contentDescription = "MAP READY"
     }
 
