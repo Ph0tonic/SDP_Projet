@@ -62,6 +62,7 @@ class MapActivityTest {
     fun mapBoxCanAddMarker(){
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.mapView)).perform(click())
+        Thread.sleep(1000)
         //click on the current marker once again to remove it
         onView(withId(R.id.mapView)).perform(click())
     }
