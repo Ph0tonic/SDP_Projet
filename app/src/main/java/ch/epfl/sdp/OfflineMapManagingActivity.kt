@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import ch.epfl.sdp.R
 import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
@@ -19,6 +18,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionDeleteCallback
 import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 /**
  * Download and view an offline map using the Mapbox Android SDK.
@@ -28,11 +28,14 @@ class OfflineMapManagingActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
     private var mapView: MapView? = null
     private var offlineManager: OfflineManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(ch.epfl.sdp.R.string.mapbox_access_token))
+
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_offline_map)
         mapView = findViewById(R.id.store_mapoffline_mapView)
@@ -41,10 +44,14 @@ class OfflineMapManagingActivity : AppCompatActivity() {
             mapboxMap.setStyle(Style.OUTDOORS) { style ->
                 // Set up the OfflineManager
                 offlineManager = OfflineManager.getInstance(this@OfflineMapManagingActivity)
+
                 // Create a bounding box for the offline region
+                val latitude = intent.getDoubleExtra("latitude", -52.6885)
+                val longitude : Double = intent.getDoubleExtra("longitude", -70.1395)
+                val area = 0.1
                 val latLngBounds = LatLngBounds.Builder()
-                        .include(LatLng(37.7897, -119.5073)) // Northeast
-                        .include(LatLng(37.6744, -119.6815)) // Southwest
+                        .include(LatLng(latitude + area, longitude + area)) // Northeast
+                        .include(LatLng(latitude - area, latitude - area)) // Southwest
                         .build()
                 // Define the offline region
                 val definition = OfflineTilePyramidRegionDefinition(
@@ -57,7 +64,7 @@ class OfflineMapManagingActivity : AppCompatActivity() {
                 val metadata: ByteArray?
                 metadata = try {
                     val jsonObject = JSONObject()
-                    jsonObject.put(JSON_FIELD_REGION_NAME, "Yosemite National Park")
+                    jsonObject.put(JSON_FIELD_REGION_NAME, "THE_STORED_MAP_S_NAME")
                     val json = jsonObject.toString()
                     json.toByteArray(charset(JSON_CHARSET))
                 } catch (exception: Exception) {
@@ -80,7 +87,7 @@ class OfflineMapManagingActivity : AppCompatActivity() {
                                         override fun onStatusChanged(status: OfflineRegionStatus) { // Calculate the download percentage and update the progress bar
                                             val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                                             if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
-                                                setPercentage(Math.round(percentage).toInt())
+                                                setPercentage(percentage.roundToInt())
                                             }
                                         }
 
@@ -119,18 +126,21 @@ class OfflineMapManagingActivity : AppCompatActivity() {
         mapView!!.onStop()
     }
 
-    public override fun onPause() {
+    fun tibo(){
+
+    }
+    override fun onPause() {
         super.onPause()
         mapView!!.onPause()
         if (offlineManager != null) {
             offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
                 override fun onList(offlineRegions: Array<OfflineRegion>) {
-                    if (offlineRegions.size > 0) { // delete the last item in the offlineRegions list which will be yosemite offline map
+                    if (offlineRegions.isNotEmpty()) { // delete the last item in the offlineRegions list which will be yosemite offline map
                         offlineRegions[offlineRegions.size - 1].delete(object : OfflineRegionDeleteCallback {
                             override fun onDelete() {
                                 Toast.makeText(
                                         this@OfflineMapManagingActivity,
-                                        "TESSSSSST",
+                                        "Map deleted",
                                         Toast.LENGTH_LONG
                                 ).show()
                             }

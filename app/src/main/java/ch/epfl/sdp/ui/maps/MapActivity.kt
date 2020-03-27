@@ -1,10 +1,13 @@
 package ch.epfl.sdp.ui.maps
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
+import ch.epfl.sdp.OfflineMapManagingActivity
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.Mapbox.getInstance
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -86,5 +89,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 .target(LatLng(latitude, longitude))
                 .zoom(zoom)
                 .build()
+
+        val mapOneButton: Button = findViewById(R.id.stored_offline_map)
+        mapOneButton.setOnClickListener {
+            startActivity(Intent(this@MapActivity, OfflineMapManagingActivity::class.java)
+                    .putExtra("latitude", mapboxMap.cameraPosition.target.latitude)
+                    .putExtra("longitude", mapboxMap.cameraPosition.target.longitude)
+                    .putExtra("zoom", mapboxMap.cameraPosition.zoom)
+            )
+        }
     }
 }

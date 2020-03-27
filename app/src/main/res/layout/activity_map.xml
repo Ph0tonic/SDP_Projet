@@ -34,21 +34,21 @@
         <Button
             android:id="@+id/button_location_mode"
             style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
+            android:layout_width="31dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.25"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="Normal"
             android:textColor="@android:color/white" />
 
         <Button
-            android:id="@+id/button_location_tracking"
+            android:id="@+id/stored_offline_map"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.15"
             android:gravity="center"
-            android:text="None"
+            android:text="Store Map"
             android:textColor="@android:color/white" />
 
         <TextView
