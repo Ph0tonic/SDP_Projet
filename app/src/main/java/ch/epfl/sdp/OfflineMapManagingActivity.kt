@@ -72,13 +72,35 @@ class OfflineMapManagingActivity : AppCompatActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS)
 
-        // Load latest location
-        val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("latitude", null)?.toDouble() ?: -52.6885
-        val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("longitude", null)?.toDouble() ?: -70.1395
-        val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("zoom", null)?.toDouble() ?: 9.0
+        val mapNumber = intent.getIntExtra("ButtonId", 0)
+        var latitude : Double = -52.6885
+        var longitude : Double = -70.1395
+        var zoom : Double = 9.0
+
+        when(mapNumber) {
+            0 -> {
+                // Load latest location
+                val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                        .getString("latitude", null)?.toDouble() ?: -52.6885
+                val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                        .getString("longitude", null)?.toDouble() ?: -70.1395
+                val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
+                        .getString("zoom", null)?.toDouble() ?: 9.0
+            }
+            1 -> {
+                latitude = 45.980537
+                longitude = 7.641618
+            }
+            2 -> {
+                latitude = 45.832622
+                longitude = 6.865175
+            }
+            3 -> {
+                latitude = 48.858093
+                longitude = 2.294694
+            }
+        }
+
 
         mapboxMap.cameraPosition = CameraPosition.Builder()
                 .target(LatLng(latitude, longitude))
