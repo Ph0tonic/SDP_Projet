@@ -35,11 +35,6 @@ class HomeFragment : Fragment() {
             startActivity(Intent(context, MapActivity::class.java))
         }
 
-        val startMissionButton: Button = root.findViewById(R.id.startMissionButton)
-        startMissionButton.setOnClickListener {
-            val dme = DroneMissionExample.makeDroneMission()
-            dme.startMission()
-        }
         return root
     }
 }
