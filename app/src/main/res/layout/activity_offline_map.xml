@@ -53,6 +53,27 @@
             android:text="Download"
             android:textColor="@android:color/white" />
 
+        <Button
+            android:id="@+id/store_mapoffline_button_list"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.25"
+            android:gravity="center"
+            android:onClick="listOfflineMaps"
+            android:text="SHOW"
+            android:textColor="@android:color/white" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:paddingLeft="25dp"
+            android:layout_gravity="center"
+            android:paddingRight="25dp"
+            android:visibility="gone"/>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
