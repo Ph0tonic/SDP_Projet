@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -32,43 +31,43 @@
         tools:layout_constraintRight_creator="1">
 
         <Button
-            android:id="@+id/button_location_mode"
+            android:id="@+id/start_mission_button"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.25"
             android:gravity="center"
-            android:text="Normal"
+            android:text="Start"
             android:textColor="@android:color/white" />
 
         <Button
-            android:id="@+id/button_location_tracking"
+            android:id="@+id/locate_button"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.15"
             android:gravity="center"
-            android:text="None"
+            android:text="Locate"
             android:textColor="@android:color/white" />
 
         <TextView
-            android:id="@+id/tv_tracking"
+            android:id="@+id/tv_latitude"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight=".85"
             android:gravity="center"
-            android:text="Tracking:"
+            android:text="Latitude:"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tv_mode"
+            android:id="@+id/tv_longitude"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight=".75"
             android:gravity="center"
-            android:text="Mode:"
+            android:text="Longitude:"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
