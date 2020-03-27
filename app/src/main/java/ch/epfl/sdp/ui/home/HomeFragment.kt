@@ -9,9 +9,10 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import ch.epfl.sdp.DroneMissionExample
 import ch.epfl.sdp.R
-import ch.epfl.sdp.ui.maps.SupportMapFragmentActivity
+import ch.epfl.sdp.MapActivity
 
 class HomeFragment : Fragment() {
 
@@ -22,8 +23,7 @@ class HomeFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel::class.java)
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         val textView: TextView = root.findViewById(R.id.text_home)
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
@@ -32,8 +32,9 @@ class HomeFragment : Fragment() {
 
         val button: Button = root.findViewById(R.id.display_map)
         button.setOnClickListener {
-            startActivity(Intent(context, SupportMapFragmentActivity::class.java))
+            startActivity(Intent(context, MapActivity::class.java))
         }
+
         return root
     }
 }
