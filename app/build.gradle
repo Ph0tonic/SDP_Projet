@@ -76,6 +76,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.1.0-alpha.1'
+    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 }
 
 tasks.withType(Test) {
