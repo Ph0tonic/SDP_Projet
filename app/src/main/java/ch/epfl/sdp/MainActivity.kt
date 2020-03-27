@@ -1,8 +1,8 @@
 package ch.epfl.sdp
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +16,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.missionDesign.TrajectoryPlanningActivity
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -24,6 +26,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.mapbox.mapboxsdk.geometry.LatLng
+import io.mavsdk.mission.Mission
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var mGoogleSignInClient: GoogleSignInClient
+
+    private val TRAJECTORY_PLANNING_REQUEST_CODE = 42
+    var waypoints = mutableListOf<LatLng>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,6 +106,9 @@ class MainActivity : AppCompatActivity() {
                         .setAction("Action", null).show()
             }
         }
+        if (requestCode == TRAJECTORY_PLANNING_REQUEST_CODE && resultCode == Activity.RESULT_OK){
+            waypoints = data?.extras?.get("waypoints") as MutableList<LatLng>
+        }
     }
 
     fun updateUserView(username: String?, userEmail: String?, userURL: String?){
@@ -113,4 +123,22 @@ class MainActivity : AppCompatActivity() {
         Glide.with(this).load(userURL).error(R.mipmap.ic_launcher_round).into(userImageView)
 
     }
+
+    fun goToTrajectoryDesign(view: View) {
+        startActivityForResult(Intent(this, TrajectoryPlanningActivity::class.java), 42)
+    }
+
+    fun followWaypoints(view: View) {
+        Drone.instance.mission.uploadMission(waypoints.map { wp ->
+                    Mission.MissionItem(wp.latitude, wp.longitude, 10f,10f,
+                            true, Float.NaN, Float.NaN,
+                            Mission.MissionItem.CameraAction.NONE, Float.NaN, 1.0)
+                }).andThen(Drone.instance.mission.setReturnToLaunchAfterMission(true))
+                .andThen(Drone.instance.action.arm())
+                .andThen(Drone.instance.action.takeoff())
+                .andThen(Drone.instance.mission.startMission())
+                .subscribe()
+    }
 }
+
+

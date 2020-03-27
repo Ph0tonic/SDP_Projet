@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Context
+import android.content.Intent
 import android.view.Gravity
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
@@ -11,21 +12,23 @@ import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.filterEquals
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.ui.missionDesign.TrajectoryPlanningActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
@@ -155,7 +158,6 @@ class MainActivityTest {
         getInstrumentation().waitForIdleSync()
         onView(withId(R.id.nav_username)).check(matches(withText(dummyUserName)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(dummyEmail)))
-        //onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -175,5 +177,15 @@ class MainActivityTest {
             mActivityRule.activity.onSupportNavigateUp()
         }
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToTrajectoryDesignActuallyOpensTrajectoryDesignActivity(){
+        openDrawer()
+        onView(withId(R.id.nav_view))
+                .perform(NavigationViewActions.navigateTo(R.id.nav_misson_design))
+        onView(withId(R.id.go_to_trajectory_planning_button)).perform(click())
+        val intent = Intent(mActivityRule.activity, TrajectoryPlanningActivity::class.java)
+        intending(filterEquals(intent))
     }
 }
