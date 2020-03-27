@@ -15,6 +15,9 @@
             android:name=".ui.maps.MapActivity"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".OfflineMapManagingActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">

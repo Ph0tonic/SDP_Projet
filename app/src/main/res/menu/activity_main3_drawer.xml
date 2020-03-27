@@ -16,5 +16,9 @@
             android:id="@+id/nav_maps_managing"
             android:icon="@android:drawable/ic_dialog_map"
             android:title="@string/menu_maps_managing" />
+        <item
+            android:id="@+id/nav_offline_maps_managing"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:title="Offline maps managing" />
     </group>
 </menu>
