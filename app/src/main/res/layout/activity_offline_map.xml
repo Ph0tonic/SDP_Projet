@@ -42,6 +42,17 @@
             android:text="Done"
             android:textColor="@android:color/white" />
 
+        <Button
+            android:id="@+id/store_mapoffline_button_download"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.25"
+            android:gravity="center"
+            android:onClick="downloadOfflineMap"
+            android:text="Download"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

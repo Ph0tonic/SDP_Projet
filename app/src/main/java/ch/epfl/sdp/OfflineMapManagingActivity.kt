@@ -1,39 +1,27 @@
 package ch.epfl.sdp
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.offline.OfflineManager
+import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
+import org.json.JSONObject
 
 class OfflineMapManagingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mapView: MapView? = null
     private var mapboxMap: MapboxMap? = null
-
-    /*
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
-                setContentView(R.layout.fragment_offline_map_managing)
-                mapView = findViewById(R.id.mapView)
-                mapView?.onCreate(savedInstanceState)
-                mapView?.getMapAsync { mapboxMap ->
-            mapboxMap.setStyle(Style.MAPBOX_STREETS) {
-
-                // Map is set up and the style has loaded. Now you can add data or make other map adjustments
-
-            }
-
-        }
-    }
-
-     */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,28 +34,47 @@ class OfflineMapManagingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapView = findViewById(R.id.store_mapoffline_mapView)
         mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this);
+        mapView?.getMapAsync(this)
+
     }
 
-    /*
-    override fun onMapReady(mapboxMap: MapboxMap) {
+    fun downloadOfflineMap(view : View){
+        val longitude = mapboxMap?.cameraPosition?.target!!.longitude
+        val latitude = mapboxMap?.cameraPosition?.target!!.latitude
+
         // Set up the OfflineManager
-        val offlineManager = OfflineManager.getInstance(Mapbox.getApplicationContext())
+        val offlineManager = OfflineManager.getInstance(this)
 
         // Create a bounding box for the offline region
         val latLngBounds = LatLngBounds.Builder()
-                .include(LatLng(37.7897, -119.5073)) // Northeast
-                .include(LatLng(37.6744, -119.6815)) // Southwest
+                .include(LatLng(latitude + 0.1, longitude + 0.1)) // Northeast
+                .include(LatLng(latitude - 0.1, longitude - 0.1)) // Southwest
                 .build()
 
         // Define the offline region
         val definition = OfflineTilePyramidRegionDefinition(
-                mapboxMap.style.toString(),
+                Style.SATELLITE,
                 latLngBounds,
                 10.0,
-                20.0,Mapbox.getApplicationContext().getResources().getDisplayMetrics().density)
+                20.0,this.resources.displayMetrics.density)
+
+        // Implementation that uses JSON to store a map as the offline region name.
+        var metadata: ByteArray?
+        try {
+            val jsonObject = JSONObject()
+            val JSON_FIELD_REGION_NAME = "test"
+            jsonObject.put(JSON_FIELD_REGION_NAME, "Yosemite National Park")
+            val json = jsonObject.toString()
+            val JSON_CHARSET = "test_name"
+            metadata = json.toByteArray(charset(JSON_CHARSET))
+        } catch (exception: Exception) {
+            Log.e("---------------> TAG", "Failed to encode metadata: " + exception.message)
+            metadata = null
+        }
+
+
     }
-    */
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS)
@@ -101,11 +108,11 @@ class OfflineMapManagingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-
         mapboxMap.cameraPosition = CameraPosition.Builder()
                 .target(LatLng(latitude, longitude))
                 .zoom(zoom)
                 .build()
+
     }
 
     override fun onStart() {
