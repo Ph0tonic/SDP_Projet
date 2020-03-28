@@ -29,4 +29,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="mapbox_access_token">sk.eyJ1IjoibXlocmFlbCIsImEiOiJjazduaGgyOWowMTk1M2xsOHQ5d2N6MW02In0.mOwke6u2usaPmvK9asaXew</string>
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
+
+    <string name="simple_offline_end_progress_success">Région téléchargée avec succès.</string>
 </resources>

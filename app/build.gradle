@@ -80,6 +80,7 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.1.0-alpha.1'
     implementation 'com.google.guava:guava:28.2-android'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-offline-v9:0.7.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
 
 tasks.withType(Test) {

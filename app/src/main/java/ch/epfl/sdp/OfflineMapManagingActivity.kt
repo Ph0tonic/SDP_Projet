@@ -1,11 +1,13 @@
 package ch.epfl.sdp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
@@ -17,7 +19,6 @@ import com.mapbox.mapboxsdk.offline.OfflineManager.ListOfflineRegionsCallback
 import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionDeleteCallback
 import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
-import timber.log.Timber
 import kotlin.math.roundToInt
 
 /**
@@ -28,37 +29,52 @@ class OfflineMapManagingActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
     private var mapView: MapView? = null
     private var offlineManager: OfflineManager? = null
+    private var statusquoi : Long? = null
+    private var completeStatus : Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
-        Mapbox.getInstance(this, getString(ch.epfl.sdp.R.string.mapbox_access_token))
+        Mapbox.getInstance(this,
+                getString(ch.epfl.sdp.R.string.mapbox_access_token))
+
+        val latitude = intent.getDoubleExtra("latitude", -52.6885)
+        val longitude : Double = intent.getDoubleExtra("longitude", -70.1395)
 
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_offline_map)
+
         mapView = findViewById(R.id.store_mapoffline_mapView)
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(OnMapReadyCallback { mapboxMap ->
-            mapboxMap.setStyle(Style.OUTDOORS) { style ->
+            mapboxMap.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(latitude, longitude))
+                    .build()
+            mapboxMap.setStyle(Style.OUTDOORS)
+            { style ->
                 // Set up the OfflineManager
                 offlineManager = OfflineManager.getInstance(this@OfflineMapManagingActivity)
 
                 // Create a bounding box for the offline region
-                val latitude = intent.getDoubleExtra("latitude", -52.6885)
-                val longitude : Double = intent.getDoubleExtra("longitude", -70.1395)
-                val area = 0.1
+                val area = 0.001 // for the moment I define a small square
+                Log.d("DEBUG", "DEBUG_DEBUGGIIIIING1 latitude NW = " + (latitude + area))
+                Log.d("DEBUG", "DEBUG_DEBUGGIIIIING2 longitude NW = " + (longitude + area))
+
+                Log.d("DEBUG", "DEBUG_DEBUGGIIIIING1 latitude SW = " + (latitude - area))
+                Log.d("DEBUG", "DEBUG_DEBUGGIIIIING2 longitude SW = " + (longitude - area))
+
                 val latLngBounds = LatLngBounds.Builder()
                         .include(LatLng(latitude + area, longitude + area)) // Northeast
                         .include(LatLng(latitude - area, latitude - area)) // Southwest
                         .build()
                 // Define the offline region
                 val definition = OfflineTilePyramidRegionDefinition(
-                        style.uri,
+                        style.url,
                         latLngBounds,
+                        9.0,
                         10.0,
-                        20.0,
                         this@OfflineMapManagingActivity.resources.displayMetrics.density)
                 // Set the metadata
                 val metadata: ByteArray?
@@ -68,16 +84,19 @@ class OfflineMapManagingActivity : AppCompatActivity() {
                     val json = jsonObject.toString()
                     json.toByteArray(charset(JSON_CHARSET))
                 } catch (exception: Exception) {
-                    Timber.e("Failed to encode metadata: %s", exception.message)
+                    Log.d("DEBUG", "DEBUG_DEBUGGIIIIING1")
+                    Log.e("data encode fail: %s", exception.message)
                     null
                 }
                 // Create the region asynchronously
                 if (metadata != null) {
+                    Log.d("DEBUG", "DEBUG_DEBUGGIIIIING2")
                     offlineManager?.createOfflineRegion(
                             definition,
                             metadata,
                             object : CreateOfflineRegionCallback {
                                 override fun onCreate(offlineRegion: OfflineRegion) {
+                                    Log.d("DEBUG", "DEBUG_DEBUGGIIIIING3")
                                     offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
                                     // Display the download progress bar
                                     progressBar = findViewById(R.id.progress_bar)
@@ -85,25 +104,30 @@ class OfflineMapManagingActivity : AppCompatActivity() {
                                     // Monitor the download progress using setObserver
                                     offlineRegion.setObserver(object : OfflineRegionObserver {
                                         override fun onStatusChanged(status: OfflineRegionStatus) { // Calculate the download percentage and update the progress bar
+                                            statusquoi = status.requiredResourceCount
+                                            completeStatus = status.completedResourceCount
                                             val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
-                                            if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
+                                            if(status.isComplete){
+                                                endProgress(getString(R.string.simple_offline_end_progress_success))
+                                            }
+                                            else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                                                 setPercentage(percentage.roundToInt())
                                             }
                                         }
 
                                         override fun onError(error: OfflineRegionError) { // If an error occurs, print to logcat
-                                            Timber.e("onError reason: %s", error.reason)
-                                            Timber.e("onError message: %s", error.message)
+                                            Log.e("OFFDLE_Err", error.reason)
+                                            Log.e("OFFDLE_Err", error.message)
                                         }
 
                                         override fun mapboxTileCountLimitExceeded(limit: Long) { // Notify if offline region exceeds maximum tile count
-                                            Timber.e("Mapbox tile count limit exceeded: %s", limit)
+                                            Log.e("OFFDLE_TileCount","Too many tiles : " + limit + " Trying to download " + statusquoi + "did download :" + completeStatus)
                                         }
                                     })
                                 }
 
                                 override fun onError(error: String) {
-                                    Timber.e("Error: %s", error)
+                                    Log.e("Error: %s", error)
                                 }
                             })
                 }
@@ -126,9 +150,6 @@ class OfflineMapManagingActivity : AppCompatActivity() {
         mapView!!.onStop()
     }
 
-    fun tibo(){
-
-    }
     override fun onPause() {
         super.onPause()
         mapView!!.onPause()
@@ -136,6 +157,7 @@ class OfflineMapManagingActivity : AppCompatActivity() {
             offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
                 override fun onList(offlineRegions: Array<OfflineRegion>) {
                     if (offlineRegions.isNotEmpty()) { // delete the last item in the offlineRegions list which will be yosemite offline map
+                        Log.d("DEBUG", "DEBUG MAP ID" + offlineRegions[offlineRegions.size - 1].id)
                         offlineRegions[offlineRegions.size - 1].delete(object : OfflineRegionDeleteCallback {
                             override fun onDelete() {
                                 Toast.makeText(
@@ -146,14 +168,14 @@ class OfflineMapManagingActivity : AppCompatActivity() {
                             }
 
                             override fun onError(error: String) {
-                                Timber.e("On delete error: %s", error)
+                                Log.e("On delete error: %s", error)
                             }
                         })
                     }
                 }
 
                 override fun onError(error: String) {
-                    Timber.e("onListError: %s", error)
+                    Log.e("onListError: %s", error)
                 }
             })
         }

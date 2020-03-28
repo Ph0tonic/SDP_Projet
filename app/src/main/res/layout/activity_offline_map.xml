@@ -1,79 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    tools:context=".OfflineMapManagingActivity">
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/store_mapoffline_mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        mapbox:mapbox_cameraTargetLat="37.73359"
+        mapbox:mapbox_cameraTargetLng="-119.58410"
+        mapbox:mapbox_cameraZoom="10"
+        mapbox:mapbox_cameraZoomMin="10"/>
 
-    <LinearLayout
-        android:id="@+id/store_mapoffline_buttons"
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal"
-        android:weightSum="4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1">
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:paddingLeft="25dp"
+        android:layout_gravity="center"
+        android:paddingRight="25dp"
+        android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/store_mapoffline_button_done"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.25"
-            android:gravity="center"
-            android:onClick="returnPathToMaps"
-            android:text="Done"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/store_mapoffline_button_download"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.25"
-            android:gravity="center"
-            android:onClick="downloadOfflineMap"
-            android:text="Download"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/store_mapoffline_button_list"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.25"
-            android:gravity="center"
-            android:onClick="listOfflineMaps"
-            android:text="SHOW"
-            android:textColor="@android:color/white" />
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:paddingLeft="25dp"
-            android:layout_gravity="center"
-            android:paddingRight="25dp"
-            android:visibility="gone"/>
-
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
