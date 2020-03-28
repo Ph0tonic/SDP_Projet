@@ -112,7 +112,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
     fun onMapClicked(position: LatLng): Boolean{
         if (waypoints.size < 4){
             waypoints.add(position)
-            drawPinpoints(position)
+            drawPinpoint(position)
 
             if (waypoints.isNotEmpty()){
                 drawRegion(waypoints)
