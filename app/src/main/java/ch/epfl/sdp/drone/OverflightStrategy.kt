@@ -1,8 +1,11 @@
 package ch.epfl.sdp.drone
 
+import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
+import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
+import kotlin.math.min
 
 interface OverflightStrategy {
     fun createFlightPath(waypoints: List<LatLng>): List<LatLng>
@@ -14,21 +17,21 @@ interface OverflightStrategy {
 class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStrategy{
     private val maxDistBetweenLines: Double
     init {
-        require(maxDistBetweenLinesIn <= 0.0){
+        require(maxDistBetweenLinesIn > 0.0){
             "The maximum distance between passes must be strictly positive"
         }
         this.maxDistBetweenLines = maxDistBetweenLinesIn
     }
     @Throws(IllegalArgumentException::class)
     override fun createFlightPath(pinpoints: List<LatLng>): List<LatLng> {
-        require(pinpoints.size != 4){
+        require(pinpoints.size == 4){
             "This strategy requires exactly 4 pinpoints, ${pinpoints.size} given."
         }
 
         // Make a mutable copy of the waypoints to be able to reorder them
         var waypoints = mutableListOf<LatLng>().apply { addAll(pinpoints) }
 
-        val steps = max(2,floor(max(
+        val steps = max(2, ceil(max(
                 waypoints[0].distanceTo(waypoints[1]) / maxDistBetweenLines,
                 waypoints[2].distanceTo(waypoints[3]) / maxDistBetweenLines)).toInt())
 
@@ -49,6 +52,7 @@ class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStr
     private fun getStepAlong(p0: LatLng, p1: LatLng, step: Int, steps: Int): LatLng{
         val stepLat = (p1.latitude - p0.latitude) / (steps - 1)
         val stepLng = (p1.longitude - p0.longitude)  / (steps - 1)
+        Log.d("----------------","${p0.latitude}, $steps, $stepLat")
         return LatLng(p0.latitude + step * stepLat, p0.longitude + step * stepLng)
     }
 }

@@ -21,7 +21,7 @@ class OverflightStrategyTest {
         SimpleMultiPassOnQuadrangle(0.0)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = java.lang.IllegalArgumentException::class)
     fun simpleMultiPassOnQuadrangleDoesNotAcceptCreatingPathWithLessThanFourPositions(){
         SimpleMultiPassOnQuadrangle(-10.0)
                 .createFlightPath(listOf(LatLng(0.0,0.0)))
@@ -40,7 +40,7 @@ class OverflightStrategyTest {
 
     @Test
     fun simpleMultiPassCreatesGoodNumberOfPointsForSmallArea(){
-        val strategy = SimpleMultiPassOnQuadrangle(10000000000000000.0)
+        val strategy = SimpleMultiPassOnQuadrangle(1000000000000.0)
         val path = strategy.createFlightPath(listOf(
                         LatLng(0.0,0.0),
                         LatLng(1.0,0.0),
