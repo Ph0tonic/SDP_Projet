@@ -87,6 +87,14 @@ class TrajectoryPlanningActivityTest {
     }
 
     @Test
+    fun clearWaypointsClearsWaypoints(){
+        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000);
+        onView(withId(R.id.trajectory_planning_mapView)).perform(click())
+        onView(withId(R.id.mission_design_button_clear_waypoint)).perform(click())
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
+    }
+
+    @Test
     fun mapIsVisible(){
         onView(withId(R.id.trajectory_planning_mapView)).check(matches(isDisplayed()))
     }

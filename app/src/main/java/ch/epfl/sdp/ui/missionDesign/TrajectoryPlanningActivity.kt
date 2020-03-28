@@ -7,18 +7,16 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import ch.epfl.sdp.R
+import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapUtils
 import com.mapbox.mapboxsdk.Mapbox.getInstance
-import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import com.mapbox.mapboxsdk.utils.ColorUtils.colorToRgbaString
 
 
 class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -28,6 +26,12 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
     private var  circleManager: CircleManager? = null
     private var  lineManager: LineManager? = null
     private var fillManager: FillManager? = null
+
+    private val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
+    private val MAP_READY_DESCRIPTION: String = "MAP READY"
+
+    private val PATH_THICKNESS: Float = 5F
+    private val REGION_FILL_OPACITY: Float = 0.5F
 
     var waypoints = arrayListOf<LatLng>()
 
@@ -46,7 +50,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView?.getMapAsync(this)
 
         // Used to detect when the map is ready in tests
-        mapView?.contentDescription = "MAP NOT READY"
+        mapView?.contentDescription = MAP_NOT_READY_DESCRIPTION
     }
 
     override fun onStart() {
@@ -90,10 +94,10 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
 
-            symbolManager = SymbolManager(mapView!!, mapboxMap, style!!)
-            circleManager = CircleManager(mapView!!, mapboxMap, style)
+            fillManager = FillManager(mapView!!, mapboxMap,style!!)
+            symbolManager = SymbolManager(mapView!!, mapboxMap, style)
             lineManager = LineManager(mapView!!, mapboxMap, style)
-            fillManager = FillManager(mapView!!, mapboxMap,style)
+            circleManager = CircleManager(mapView!!, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -102,7 +106,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         // Used to detect when the map is ready in tests
-        mapView?.contentDescription = "MAP READY"
+        mapView?.contentDescription = MAP_READY_DESCRIPTION
     }
 
     fun onMapClicked(position: LatLng): Boolean{
@@ -114,21 +118,31 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
             circleManager?.create(circleOptions)
 
             if (waypoints.isNotEmpty()){
+                val fillOption = FillOptions()
+                        .withLatLngs(listOf(waypoints))
+                        .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
+                        .withFillOpacity(REGION_FILL_OPACITY)
+                fillManager?.deleteAll()
+                fillManager?.create(fillOption)
+
                 val linePoints = arrayListOf<LatLng>().apply {
                     addAll(waypoints)
                     add(waypoints[0])
                 }
-
-                val fillOption = FillOptions()
-                        .withLatLngs(listOf(waypoints))
-                        .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
-                        .withFillOpacity(0.5F)
-                fillManager?.create(fillOption)
-
-                val lineOptions = LineOptions().withLatLngs(linePoints)
+                val lineOptions = LineOptions()
+                        .withLatLngs(linePoints)
+                        .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
                 lineManager?.deleteAll()
                 lineManager?.create(lineOptions)
+            }
 
+            if (waypoints.size == 4){
+
+                val path = Drone.overflightStrategy.createFlightPath(waypoints)
+
+                lineManager?.create(LineOptions()
+                        .withLatLngs(path)
+                        .withLineWidth(PATH_THICKNESS))
             }
         }
         return true
