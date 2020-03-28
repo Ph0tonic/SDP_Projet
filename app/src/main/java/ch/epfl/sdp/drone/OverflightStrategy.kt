@@ -1,6 +1,5 @@
 package ch.epfl.sdp.drone
 
-import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 import kotlin.collections.ArrayList
@@ -53,7 +52,6 @@ class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStr
     private fun generateStepAlong(p0: LatLng, p1: LatLng, step: Int, steps: Int): LatLng{
         val stepLat = (p1.latitude - p0.latitude) / (steps - 1)
         val stepLng = (p1.longitude - p0.longitude)  / (steps - 1)
-        Log.d("----------------","${p0.latitude}, $steps, $stepLat")
         return LatLng(p0.latitude + step * stepLat, p0.longitude + step * stepLng)
     }
 }
