@@ -33,30 +33,39 @@ class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStr
         // If points were pace not in the right order
         assert(waypoints.size == 4)
 
-        val passes = max(2,floor(max(
+        val steps = max(2,floor(max(
                 waypoints[0].distanceTo(waypoints[1]) / maxDistBetweenLines,
                 waypoints[2].distanceTo(waypoints[3]) / maxDistBetweenLines)).toInt())
 
-        val stepLat1 = (waypoints[1].latitude - waypoints[0].latitude) / (passes - 1)
-        val stepLong1 = (waypoints[1].longitude - waypoints[0].longitude)  / (passes - 1)
-        val stepLat2 = (waypoints[2].latitude - waypoints[3].latitude)  / (passes - 1)
-        val stepLong2 = (waypoints[2].longitude - waypoints[3].longitude)  / (passes - 1)
+        val stepLat1 = (waypoints[1].latitude - waypoints[0].latitude) / (steps - 1)
+        val stepLong1 = (waypoints[1].longitude - waypoints[0].longitude)  / (steps - 1)
+        val stepLat2 = (waypoints[2].latitude - waypoints[3].latitude)  / (steps - 1)
+        val stepLong2 = (waypoints[2].longitude - waypoints[3].longitude)  / (steps - 1)
 
         val path = ArrayList<LatLng>()
 
-        for (pass in 0 until passes){
-            if(pass % 2 == 0){
-                path.add(LatLng(waypoints[0].latitude + pass * stepLat1,
-                        waypoints[0].longitude + pass * stepLong1))
-                path.add(LatLng(waypoints[3].latitude + pass * stepLat2,
-                        waypoints[3].longitude + pass * stepLong2))
+        for (step in 0 until steps){
+            if(step % 2 == 0){
+                path.add(LatLng(waypoints[0].latitude + step * stepLat1,
+                        waypoints[0].longitude + step * stepLong1))
+                getStepAlong(waypoints[0], waypoints[1])
+                path.add(LatLng(waypoints[3].latitude + step * stepLat2,
+                        waypoints[3].longitude + step * stepLong2))
             }else{
-                path.add(LatLng(waypoints[3].latitude + pass * stepLat2,
-                        waypoints[3].longitude + pass * stepLong2))
-                path.add(LatLng(waypoints[0].latitude + pass * stepLat1,
-                        waypoints[0].longitude + pass * stepLong1))
+                path.add(LatLng(waypoints[3].latitude + step * stepLat2,
+                        waypoints[3].longitude + step * stepLong2))
+                path.add(LatLng(waypoints[0].latitude + step * stepLat1,
+                        waypoints[0].longitude + step * stepLong1))
             }
         }
         return path
+    }
+
+    private fun getStepAlong(p0: LatLng, p1: LatLng,
+                             step: Int, steps: Int,
+                             stepLat: LatLng, stepLng: LatLng): LatLng{
+        val stepLat = (p1.latitude - p0.latitude) / (steps - 1)
+        val stepLng = (p1.longitude - p0.longitude)  / (steps - 1)
+        return LatLng(p0.latitude + step * stepLat, p0.longitude + step * stepLng)
     }
 }

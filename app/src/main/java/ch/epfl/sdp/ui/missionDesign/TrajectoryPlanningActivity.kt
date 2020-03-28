@@ -112,40 +112,53 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
     fun onMapClicked(position: LatLng): Boolean{
         if (waypoints.size < 4){
             waypoints.add(position)
-            val circleOptions = CircleOptions()
-                    .withLatLng(position)
-                    .withDraggable(true)
-            circleManager?.create(circleOptions)
+            drawPinpoints(position)
 
             if (waypoints.isNotEmpty()){
-                val fillOption = FillOptions()
-                        .withLatLngs(listOf(waypoints))
-                        .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
-                        .withFillOpacity(REGION_FILL_OPACITY)
-                fillManager?.deleteAll()
-                fillManager?.create(fillOption)
-
-                val linePoints = arrayListOf<LatLng>().apply {
-                    addAll(waypoints)
-                    add(waypoints[0])
-                }
-                val lineOptions = LineOptions()
-                        .withLatLngs(linePoints)
-                        .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
-                lineManager?.deleteAll()
-                lineManager?.create(lineOptions)
+                drawRegion(waypoints)
             }
 
             if (waypoints.size == 4){
-
-                val path = Drone.overflightStrategy.createFlightPath(waypoints)
-
-                lineManager?.create(LineOptions()
-                        .withLatLngs(path)
-                        .withLineWidth(PATH_THICKNESS))
+                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
             }
         }
         return true
+    }
+
+    private fun drawPath(path: List<LatLng>){
+        lineManager?.create(LineOptions()
+                .withLatLngs(path)
+                .withLineWidth(PATH_THICKNESS))
+    }
+
+    private fun drawRegion(corners: List<LatLng>){
+        // Draw the fill
+        val fillOption = FillOptions()
+                .withLatLngs(listOf(waypoints))
+                .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
+                .withFillOpacity(REGION_FILL_OPACITY)
+        fillManager?.deleteAll()
+        fillManager?.create(fillOption)
+
+        //Draw the borders
+
+        // Make it loop
+        val linePoints = arrayListOf<LatLng>().apply {
+            addAll(corners)
+            add(corners[0])
+        }
+        val lineOptions = LineOptions()
+                .withLatLngs(linePoints)
+                .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
+        lineManager?.deleteAll()
+        lineManager?.create(lineOptions)
+    }
+
+    private fun drawPinpoint(pinpoints: LatLng){
+        val circleOptions = CircleOptions()
+                .withLatLng(pinpoints)
+                .withDraggable(true)
+        circleManager?.create(circleOptions)
     }
 
     fun returnPathToMissionDesign(view: View) {
