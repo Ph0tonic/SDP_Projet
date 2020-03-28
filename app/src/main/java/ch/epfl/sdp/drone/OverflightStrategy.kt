@@ -2,10 +2,10 @@ package ch.epfl.sdp.drone
 
 import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.math.max
-import kotlin.math.min
 
 interface OverflightStrategy {
     fun createFlightPath(waypoints: List<LatLng>): List<LatLng>
@@ -38,18 +38,19 @@ class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStr
         val path = ArrayList<LatLng>()
 
         for (step in 0 until steps){
-            if(step % 2 == 0){
-                path.add(getStepAlong(waypoints[0], waypoints[1], step, steps))
-                path.add(getStepAlong(waypoints[3], waypoints[2], step, steps))
-            }else{
-                path.add(getStepAlong(waypoints[3], waypoints[2], step, steps))
-                path.add(getStepAlong(waypoints[0], waypoints[1], step, steps))
+            path.add(generateStepAlong(waypoints[0], waypoints[1], step, steps))
+            path.add(generateStepAlong(waypoints[3], waypoints[2], step, steps))
+            if(step % 2 != 0){
+                Collections.swap(path, path.size-1,path.size-2)
             }
         }
         return path
     }
 
-    private fun getStepAlong(p0: LatLng, p1: LatLng, step: Int, steps: Int): LatLng{
+    /**
+     * Generates a LatLng positioned at step/steps in the segment p0---p1
+     */
+    private fun generateStepAlong(p0: LatLng, p1: LatLng, step: Int, steps: Int): LatLng{
         val stepLat = (p1.latitude - p0.latitude) / (steps - 1)
         val stepLng = (p1.longitude - p0.longitude)  / (steps - 1)
         Log.d("----------------","${p0.latitude}, $steps, $stepLat")
