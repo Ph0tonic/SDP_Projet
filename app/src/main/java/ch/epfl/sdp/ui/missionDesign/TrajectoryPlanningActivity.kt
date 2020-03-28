@@ -27,13 +27,17 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
     private var  lineManager: LineManager? = null
     private var fillManager: FillManager? = null
 
-    private val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
-    private val MAP_READY_DESCRIPTION: String = "MAP READY"
 
-    private val PATH_THICKNESS: Float = 5F
-    private val REGION_FILL_OPACITY: Float = 0.5F
 
     var waypoints = arrayListOf<LatLng>()
+
+    companion object{
+        private const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
+        private const val MAP_READY_DESCRIPTION: String = "MAP READY"
+
+        private const val PATH_THICKNESS: Float = 5F
+        private const val REGION_FILL_OPACITY: Float = 0.5F
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

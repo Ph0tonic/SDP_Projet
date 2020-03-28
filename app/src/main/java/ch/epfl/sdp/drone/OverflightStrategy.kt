@@ -14,24 +14,19 @@ interface OverflightStrategy {
 class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStrategy{
     private val maxDistBetweenLines: Double
     init {
-        if (maxDistBetweenLinesIn <= 0.0){
-            throw java.lang.IllegalArgumentException("The maximum distance between passes must " +
-                    "be strictly positive")
+        require(maxDistBetweenLinesIn <= 0.0){
+            "The maximum distance between passes must be strictly positive"
         }
         this.maxDistBetweenLines = maxDistBetweenLinesIn
     }
     @Throws(IllegalArgumentException::class)
     override fun createFlightPath(pinpoints: List<LatLng>): List<LatLng> {
-        if(pinpoints.size != 4){
-            throw IllegalArgumentException("This strategy requires exactly 4 pinpoints, " +
-                    "${pinpoints.size} given.")
+        require(pinpoints.size != 4){
+            "This strategy requires exactly 4 pinpoints, ${pinpoints.size} given."
         }
 
         // Make a mutable copy of the waypoints to be able to reorder them
         var waypoints = mutableListOf<LatLng>().apply { addAll(pinpoints) }
-
-        // If points were pace not in the right order
-        assert(waypoints.size == 4)
 
         val steps = max(2,floor(max(
                 waypoints[0].distanceTo(waypoints[1]) / maxDistBetweenLines,
