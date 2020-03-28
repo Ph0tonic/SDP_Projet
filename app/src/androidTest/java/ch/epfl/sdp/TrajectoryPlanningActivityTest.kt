@@ -10,7 +10,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
@@ -84,6 +83,14 @@ class TrajectoryPlanningActivityTest {
         onView(withId(R.id.mission_design_button_done)).perform(click())
 
         assertThat(mActivityRule.activityResult, hasResultData(IntentMatchers.hasExtra("waypoints", wayPoints)))
+    }
+
+    @Test
+    fun clearWaypointsClearsWaypoints(){
+        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000);
+        onView(withId(R.id.trajectory_planning_mapView)).perform(click())
+        onView(withId(R.id.mission_design_button_clear_waypoint)).perform(click())
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
     }
 
     @Test
