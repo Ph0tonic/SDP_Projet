@@ -2,13 +2,10 @@ package ch.epfl.sdp.ui.maps
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.OfflineManagerActivity
-import ch.epfl.sdp.OfflineMapManagingActivity
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.Mapbox.getInstance
 import com.mapbox.mapboxsdk.camera.CameraPosition
