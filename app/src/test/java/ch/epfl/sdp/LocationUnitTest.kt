@@ -1,7 +1,10 @@
 package ch.epfl.sdp
 
+import android.content.Context
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
