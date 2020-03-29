@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -12,6 +13,7 @@ import ch.epfl.sdp.OfflineManagerActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -48,6 +50,10 @@ class OfflineManagerActivity : AppCompatActivity() {
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_offline_manager)
+        val latitude = intent.getDoubleExtra("latitude", -52.6885)
+        val longitude : Double = intent.getDoubleExtra("longitude", -70.1395)
+        val zoom : Double = intent.getDoubleExtra("zoom", 10.0)
+
         // Set up the MapView
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
@@ -66,6 +72,10 @@ class OfflineManagerActivity : AppCompatActivity() {
                 listButton = findViewById(R.id.list_button)
                 listButton?.setOnClickListener(View.OnClickListener { downloadedRegionList() })
             }
+            mapboxMap.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(latitude, longitude))
+                    .zoom(zoom)
+                    .build()
         })
     }
 
@@ -106,8 +116,8 @@ class OfflineManagerActivity : AppCompatActivity() {
     }
 
     private fun downloadRegionDialog() { // Set up download interaction. Display a dialog
-// when the user clicks download button and require
-// a user-provided region name
+        // when the user clicks download button and require
+        // a user-provided region name
         val builder = AlertDialog.Builder(this@OfflineManagerActivity)
         val regionNameEdit = EditText(this@OfflineManagerActivity)
         regionNameEdit.hint = getString(R.string.set_region_name_hint)
@@ -142,7 +152,8 @@ class OfflineManagerActivity : AppCompatActivity() {
             val styleUrl = style.uri
             val bounds = map!!.projection.visibleRegion.latLngBounds
             val minZoom = map!!.cameraPosition.zoom
-            val maxZoom = map!!.maxZoomLevel
+            val maxZoom : Double = 20.0
+            //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
             val pixelRatio = this@OfflineManagerActivity.resources.displayMetrics.density
             val definition = OfflineTilePyramidRegionDefinition(
                     styleUrl, bounds, minZoom, maxZoom, pixelRatio)
@@ -267,6 +278,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                             // When the user cancels, don't do anything.
                             // The dialog will automatically close
                         }.create()
+
                 dialog.show()
             }
 
