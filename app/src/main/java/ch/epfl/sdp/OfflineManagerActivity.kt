@@ -44,7 +44,7 @@ class OfflineManagerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Mapbox access token is configured here. This needs to be called either in your application
-// object or in the same activity which contains the mapview.
+        // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_offline_manager)
@@ -59,7 +59,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                 // Set up the offlineManager
                 offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
                 // Bottom navigation bar button clicks are handled here.
-// Download offline button
+                // Download offline button
                 downloadButton = findViewById(R.id.download_button)
                 downloadButton?.setOnClickListener(View.OnClickListener { downloadRegionDialog() })
                 // List offline regions
@@ -115,28 +115,29 @@ class OfflineManagerActivity : AppCompatActivity() {
         builder.setTitle(getString(R.string.dialog_title))
                 .setView(regionNameEdit)
                 .setMessage(getString(R.string.dialog_message))
-                .setPositiveButton(getString(R.string.dialog_positive_button)) { dialog, which ->
+                .setPositiveButton(getString(R.string.dialog_positive_button)) { _, _ ->
                     val regionName = regionNameEdit.text.toString()
                     // Require a region name to begin the download.
-// If the user-provided string is empty, display
-// a toast message and do not begin download.
-                    if (regionName.length == 0) {
-                        Toast.makeText(this@OfflineManagerActivity, "TODO getString(R.string.dialog_toast)", Toast.LENGTH_SHORT).show()
+                    // If the user-provided string is empty, display
+                    // a toast message and do not begin download.
+                    if (regionName.isEmpty()) {
+                        Toast.makeText(this@OfflineManagerActivity, getString(R.string.dialog_toast), Toast.LENGTH_SHORT).show()
                     } else { // Begin download process
                         downloadRegion(regionName)
                     }
                 }
-                .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, which -> dialog.cancel() }
+                .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
         // Display the dialog
         builder.show()
     }
 
-    private fun downloadRegion(regionName: String) { // Define offline region parameters, including bounds,
-// min/max zoom, and metadata
-// Start the progressBar
+    private fun downloadRegion(regionName: String) {
+        // Define offline region parameters, including bounds,
+        // min/max zoom, and metadata
+        // Start the progressBar
         startProgress()
         // Create offline definition using the current
-// style and boundaries of visible map area
+        // style and boundaries of visible map area
         map!!.getStyle { style ->
             val styleUrl = style.uri
             val bounds = map!!.projection.visibleRegion.latLngBounds
@@ -146,8 +147,8 @@ class OfflineManagerActivity : AppCompatActivity() {
             val definition = OfflineTilePyramidRegionDefinition(
                     styleUrl, bounds, minZoom, maxZoom, pixelRatio)
             // Build a JSONObject using the user-defined offline region title,
-// convert it into string, and use it to create a metadata variable.
-// The metadata variable will later be passed to createOfflineRegion()
+            // convert it into string, and use it to create a metadata variable.
+            // The metadata variable will later be passed to createOfflineRegion()
             val metadata: ByteArray?
             metadata = try {
                 val jsonObject = JSONObject()
@@ -179,7 +180,7 @@ class OfflineManagerActivity : AppCompatActivity() {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete) { // Download complete
-                    endProgress("TODO : getString(R.string.end_progress_success)")
+                    endProgress(getString(R.string.end_progress_success))
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     setPercentage(Math.round(percentage).toInt())
@@ -208,8 +209,8 @@ class OfflineManagerActivity : AppCompatActivity() {
         offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
 // downloaded yet, notify user and return
-                if (offlineRegions == null || offlineRegions.size == 0) {
-                    Toast.makeText(applicationContext, "TODO : getString(R.string.toast_no_regions_yet)", Toast.LENGTH_SHORT).show()
+                if (offlineRegions == null || offlineRegions.isEmpty()) {
+                    Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
                 // Add all of the region names to a list
@@ -250,7 +251,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                                     // progressBar and display a toast
                                     progressBar!!.visibility = View.INVISIBLE
                                     progressBar!!.isIndeterminate = false
-                                    Toast.makeText(applicationContext, "TODO : getString(R.string.toast_region_deleted)",
+                                    Toast.makeText(applicationContext, getString(R.string.toast_region_deleted),
                                             Toast.LENGTH_LONG).show()
                                 }
 
@@ -284,7 +285,7 @@ class OfflineManagerActivity : AppCompatActivity() {
             jsonObject.getString(JSON_FIELD_REGION_NAME)
         } catch (exception: Exception) {
             Timber.e("Failed to decode metadata: %s", exception.message)
-            String.format("TODO : getString(R.string.region_name)", offlineRegion.id)
+            String.format(getString(R.string.region_name), offlineRegion.id)
         }
         return regionName
     }

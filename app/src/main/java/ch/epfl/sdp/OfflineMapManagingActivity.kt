@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionDeleteCallback
 import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 /**
  * Download and view an offline map using the Mapbox Android SDK.
@@ -86,9 +87,9 @@ class OfflineMapManagingActivity : AppCompatActivity() {
                                         override fun onStatusChanged(status: OfflineRegionStatus) { // Calculate the download percentage and update the progress bar
                                             val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                                             if (status.isComplete) { // Download complete
-                                                endProgress(getString(R.string.simple_offline_end_progress_success))
+                                                endProgress(getString(R.string.end_progress_success))
                                             } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
-                                                setPercentage(Math.round(percentage).toInt())
+                                                setPercentage(percentage.roundToInt())
                                             }
                                         }
 

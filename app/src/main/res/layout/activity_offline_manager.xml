@@ -33,33 +33,31 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorAccent"
+        android:background="@color/colorPrimaryDark"
         android:elevation="8dp"
         android:orientation="horizontal"
         android:paddingTop="8dp">
 
         <Button
             android:id="@+id/download_button"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/white"
             android:clickable="true"
-            android:text="Download"
+            android:text="@string/dialog_positive_button"
             android:textAllCaps="false"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/list_button"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/white"
-            android:text="List"
+            android:text="@string/navigate_title"
             android:textAllCaps="false"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
     </LinearLayout>
 </RelativeLayout>
