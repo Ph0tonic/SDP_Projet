@@ -30,5 +30,15 @@
     <string name="mapbox_access_token">sk.eyJ1IjoibXlocmFlbCIsImEiOiJjazduaGgyOWowMTk1M2xsOHQ5d2N6MW02In0.mOwke6u2usaPmvK9asaXew</string>
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
 
-    <string name="simple_offline_end_progress_success">Région téléchargée avec succès.</string>
+    <string name="simple_offline_end_progress_success">Region successfully downloaded.</string>
+    <string name="dialog_title">Name new Region</string>
+    <string name="dialog_message">Download the map region you currently are viewing</string>
+    <string name="set_region_name_hint">Enter name</string>
+    <string name="dialog_positive_button">DOWNLOAD</string>
+    <string name="dialog_negative_button">CANCEL</string>
+    <string name="navigate_title">List</string>
+    <string name="navigate_positive_button">NAVIGATE TO</string>
+    <string name="navigate_negative_button_title">CANCEL</string>
+    <string name="navigate_neutral_button_title">DELETE</string>
+    
 </resources>

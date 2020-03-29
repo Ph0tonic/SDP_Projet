@@ -9,11 +9,7 @@
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/store_mapoffline_mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        mapbox:mapbox_cameraTargetLat="37.73359"
-        mapbox:mapbox_cameraTargetLng="-119.58410"
-        mapbox:mapbox_cameraZoom="10"
-        mapbox:mapbox_cameraZoomMin="10"/>
+        android:layout_height="match_parent"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"
