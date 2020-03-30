@@ -138,9 +138,7 @@ class OfflineManagerActivity : AppCompatActivity() {
          */
                 val regionNameEdit = EditText(this@OfflineManagerActivity)
                 regionNameEdit.hint = getString(R.string.set_region_name_hint)
-                regionNameEdit.id = R.integer.dialog_textfield_id
-                val lID = regionNameEdit.id
-            Log.d("BEU", "DEBUG : +++++++++++++++++++++++++++++++++++++ L'ID :" + lID)
+                regionNameEdit.id = R.integer.dialog_textfield_id as Int
 
         // Build the dialog box
         builder.setTitle(getString(R.string.dialog_title))
@@ -162,10 +160,11 @@ class OfflineManagerActivity : AppCompatActivity() {
         downloadDialog = builder.show()
     }
 
+    /**
+     * Define offline region parameters, including bounds,
+     * min/max zoom, and metadata
+     */
     private fun downloadRegion(regionName: String) {
-        // Define offline region parameters, including bounds,
-        // min/max zoom, and metadata
-        // Start the progressBar
         startProgress()
         // Create offline definition using the current
         // style and boundaries of visible map area
