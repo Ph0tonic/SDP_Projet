@@ -223,12 +223,12 @@ class OfflineManagerActivity : AppCompatActivity() {
     }
 
     private fun downloadedRegionList() { // Build a region list when the user clicks the list button
-// Reset the region selected int to 0
-        regionSelected = 0
-        // Query the DB asynchronously
-        offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
+            // Reset the region selected int to 0
+            regionSelected = 0
+            // Query the DB asynchronously
+            offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
-// downloaded yet, notify user and return
+            // downloaded yet, notify user and return
                 if (offlineRegions == null || offlineRegions.isEmpty()) {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
