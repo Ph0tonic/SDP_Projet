@@ -44,14 +44,9 @@ class OfflineManagerActivity : AppCompatActivity() {
     private var listButton: Button? = null
     private var isEndNotified = false
     private var regionSelected = 0
-    private var downloadDialog: AlertDialog? = null
     // Offline objects
     private var offlineManager: OfflineManager? = null
     private var offlineRegion: OfflineRegion? = null
-
-    fun getDialog(): AlertDialog?{
-        return downloadDialog
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,15 +125,9 @@ class OfflineManagerActivity : AppCompatActivity() {
         // a user-provided region name
         val builder = AlertDialog.Builder(this@OfflineManagerActivity)
 
-        /*
-        val regionNameEdit = findViewById<EditText>(R.id.editName)
-        regionNameEdit.visibility = View.VISIBLE
-
-
-         */
-                val regionNameEdit = EditText(this@OfflineManagerActivity)
-                regionNameEdit.hint = getString(R.string.set_region_name_hint)
-                regionNameEdit.id = R.integer.dialog_textfield_id as Int
+        val regionNameEdit = EditText(this@OfflineManagerActivity)
+            regionNameEdit.hint = getString(R.string.set_region_name_hint)
+            regionNameEdit.id = R.integer.dialog_textfield_id as Int
 
         // Build the dialog box
         builder.setTitle(getString(R.string.dialog_title))
@@ -157,7 +146,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                 }
                 .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
         // Display the dialog
-        downloadDialog = builder.show()
+        builder.show()
     }
 
     /**
@@ -253,7 +242,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                 // Build a dialog containing the list of regions
                 val dialog = AlertDialog.Builder(this@OfflineManagerActivity)
                         .setTitle(getString(R.string.navigate_title))
-                        .setSingleChoiceItems(items, 0) { dialog, which ->
+                        .setSingleChoiceItems(items, 0) { _, which ->
                             // Track which region the user selects
                             regionSelected = which
                         }
