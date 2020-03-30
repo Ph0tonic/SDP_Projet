@@ -2,14 +2,12 @@ package ch.epfl.sdp
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import ch.epfl.sdp.OfflineManagerActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -27,9 +25,13 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * Download, view, navigate to, and delete an offline region.
+ *
+ * Be careful, the maximum number of tiles a user can download is 6000
+ * TODO : show error when user try to download more than the limit
  */
 class OfflineManagerActivity : AppCompatActivity() {
     // UI elements
@@ -43,6 +45,7 @@ class OfflineManagerActivity : AppCompatActivity() {
     // Offline objects
     private var offlineManager: OfflineManager? = null
     private var offlineRegion: OfflineRegion? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Mapbox access token is configured here. This needs to be called either in your application
@@ -186,7 +189,7 @@ class OfflineManagerActivity : AppCompatActivity() {
     }
 
     private fun launchDownload() { // Set up an observer to handle download progress and
-// notify the user when the region is finished downloading
+        // notify the user when the region is finished downloading
         offlineRegion!!.setObserver(object : OfflineRegionObserver {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
@@ -194,7 +197,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                     endProgress(getString(R.string.end_progress_success))
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
-                    setPercentage(Math.round(percentage).toInt())
+                    setPercentage(percentage.roundToInt())
                 }
                 // Log what is being currently downloaded
                 Timber.d("%s/%s resources; %s bytes downloaded.", status.completedResourceCount.toString(), status.requiredResourceCount.toString(), status.completedResourceSize.toString())
@@ -274,7 +277,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                             })
                         }
                         .setNegativeButton(getString(R.string.navigate_negative_button_title)
-                        ) { dialog, id ->
+                        ) { _, _ ->
                             // When the user cancels, don't do anything.
                             // The dialog will automatically close
                         }.create()
@@ -333,7 +336,6 @@ class OfflineManagerActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "OffManActivity"
         // JSON encoding/decoding
         const val JSON_CHARSET = "UTF-8"
         const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
