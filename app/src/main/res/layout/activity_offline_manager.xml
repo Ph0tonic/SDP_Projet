@@ -12,7 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         mapbox:mapbox_cameraZoom="15.27"
-        mapbox:mapbox_cameraZoomMin="10"/>
+        mapbox:mapbox_cameraZoomMin="10" >
+    </com.mapbox.mapboxsdk.maps.MapView>
+
+    <EditText
+        android:id="@+id/editName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter Name"
+        android:visibility="invisible"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"

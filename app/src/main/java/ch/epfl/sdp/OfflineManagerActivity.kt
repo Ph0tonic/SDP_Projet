@@ -1,7 +1,9 @@
 package ch.epfl.sdp
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -42,9 +44,14 @@ class OfflineManagerActivity : AppCompatActivity() {
     private var listButton: Button? = null
     private var isEndNotified = false
     private var regionSelected = 0
+    private var downloadDialog: AlertDialog? = null
     // Offline objects
     private var offlineManager: OfflineManager? = null
     private var offlineRegion: OfflineRegion? = null
+
+    fun getDialog(): AlertDialog?{
+        return downloadDialog
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,8 +129,19 @@ class OfflineManagerActivity : AppCompatActivity() {
         // when the user clicks download button and require
         // a user-provided region name
         val builder = AlertDialog.Builder(this@OfflineManagerActivity)
-        val regionNameEdit = EditText(this@OfflineManagerActivity)
-        regionNameEdit.hint = getString(R.string.set_region_name_hint)
+
+        /*
+        val regionNameEdit = findViewById<EditText>(R.id.editName)
+        regionNameEdit.visibility = View.VISIBLE
+
+
+         */
+                val regionNameEdit = EditText(this@OfflineManagerActivity)
+                regionNameEdit.hint = getString(R.string.set_region_name_hint)
+                regionNameEdit.id = R.integer.dialog_textfield_id
+                val lID = regionNameEdit.id
+            Log.d("BEU", "DEBUG : +++++++++++++++++++++++++++++++++++++ L'ID :" + lID)
+
         // Build the dialog box
         builder.setTitle(getString(R.string.dialog_title))
                 .setView(regionNameEdit)
@@ -141,7 +159,7 @@ class OfflineManagerActivity : AppCompatActivity() {
                 }
                 .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
         // Display the dialog
-        builder.show()
+        downloadDialog = builder.show()
     }
 
     private fun downloadRegion(regionName: String) {
