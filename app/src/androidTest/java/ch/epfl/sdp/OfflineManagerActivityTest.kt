@@ -23,20 +23,20 @@ import ch.epfl.sdp.R.string.dialog_title
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_map.*
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 
 
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class OfflineManagerActivityTest {
     private var mUiDevice: UiDevice? = null
     private val latitude = 46.307165438
     private val longitude = 7.476331
     private val zoom = 10.0
     private val name = "Crans-Montana"
+    private val timeout : Long = 2000
 
     @Before
     @Throws(Exception::class)
@@ -65,89 +65,80 @@ class OfflineManagerActivityTest {
 
     @Test
     fun canOpenDownloadDialog(){
-        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("Enter")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
         onView(withId(R.integer.dialog_textfield_id))
                .check(matches(isDisplayed()))
     }
 
     @Test
     fun canOpenListDialog(){
-        mUiDevice?.wait(Until.hasObject(By.desc("List")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("List")), timeout)
         onView(withText(R.string.navigate_title)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("List")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("List")), timeout)
         onView(withText(R.string.navigate_title))
                 .check(matches(isDisplayed()))
     }
 
     @Test
     fun canCancelDownload(){
-        mUiDevice?.wait(Until.hasObject(By.desc("Download")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("Download")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("CANCEL")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("CANCEL")), timeout)
         onView(withText(R.string.dialog_negative_button)).perform(click())
     }
 
     @Test
     fun canCancelList(){
-        mUiDevice?.wait(Until.hasObject(By.desc("List")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("List")), timeout)
         onView(withText(R.string.navigate_title)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("CANCEL")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("CANCEL")), timeout)
         onView(withText(R.string.navigate_negative_button_title)).perform(click())
     }
 
     @Test
-    fun canDownloadMap(){
-        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+    fun a_canDownloadMap(){
+        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("Enter")), 1000)
+        mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
         onView(withId(R.integer.dialog_textfield_id)).perform(typeText(name))
 
         mUiDevice?.pressBack()
 
-        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), 1000)
+        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
     }
 
     @Test
-    fun canDeleteMap(){
-        runOnUiThread {
-            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = CameraPosition.Builder()
-                        .target(LatLng(latitude, longitude))
-                        .zoom(zoom)
-                        .build()
-            }
-        }
-        mUiDevice?.wait(Until.hasObject(By.desc("List")), 1000)
+    fun z_canDeleteMap(){
+        mUiDevice?.wait(Until.hasObject(By.desc("List")), timeout)
         onView(withText(R.string.navigate_title)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("DELETE")), 1000)
+        mUiDevice?.wait(Until.hasObject(By.desc("DELETE")), timeout)
         onView(withText(R.string.navigate_neutral_button_title)).perform(click())
-        Thread.sleep(2000)
     }
 
     @Test
     fun canNavigateTo(){
-        mUiDevice?.wait(Until.hasObject(By.desc("List")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("List")), timeout)
         onView(withText(R.string.navigate_title)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("NAVIGATE")), 2000);
+        mUiDevice?.wait(Until.hasObject(By.desc("NAVIGATE")), timeout)
         onView(withText(R.string.navigate_positive_button)).perform(click())
     }
 
     @Test
     fun cannotEmptyDownloadName(){
-        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), 1000)
+        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), 1000)
+        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
     }
 }
