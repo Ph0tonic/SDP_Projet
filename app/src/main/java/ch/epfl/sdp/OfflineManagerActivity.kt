@@ -172,9 +172,8 @@ class OfflineManagerActivity : AppCompatActivity() {
             val metadata: ByteArray?
             metadata = try {
                 val jsonObject = JSONObject()
-                jsonObject.put(JSON_FIELD_REGION_NAME, regionName)
-                val json = jsonObject.toString()
-                json.toByteArray(charset(JSON_CHARSET))
+                                                .put(JSON_FIELD_REGION_NAME, regionName)
+                jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
                 Timber.e("Failed to encode metadata: %s", exception.message)
                 null
@@ -300,10 +299,9 @@ class OfflineManagerActivity : AppCompatActivity() {
     private fun getRegionName(offlineRegion: OfflineRegion): String { // Get the region name from the offline region metadata
         val regionName: String
         regionName = try {
-            val metadata = offlineRegion.metadata
-            val json = String(metadata, Charset.forName(JSON_CHARSET))
-            val jsonObject = JSONObject(json)
-            jsonObject.getString(JSON_FIELD_REGION_NAME)
+           JSONObject(
+                   String(offlineRegion.metadata, Charset.forName(JSON_CHARSET))
+                     ).getString(JSON_FIELD_REGION_NAME)
         } catch (exception: Exception) {
             Timber.e("Failed to decode metadata: %s", exception.message)
             String.format(getString(R.string.region_name), offlineRegion.id)
