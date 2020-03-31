@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -67,6 +68,6 @@ class MapActivityTest {
         // Launch activity
         mActivityRule.launchActivity(Intent())
 
-        Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
+        onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
     }
 }

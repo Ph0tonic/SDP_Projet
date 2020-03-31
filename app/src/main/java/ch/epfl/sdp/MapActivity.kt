@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -56,6 +57,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         button.setOnClickListener {
             val dme = DroneMissionExample.makeDroneMission()
             dme.startMission()
+        }
+
+        val offlineButton : Button = findViewById(R.id.stored_offline_map)
+        offlineButton.setOnClickListener {
+            startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
     }
 
