@@ -158,14 +158,13 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
         // Create offline definition using the current
         // style and boundaries of visible map area
         map!!.getStyle { style ->
-            val styleUrl = style.uri
-            val bounds = map!!.projection.visibleRegion.latLngBounds
-            val minZoom = map!!.cameraPosition.zoom
-            val maxZoom : Double = 20.0
-            //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
-            val pixelRatio = this@OfflineManagerActivity.resources.displayMetrics.density
+            val maxZoom : Double = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
             val definition = OfflineTilePyramidRegionDefinition(
-                    styleUrl, bounds, minZoom, maxZoom, pixelRatio)
+                    style.uri,
+                    map!!.projection.visibleRegion.latLngBounds,
+                    map!!.cameraPosition.zoom, //minimum Zoom level
+                    maxZoom,
+                    this@OfflineManagerActivity.resources.displayMetrics.density)
             // Build a JSONObject using the user-defined offline region title,
             // convert it into string, and use it to create a metadata variable.
             // The metadata variable will later be passed to createOfflineRegion()
