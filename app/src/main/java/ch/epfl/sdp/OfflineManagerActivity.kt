@@ -35,7 +35,7 @@ import kotlin.math.roundToInt
  * Be careful, the maximum number of tiles a user can download is 6000
  * TODO : show error when user try to download more than the limit
  */
-class OfflineManagerActivity : AppCompatActivity() {
+class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
     // UI elements
     private var mapView: MapView? = null
     private var map: MapboxMap? = null
@@ -44,6 +44,9 @@ class OfflineManagerActivity : AppCompatActivity() {
     private var listButton: Button? = null
     private var isEndNotified = false
     private var regionSelected = 0
+    private var latitude : Double = 0.0
+    private var longitude : Double = 0.0
+    private var zoom : Double = 0.0
     // Offline objects
     private var offlineManager: OfflineManager? = null
     private var offlineRegion: OfflineRegion? = null
@@ -55,33 +58,35 @@ class OfflineManagerActivity : AppCompatActivity() {
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_offline_manager)
-        val latitude = intent.getDoubleExtra("latitude", -52.6885)
-        val longitude : Double = intent.getDoubleExtra("longitude", -70.1395)
-        val zoom : Double = intent.getDoubleExtra("zoom", 10.0)
+        latitude = intent.getDoubleExtra("latitude", -52.6885)
+        longitude = intent.getDoubleExtra("longitude", -70.1395)
+        zoom = intent.getDoubleExtra("zoom", 10.0)
 
         // Set up the MapView
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(OnMapReadyCallback { mapboxMap ->
-            map = mapboxMap
-            mapboxMap.setStyle(Style.MAPBOX_STREETS) {
-                // Assign progressBar for later use
-                progressBar = findViewById(R.id.progress_bar)
-                // Set up the offlineManager
-                offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
-                // Bottom navigation bar button clicks are handled here.
-                // Download offline button
-                downloadButton = findViewById(R.id.download_button)
-                downloadButton?.setOnClickListener(View.OnClickListener { downloadRegionDialog() })
-                // List offline regions
-                listButton = findViewById(R.id.list_button)
-                listButton?.setOnClickListener(View.OnClickListener { downloadedRegionList() })
-            }
-            mapboxMap.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(latitude, longitude))
-                    .zoom(zoom)
-                    .build()
-        })
+        mapView?.getMapAsync(this)
+    }
+
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        map = mapboxMap
+        mapboxMap.setStyle(Style.MAPBOX_STREETS) {
+            // Assign progressBar for later use
+            progressBar = findViewById(R.id.progress_bar)
+            // Set up the offlineManager
+            offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
+            // Bottom navigation bar button clicks are handled here.
+            // Download offline button
+            downloadButton = findViewById(R.id.download_button)
+            downloadButton?.setOnClickListener(View.OnClickListener { downloadRegionDialog() })
+            // List offline regions
+            listButton = findViewById(R.id.list_button)
+            listButton?.setOnClickListener(View.OnClickListener { downloadedRegionList() })
+        }
+        mapboxMap.cameraPosition = CameraPosition.Builder()
+                .target(LatLng(latitude, longitude))
+                .zoom(zoom)
+                .build()
     }
 
     // Override Activity lifecycle methods
