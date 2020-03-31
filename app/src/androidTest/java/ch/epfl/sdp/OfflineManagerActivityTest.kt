@@ -29,7 +29,6 @@ import org.junit.runners.MethodSorters
 
 
 @RunWith(AndroidJUnit4::class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class OfflineManagerActivityTest {
     private var mUiDevice: UiDevice? = null
     private val latitude = 46.307165438
@@ -102,7 +101,7 @@ class OfflineManagerActivityTest {
     }
 
     @Test
-    fun a_canDownloadMap(){
+    fun canDownloadMap(){
         mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
@@ -116,7 +115,18 @@ class OfflineManagerActivityTest {
     }
 
     @Test
-    fun z_canDeleteMap(){
+    fun canDeleteMap(){
+        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), timeout)
+        onView(withText(R.string.dialog_positive_button)).perform(click())
+
+        mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
+        onView(withId(R.integer.dialog_textfield_id)).perform(typeText(name))
+
+        mUiDevice?.pressBack()
+
+        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), timeout)
+        onView(withText(R.string.dialog_positive_button)).perform(click())
+
         mUiDevice?.wait(Until.hasObject(By.desc("List")), timeout)
         onView(withText(R.string.navigate_title)).perform(click())
 
