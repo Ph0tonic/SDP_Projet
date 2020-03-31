@@ -126,7 +126,7 @@ class OfflineManagerActivityTest {
         mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        Thread.sleep(timeout)
+        Thread.sleep(timeout*30)
 
         mUiDevice?.wait(Until.hasObject(By.desc("List")),  timeout)
         onView(withId(R.id.list_button)).perform(click())
