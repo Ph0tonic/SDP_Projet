@@ -129,10 +129,10 @@ class OfflineManagerActivityTest {
         mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD").clickable(true)), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("List").clickable(true)), timeout)
+        mUiDevice?.wait(Until.hasObject(By.desc("List").clickable(true)),  timeout * 10)
         onView(withId(R.id.list_button)).perform(click())
 
-        mUiDevice?.wait(Until.hasObject(By.desc("DELETE")), timeout)
+        mUiDevice?.wait(Until.hasObject(By.desc("DELETE").clickable(true)), timeout * 10)
         onView(withText(R.string.navigate_neutral_button_title)).perform(click())
     }
 
