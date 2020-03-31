@@ -18,9 +18,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_map.*
 import org.junit.*
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 
 
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class OfflineManagerActivityTest {
     private var mUiDevice: UiDevice? = null
 
@@ -99,7 +101,7 @@ class OfflineManagerActivityTest {
     }
 
     @Test
-    fun canDownloadMap(){
+    fun acanDownloadMap(){
         mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), timeout)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
@@ -113,20 +115,7 @@ class OfflineManagerActivityTest {
     }
 
     @Test
-    fun canDeleteOceanMap(){
-
-        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), timeout)
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-
-        mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
-        onView(withId(R.id.dialog_textfield_id)).perform(typeText(oceanName))
-
-        mUiDevice?.pressBack()
-
-        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD")), timeout)
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-
-        Thread.sleep(timeout*30)
+    fun zcanDeleteOceanMap(){
 
         mUiDevice?.wait(Until.hasObject(By.desc("List")),  timeout)
         onView(withId(R.id.list_button)).perform(click())
