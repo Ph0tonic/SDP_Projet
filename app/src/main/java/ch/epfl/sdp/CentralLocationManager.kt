@@ -28,7 +28,7 @@ object CentralLocationManager {
         locationManager = this.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
 
-        if(checkPermission()){
+        if(checkAndRequestPermission()){
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
         }
@@ -49,19 +49,31 @@ object CentralLocationManager {
                     val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     activity.startActivity(myIntent)
                 }
-                .setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt ->})
+                .setNegativeButton("Cancel") { paramDialogInterface, paramInt ->}
 
         locationDisabledAlert.show()
     }
 
 
-    private fun checkPermission(): Boolean {
-        return if (ActivityCompat.checkSelfPermission(activity.applicationContext,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(activity.applicationContext,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    private fun checkAndRequestPermission(): Boolean {
+        val hasPermission = checkPermission()
+        if (!hasPermission){
             requestPermissions()
-            false
-        } else {
-            true
         }
+        return hasPermission
+    }
+
+    private fun checkPermission(): Boolean{
+        val t1 = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        val t2 = checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        //Log.d("---------------------", "Fine: $t1 Coarse: $t2")
+
+        return t1 && t2
+    }
+
+    private fun checkPermission(permission: String): Boolean{
+        return ActivityCompat.checkSelfPermission(activity.applicationContext,permission) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermissions(){
