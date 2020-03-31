@@ -226,7 +226,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
             offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
             // downloaded yet, notify user and return
-                if (offlineRegions == null || offlineRegions.isEmpty()) {
+                if (offlineRegions.isEmpty()) {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
@@ -243,7 +243,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
                             // Track which region the user selects
                             regionSelected = which
                         }
-                        .setPositiveButton(getString(R.string.navigate_positive_button)) { dialog, id ->
+                        .setPositiveButton(getString(R.string.navigate_positive_button)) { _, _ ->
                             Toast.makeText(this@OfflineManagerActivity, items[regionSelected], Toast.LENGTH_LONG).show()
                             // Get the region bounds and zoom
                             val bounds = offlineRegions[regionSelected].definition.bounds
@@ -256,7 +256,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
                             // Move camera to new position
                             map!!.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
                         }
-                        .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { dialog, id ->
+                        .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
                             // Make progressBar indeterminate and
                             // set it to visible to signal that
                             // the deletion process has begun
