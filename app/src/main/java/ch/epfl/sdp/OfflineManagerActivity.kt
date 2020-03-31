@@ -81,7 +81,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
             listButton = findViewById(R.id.list_button)
             listButton?.setOnClickListener(View.OnClickListener { downloadedRegionList() })
         }
-        setupCameraWithParameters(applicationContext, mapboxMap, latitude, longitude, zoom)
+        setupCameraWithParameters(mapboxMap, latitude, longitude, zoom)
     }
 
     // Override Activity lifecycle methods
