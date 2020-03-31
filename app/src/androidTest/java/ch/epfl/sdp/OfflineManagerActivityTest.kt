@@ -68,7 +68,7 @@ class OfflineManagerActivityTest {
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
         mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
-        onView(withId(R.integer.dialog_textfield_id))
+        onView(withId(R.id.dialog_textfield_id))
                .check(matches(isDisplayed()))
     }
 
@@ -106,7 +106,7 @@ class OfflineManagerActivityTest {
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
         mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
-        onView(withId(R.integer.dialog_textfield_id)).perform(typeText(name))
+        onView(withId(R.id.dialog_textfield_id)).perform(typeText(name))
 
         mUiDevice?.pressBack()
 
@@ -120,7 +120,7 @@ class OfflineManagerActivityTest {
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
         mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
-        onView(withId(R.integer.dialog_textfield_id)).perform(typeText(name))
+        onView(withId(R.id.dialog_textfield_id)).perform(typeText(name))
 
         mUiDevice?.pressBack()
 

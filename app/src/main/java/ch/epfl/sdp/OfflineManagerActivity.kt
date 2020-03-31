@@ -1,9 +1,7 @@
 package ch.epfl.sdp
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -49,7 +47,6 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
     private var zoom : Double = 0.0
     // Offline objects
     private var offlineManager: OfflineManager? = null
-    private var offlineRegion: OfflineRegion? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,7 +129,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val regionNameEdit = EditText(this@OfflineManagerActivity)
             regionNameEdit.hint = getString(R.string.set_region_name_hint)
-            regionNameEdit.id = R.integer.dialog_textfield_id as Int
+            regionNameEdit.id =  R.id.dialog_textfield_id
 
         // Build the dialog box
         builder.setTitle(getString(R.string.dialog_title))
@@ -186,9 +183,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
             // Create the offline region and launch the download
             offlineManager!!.createOfflineRegion(definition, metadata!!, object : CreateOfflineRegionCallback {
                 override fun onCreate(offlineRegion: OfflineRegion) {
-                    Timber.d("Offline region created: %s", regionName)
-                    this@OfflineManagerActivity.offlineRegion = offlineRegion
-                    launchDownload()
+                    launchDownload(offlineRegion)
                 }
 
                 override fun onError(error: String) {
@@ -198,9 +193,9 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun launchDownload() { // Set up an observer to handle download progress and
+    private fun launchDownload(offlineRegion: OfflineRegion) { // Set up an observer to handle download progress and
         // notify the user when the region is finished downloading
-        offlineRegion!!.setObserver(object : OfflineRegionObserver {
+        offlineRegion.setObserver(object : OfflineRegionObserver {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete) { // Download complete
@@ -209,8 +204,6 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     setPercentage(percentage.roundToInt())
                 }
-                // Log what is being currently downloaded
-                Timber.d("%s/%s resources; %s bytes downloaded.", status.completedResourceCount.toString(), status.requiredResourceCount.toString(), status.completedResourceSize.toString())
             }
 
             override fun onError(error: OfflineRegionError) {
@@ -223,7 +216,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
         // Change the region state
-        offlineRegion!!.setDownloadState(OfflineRegion.STATE_ACTIVE)
+        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
     }
 
     private fun downloadedRegionList() { // Build a region list when the user clicks the list button
