@@ -13,6 +13,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import ch.epfl.sdp.ui.maps.MapUtils
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_map.*
@@ -43,14 +44,10 @@ class OfflineManagerActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = CameraPosition.Builder()
-                        .target(LatLng(oceanlatitude, oceanlongitude))
-                        .zoom(oceanZoom)
-                        .build()
+                MapUtils.setupCameraWithParameters(getContext(), mapboxMap, oceanlatitude, oceanlongitude, zoom)
             }
         }
     }
-
 
     @get:Rule
     var mActivityRule = ActivityTestRule(

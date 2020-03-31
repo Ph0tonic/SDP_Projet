@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -80,10 +81,7 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
             listButton = findViewById(R.id.list_button)
             listButton?.setOnClickListener(View.OnClickListener { downloadedRegionList() })
         }
-        mapboxMap.cameraPosition = CameraPosition.Builder()
-                .target(LatLng(latitude, longitude))
-                .zoom(zoom)
-                .build()
+        setupCameraWithParameters(applicationContext, mapboxMap, latitude, longitude, zoom)
     }
 
     // Override Activity lifecycle methods

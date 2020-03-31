@@ -47,4 +47,19 @@ object MapUtils {
                 .zoom(loadLastMapZoomFromPrefs(context))
                 .build()
     }
+
+    /**
+     * Loads and applies the camera settings passed in parameters to the camera of the given map
+     * @param context
+     * @param mapboxMap
+     * @param latitude
+     * @param longitude
+     * @param zoom
+     */
+    fun setupCameraWithParameters(context : Context, mapboxMap: MapboxMap, latitude : Double, longitude : Double, zoom : Double){
+        mapboxMap.cameraPosition = CameraPosition.Builder()
+                .target(LatLng(latitude, longitude))
+                .zoom(zoom)
+                .build()
+    }
 }
