@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.doubleClick
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -61,6 +64,19 @@ class MapActivityTest {
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
     }
+    @Test
+    fun mapBoxCanAddMarker(){
+        mActivityRule.launchActivity(Intent())
+        onView(withId(R.id.mapView)).perform(click())
+        Thread.sleep(1000)
+        //click on the current marker once again to remove it
+        onView(withId(R.id.mapView)).perform(click())
+    }
+    @Test
+    fun mapBoxCanRemoveMarker() {
+        mActivityRule.launchActivity(Intent())
+        onView(withId(R.id.mapView)).perform(doubleClick())
+    }
 
     @Test
     fun canStartMission(){
@@ -68,5 +84,6 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
 
         Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
+
     }
 }
