@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -142,6 +143,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationSubscriber 
                 .target(LatLng(latitude, longitude))
                 .zoom(zoom)
                 .build()
+
+        mapboxMap.addOnMapClickListener { point ->
+            mapboxMap.addMarker(MarkerOptions().position(point).title(point.toString()))
+            true
+        }
+        mapboxMap.setOnMarkerClickListener { marker ->
+            mapboxMap.removeMarker(marker)
+            true
+        }
 
 //        mapboxMap.uiSettings.isRotateGesturesEnabled = false
 //        mapboxMap.uiSettings.isTiltGesturesEnabled = false
