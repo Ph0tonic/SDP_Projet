@@ -47,6 +47,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var offlineManager: OfflineManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.mapView = findViewById(R.id.mapView)
         super.onCreate(savedInstanceState)
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
@@ -58,7 +59,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         zoom = intent.getDoubleExtra("zoom", 10.0)
 
         // Set up the MapView
-        super.mapView = findViewById(R.id.mapView)
         super.mapView?.getMapAsync(this)
     }
 
@@ -118,7 +118,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Create offline definition using the current
         // style and boundaries of visible map area
         map!!.getStyle { style ->
-            val maxZoom : Double = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
+            val maxZoom = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
             val definition = OfflineTilePyramidRegionDefinition(
                     style.uri,
                     map!!.projection.visibleRegion.latLngBounds,
@@ -186,13 +186,13 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
                 val items = offlineRegionsNames.toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
-                val dialog = createDialog(items, offlineRegions).show()
+                showDialog(items, offlineRegions)
             }
             override fun onError(error: String) { Timber.e("Error: %s", error) }
         })
     }
 
-    private fun createDialog(items : Array<CharSequence>, offlineRegions : Array<OfflineRegion>) : AlertDialog {
+    private fun showDialog(items : Array<CharSequence>, offlineRegions : Array<OfflineRegion>)  {
         return AlertDialog.Builder(this@OfflineManagerActivity)
                 .setTitle(getString(R.string.navigate_title)).setSingleChoiceItems(items, 0) { _, which -> regionSelected = which }
                 .setPositiveButton(getString(R.string.navigate_positive_button)) { _, _ ->
@@ -213,7 +213,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 // When the user cancels, don't do anything.
                 // The dialog will automatically close
                 .setNegativeButton(getString(R.string.navigate_negative_button_title)
-                ) { _, _ -> }.create()
+                ) { _, _ -> }.create().show()
     }
 
     private fun deleteOfflineRegion(offRegion : OfflineRegion){
