@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -26,18 +27,23 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  * 2. Long click on map to add a waypoint
  * 3. Hit play to start mission.
  */
-class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationSubscriber {
 
     private var mapView: MapView? = null
     private var mapboxMap: MapboxMap? = null
 
     private var circleManager: CircleManager? = null
+    private var userCircleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
+    private var currentUserPositionMarker: Circle? = null
     private val waypoints: MutableList<Circle> = ArrayList()
 
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
+
+    private var userLatLng: LatLng = LatLng()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,11 +68,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onStart() {
         super.onStart()
         mapView?.onStart()
+        CentralLocationManager.configure(this)
     }
 
     override fun onResume() {
         super.onResume()
         mapView?.onResume()
+
+        CentralLocationListener.subscribe(this)
 
         Drone.currentPositionLiveData.observe(this, currentPositionObserver)
         // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
@@ -75,6 +84,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onPause() {
         super.onPause()
         mapView?.onPause()
+
+        CentralLocationListener.unsubscribe(this)
 
         Drone.currentPositionLiveData.removeObserver(currentPositionObserver)
         //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
@@ -115,6 +126,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
+            userCircleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
         }
 
         // Load latest location
@@ -180,6 +192,28 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             currentPositionMarker!!.latLng = newLatLng
             circleManager!!.update(currentPositionMarker)
         }
+    }
+
+    private fun updateUserPosition(){
+        if (mapboxMap == null || userCircleManager == null) {
+            // Not ready
+            return
+        }
+
+        // Add a vehicle marker and move the camera
+        if (currentUserPositionMarker == null) {
+            val circleOptions = CircleOptions()
+            circleOptions.withLatLng(userLatLng)
+            currentUserPositionMarker = userCircleManager!!.create(circleOptions)
+        } else {
+            currentUserPositionMarker!!.latLng = userLatLng
+            userCircleManager!!.update(currentUserPositionMarker)
+        }
+    }
+
+    override fun onLocationChanged(location: Location) {
+        userLatLng = LatLng(location)
+        updateUserPosition()
     }
 
 //    /**

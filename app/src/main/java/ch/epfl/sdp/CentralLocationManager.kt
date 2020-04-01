@@ -30,7 +30,7 @@ object CentralLocationManager {
 
         if(checkAndRequestPermission()){
             locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
+                    LocationManager.GPS_PROVIDER, 500, 10f, CentralLocationListener)
         }
     }
 
@@ -83,7 +83,7 @@ object CentralLocationManager {
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if(requestCode == this.requestCode && checkPermission()){
             locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, 2 * 1000, 10f, CentralLocationListener)
+                    LocationManager.GPS_PROVIDER, 500, 10f, CentralLocationListener)
         }
     }
 

@@ -60,7 +60,7 @@ class LocationWithPermissionTest {
         Mockito.`when`(activity.getApplicationContext()).thenReturn(context)
         Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
         CentralLocationManager.configure(activity)
-        Mockito.verify(manager).requestLocationUpdates(LocationManager.GPS_PROVIDER,2 * 1000,10f, CentralLocationListener)
+        Mockito.verify(manager).requestLocationUpdates(LocationManager.GPS_PROVIDER,500,10f, CentralLocationListener)
     }
 
     @Test

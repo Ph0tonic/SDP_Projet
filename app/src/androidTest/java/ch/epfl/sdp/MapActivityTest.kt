@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.location.Location
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
@@ -68,5 +69,15 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
 
         Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
+    }
+
+    @Test
+    fun onLocationChangedUpdatesPosition(){
+        mActivityRule.launchActivity(Intent())
+        val location: Location = Location("")
+        location.latitude = -LATITUDE_TEST.toDouble()
+        location.longitude = -LONGITUDE_TEST.toDouble()
+        CentralLocationListener.onLocationChanged(location)
+
     }
 }
