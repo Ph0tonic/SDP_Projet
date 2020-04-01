@@ -44,7 +44,7 @@ class OfflineManagerActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                MapUtils.setupCameraWithParameters(mapboxMap, oceanlatitude, oceanlongitude, zoom)
+                MapUtils.setupCameraWithParameters(mapboxMap, LatLng(oceanlatitude, oceanlongitude), zoom)
             }
         }
     }

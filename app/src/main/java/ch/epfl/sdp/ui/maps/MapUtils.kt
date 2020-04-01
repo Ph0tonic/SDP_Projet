@@ -42,10 +42,9 @@ object MapUtils {
      * map
      */
     fun setupCameraAsLastTimeUsed(context: Context, mapboxMap: MapboxMap){
-        mapboxMap.cameraPosition = CameraPosition.Builder()
-                .target(loadLastMapPositionFromPrefs(context))
-                .zoom(loadLastMapZoomFromPrefs(context))
-                .build()
+        setupCameraWithParameters(mapboxMap,
+                loadLastMapPositionFromPrefs(context),
+                loadLastMapZoomFromPrefs(context))
     }
 
     /**
@@ -55,9 +54,9 @@ object MapUtils {
      * @param longitude
      * @param zoom
      */
-    fun setupCameraWithParameters(mapboxMap: MapboxMap?, latitude : Double, longitude : Double, zoom : Double){
+    fun setupCameraWithParameters(mapboxMap: MapboxMap?, lat : LatLng, zoom : Double){
         mapboxMap?.cameraPosition = CameraPosition.Builder()
-                .target(LatLng(latitude, longitude))
+                .target(lat)
                 .zoom(zoom)
                 .build()
     }

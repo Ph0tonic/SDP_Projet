@@ -95,7 +95,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("zoom", null)?.toDoubleOrNull() ?: 9.0
 
-        setupCameraWithParameters(mapboxMap, latitude, longitude, zoom)
+        setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
     }
 
     /** FOR THE MENU IF NEEDED **/
