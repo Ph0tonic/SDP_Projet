@@ -1,22 +1,21 @@
 package ch.epfl.sdp.ui.maps
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import com.mapbox.mapboxsdk.maps.MapView
 
-open class MapViewUtils : AppCompatActivity(){
-    private var mapView: MapView? = null
-
-    fun setMapView(mapView: MapView){
-        this.mapView = mapView
-    }
-
-    fun getMapView(): MapView? {
-        return this.mapView
-    }
+open class MapViewBaseActivity : AppCompatActivity(){
+    protected var mapView: MapView? = null
 
     // Override Activity lifecycle methods
-    public override fun onResume() {
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        mapView!!.onCreate(savedInstanceState)
+
+    }
+
+    override fun onResume() {
         super.onResume()
         mapView!!.onResume()
     }
@@ -31,7 +30,7 @@ open class MapViewUtils : AppCompatActivity(){
         mapView!!.onStop()
     }
 
-    public override fun onPause() {
+    override fun onPause() {
         super.onPause()
         mapView!!.onPause()
     }

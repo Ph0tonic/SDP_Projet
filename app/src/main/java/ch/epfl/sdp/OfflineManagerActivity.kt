@@ -7,14 +7,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
-import ch.epfl.sdp.ui.maps.MapViewUtils
+import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -35,7 +32,7 @@ import kotlin.math.roundToInt
  * Be careful, the maximum number of tiles a user can download is 6000
  * TODO : show error when user try to download more than the limit
  */
-class OfflineManagerActivity : MapViewUtils(), OnMapReadyCallback {
+class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     // UI elements
     private var map: MapboxMap? = null
     private var progressBar: ProgressBar? = null
@@ -61,9 +58,8 @@ class OfflineManagerActivity : MapViewUtils(), OnMapReadyCallback {
         zoom = intent.getDoubleExtra("zoom", 10.0)
 
         // Set up the MapView
-        super.setMapView(findViewById(R.id.mapView))
-        super.getMapView()?.onCreate(savedInstanceState)
-        super.getMapView()?.getMapAsync(this)
+        super.mapView = findViewById(R.id.mapView)
+        super.mapView?.getMapAsync(this)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
