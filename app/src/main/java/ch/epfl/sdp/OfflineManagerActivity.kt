@@ -122,8 +122,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             val definition = OfflineTilePyramidRegionDefinition(
                     style.uri,
                     map!!.projection.visibleRegion.latLngBounds,
-                    map!!.cameraPosition.zoom, //minimum Zoom level
-                    maxZoom,
+                    map!!.cameraPosition.zoom, maxZoom,
                     this@OfflineManagerActivity.resources.displayMetrics.density)
             // Build a JSONObject using the user-defined offline region title,
             // convert it into string, and use it to create a metadata variable.
@@ -134,18 +133,11 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
                 Timber.e("Failed to encode metadata: %s", exception.message)
-                null
-            }
+                null }
             // Create the offline region and launch the download
             offlineManager!!.createOfflineRegion(definition, metadata!!, object : CreateOfflineRegionCallback {
-                override fun onCreate(offlineRegion: OfflineRegion) {
-                    launchDownload(offlineRegion)
-                }
-
-                override fun onError(error: String) {
-                    Timber.e("Error: %s", error)
-                }
-            })
+                override fun onCreate(offlineRegion: OfflineRegion) { launchDownload(offlineRegion) }
+                override fun onError(error: String) { Timber.e("Error: %s", error) }})
         }
     }
 
