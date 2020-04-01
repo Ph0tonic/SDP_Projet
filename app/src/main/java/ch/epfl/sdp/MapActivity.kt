@@ -42,7 +42,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationSubscriber 
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
-    private var userLatLng: LatLng = LatLng()
+    var userLatLng: LatLng = LatLng()
+        private set
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
