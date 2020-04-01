@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -131,10 +132,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("zoom", null)?.toDoubleOrNull() ?: 9.0
 
-        mapboxMap.cameraPosition = CameraPosition.Builder()
-                .target(LatLng(latitude, longitude))
-                .zoom(zoom)
-                .build()
+        setupCameraWithParameters(mapboxMap, latitude, longitude, zoom)
 
 //        mapboxMap.uiSettings.isRotateGesturesEnabled = false
 //        mapboxMap.uiSettings.isTiltGesturesEnabled = false

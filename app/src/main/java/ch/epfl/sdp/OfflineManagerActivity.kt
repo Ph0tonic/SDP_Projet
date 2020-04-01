@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
+import ch.epfl.sdp.ui.maps.MapViewUtils
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -34,9 +35,8 @@ import kotlin.math.roundToInt
  * Be careful, the maximum number of tiles a user can download is 6000
  * TODO : show error when user try to download more than the limit
  */
-class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
+class OfflineManagerActivity : MapViewUtils(), OnMapReadyCallback {
     // UI elements
-    private var mapView: MapView? = null
     private var map: MapboxMap? = null
     private var progressBar: ProgressBar? = null
     private var downloadButton: Button? = null
@@ -61,9 +61,9 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
         zoom = intent.getDoubleExtra("zoom", 10.0)
 
         // Set up the MapView
-        mapView = findViewById(R.id.mapView)
-        mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+        super.setMapView(findViewById(R.id.mapView))
+        super.getMapView()?.onCreate(savedInstanceState)
+        super.getMapView()?.getMapAsync(this)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -82,42 +82,6 @@ class OfflineManagerActivity : AppCompatActivity(), OnMapReadyCallback {
             listButton?.setOnClickListener(View.OnClickListener { downloadedRegionList() })
         }
         setupCameraWithParameters(mapboxMap, latitude, longitude, zoom)
-    }
-
-    // Override Activity lifecycle methods
-    public override fun onResume() {
-        super.onResume()
-        mapView!!.onResume()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mapView!!.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView!!.onStop()
-    }
-
-    public override fun onPause() {
-        super.onPause()
-        mapView!!.onPause()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView!!.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView!!.onLowMemory()
     }
 
     private fun downloadRegionDialog() { // Set up download interaction. Display a dialog
