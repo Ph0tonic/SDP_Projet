@@ -1,27 +1,22 @@
 package ch.epfl.sdp
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.utils.ColorUtils
+import com.mapbox.mapboxsdk.plugins.annotation.Circle
+import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
+import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 
 /**
  * Main Activity to display map and create missions.
@@ -35,7 +30,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var circleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
-    private val waypoints: MutableList<Circle> = ArrayList()
 
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
@@ -51,13 +45,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             dme.startMission()
         }
 
-        val offlineButton : Button = findViewById(R.id.stored_offline_map)
+        val offlineButton: Button = findViewById(R.id.stored_offline_map)
         offlineButton.setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
     }
-
-
 
     override fun onResume() {
         super.onResume()
@@ -78,7 +70,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
                 .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
                 .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
-                .apply();
+                .apply()
         super.onStop()
     }
 
@@ -95,6 +87,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
 
         // Load latest location
+
         val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("latitude", null)?.toDoubleOrNull() ?: -52.6885
         val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
@@ -103,23 +96,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .getString("zoom", null)?.toDoubleOrNull() ?: 9.0
 
         setupCameraWithParameters(mapboxMap, latitude, longitude, zoom)
-
-        mapboxMap.addOnMapClickListener { point ->
-            mapboxMap.addMarker(MarkerOptions().position(point).title(point.toString()))
-            true
-        }
-        mapboxMap.setOnMarkerClickListener { marker ->
-            mapboxMap.removeMarker(marker)
-            true
-        }
-
-//        mapboxMap.uiSettings.isRotateGesturesEnabled = false
-//        mapboxMap.uiSettings.isTiltGesturesEnabled = false
-        // Allow to pinpoint
-//        mapboxMap.addOnMapLongClickListener { point: LatLng? ->
-//            viewModel.addWaypoint(point)
-//            true
-//        }
     }
 
     /** FOR THE MENU IF NEEDED **/

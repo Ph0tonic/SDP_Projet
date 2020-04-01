@@ -9,7 +9,6 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -38,9 +37,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var listButton: Button? = null
     private var isEndNotified = false
     private var regionSelected = 0
-    private var latitude : Double = 0.0
-    private var longitude : Double = 0.0
-    private var zoom : Double = 0.0
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
+    private var zoom: Double = 0.0
     // Offline objects
     private var offlineManager: OfflineManager? = null
 
@@ -52,7 +51,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         latitude = intent.getDoubleExtra("latitude", -52.6885)
         longitude = intent.getDoubleExtra("longitude", -70.1395)
         zoom = intent.getDoubleExtra("zoom", 10.0)
-
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -65,10 +63,10 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // Bottom navigation bar button clicks are handled here.
             // Download offline button
             downloadButton = findViewById(R.id.download_button)
-            downloadButton?.setOnClickListener(View.OnClickListener { downloadRegionDialog() })
+            downloadButton?.setOnClickListener { downloadRegionDialog() }
             // List offline regions
             listButton = findViewById(R.id.list_button)
-            listButton?.setOnClickListener(View.OnClickListener { downloadedRegionList() })
+            listButton?.setOnClickListener { downloadedRegionList() }
         }
         setupCameraWithParameters(mapboxMap, latitude, longitude, zoom)
     }
@@ -79,8 +77,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val builder = AlertDialog.Builder(this@OfflineManagerActivity)
 
         val regionNameEdit = EditText(this@OfflineManagerActivity)
-            regionNameEdit.hint = getString(R.string.set_region_name_hint)
-            regionNameEdit.id =  R.id.dialog_textfield_id
+        regionNameEdit.hint = getString(R.string.set_region_name_hint)
+        regionNameEdit.id = R.id.dialog_textfield_id
 
         // Build the dialog box
         builder.setTitle(getString(R.string.dialog_title))
@@ -124,9 +122,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             metadata = try {
                 val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
-            } catch (exception: Exception) {
-                Timber.e("Failed to encode metadata: %s", exception.message)
-                null }
+            } catch (exception: Exception) { Timber.e("Failed to encode metadata: %s", exception.message)
+                null
+            }
             // Create the offline region and launch the download
             offlineManager!!.createOfflineRegion(definition, metadata!!, object : CreateOfflineRegionCallback {
                 override fun onCreate(offlineRegion: OfflineRegion) { launchDownload(offlineRegion) }
@@ -152,40 +150,36 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 Timber.e("onError reason: %s", error.reason)
                 Timber.e("onError message: %s", error.message)
             }
-
-            override fun mapboxTileCountLimitExceeded(limit: Long) {
-                Timber.e("Mapbox tile count limit exceeded: %s", limit)
-            }
+            override fun mapboxTileCountLimitExceeded(limit: Long) { Timber.e("Mapbox tile count limit exceeded: %s", limit) }
         })
         // Change the region state
         offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
     }
 
     private fun downloadedRegionList() { // Build a region list when the user clicks the list button
-            // Reset the region selected int to 0
-            regionSelected = 0
-            // Query the DB asynchronously
-            offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
+        // Reset the region selected int to 0
+        regionSelected = 0
+        // Query the DB asynchronously
+        offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
-            // downloaded yet, notify user and return
+                // downloaded yet, notify user and return
                 if (offlineRegions.isEmpty()) {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
                 // Add all of the region names to a list
                 val offlineRegionsNames = ArrayList<String>()
-                for (offlineRegion in offlineRegions) {
-                    offlineRegionsNames.add(getRegionName(offlineRegion))
-                }
+                for (offlineRegion in offlineRegions) { offlineRegionsNames.add(getRegionName(offlineRegion)) }
                 val items = offlineRegionsNames.toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
                 showDialog(items, offlineRegions)
             }
+
             override fun onError(error: String) { Timber.e("Error: %s", error) }
         })
     }
 
-    private fun showDialog(items : Array<CharSequence>, offlineRegions : Array<OfflineRegion>)  {
+    private fun showDialog(items: Array<CharSequence>, offlineRegions: Array<OfflineRegion>) {
         return AlertDialog.Builder(this@OfflineManagerActivity)
                 .setTitle(getString(R.string.navigate_title)).setSingleChoiceItems(items, 0) { _, which -> regionSelected = which }
                 .setPositiveButton(getString(R.string.navigate_positive_button)) { _, _ ->
@@ -209,7 +203,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 ) { _, _ -> }.create().show()
     }
 
-    private fun deleteOfflineRegion(offRegion : OfflineRegion){
+    private fun deleteOfflineRegion(offRegion: OfflineRegion) {
         offRegion.delete(object : OfflineRegionDeleteCallback {
             override fun onDelete() { // Once the region is deleted, remove the
                 // progressBar and display a toast
@@ -227,12 +221,12 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         })
     }
 
-    private fun getRegionName(offlineRegion: OfflineRegion): String { // Get the region name from the offline region metadata
+    // Get the region name from the offline region metadata
+    private fun getRegionName(offlineRegion: OfflineRegion): String {
         val regionName: String
         regionName = try {
-           JSONObject(
-                   String(offlineRegion.metadata, Charset.forName(JSON_CHARSET))
-                     ).getString(JSON_FIELD_REGION_NAME)
+            JSONObject(String(offlineRegion.metadata, Charset.forName(JSON_CHARSET)))
+                    .getString(JSON_FIELD_REGION_NAME)
         } catch (exception: Exception) {
             Timber.e("Failed to decode metadata: %s", exception.message)
             String.format(getString(R.string.region_name), offlineRegion.id)
@@ -251,9 +245,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun endProgress(message: String) { // Don't notify more than once
-        if (isEndNotified) {
-            return
-        }
+        if (isEndNotified) { return }
         // Enable buttons
         downloadButton!!.isEnabled = true
         listButton!!.isEnabled = true
