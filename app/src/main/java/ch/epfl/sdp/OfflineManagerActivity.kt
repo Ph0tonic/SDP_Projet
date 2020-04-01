@@ -150,7 +150,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     endProgress(getString(R.string.end_progress_success))
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
-                    setPercentage(percentage.roundToInt())
+                    progressBar!!.isIndeterminate = false
+                    progressBar!!.progress = percentage.roundToInt()
                 }
             }
 
@@ -255,12 +256,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         progressBar!!.isIndeterminate = true
         progressBar!!.visibility = View.VISIBLE
     }
-
-    private fun setPercentage(percentage: Int) {
-        progressBar!!.isIndeterminate = false
-        progressBar!!.progress = percentage
-    }
-
+    
     private fun endProgress(message: String) { // Don't notify more than once
         if (isEndNotified) {
             return
