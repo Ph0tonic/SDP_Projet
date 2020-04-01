@@ -256,7 +256,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         progressBar!!.isIndeterminate = true
         progressBar!!.visibility = View.VISIBLE
     }
-    
+
     private fun endProgress(message: String) { // Don't notify more than once
         if (isEndNotified) {
             return

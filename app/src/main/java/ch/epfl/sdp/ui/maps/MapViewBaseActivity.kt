@@ -9,8 +9,8 @@ open class MapViewBaseActivity : AppCompatActivity(){
     protected var mapView: MapView? = null
 
     // Override Activity lifecycle methods
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         mapView!!.onCreate(savedInstanceState)
 
     }
