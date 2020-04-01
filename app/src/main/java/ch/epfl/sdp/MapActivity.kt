@@ -37,7 +37,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
-        mapView?.getMapAsync(this)
+        mapView.getMapAsync(this)
 
         val button: Button = findViewById(R.id.start_mission_button)
         button.setOnClickListener {
@@ -81,9 +81,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 //            style.addImage("marker-icon-id",
 //                    BitmapFactory.decodeResource(
 //                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
-            symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
+            symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
-            circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
+            circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
         }
 
         // Load latest location

@@ -1,18 +1,15 @@
 package ch.epfl.sdp.ui.maps
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
 open class MapViewBaseActivity : AppCompatActivity() {
-    protected var mapView: MapView? = null
+    protected lateinit var mapView: MapView
 
-    protected fun initMapView(savedInstanceState: Bundle?, contentViewId : Int, mapViewId : Int){
+    protected fun initMapView(savedInstanceState: Bundle?, contentViewId: Int, mapViewId: Int) {
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
@@ -20,42 +17,42 @@ open class MapViewBaseActivity : AppCompatActivity() {
         setContentView(contentViewId)
         // Set up the MapView
         mapView = findViewById(mapViewId)
-        mapView!!.onCreate(savedInstanceState)
+        mapView.onCreate(savedInstanceState)
     }
 
     // Override Activity lifecycle methods
     override fun onResume() {
         super.onResume()
-        mapView!!.onResume()
+        mapView.onResume()
     }
 
     override fun onStart() {
         super.onStart()
-        mapView!!.onStart()
+        mapView.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView!!.onStop()
+        mapView.onStop()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView!!.onPause()
+        mapView.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView!!.onDestroy()
+        mapView.onDestroy()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView!!.onLowMemory()
+        mapView.onLowMemory()
     }
 }

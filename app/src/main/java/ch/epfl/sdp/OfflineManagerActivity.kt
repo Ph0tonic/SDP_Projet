@@ -47,7 +47,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
-        mapView?.getMapAsync(this)
+        mapView.getMapAsync(this)
 
         latitude = intent.getDoubleExtra("latitude", -52.6885)
         longitude = intent.getDoubleExtra("longitude", -70.1395)
