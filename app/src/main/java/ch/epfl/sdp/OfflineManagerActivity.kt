@@ -10,8 +10,6 @@ import android.widget.Toast
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -47,19 +45,14 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var offlineManager: OfflineManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.mapView = findViewById(R.id.mapView)
         super.onCreate(savedInstanceState)
-        // Mapbox access token is configured here. This needs to be called either in your application
-        // object or in the same activity which contains the mapview.
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
-        // This contains the MapView in XML and needs to be called after the access token is configured.
-        setContentView(R.layout.activity_offline_manager)
+        super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
+        mapView?.getMapAsync(this)
+
         latitude = intent.getDoubleExtra("latitude", -52.6885)
         longitude = intent.getDoubleExtra("longitude", -70.1395)
         zoom = intent.getDoubleExtra("zoom", 10.0)
 
-        // Set up the MapView
-        super.mapView?.getMapAsync(this)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {

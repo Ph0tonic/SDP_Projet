@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
+import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -22,16 +23,13 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-
 /**
  * Main Activity to display map and create missions.
  * 1. Take off
  * 2. Long click on map to add a waypoint
  * 3. Hit play to start mission.
  */
-class MapActivity : AppCompatActivity(), OnMapReadyCallback {
-
-    private var mapView: MapView? = null
+class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
 
     private var circleManager: CircleManager? = null
@@ -44,15 +42,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Mapbox access token is configured here. This needs to be called either in your application
-        // object or in the same activity which contains the mapview.
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
-
-        setContentView(R.layout.activity_map)
-
-        mapView = findViewById(R.id.mapView)
-        mapView?.onCreate(savedInstanceState)
+        super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView?.getMapAsync(this)
 
         val button: Button = findViewById(R.id.start_mission_button)
@@ -67,14 +57,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapView?.onStart()
-    }
+
 
     override fun onResume() {
         super.onResume()
-        mapView?.onResume()
 
         Drone.currentPositionLiveData.observe(this, currentPositionObserver)
         // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
@@ -82,35 +68,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onPause() {
         super.onPause()
-        mapView?.onPause()
 
         Drone.currentPositionLiveData.removeObserver(currentPositionObserver)
         //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
 
     override fun onStop() {
-        super.onStop()
         PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
                 .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
                 .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
                 .apply();
-        mapView?.onStop()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView?.onSaveInstanceState(outState)
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView?.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView?.onDestroy()
+        super.onStop()
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {

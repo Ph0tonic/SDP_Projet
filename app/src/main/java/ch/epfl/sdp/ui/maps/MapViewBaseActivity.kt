@@ -3,18 +3,27 @@ package ch.epfl.sdp.ui.maps
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
+import ch.epfl.sdp.R
+import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
-open class MapViewBaseActivity : AppCompatActivity(){
+open class MapViewBaseActivity : AppCompatActivity() {
     protected var mapView: MapView? = null
 
-    // Override Activity lifecycle methods
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    protected fun initMapView(savedInstanceState: Bundle?, contentViewId : Int, mapViewId : Int){
+        // Mapbox access token is configured here. This needs to be called either in your application
+        // object or in the same activity which contains the mapview.
+        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
+        // This contains the MapView in XML and needs to be called after the access token is configured.
+        setContentView(contentViewId)
+        // Set up the MapView
+        mapView = findViewById(mapViewId)
         mapView!!.onCreate(savedInstanceState)
-
     }
 
+    // Override Activity lifecycle methods
     override fun onResume() {
         super.onResume()
         mapView!!.onResume()
