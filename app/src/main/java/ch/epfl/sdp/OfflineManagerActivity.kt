@@ -130,8 +130,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // The metadata variable will later be passed to createOfflineRegion()
             val metadata: ByteArray?
             metadata = try {
-                val jsonObject = JSONObject()
-                                                .put(JSON_FIELD_REGION_NAME, regionName)
+                val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
                 Timber.e("Failed to encode metadata: %s", exception.message)
@@ -194,58 +193,49 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
                 val items = offlineRegionsNames.toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
-                val dialog = AlertDialog.Builder(this@OfflineManagerActivity)
-                        .setTitle(getString(R.string.navigate_title))
-                        .setSingleChoiceItems(items, 0) { _, which ->
-                            // Track which region the user selects
-                            regionSelected = which
-                        }
-                        .setPositiveButton(getString(R.string.navigate_positive_button)) { _, _ ->
-                            Toast.makeText(this@OfflineManagerActivity, items[regionSelected], Toast.LENGTH_LONG).show()
-                            // Get the region bounds and zoom
-                            val bounds = offlineRegions[regionSelected].definition.bounds
-                            val regionZoom = offlineRegions[regionSelected].definition.minZoom
-                            // Create new camera position
-                            val cameraPosition = CameraPosition.Builder()
-                                    .target(bounds.center)
-                                    .zoom(regionZoom)
-                                    .build()
-                            // Move camera to new position
-                            map!!.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-                        }
-                        .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
-                            // Make progressBar indeterminate and
-                            // set it to visible to signal that
-                            // the deletion process has begun
-                            progressBar!!.isIndeterminate = true
-                            progressBar!!.visibility = View.VISIBLE
-                            // Begin the deletion process
-                            offlineRegions[regionSelected].delete(object : OfflineRegionDeleteCallback {
-                                override fun onDelete() { // Once the region is deleted, remove the
-                                    // progressBar and display a toast
-                                    progressBar!!.visibility = View.INVISIBLE
-                                    progressBar!!.isIndeterminate = false
-                                    Toast.makeText(applicationContext, getString(R.string.toast_region_deleted),
-                                            Toast.LENGTH_LONG).show()
-                                }
+                val dialog = createDialog(items, offlineRegions).show()
+            }
+            override fun onError(error: String) { Timber.e("Error: %s", error) }
+        })
+    }
 
-                                override fun onError(error: String) {
-                                    progressBar!!.visibility = View.INVISIBLE
-                                    progressBar!!.isIndeterminate = false
-                                    Timber.e("Error: %s", error)
-                                }
-                            })
-                        }
-                        .setNegativeButton(getString(R.string.navigate_negative_button_title)
-                        ) { _, _ ->
-                            // When the user cancels, don't do anything.
-                            // The dialog will automatically close
-                        }.create()
+    private fun createDialog(items : Array<CharSequence>, offlineRegions : Array<OfflineRegion>) : AlertDialog {
+        return AlertDialog.Builder(this@OfflineManagerActivity)
+                .setTitle(getString(R.string.navigate_title)).setSingleChoiceItems(items, 0) { _, which -> regionSelected = which }
+                .setPositiveButton(getString(R.string.navigate_positive_button)) { _, _ ->
+                    Toast.makeText(this@OfflineManagerActivity, items[regionSelected], Toast.LENGTH_LONG).show()
+                    // Create new camera position
+                    val definition = offlineRegions[regionSelected].definition
+                    setupCameraWithParameters(map, definition.bounds.latitudeSpan, definition.bounds.longitudeSpan, definition.minZoom)
+                }
+                .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
+                    // Make progressBar indeterminate and
+                    // set it to visible to signal that
+                    // the deletion process has begun
+                    progressBar!!.isIndeterminate = true
+                    progressBar!!.visibility = View.VISIBLE
+                    // Begin the deletion process
+                    deleteOfflineRegion(offlineRegions[regionSelected])
+                }
+                // When the user cancels, don't do anything.
+                // The dialog will automatically close
+                .setNegativeButton(getString(R.string.navigate_negative_button_title)
+                ) { _, _ -> }.create()
+    }
 
-                dialog.show()
+    private fun deleteOfflineRegion(offRegion : OfflineRegion){
+        offRegion.delete(object : OfflineRegionDeleteCallback {
+            override fun onDelete() { // Once the region is deleted, remove the
+                // progressBar and display a toast
+                progressBar!!.visibility = View.INVISIBLE
+                progressBar!!.isIndeterminate = false
+                Toast.makeText(applicationContext, getString(R.string.toast_region_deleted),
+                        Toast.LENGTH_LONG).show()
             }
 
             override fun onError(error: String) {
+                progressBar!!.visibility = View.INVISIBLE
+                progressBar!!.isIndeterminate = false
                 Timber.e("Error: %s", error)
             }
         })

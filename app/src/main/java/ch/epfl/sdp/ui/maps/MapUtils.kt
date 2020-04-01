@@ -55,8 +55,8 @@ object MapUtils {
      * @param longitude
      * @param zoom
      */
-    fun setupCameraWithParameters(mapboxMap: MapboxMap, latitude : Double, longitude : Double, zoom : Double){
-        mapboxMap.cameraPosition = CameraPosition.Builder()
+    fun setupCameraWithParameters(mapboxMap: MapboxMap?, latitude : Double, longitude : Double, zoom : Double){
+        mapboxMap?.cameraPosition = CameraPosition.Builder()
                 .target(LatLng(latitude, longitude))
                 .zoom(zoom)
                 .build()
