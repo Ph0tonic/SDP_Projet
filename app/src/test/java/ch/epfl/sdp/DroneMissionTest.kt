@@ -1,13 +1,14 @@
 package ch.epfl.sdp
 
+import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
 import org.junit.Assert
 import org.junit.Test
 import java.util.ArrayList
 import java.util.concurrent.ThreadLocalRandom
-import ch.epfl.sdp.DroneMissionExample as DME
+import ch.epfl.sdp.DroneMission as DME
 
-class DroneMissionExampleTest {
+class DroneMissionTest {
 
     @Test
     fun generateMissionItemTest(){
@@ -30,13 +31,19 @@ class DroneMissionExampleTest {
 
     @Test
     fun makeDroneMissionTest(){
-        val expectedMissionItems: ArrayList<Mission.MissionItem> = arrayListOf<Mission.MissionItem>()
-        expectedMissionItems.add(ch.epfl.sdp.DroneMissionExample.generateMissionItem(47.398039859999997, 8.5455725400000002))
-        expectedMissionItems.add(ch.epfl.sdp.DroneMissionExample.generateMissionItem(47.398036222362471, 8.5450146439425509))
-        expectedMissionItems.add(ch.epfl.sdp.DroneMissionExample.generateMissionItem(47.397825620791885, 8.5450092830163271))
-        expectedMissionItems.add(ch.epfl.sdp.DroneMissionExample.generateMissionItem(47.397832880000003, 8.5455939999999995))
 
-        val droneMissionExample =  DME.makeDroneMission()
+        val positions = arrayListOf<LatLng>()
+        positions.add(LatLng(47.398039859999997, 8.5455725400000002))
+        positions.add(LatLng(47.398036222362471, 8.5450146439425509))
+        positions.add(LatLng(47.397825620791885, 8.5450092830163271))
+        positions.add(LatLng(47.397832880000003, 8.5455939999999995))
+
+        val expectedMissionItems: ArrayList<Mission.MissionItem> = arrayListOf<Mission.MissionItem>()
+        for(pos in positions){
+            expectedMissionItems.add(ch.epfl.sdp.DroneMission.generateMissionItem(pos.latitude, pos.longitude))
+        }
+
+        val droneMissionExample =  DME.makeDroneMission(positions)
         val missionsItems = droneMissionExample.getMissionItems()
 
         for((i, expectedMission) in expectedMissionItems.withIndex()){
