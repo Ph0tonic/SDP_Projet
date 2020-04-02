@@ -90,38 +90,29 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
                 .apply()
         super.onStop()
-        //TODO - CHECK : the following line was between super.onStop() and mapView?.onStop() in Trajectory Planning
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
 
     }
-
-    //TODO
+    
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            // Add the marker image to map
-//            style.addImage("marker-icon-id",
-//                    BitmapFactory.decodeResource(
-//                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
+
+            //symbolManager = SymbolManager(mapView!!, mapboxMap, style)
+            //circleManager = CircleManager(mapView!!, mapboxMap, style)
             symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
+            lineManager = LineManager(mapView!!, mapboxMap, style)
+            fillManager = FillManager(mapView!!, mapboxMap,style!!)
+
+            mapboxMap.addOnMapClickListener { position ->
+                onMapClicked(position)
+                true
+            }
+
         }
-
-        /** TrajectoryPlanningActivity was :
-        mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
-
-        fillManager = FillManager(mapView!!, mapboxMap,style!!)
-        symbolManager = SymbolManager(mapView!!, mapboxMap, style)
-        lineManager = LineManager(mapView!!, mapboxMap, style)
-        circleManager = CircleManager(mapView!!, mapboxMap, style)
-
-        mapboxMap.addOnMapClickListener { position ->
-        onMapClicked(position)
-        true
-        }
-        }*/
 
         // Load latest location
         /** TrajectoryPlanningActivity was : MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)*/
@@ -226,57 +217,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun clearWaypoints(view: View) {
-        circleManager?.deleteAll()
+        //circleManager?.deleteAll() //TODO : delete waypoints but not drone.
         lineManager?.deleteAll()
         fillManager?.deleteAll()
         waypoints.clear()
     }
-
-
-
 }
 
-
-/** FOR THE MENU IF NEEDED **/
-//    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.menu_maps, menu)
-//        return true
-//    }
-
-//    override fun _onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle item selection
-//        when (item.getItemId()) {
-//            R.id.disarm -> drone.getAction().kill().subscribe()
-//            R.id.land -> drone.getAction().land().subscribe()
-//            R.id.return_home -> drone.getAction().returnToLaunch().subscribe()
-//            R.id.takeoff -> drone.getAction().arm().andThen(drone.getAction().takeoff()).subscribe()
-//            else -> return super.onOptionsItemSelected(item)
-//        }
-//        return true
-//    }
-
-
-
-
-//    /**
-//     * Update the [map] with the current mission plan waypoints.
-//     *
-//     * @param latLngs current mission waypoints
-//     */
-//    private fun updateMarkers(latLngs: List<LatLng>) {
-//        if (circleManager != null) {
-//            circleManager!!.delete(waypoints)
-//            waypoints.clear()
-//        }
-//        for (latLng in latLngs) {
-//            val circleOptions: CircleOptions = CircleOptions()
-//                    .withLatLng(latLng)
-//                    .withCircleColor(ColorUtils.colorToRgbaString(Color.BLUE))
-//                    .withCircleStrokeColor(ColorUtils.colorToRgbaString(Color.BLACK))
-//                    .withCircleStrokeWidth(1.0f)
-//                    .withCircleRadius(12f)
-//                    .withDraggable(false)
-//            circleManager?.create(circleOptions)
-//        }
-//    }
 
