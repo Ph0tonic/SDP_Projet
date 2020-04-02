@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
+import com.mapbox.geojson.*
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -18,6 +19,10 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
+import com.mapbox.mapboxsdk.style.layers.*
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
 
@@ -31,11 +36,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mapView: MapView? = null
     private var mapboxMap: MapboxMap? = null
+    private var heatmapLayer: HeatmapLayer? = null
 
     private var circleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
-    private val waypoints: MutableList<Circle> = ArrayList()
+    private val heatMapLayerID = "heatMapLayerID"
+    private val heatMapSourceID = "heatMapSourceID"
 
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
@@ -116,6 +123,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
+            createLoadGeoJsonData(style)
         }
 
         // Load latest location
@@ -139,7 +147,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             mapboxMap.removeMarker(marker)
             true
         }
-
 //        mapboxMap.uiSettings.isRotateGesturesEnabled = false
 //        mapboxMap.uiSettings.isTiltGesturesEnabled = false
         // Allow to pinpoint
@@ -147,6 +154,34 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 //            viewModel.addWaypoint(point)
 //            true
 //        }
+    }
+    private fun createLoadGeoJsonData(style: Style){
+        var featureCollection : FeatureCollection
+        val points = ArrayList<Point>()
+        points.add(Point.fromLngLat(8.543934,47.398279))
+        points.add(Point.fromLngLat(8.544867,47.397426))
+        if (points.size>=2) {
+            val multiPoints = MultiPoint.fromLngLats(points)
+            featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(multiPoints))
+            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection))
+        }
+        else if (points.size==1){
+            val point = points[0]
+            featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(point))
+            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection))
+        }
+        else{
+            /** NO POINTS DETECTED**/
+        }
+
+        val unclustered = CircleLayer(heatMapLayerID, heatMapSourceID)
+        unclustered.setProperties(
+                circleColor(Color.parseColor("#FBB03B")),
+                circleRadius(18f),
+                circleBlur(1f))
+        style.addLayer(unclustered)
+
+
     }
 
     /** FOR THE MENU IF NEEDED **/
