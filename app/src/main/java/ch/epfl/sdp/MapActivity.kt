@@ -109,7 +109,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
         }
 
-        /**
+        /** TrajectoryPlanningActivity was :
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
 
         fillManager = FillManager(mapView!!, mapboxMap,style!!)
