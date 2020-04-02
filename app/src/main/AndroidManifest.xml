@@ -34,6 +34,7 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".NewMapActivity" />
     </application>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
