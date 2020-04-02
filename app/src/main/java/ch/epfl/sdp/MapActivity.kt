@@ -45,6 +45,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var geoJsonSource: GeoJsonSource? = null
     private val heatMapSourceID = "heatMapSourceID"
 
+    private val darkRed = Color.parseColor("#E55E5E")
+    private val lightRed = Color.parseColor("#F9886C")
+    private val orange = Color.parseColor("#FBB03B")
 
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
@@ -153,9 +156,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun clusteredLayerData(style: Style) {
         val layers = arrayOf(
-                intArrayOf(10, Color.parseColor("#E55E5E")),
-                intArrayOf(4, Color.parseColor("#F9886C")),
-                intArrayOf(0, Color.parseColor("#FBB03B")))
+                intArrayOf(4, darkRed),
+                intArrayOf(2, lightRed),
+                intArrayOf(0, orange))
         for (i in layers.indices) {
             val circles = CircleLayer("cluster-$i", heatMapSourceID)
             circles.setProperties(
