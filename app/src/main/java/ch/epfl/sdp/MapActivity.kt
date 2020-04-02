@@ -7,13 +7,11 @@ import android.widget.Button
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
+import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.camera.CameraPosition
-import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
-import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -42,9 +40,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var circleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
-    private var featureCollection : FeatureCollection? =null
+    private var featureCollection: FeatureCollection? = null
     private var features = ArrayList<Feature>()
-    private var geoJsonSource : GeoJsonSource? =null
+    private var geoJsonSource: GeoJsonSource? = null
     private val heatMapSourceID = "heatMapSourceID"
 
 
@@ -100,13 +98,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 //                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
             symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
-            circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
+            circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
             createLayersForHeatMap(style)
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTER**/
-            addPointToHeatMap(style,8.543434,47.398979)
-            addPointToHeatMap(style,8.543934,47.398279)
-            addPointToHeatMap(style,8.544867,47.397426)
-            addPointToHeatMap(style,8.543067,47.397026)
+            addPointToHeatMap(8.543434, 47.398979)
+            addPointToHeatMap(8.543934, 47.398279)
+            addPointToHeatMap(8.544867, 47.397426)
+            addPointToHeatMap(8.543067, 47.397026)
 
         }
 
@@ -123,23 +121,27 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
 
     }
-    private fun createLayersForHeatMap(style: Style){
+
+    private fun createLayersForHeatMap(style: Style) {
         createSourceData(style)
         unclusteredLayerData(style)
         clusteredLayerData(style)
     }
-    private fun addPointToHeatMap(style: Style, longitude: Double, latitude: Double){
+
+    fun addPointToHeatMap(longitude: Double, latitude: Double) {
         features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
         featureCollection = FeatureCollection.fromFeatures(features)
         geoJsonSource!!.setGeoJson(featureCollection)
 
     }
-    private fun createSourceData(style: Style){
+
+    private fun createSourceData(style: Style) {
         geoJsonSource = GeoJsonSource(heatMapSourceID, GeoJsonOptions().withCluster(true))
         geoJsonSource!!.setGeoJson(featureCollection)
         style.addSource(geoJsonSource!!)
     }
-    private fun unclusteredLayerData(style: Style){
+
+    private fun unclusteredLayerData(style: Style) {
         val unclustered = CircleLayer("unclustered-points", heatMapSourceID)
         unclustered.setProperties(
                 circleColor(Color.parseColor("#FBB03B")),
@@ -148,12 +150,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         unclustered.setFilter(Expression.neq(get("cluster"), literal(true)))
         style.addLayerBelow(unclustered, "building")
     }
-    private fun clusteredLayerData(style: Style){
+
+    private fun clusteredLayerData(style: Style) {
         val layers = arrayOf(
                 intArrayOf(10, Color.parseColor("#E55E5E")),
                 intArrayOf(4, Color.parseColor("#F9886C")),
                 intArrayOf(0, Color.parseColor("#FBB03B")))
-         for (i in layers.indices) {
+        for (i in layers.indices) {
             val circles = CircleLayer("cluster-$i", heatMapSourceID)
             circles.setProperties(
                     circleColor(layers[i][1]),
