@@ -22,6 +22,7 @@ class VlcActivity : AppCompatActivity() {
         setContentView(R.layout.activity_vlc)
         val args: ArrayList<String> = ArrayList()
         args.add("-vvv")
+        args.add("--live-caching=100")
         mLibVLC = LibVLC(this, args)
         mMediaPlayer = MediaPlayer(mLibVLC)
         mVideoLayout = findViewById(R.id.video_layout)

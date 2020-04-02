@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import ch.epfl.sdp.DroneMissionExample
 import ch.epfl.sdp.R
 import ch.epfl.sdp.MapActivity
+import ch.epfl.sdp.OfflineManagerActivity
 
 class HomeFragment : Fragment() {
 

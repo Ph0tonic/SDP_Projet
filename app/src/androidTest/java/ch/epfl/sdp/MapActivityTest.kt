@@ -1,10 +1,11 @@
 package ch.epfl.sdp
 
+
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -13,7 +14,6 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
-import kotlinx.android.synthetic.main.activity_map.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +28,7 @@ class MapActivityTest {
         const val ZOOM_TEST = "0.9"
     }
 
-    private var preferencesEditor: SharedPreferences.Editor? = null
+    private lateinit var preferencesEditor: SharedPreferences.Editor
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -44,18 +44,18 @@ class MapActivityTest {
 
     @Test
     fun mapboxUseOurPreferences() {
-        preferencesEditor!!
-                .putString("latitude", Companion.LATITUDE_TEST)
+        preferencesEditor
+                .putString("latitude", LATITUDE_TEST)
                 .putString("longitude", LONGITUDE_TEST)
                 .putString("zoom", ZOOM_TEST)
-                .apply();
+                .apply()
 
         // Launch activity
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assert(mapboxMap.cameraPosition.target.latitude.toString() == Companion.LATITUDE_TEST)
+                assert(mapboxMap.cameraPosition.target.latitude.toString() == LATITUDE_TEST)
                 assert(mapboxMap.cameraPosition.target.longitude.toString() == LONGITUDE_TEST)
                 assert(mapboxMap.cameraPosition.zoom.toString() == ZOOM_TEST)
             }
@@ -66,11 +66,9 @@ class MapActivityTest {
     }
 
     @Test
-    fun canStartMission(){
+    fun canStartMission() {
         // Launch activity
         mActivityRule.launchActivity(Intent())
-
-        Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
+        onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
     }
-
 }
