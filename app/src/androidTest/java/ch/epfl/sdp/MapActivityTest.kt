@@ -19,13 +19,16 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-const val LATITUDE_TEST = "42.125"
-const val LONGITUDE_TEST = "-30.229"
-const val ZOOM_TEST = "0.9"
-
 @RunWith(AndroidJUnit4::class)
 class MapActivityTest {
-    var preferencesEditor: SharedPreferences.Editor? = null
+
+    companion object {
+        const val LATITUDE_TEST = "42.125"
+        const val LONGITUDE_TEST = "-30.229"
+        const val ZOOM_TEST = "0.9"
+    }
+
+    private var preferencesEditor: SharedPreferences.Editor? = null
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -42,7 +45,7 @@ class MapActivityTest {
     @Test
     fun mapboxUseOurPreferences() {
         preferencesEditor!!
-                .putString("latitude", LATITUDE_TEST)
+                .putString("latitude", Companion.LATITUDE_TEST)
                 .putString("longitude", LONGITUDE_TEST)
                 .putString("zoom", ZOOM_TEST)
                 .apply();
@@ -52,7 +55,7 @@ class MapActivityTest {
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assert(mapboxMap.cameraPosition.target.latitude.toString() == LATITUDE_TEST)
+                assert(mapboxMap.cameraPosition.target.latitude.toString() == Companion.LATITUDE_TEST)
                 assert(mapboxMap.cameraPosition.target.longitude.toString() == LONGITUDE_TEST)
                 assert(mapboxMap.cameraPosition.zoom.toString() == ZOOM_TEST)
             }
@@ -69,4 +72,5 @@ class MapActivityTest {
 
         Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
     }
+
 }
