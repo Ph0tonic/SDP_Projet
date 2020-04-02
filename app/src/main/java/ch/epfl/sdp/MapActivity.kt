@@ -248,4 +248,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationSubscriber 
 //            circleManager?.create(circleOptions)
 //        }
 //    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestCode,permissions, grantResults)
+    }
 }
