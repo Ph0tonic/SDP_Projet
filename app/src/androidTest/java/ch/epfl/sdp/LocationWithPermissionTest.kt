@@ -127,24 +127,3 @@ class LocationWithPermissionTest {
 
 
 }
-
-/*
-private class LocationTestActivity: Activity() {
-    private var locationChanged = false
-        get() = field
-        set(value) {
-            field = value
-        }
-
-    override fun onStart() {
-        super.onStart()
-        locationChanged = false
-
-    }
-
-    override fun onLocationChanged(location: Location) {
-        locationChanged = true
-    }
-
-}
-*/
