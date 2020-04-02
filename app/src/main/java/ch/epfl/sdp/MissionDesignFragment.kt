@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.missionDesign
+package ch.epfl.sdp
 
 import android.os.Bundle
 import android.view.LayoutInflater
