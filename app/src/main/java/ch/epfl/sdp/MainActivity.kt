@@ -17,7 +17,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.ui.missionDesign.TrajectoryPlanningActivity
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -124,8 +123,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //TODO
     fun goToTrajectoryDesign(view: View) {
-        startActivityForResult(Intent(this, TrajectoryPlanningActivity::class.java), 42)
+        startActivityForResult(Intent(this, MapActivity::class.java), 42)
     }
 
     fun followWaypoints(view: View) {
