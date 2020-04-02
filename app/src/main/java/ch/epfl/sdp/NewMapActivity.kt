@@ -1,7 +1,10 @@
 package ch.epfl.sdp
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -18,6 +21,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
+import com.mapbox.mapboxsdk.utils.ColorUtils
 
 /**
  * Main Activity to display map and create missions.
@@ -35,12 +39,12 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
 
     //Trajectory Planning
-    private var  lineManager: LineManager? = null
+    private var lineManager: LineManager? = null
     private var fillManager: FillManager? = null
     var waypoints = arrayListOf<LatLng>()
 
 
-    companion object{
+    companion object {
         private const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         private const val MAP_READY_DESCRIPTION: String = "MAP READY"
 
@@ -51,7 +55,7 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-                                            //R.layout.trajectory_planning_map
+        //R.layout.trajectory_planning_map
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
@@ -82,7 +86,6 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
 
-    //TODO
     override fun onStop() {
         PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
@@ -90,11 +93,12 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
                 .apply()
         super.onStop()
-        //CAUTION : the following line was between super.onStop() and mapView?.onStop() in Trajectory Planning
+        //TODO - CHECK : the following line was between super.onStop() and mapView?.onStop() in Trajectory Planning
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
 
     }
 
+    //TODO
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
@@ -119,23 +123,6 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
     }
 
-    /** FOR THE MENU IF NEEDED **/
-//    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.menu_maps, menu)
-//        return true
-//    }
-
-//    override fun _onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle item selection
-//        when (item.getItemId()) {
-//            R.id.disarm -> drone.getAction().kill().subscribe()
-//            R.id.land -> drone.getAction().land().subscribe()
-//            R.id.return_home -> drone.getAction().returnToLaunch().subscribe()
-//            R.id.takeoff -> drone.getAction().arm().andThen(drone.getAction().takeoff()).subscribe()
-//            else -> return super.onOptionsItemSelected(item)
-//        }
-//        return true
-//    }
 
     /**
      * Update [currentPositionMarker] position with a new [position].
@@ -162,6 +149,100 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
+    /** Trajectory Planning **/
+
+    fun onMapClicked(position: LatLng): Boolean{
+        if (waypoints.size < 4){
+            waypoints.add(position)
+            drawPinpoint(position)
+
+            if (waypoints.isNotEmpty()){
+                drawRegion(waypoints)
+            }
+
+            if (waypoints.size == 4){
+                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
+            }
+        }
+        return true
+    }
+
+    private fun drawPath(path: List<LatLng>){
+        lineManager?.create(LineOptions()
+                .withLatLngs(path)
+                .withLineWidth(PATH_THICKNESS))
+    }
+
+    private fun drawRegion(corners: List<LatLng>){
+        // Draw the fill
+        val fillOption = FillOptions()
+                .withLatLngs(listOf(waypoints))
+                .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
+                .withFillOpacity(REGION_FILL_OPACITY)
+        fillManager?.deleteAll()
+        fillManager?.create(fillOption)
+
+        //Draw the borders
+
+        // Make it loop
+        val linePoints = arrayListOf<LatLng>().apply {
+            addAll(corners)
+            add(corners[0])
+        }
+        val lineOptions = LineOptions()
+                .withLatLngs(linePoints)
+                .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
+        lineManager?.deleteAll()
+        lineManager?.create(lineOptions)
+    }
+
+    private fun drawPinpoint(pinpoints: LatLng){
+        val circleOptions = CircleOptions()
+                .withLatLng(pinpoints)
+                .withDraggable(true)
+        circleManager?.create(circleOptions)
+    }
+
+    fun returnPathToMissionDesign(view: View) {
+        val resultIntent = Intent()
+        resultIntent.putExtra("waypoints", waypoints)
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
+    }
+
+    fun clearWaypoints(view: View) {
+        circleManager?.deleteAll()
+        lineManager?.deleteAll()
+        fillManager?.deleteAll()
+        waypoints.clear()
+    }
+
+
+
+}
+
+
+    /** FOR THE MENU IF NEEDED **/
+//    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.menu_maps, menu)
+//        return true
+//    }
+
+//    override fun _onOptionsItemSelected(item: MenuItem): Boolean {
+//        // Handle item selection
+//        when (item.getItemId()) {
+//            R.id.disarm -> drone.getAction().kill().subscribe()
+//            R.id.land -> drone.getAction().land().subscribe()
+//            R.id.return_home -> drone.getAction().returnToLaunch().subscribe()
+//            R.id.takeoff -> drone.getAction().arm().andThen(drone.getAction().takeoff()).subscribe()
+//            else -> return super.onOptionsItemSelected(item)
+//        }
+//        return true
+//    }
+
+
+
+
 //    /**
 //     * Update the [map] with the current mission plan waypoints.
 //     *
@@ -183,4 +264,4 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 //            circleManager?.create(circleOptions)
 //        }
 //    }
-}
+
