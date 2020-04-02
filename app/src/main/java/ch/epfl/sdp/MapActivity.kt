@@ -2,13 +2,15 @@ package ch.epfl.sdp
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
-import com.mapbox.geojson.*
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.MultiPoint
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -18,12 +20,17 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.layers.*
+import com.mapbox.mapboxsdk.plugins.annotation.Circle
+import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
+import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.style.expressions.Expression
+import com.mapbox.mapboxsdk.style.expressions.Expression.*
+import com.mapbox.mapboxsdk.style.layers.CircleLayer
+import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.utils.ColorUtils
 
 
 /**
@@ -163,26 +170,68 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         if (points.size>=2) {
             val multiPoints = MultiPoint.fromLngLats(points)
             featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(multiPoints))
-            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection))
+            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withMaxZoom(40)))
         }
         else if (points.size==1){
             val point = points[0]
             featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(point))
-            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection))
+            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withCluster(true)))
+            //Here the GeoJsonOption withCluster() works because the geometry is point and not a multiPoint
         }
         else{
             /** NO POINTS DETECTED**/
         }
 
-        val unclustered = CircleLayer(heatMapLayerID, heatMapSourceID)
+        /**UNCOMMENT THIS WHEN CLUSTER WORKS**/
+        /*
+        val layers = arrayOf(
+                intArrayOf(2, Color.parseColor("#E55E5E")),
+                intArrayOf(1, Color.parseColor("#F9886C")),
+                intArrayOf(0, Color.parseColor("#FBB03B")))
+
+        val unclustered = CircleLayer("unclustered-points", heatMapSourceID)
         unclustered.setProperties(
                 circleColor(Color.parseColor("#FBB03B")),
-                circleRadius(18f),
+                circleRadius(20f),
                 circleBlur(1f))
-        style.addLayer(unclustered)
+        unclustered.setFilter(Expression.neq(get("cluster"), literal(true)))
+        style.addLayerBelow(unclustered, "building")
 
 
-    }
+
+        for (i in layers.indices) {
+            val circles = CircleLayer("cluster-$i", heatMapSourceID)
+            circles.setProperties(
+                    circleColor(layers[i][1]),
+                    circleRadius(70f),
+                    circleBlur(1f)
+            )
+            val pointCount: Expression = toNumber(get("point_count"))
+            circles.setFilter(
+                    if (i == 0) Expression.gte(pointCount, literal(layers[i][0])) else Expression.all(
+                            Expression.gte(pointCount, literal(layers[i][0])),
+                            Expression.lt(pointCount, literal(layers[i - 1][0]))
+                    )
+            )
+            style.addLayerBelow(circles, "building")
+        }
+        */
+        /**DELETE THIS WHEN CLUSTER WORKS**/
+        val layers = arrayOf(
+                intArrayOf(150, Color.parseColor("#E55E5E")),
+                intArrayOf(20, Color.parseColor("#F9886C")),
+                intArrayOf(0, Color.parseColor("#FBB03B")))
+
+        for (i in layers.indices) { //Add clusters' circles
+            val circles = CircleLayer("cluster-$i", heatMapSourceID)
+            circles.setProperties(
+                    circleColor(layers[i][1]),
+                    circleRadius(30f),
+                    circleBlur(1f)
+            )
+            style.addLayer(circles)
+        }
+  }
 
     /** FOR THE MENU IF NEEDED **/
 //    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
