@@ -179,10 +179,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         //display coordinates in the bar
         val latView: TextView = findViewById(R.id.tv_latitude)
-        latView.text = ("LAT : " + newLatLng.latitude  + "0000000000").subSequence(0,15)
+        latView.text = prettyPrint("LAT : " + newLatLng.latitude)
         val lonView: TextView = findViewById(R.id.tv_longitude)
-        lonView.text = ("LON : " + newLatLng.longitude + "0000000000").subSequence(0,15)
+        lonView.text = prettyPrint("LON : " + newLatLng.longitude)
 
+    }
+
+    private fun prettyPrint(str : String) : CharSequence {
+        return (str + "0000000000000000").subSequence(0,15)
     }
 
     /** Trajectory Planning **/
