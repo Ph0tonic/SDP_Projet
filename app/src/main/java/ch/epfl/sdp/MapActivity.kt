@@ -26,7 +26,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
  * 2. Long click on map to add a waypoint
  * 3. Hit play to start mission.
  */
-class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, LocationSubscriber {
+class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
 
     private var circleManager: CircleManager? = null
@@ -35,7 +35,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, LocationSubscribe
     private var currentPositionMarker: Circle? = null
     private var currentUserPositionMarker: Circle? = null
 
-    private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
+    private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
+    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
     var userLatLng: LatLng = LatLng()
@@ -63,18 +64,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, LocationSubscribe
     override fun onResume() {
         super.onResume()
 
-        CentralLocationListener.subscribe(this)
+        CentralLocationManager.currentUserPosition.observe(this,userPositionObserver)
 
-        Drone.currentPositionLiveData.observe(this, currentPositionObserver)
+        Drone.currentPositionLiveData.observe(this, dronePositionObserver)
         // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
     }
 
     override fun onPause() {
         super.onPause()
 
-        CentralLocationListener.unsubscribe(this)
+        CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
 
-        Drone.currentPositionLiveData.removeObserver(currentPositionObserver)
+        Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
         //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
 
@@ -155,7 +156,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, LocationSubscribe
         }
     }
 
-    private fun updateUserPosition(){
+    private fun updateUserPosition(userLatLng: LatLng){
         if (mapboxMap == null || userCircleManager == null) {
             // Not ready
             return
@@ -170,11 +171,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, LocationSubscribe
             currentUserPositionMarker!!.latLng = userLatLng
             userCircleManager!!.update(currentUserPositionMarker)
         }
-    }
-
-    override fun onLocationChanged(location: Location) {
-        userLatLng = LatLng(location)
-        updateUserPosition()
     }
 
 //    /**

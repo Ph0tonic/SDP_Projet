@@ -96,17 +96,4 @@ class MapActivityTest {
         Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
 
     }
-
-    @Test
-    fun onLocationChangedUpdatesPosition(){
-        mActivityRule.launchActivity(Intent())
-        val location: Location = Location("")
-        location.latitude = -LATITUDE_TEST.toDouble()
-        location.longitude = -LONGITUDE_TEST.toDouble()
-        runOnUiThread {
-            CentralLocationListener.onLocationChanged(location)
-        }
-        val latLng = mActivityRule.activity.userLatLng
-        Assert.assertEquals(LatLng(location),latLng)
-    }
 }

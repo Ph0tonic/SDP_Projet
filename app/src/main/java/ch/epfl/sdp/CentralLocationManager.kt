@@ -18,12 +18,15 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnFailureListener
+import com.mapbox.mapboxsdk.geometry.LatLng
 
 object CentralLocationManager {
     private lateinit var locationManager: LocationManager
     private lateinit var activity: Activity
     private const val requestCode = 1011
+    internal var currentUserPosition: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
 
 
     fun configure(activity: Activity) {
@@ -92,23 +95,9 @@ object CentralLocationManager {
 }
 
 private object CentralLocationListener : LocationListener {
-    private val subscribers: MutableSet<LocationSubscriber> = mutableSetOf()
-
-    fun subscribe(subscriber: LocationSubscriber){
-        subscribers.add(subscriber)
-    }
-
-    fun unsubscribe(subscriber: LocationSubscriber){
-        subscribers.remove(subscriber)
-    }
 
     override fun onLocationChanged(location: Location) {
-        subscribers.forEach {
-            subscriber ->
-            run {
-                subscriber.onLocationChanged(location)
-            }
-        }
+        CentralLocationManager.currentUserPosition.postValue(LatLng(location))
     }
 
     override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {}
