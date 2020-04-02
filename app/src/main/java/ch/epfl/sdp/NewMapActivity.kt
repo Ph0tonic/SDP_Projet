@@ -101,6 +101,7 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     //TODO
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
+
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             // Add the marker image to map
 //            style.addImage("marker-icon-id",
@@ -111,8 +112,22 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
         }
 
-        // Load latest location
+        /**
+        mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
 
+            fillManager = FillManager(mapView!!, mapboxMap,style!!)
+            symbolManager = SymbolManager(mapView!!, mapboxMap, style)
+            lineManager = LineManager(mapView!!, mapboxMap, style)
+            circleManager = CircleManager(mapView!!, mapboxMap, style)
+
+            mapboxMap.addOnMapClickListener { position ->
+                onMapClicked(position)
+                true
+            }
+        }*/
+
+        // Load latest location
+        /** TrajectoryPlanningActivity was : MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)*/
         val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("latitude", null)?.toDoubleOrNull() ?: -52.6885
         val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
@@ -121,6 +136,9 @@ class NewMapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .getString("zoom", null)?.toDoubleOrNull() ?: 9.0
 
         setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
+
+        // Used to detect when the map is ready in tests
+        mapView?.contentDescription = MAP_READY_DESCRIPTION
     }
 
 
