@@ -52,13 +52,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //R.layout.trajectory_planning_map
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
         val button: Button = findViewById(R.id.start_mission_button)
         button.setOnClickListener {
-            val dme = DroneMissionExample.makeDroneMission()
+            val dme = DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints))
             dme.startMission()
         }
 
@@ -93,7 +92,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
 
     }
-    
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
 

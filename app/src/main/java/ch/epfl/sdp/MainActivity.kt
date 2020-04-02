@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    //TODO
+    //TODO ?
     fun goToTrajectoryDesign(view: View) {
         startActivityForResult(Intent(this, MapActivity::class.java), 42)
     }

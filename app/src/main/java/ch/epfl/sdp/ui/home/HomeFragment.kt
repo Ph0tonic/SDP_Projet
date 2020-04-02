@@ -10,10 +10,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import ch.epfl.sdp.DroneMissionExample
 import ch.epfl.sdp.R
 import ch.epfl.sdp.MapActivity
-import ch.epfl.sdp.OfflineManagerActivity
 
 class HomeFragment : Fragment() {
 
