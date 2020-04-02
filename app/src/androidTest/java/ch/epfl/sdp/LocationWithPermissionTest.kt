@@ -1,17 +1,12 @@
 package ch.epfl.sdp
 
-import android.app.Activity
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationManager
-import android.util.Log
+import android.os.Process
 import androidx.appcompat.app.AppCompatActivity
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
@@ -21,12 +16,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatcher
-import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.spy
-import org.mockito.verification.VerificationMode
 
 
 @RunWith(AndroidJUnit4::class)
@@ -107,6 +98,24 @@ class LocationWithPermissionTest {
         Mockito.verify(manager, Mockito.times(2) ).requestLocationUpdates(LocationManager.GPS_PROVIDER,500,10f, CentralLocationListener)
     }
 
+    @Test
+    fun onRequestPermissionResultDoesNotRequestLocationUpdatesIfItDoesNotHavePermission() {
+        val activity = mock(AppCompatActivity::class.java)
+        val manager = mock(LocationManager::class.java)
+        Mockito.`when`(activity.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
+
+        //Mockito.`when`(activity.checkSelfPermission(Mockito.any())).thenReturn(PackageManager.PERMISSION_GRANTED)
+
+        //context.checkPermission(permission, Process.myPid(), Process.myUid())
+
+        Mockito.`when`(activity.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,Process.myPid(),Process.myUid())).thenReturn(PackageManager.PERMISSION_DENIED)
+        Mockito.`when`(activity.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION,Process.myPid(),Process.myUid())).thenReturn(PackageManager.PERMISSION_DENIED)
+
+        Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
+        CentralLocationManager.configure(activity)
+        CentralLocationManager.onRequestPermissionsResult(1011,Array(0) {""},IntArray(0))
+        Mockito.verify(manager, Mockito.times(0) ).requestLocationUpdates(LocationManager.GPS_PROVIDER,500,10f, CentralLocationListener)
+    }
 
 
 
