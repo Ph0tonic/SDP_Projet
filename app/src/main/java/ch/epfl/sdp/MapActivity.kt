@@ -164,13 +164,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     private fun createLoadGeoJsonData(style: Style){
         var featureCollection : FeatureCollection
+        var features = ArrayList<Feature>()
         val points = ArrayList<Point>()
         points.add(Point.fromLngLat(8.543934,47.398279))
         points.add(Point.fromLngLat(8.544867,47.397426))
         if (points.size>=2) {
-            val multiPoints = MultiPoint.fromLngLats(points)
-            featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(multiPoints))
-            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withMaxZoom(40)))
+            /*
+                val multiPoints = MultiPoint.fromLngLats(points)
+                featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(multiPoints))
+                style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withMaxZoom(40))
+               */
+            for (i in points.indices) {
+                val point = points[i]
+                features.add(Feature.fromGeometry(point))
+            }
+            featureCollection = FeatureCollection.fromFeatures(features)
+            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withCluster(true).withMaxZoom(40)))
         }
         else if (points.size==1){
             val point = points[0]
