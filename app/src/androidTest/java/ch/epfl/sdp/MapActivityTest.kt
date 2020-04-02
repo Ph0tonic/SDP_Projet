@@ -103,4 +103,17 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
     }
+
+    @Test
+    fun canUpdateUserLocationTwice(){
+        mActivityRule.launchActivity(Intent())
+        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
+        CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST.toDouble(), -LONGITUDE_TEST.toDouble()))
+    }
+
+    @Test
+    fun canOnRequestPermissionResult(){
+        mActivityRule.launchActivity(Intent())
+        mActivityRule.activity.onRequestPermissionsResult(1011,Array(0) {""},IntArray(0))
+    }
 }
