@@ -79,12 +79,12 @@ class MapActivityTest {
         onView(withId(R.id.mapView)).perform(doubleClick())
     }
 
-    @Test
+    /*@Test
     fun canStartMission() {
         // Launch activity
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
-    }
+    }*/
 
     @Test
     fun mapBoxCanAddPointToHeatMap() {

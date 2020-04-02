@@ -13,7 +13,9 @@ interface OverflightStrategy {
 /**
  * Creates a path covering a quadrilateral in several passes
  */
+const val pinPointsAmount = 4
 class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStrategy{
+
     private val maxDistBetweenLines: Double
     init {
         require(maxDistBetweenLinesIn > 0.0){
@@ -23,7 +25,7 @@ class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStr
     }
     @Throws(IllegalArgumentException::class)
     override fun createFlightPath(pinpoints: List<LatLng>): List<LatLng> {
-        require(pinpoints.size == 4){
+        require(pinpoints.size == pinPointsAmount){
             "This strategy requires exactly 4 pinpoints, ${pinpoints.size} given."
         }
 

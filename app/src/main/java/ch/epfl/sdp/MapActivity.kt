@@ -12,6 +12,9 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R.id.tv_latitude
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.drone.OverflightStrategy
+import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle
+import ch.epfl.sdp.drone.pinPointsAmount
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -32,6 +35,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
 import kotlinx.android.synthetic.main.activity_map.*
+import java.text.DecimalFormat
 
 /**
  * Main Activity to display map and create missions.
@@ -101,9 +105,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onStop() {
         PreferenceManager.getDefaultSharedPreferences(this).edit()
-                .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
-                .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
-                .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
+                .putString(getString(R.string.latitude), mapboxMap?.cameraPosition?.target?.latitude.toString())
+                .putString(getString(R.string.longitude), mapboxMap?.cameraPosition?.target?.longitude.toString())
+                .putString(getString(R.string.zoom), mapboxMap?.cameraPosition?.zoom.toString())
                 .apply()
         super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
@@ -178,21 +182,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
 
         //display coordinates in the bar
+        val df = DecimalFormat("0.0000000");
         val latView: TextView = findViewById(R.id.tv_latitude)
-        latView.text = prettyPrint("LAT : " + newLatLng.latitude)
+        latView.text = ("LAT : " + df.format(newLatLng.latitude))
         val lonView: TextView = findViewById(R.id.tv_longitude)
-        lonView.text = prettyPrint("LON : " + newLatLng.longitude)
+        lonView.text = ("LON : " + df.format(newLatLng.longitude))
 
     }
 
-    private fun prettyPrint(str : String) : CharSequence {
-        return (str + "0000000000000000").subSequence(0,15)
-    }
 
     /** Trajectory Planning **/
 
     fun onMapClicked(position: LatLng): Boolean{
-        if (waypoints.size < 4){
+        if (waypoints.size < pinPointsAmount){
             waypoints.add(position)
             drawPinpoint(position)
 
@@ -200,7 +202,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 drawRegion(waypoints)
             }
 
-            if (waypoints.size == 4){
+            if (waypoints.size == pinPointsAmount){
                 drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
             }
         }

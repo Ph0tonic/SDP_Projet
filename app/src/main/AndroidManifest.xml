@@ -14,9 +14,6 @@
         <activity
             android:name=".MapActivity"
             android:parentActivityName=".MainActivity" />
-        <!-- <activity
-            android:name=".ui.missionDesign.TrajectoryPlanningActivity"
-            android:parentActivityName=".MainActivity" />-->
         <activity
             android:name=".OfflineManagerActivity"
             android:parentActivityName=".MainActivity" />
