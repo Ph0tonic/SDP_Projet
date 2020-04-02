@@ -43,13 +43,9 @@ object CentralLocationManager {
 
     private fun showLocationDisabledAlert(){
         val locationDisabledAlert: AlertDialog.Builder = AlertDialog.Builder(activity)
-        locationDisabledAlert.setTitle("Enable Location")
-                .setMessage("This part of the app cannot function without location, please enable it")
-                .setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
-                    val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    activity.startActivity(myIntent)
-                }
-                .setNegativeButton("Cancel") { paramDialogInterface, paramInt ->}
+        locationDisabledAlert.setTitle("Enable Location").setMessage("This part of the app cannot function without location, please enable it").setPositiveButton("Location Settings") { paramDialogInterface, paramInt -> val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            activity.startActivity(myIntent)
+        }.setNegativeButton("Cancel") { paramDialogInterface, paramInt ->}
 
         locationDisabledAlert.show()
     }
