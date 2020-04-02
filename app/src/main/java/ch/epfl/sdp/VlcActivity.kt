@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
@@ -21,6 +22,7 @@ class VlcActivity : AppCompatActivity() {
     private lateinit var mVideoLayout: VLCVideoLayout
     private lateinit var mLibVLC: LibVLC
     private lateinit var mMediaPlayer: MediaPlayer
+    private var started: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +33,12 @@ class VlcActivity : AppCompatActivity() {
         mVideoLayout = findViewById(R.id.video_layout)
     }
 
-    override fun onStart() {
-        super.onStart()
+    fun switchVideo(view: View) {
+        if (started) startVideo()
+        else stopVideo()
+    }
+
+    private fun startVideo() {
         mMediaPlayer.attachViews(mVideoLayout, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
         try {
             val media = Media(mLibVLC, Uri.parse(ASSET_FILENAME))
@@ -44,10 +50,14 @@ class VlcActivity : AppCompatActivity() {
         mMediaPlayer.play()
     }
 
-    override fun onStop() {
-        super.onStop()
+    private fun stopVideo() {
         mMediaPlayer.stop()
         mMediaPlayer.detachViews()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (started) stopVideo()
     }
 
     override fun onDestroy() {

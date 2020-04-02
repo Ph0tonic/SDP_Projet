@@ -21,8 +21,8 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
 
 class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapView: MapView
-    private var mapboxMap: MapboxMap? = null
-    private var symbolManager: SymbolManager? = null
+    private lateinit var mapboxMap: MapboxMap
+
     private var circleManager: CircleManager? = null
     private var lineManager: LineManager? = null
     private var fillManager: FillManager? = null
@@ -94,9 +94,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
         MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
-
             fillManager = FillManager(mapView, mapboxMap, style!!)
-            symbolManager = SymbolManager(mapView, mapboxMap, style)
             lineManager = LineManager(mapView, mapboxMap, style)
             circleManager = CircleManager(mapView, mapboxMap, style)
 
@@ -140,8 +138,6 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
                 .withFillOpacity(REGION_FILL_OPACITY)
         fillManager?.deleteAll()
         fillManager?.create(fillOption)
-
-        //Draw the borders
 
         // Make it loop
         val linePoints = arrayListOf<LatLng>().apply {

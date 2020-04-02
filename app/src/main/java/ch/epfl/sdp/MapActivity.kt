@@ -39,14 +39,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
-        val button: Button = findViewById(R.id.start_mission_button)
-        button.setOnClickListener {
-            val dme = DroneMissionExample.makeDroneMission()
-            dme.startMission()
+        findViewById<Button>(R.id.start_mission_button).setOnClickListener {
+            DroneMissionExample.makeDroneMission().startMission()
         }
 
-        val offlineButton: Button = findViewById(R.id.stored_offline_map)
-        offlineButton.setOnClickListener {
+        findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
     }
