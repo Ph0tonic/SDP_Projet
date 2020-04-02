@@ -9,7 +9,6 @@ import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.MultiPoint
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -43,12 +42,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mapView: MapView? = null
     private var mapboxMap: MapboxMap? = null
-    private var heatmapLayer: HeatmapLayer? = null
-
     private var circleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
-    private val heatMapLayerID = "heatMapLayerID"
+    private var featureCollection : FeatureCollection? =null
+    private var features = ArrayList<Feature>()
+    private var geoJsonSource : GeoJsonSource? =null
     private val heatMapSourceID = "heatMapSourceID"
 
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
@@ -130,7 +129,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
-            createLoadGeoJsonData(style)
+            createLayersForHeatMap(style)
+            addPointToHeatMap(style,8.543434,47.398979)
+            addPointToHeatMap(style,8.543934,47.398279)
+            addPointToHeatMap(style,8.544867,47.397426)
+            addPointToHeatMap(style,8.543067,47.397026)
         }
 
         // Load latest location
@@ -162,42 +165,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 //            true
 //        }
     }
-    private fun createLoadGeoJsonData(style: Style){
-        var featureCollection : FeatureCollection
-        var features = ArrayList<Feature>()
-        val points = ArrayList<Point>()
-        points.add(Point.fromLngLat(8.543934,47.398279))
-        points.add(Point.fromLngLat(8.544867,47.397426))
-        if (points.size>=2) {
-            /*
-                val multiPoints = MultiPoint.fromLngLats(points)
-                featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(multiPoints))
-                style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withMaxZoom(40))
-               */
-            for (i in points.indices) {
-                val point = points[i]
-                features.add(Feature.fromGeometry(point))
-            }
-            featureCollection = FeatureCollection.fromFeatures(features)
-            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withCluster(true).withMaxZoom(40)))
-        }
-        else if (points.size==1){
-            val point = points[0]
-            featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(point))
-            style.addSource(GeoJsonSource(heatMapSourceID, featureCollection, GeoJsonOptions().withCluster(true)))
-            //Here the GeoJsonOption withCluster() works because the geometry is point and not a multiPoint
-        }
-        else{
-            /** NO POINTS DETECTED**/
-        }
+    private fun createLayersForHeatMap(style: Style){
+        createSourceData(style)
+        unclusteredLayerData(style)
+        clusteredLayerData(style)
+    }
+    private fun addPointToHeatMap(style: Style, longitude: Double, latitude: Double){
+        features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
+        featureCollection = FeatureCollection.fromFeatures(features)
+        geoJsonSource!!.setGeoJson(featureCollection)
 
-        /**UNCOMMENT THIS WHEN CLUSTER WORKS**/
-        /*
-        val layers = arrayOf(
-                intArrayOf(2, Color.parseColor("#E55E5E")),
-                intArrayOf(1, Color.parseColor("#F9886C")),
-                intArrayOf(0, Color.parseColor("#FBB03B")))
-
+    }
+    private fun createSourceData(style: Style){
+        geoJsonSource = GeoJsonSource(heatMapSourceID, GeoJsonOptions().withCluster(true))
+        geoJsonSource!!.setGeoJson(featureCollection)
+        style.addSource(geoJsonSource!!)
+    }
+    private fun unclusteredLayerData(style: Style){
         val unclustered = CircleLayer("unclustered-points", heatMapSourceID)
         unclustered.setProperties(
                 circleColor(Color.parseColor("#FBB03B")),
@@ -205,14 +189,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 circleBlur(1f))
         unclustered.setFilter(Expression.neq(get("cluster"), literal(true)))
         style.addLayerBelow(unclustered, "building")
-
-
-
-        for (i in layers.indices) {
+    }
+    private fun clusteredLayerData(style: Style){
+        val layers = arrayOf(
+                intArrayOf(10, Color.parseColor("#E55E5E")),
+                intArrayOf(4, Color.parseColor("#F9886C")),
+                intArrayOf(0, Color.parseColor("#FBB03B")))
+         for (i in layers.indices) {
             val circles = CircleLayer("cluster-$i", heatMapSourceID)
             circles.setProperties(
                     circleColor(layers[i][1]),
-                    circleRadius(70f),
+                    circleRadius(60f),
                     circleBlur(1f)
             )
             val pointCount: Expression = toNumber(get("point_count"))
@@ -224,23 +211,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             style.addLayerBelow(circles, "building")
         }
-        */
-        /**DELETE THIS WHEN CLUSTER WORKS**/
-        val layers = arrayOf(
-                intArrayOf(150, Color.parseColor("#E55E5E")),
-                intArrayOf(20, Color.parseColor("#F9886C")),
-                intArrayOf(0, Color.parseColor("#FBB03B")))
+    }
 
-        for (i in layers.indices) { //Add clusters' circles
-            val circles = CircleLayer("cluster-$i", heatMapSourceID)
-            circles.setProperties(
-                    circleColor(layers[i][1]),
-                    circleRadius(30f),
-                    circleBlur(1f)
-            )
-            style.addLayer(circles)
-        }
-  }
 
     /** FOR THE MENU IF NEEDED **/
 //    override fun _onCreateOptionsMenu(menu: Menu?): Boolean {
