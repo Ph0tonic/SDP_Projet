@@ -85,4 +85,12 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
     }
+
+    @Test
+    fun mapBoxCanAddPointToHeatMap() {
+        mActivityRule.launchActivity(Intent())
+        runOnUiThread {
+            mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
+        }
+    }
 }

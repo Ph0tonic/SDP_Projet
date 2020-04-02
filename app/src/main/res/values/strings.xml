@@ -44,5 +44,8 @@
     <string name="toast_no_regions_yet">No regions yet</string>
     <string name="dialog_toast">Name cannot be empty</string>
     <string name="region_name">Region name error</string>
-    
+
+    <string name="below_layer_id">building</string>
+    <string name="heatmap_source_ID">HeatMapSourceID</string>
+
 </resources>
