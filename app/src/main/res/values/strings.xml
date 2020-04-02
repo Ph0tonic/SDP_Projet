@@ -47,4 +47,8 @@
     <string name="below_layer_id">building</string>
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="zoom">Zoom</string>
+
 </resources>

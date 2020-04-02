@@ -101,9 +101,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onStop() {
         PreferenceManager.getDefaultSharedPreferences(this).edit()
-                .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
-                .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
-                .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
+                .putString(getString(R.string.latitude), mapboxMap?.cameraPosition?.target?.latitude.toString())
+                .putString(getString(R.string.longitude), mapboxMap?.cameraPosition?.target?.longitude.toString())
+                .putString(getString(R.string.zoom), mapboxMap?.cameraPosition?.zoom.toString())
                 .apply()
         super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
