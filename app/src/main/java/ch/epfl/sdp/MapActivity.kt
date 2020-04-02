@@ -167,7 +167,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             )
             val pointCount: Expression = toNumber(get("point_count"))
             circles.setFilter(
-                    if (i == 0) gte(pointCount, literal(layers[i][0])) else Expression.all(
+                    if (i == 0) gte(pointCount, literal(layers[i][0])) else all(
                             gte(pointCount, literal(layers[i][0])),
                             lt(pointCount, literal(layers[i - 1][0]))
                     )
