@@ -87,6 +87,12 @@ class LocationWithPermissionTest {
         Assert.assertTrue(true)
     }
 
+    @Test
+    fun checkLocationReturnsTrueIfLocationIsEnabled(){
+        CentralLocationManager.configure(mActivityRule.activity)
+        Assert.assertTrue(CentralLocationManager.checkLocationSetting())
+    }
+
 
 
 
