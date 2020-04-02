@@ -6,8 +6,11 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import ch.epfl.sdp.R.id.tv_latitude
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
@@ -19,6 +22,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
+import kotlinx.android.synthetic.main.activity_map.*
 
 /**
  * Main Activity to display map and create missions.
@@ -65,21 +69,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offlineButton.setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
-        mapView?.contentDescription = MAP_NOT_READY_DESCRIPTION
+        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
     }
 
     override fun onResume() {
         super.onResume()
-
         Drone.currentPositionLiveData.observe(this, currentPositionObserver)
-        // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
     }
 
     override fun onPause() {
         super.onPause()
-
         Drone.currentPositionLiveData.removeObserver(currentPositionObserver)
-        //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
 
     override fun onStop() {
@@ -103,8 +103,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
-            lineManager = LineManager(mapView!!, mapboxMap, style)
-            fillManager = FillManager(mapView!!, mapboxMap,style!!)
+            lineManager = LineManager(mapView, mapboxMap, style)
+            fillManager = FillManager(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -125,7 +125,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
 
         // Used to detect when the map is ready in tests
-        mapView?.contentDescription = MAP_READY_DESCRIPTION
+        mapView.contentDescription = MAP_READY_DESCRIPTION
     }
 
 
@@ -152,6 +152,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             currentPositionMarker!!.latLng = newLatLng
             circleManager!!.update(currentPositionMarker)
         }
+
+        //display coordinates in the bar
+        val latView: TextView = findViewById(R.id.tv_latitude)
+        latView.text = ("LAT : " + newLatLng.latitude  + "0000000000").subSequence(0,15)
+        val lonView: TextView = findViewById(R.id.tv_longitude)
+        lonView.text = ("LON : " + newLatLng.longitude + "0000000000").subSequence(0,15)
+
     }
 
     /** Trajectory Planning **/
@@ -208,19 +215,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         circleManager?.create(circleOptions)
     }
 
-    fun returnPathToMissionDesign(view: View) {
-        val resultIntent = Intent()
-        resultIntent.putExtra("waypoints", waypoints)
-        setResult(Activity.RESULT_OK, resultIntent)
-        finish()
-    }
-
+    /*
     fun clearWaypoints(view: View) {
-        //circleManager?.deleteAll() //TODO : delete waypoints but not drone.
+
+        //CAUTION : DELETES DRONE POSITION circleManager?.deleteAll()
         lineManager?.deleteAll()
         fillManager?.deleteAll()
         waypoints.clear()
-    }
+    }*/
 }
 
 

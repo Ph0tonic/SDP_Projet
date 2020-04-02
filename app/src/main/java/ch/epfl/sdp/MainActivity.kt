@@ -16,7 +16,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import ch.epfl.sdp.drone.Drone
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -26,7 +25,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.mapbox.mapboxsdk.geometry.LatLng
-import io.mavsdk.mission.Mission
 
 class MainActivity : AppCompatActivity() {
 
@@ -55,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_home, R.id.nav_misson_design, R.id.nav_maps_managing), drawerLayout)
+                R.id.nav_home, R.id.nav_maps_managing), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -123,8 +121,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    //TODO ?
-    fun goToTrajectoryDesign(view: View) {
+    /*fun goToTrajectoryDesign(view: View) {
         startActivityForResult(Intent(this, MapActivity::class.java), 42)
     }
 
@@ -138,7 +135,7 @@ class MainActivity : AppCompatActivity() {
                 .andThen(Drone.instance.action.takeoff())
                 .andThen(Drone.instance.mission.startMission())
                 .subscribe()
-    }
+    }*/
 }
 
 
