@@ -1,21 +1,21 @@
 package ch.epfl.sdp
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
+import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
+import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -26,7 +26,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
-import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -38,9 +37,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
  * 2. Long click on map to add a waypoint
  * 3. Hit play to start mission.
  */
-class MapActivity : AppCompatActivity(), OnMapReadyCallback {
-
-    private var mapView: MapView? = null
+class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private var circleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
@@ -50,37 +47,29 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var geoJsonSource : GeoJsonSource? =null
     private val heatMapSourceID = "heatMapSourceID"
 
+
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Mapbox access token is configured here. This needs to be called either in your application
-        // object or in the same activity which contains the mapview.
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
-
-        setContentView(R.layout.activity_map)
-
-        mapView = findViewById(R.id.mapView)
-        mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+        super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
+        mapView.getMapAsync(this)
 
         val button: Button = findViewById(R.id.start_mission_button)
         button.setOnClickListener {
             val dme = DroneMissionExample.makeDroneMission()
             dme.startMission()
         }
-    }
 
-    override fun onStart() {
-        super.onStart()
-        mapView?.onStart()
+        val offlineButton: Button = findViewById(R.id.stored_offline_map)
+        offlineButton.setOnClickListener {
+            startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        mapView?.onResume()
 
         Drone.currentPositionLiveData.observe(this, currentPositionObserver)
         // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
@@ -88,35 +77,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onPause() {
         super.onPause()
-        mapView?.onPause()
 
         Drone.currentPositionLiveData.removeObserver(currentPositionObserver)
         //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
 
     override fun onStop() {
-        super.onStop()
         PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
                 .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
                 .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
-                .apply();
-        mapView?.onStop()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView?.onSaveInstanceState(outState)
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView?.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView?.onDestroy()
+                .apply()
+        super.onStop()
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -126,7 +98,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 //            style.addImage("marker-icon-id",
 //                    BitmapFactory.decodeResource(
 //                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
-            symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
+            symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
             createLayersForHeatMap(style)
@@ -135,9 +107,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             addPointToHeatMap(style,8.543934,47.398279)
             addPointToHeatMap(style,8.544867,47.397426)
             addPointToHeatMap(style,8.543067,47.397026)
+
         }
 
         // Load latest location
+
         val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("latitude", null)?.toDoubleOrNull() ?: -52.6885
         val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
@@ -145,26 +119,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("zoom", null)?.toDoubleOrNull() ?: 9.0
 
-        mapboxMap.cameraPosition = CameraPosition.Builder()
-                .target(LatLng(latitude, longitude))
-                .zoom(zoom)
-                .build()
 
-        mapboxMap.addOnMapClickListener { point ->
-            mapboxMap.addMarker(MarkerOptions().position(point).title(point.toString()))
-            true
-        }
-        mapboxMap.setOnMarkerClickListener { marker ->
-            mapboxMap.removeMarker(marker)
-            true
-        }
-//        mapboxMap.uiSettings.isRotateGesturesEnabled = false
-//        mapboxMap.uiSettings.isTiltGesturesEnabled = false
-        // Allow to pinpoint
-//        mapboxMap.addOnMapLongClickListener { point: LatLng? ->
-//            viewModel.addWaypoint(point)
-//            true
-//        }
+        setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
+
     }
     private fun createLayersForHeatMap(style: Style){
         createSourceData(style)

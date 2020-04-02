@@ -18,6 +18,9 @@
             android:name=".ui.missionDesign.TrajectoryPlanningActivity"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".OfflineManagerActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">

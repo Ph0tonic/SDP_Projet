@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 object MapUtils {
 
     private const val DEFAULT_LATITUDE: Double =  47.39778846550371
-    private const val DEFAULT_LONGITUDE:Double  = 8.545970150745575
+    private const val DEFAULT_LONGITUDE: Double  = 8.545970150745575
     private const val DEFAULT_ZOOM: Double = 9.0
 
     private fun loadLastMapPositionFromPrefs(context: Context): LatLng{
@@ -42,9 +42,22 @@ object MapUtils {
      * map
      */
     fun setupCameraAsLastTimeUsed(context: Context, mapboxMap: MapboxMap){
-        mapboxMap.cameraPosition = CameraPosition.Builder()
-                .target(loadLastMapPositionFromPrefs(context))
-                .zoom(loadLastMapZoomFromPrefs(context))
+        setupCameraWithParameters(mapboxMap,
+                loadLastMapPositionFromPrefs(context),
+                loadLastMapZoomFromPrefs(context))
+    }
+
+    /**
+     * Loads and applies the camera settings passed in parameters to the camera of the given map
+     * @param mapboxMap
+     * @param latitude
+     * @param longitude
+     * @param zoom
+     */
+    fun setupCameraWithParameters(mapboxMap: MapboxMap?, lat : LatLng, zoom : Double){
+        mapboxMap?.cameraPosition = CameraPosition.Builder()
+                .target(lat)
+                .zoom(zoom)
                 .build()
     }
 }

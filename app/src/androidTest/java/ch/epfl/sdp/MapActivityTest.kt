@@ -8,6 +8,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.doubleClick
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -82,8 +83,6 @@ class MapActivityTest {
     fun canStartMission(){
         // Launch activity
         mActivityRule.launchActivity(Intent())
-
-        Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
-
+        onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
     }
 }
