@@ -130,6 +130,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView?.let { CircleManager(it, mapboxMap, style) }
             createLayersForHeatMap(style)
+            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTER**/
             addPointToHeatMap(style,8.543434,47.398979)
             addPointToHeatMap(style,8.543934,47.398279)
             addPointToHeatMap(style,8.544867,47.397426)
