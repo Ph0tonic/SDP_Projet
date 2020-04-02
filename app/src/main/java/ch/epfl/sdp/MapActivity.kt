@@ -43,7 +43,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var featureCollection: FeatureCollection? = null
     private var features = ArrayList<Feature>()
     private var geoJsonSource: GeoJsonSource? = null
-    private val heatMapSourceID = "heatMapSourceID"
 
     private val darkRed = Color.parseColor("#E55E5E")
     private val lightRed = Color.parseColor("#F9886C")
@@ -139,19 +138,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun createSourceData(style: Style) {
-        geoJsonSource = GeoJsonSource(heatMapSourceID, GeoJsonOptions().withCluster(true))
+        geoJsonSource = GeoJsonSource(getString(R.string.heatMapSourceID), GeoJsonOptions().withCluster(true))
         geoJsonSource!!.setGeoJson(featureCollection)
         style.addSource(geoJsonSource!!)
     }
 
     private fun unclusteredLayerData(style: Style) {
-        val unclustered = CircleLayer("unclustered-points", heatMapSourceID)
+        val unclustered = CircleLayer("unclustered-points", getString(R.string.heatMapSourceID))
         unclustered.setProperties(
-                circleColor(Color.parseColor("#FBB03B")),
+                circleColor(orange),
                 circleRadius(20f),
                 circleBlur(1f))
-        unclustered.setFilter(Expression.neq(get("cluster"), literal(true)))
-        style.addLayerBelow(unclustered, "building")
+        unclustered.setFilter(neq(get("cluster"), literal(true)))
+        style.addLayerBelow(unclustered, getString(R.string.building))
     }
 
     private fun clusteredLayerData(style: Style) {
@@ -160,7 +159,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 intArrayOf(2, lightRed),
                 intArrayOf(0, orange))
         for (i in layers.indices) {
-            val circles = CircleLayer("cluster-$i", heatMapSourceID)
+            val circles = CircleLayer("cluster-$i", getString(R.string.heatMapSourceID))
             circles.setProperties(
                     circleColor(layers[i][1]),
                     circleRadius(60f),
@@ -168,12 +167,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             )
             val pointCount: Expression = toNumber(get("point_count"))
             circles.setFilter(
-                    if (i == 0) Expression.gte(pointCount, literal(layers[i][0])) else Expression.all(
-                            Expression.gte(pointCount, literal(layers[i][0])),
-                            Expression.lt(pointCount, literal(layers[i - 1][0]))
+                    if (i == 0) gte(pointCount, literal(layers[i][0])) else Expression.all(
+                            gte(pointCount, literal(layers[i][0])),
+                            lt(pointCount, literal(layers[i - 1][0]))
                     )
             )
-            style.addLayerBelow(circles, "building")
+            style.addLayerBelow(circles, getString(R.string.building))
         }
     }
 
