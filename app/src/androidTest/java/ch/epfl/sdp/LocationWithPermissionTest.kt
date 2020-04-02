@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.util.Log
@@ -25,6 +26,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
+import org.mockito.verification.VerificationMode
 
 
 @RunWith(AndroidJUnit4::class)
@@ -91,6 +93,18 @@ class LocationWithPermissionTest {
     fun checkLocationReturnsTrueIfLocationIsEnabled(){
         CentralLocationManager.configure(mActivityRule.activity)
         Assert.assertTrue(CentralLocationManager.checkLocationSetting())
+    }
+
+    @Test
+    fun onRequestPermissionResultRequestsLocationUpdatesIfItHasPermission() {
+        val activity = mock(AppCompatActivity::class.java)
+        val manager = mock(LocationManager::class.java)
+        Mockito.`when`(activity.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
+        Mockito.`when`(activity.checkSelfPermission(Mockito.any())).thenReturn(PackageManager.PERMISSION_GRANTED)
+        Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
+        CentralLocationManager.configure(activity)
+        CentralLocationManager.onRequestPermissionsResult(1011,Array(0) {""},IntArray(0))
+        Mockito.verify(manager, Mockito.times(2) ).requestLocationUpdates(LocationManager.GPS_PROVIDER,500,10f, CentralLocationListener)
     }
 
 

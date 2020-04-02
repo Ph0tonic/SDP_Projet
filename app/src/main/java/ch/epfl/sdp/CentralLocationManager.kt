@@ -69,7 +69,7 @@ object CentralLocationManager {
     }
 
     private fun checkPermission(permission: String): Boolean{
-        return ActivityCompat.checkSelfPermission(activity.applicationContext,permission) == PackageManager.PERMISSION_GRANTED
+        return ActivityCompat.checkSelfPermission(activity,permission) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermissions(){
