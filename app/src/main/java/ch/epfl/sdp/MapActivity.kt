@@ -138,19 +138,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun createSourceData(style: Style) {
-        geoJsonSource = GeoJsonSource(getString(R.string.heatMapSourceID), GeoJsonOptions().withCluster(true))
+        geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
         geoJsonSource!!.setGeoJson(featureCollection)
         style.addSource(geoJsonSource!!)
     }
 
     private fun unclusteredLayerData(style: Style) {
-        val unclustered = CircleLayer("unclustered-points", getString(R.string.heatMapSourceID))
+        val unclustered = CircleLayer("unclustered-points", getString(R.string.heatmap_source_ID))
         unclustered.setProperties(
                 circleColor(orange),
                 circleRadius(20f),
                 circleBlur(1f))
         unclustered.setFilter(neq(get("cluster"), literal(true)))
-        style.addLayerBelow(unclustered, getString(R.string.building))
+        style.addLayerBelow(unclustered, getString(R.string.below_layer_id))
     }
 
     private fun clusteredLayerData(style: Style) {
@@ -159,7 +159,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 intArrayOf(2, lightRed),
                 intArrayOf(0, orange))
         for (i in layers.indices) {
-            val circles = CircleLayer("cluster-$i", getString(R.string.heatMapSourceID))
+            val circles = CircleLayer("cluster-$i", getString(R.string.heatmap_source_ID))
             circles.setProperties(
                     circleColor(layers[i][1]),
                     circleRadius(60f),
@@ -172,7 +172,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                             lt(pointCount, literal(layers[i - 1][0]))
                     )
             )
-            style.addLayerBelow(circles, getString(R.string.building))
+            style.addLayerBelow(circles, getString(R.string.below_layer_id))
         }
     }
 
