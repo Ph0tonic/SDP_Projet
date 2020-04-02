@@ -96,4 +96,11 @@ class MapActivityTest {
         Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
 
     }
+
+
+    @Test
+    fun canUpdateUserLocation(){
+        mActivityRule.launchActivity(Intent())
+        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
+    }
 }

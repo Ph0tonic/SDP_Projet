@@ -12,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import com.mapbox.mapboxsdk.geometry.LatLng
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -31,7 +32,7 @@ class LocationWithPermissionTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     @get:Rule
-    val mActivityRule = IntentsTestRule(MainActivity::class.java)
+    val mActivityRule = IntentsTestRule(MapActivity::class.java)
 
     @Before
     @Throws(Exception::class)
