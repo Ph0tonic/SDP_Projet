@@ -10,9 +10,14 @@ import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.IOException
 
 class VlcActivity : AppCompatActivity() {
-    private val USE_TEXTURE_VIEW = false
-    private val ENABLE_SUBTITLES = true
-    private val ASSET_FILENAME = "rtsp://192.168.1.120:8554/live"
+
+    companion object {
+        private const val USE_TEXTURE_VIEW = false
+        private const val ENABLE_SUBTITLES = false
+        private const val ASSET_FILENAME = "rtsp://192.168.1.120:8554/live"
+        private val ARGS = arrayListOf("-vvv", "--live-caching=200")
+    }
+
     private lateinit var mVideoLayout: VLCVideoLayout
     private lateinit var mLibVLC: LibVLC
     private lateinit var mMediaPlayer: MediaPlayer
@@ -20,18 +25,10 @@ class VlcActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vlc)
-        val args: ArrayList<String> = ArrayList()
-        args.add("-vvv")
-        args.add("--live-caching=100")
-        mLibVLC = LibVLC(this, args)
+
+        mLibVLC = LibVLC(this, ARGS)
         mMediaPlayer = MediaPlayer(mLibVLC)
         mVideoLayout = findViewById(R.id.video_layout)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mMediaPlayer.release()
-        mLibVLC.release()
     }
 
     override fun onStart() {
@@ -42,8 +39,7 @@ class VlcActivity : AppCompatActivity() {
             mMediaPlayer.media = media
             media.release()
         } catch (e: IOException) {
-            throw RuntimeException("Invalid asset folder")
-            //return
+            throw RuntimeException("Invalid stream api")
         }
         mMediaPlayer.play()
     }
@@ -54,5 +50,9 @@ class VlcActivity : AppCompatActivity() {
         mMediaPlayer.detachViews()
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        mMediaPlayer.release()
+        mLibVLC.release()
+    }
 }

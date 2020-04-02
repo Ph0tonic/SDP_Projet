@@ -20,25 +20,22 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
 
 
 class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
-    private var mapView: MapView? = null
+    private lateinit var mapView: MapView
     private var mapboxMap: MapboxMap? = null
-    private var  symbolManager: SymbolManager? = null
-    private var  circleManager: CircleManager? = null
-    private var  lineManager: LineManager? = null
+    private var symbolManager: SymbolManager? = null
+    private var circleManager: CircleManager? = null
+    private var lineManager: LineManager? = null
     private var fillManager: FillManager? = null
-
-
 
     var waypoints = arrayListOf<LatLng>()
 
-    companion object{
+    companion object {
         private const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         private const val MAP_READY_DESCRIPTION: String = "MAP READY"
 
         private const val PATH_THICKNESS: Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,47 +47,47 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.trajectory_planning_map)
 
         mapView = findViewById(R.id.trajectory_planning_mapView)
-        mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
 
         // Used to detect when the map is ready in tests
-        mapView?.contentDescription = MAP_NOT_READY_DESCRIPTION
+        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
     }
 
     override fun onStart() {
         super.onStart()
-        mapView?.onStart()
+        mapView.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        mapView?.onResume()
+        mapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView?.onPause()
+        mapView.onPause()
     }
 
     override fun onStop() {
         super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
-        mapView?.onStop()
+        mapView.onStop()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView?.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView?.onLowMemory()
+        mapView.onLowMemory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView?.onDestroy()
+        mapView.onDestroy()
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -98,10 +95,10 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
 
-            fillManager = FillManager(mapView!!, mapboxMap,style!!)
-            symbolManager = SymbolManager(mapView!!, mapboxMap, style)
-            lineManager = LineManager(mapView!!, mapboxMap, style)
-            circleManager = CircleManager(mapView!!, mapboxMap, style)
+            fillManager = FillManager(mapView, mapboxMap, style!!)
+            symbolManager = SymbolManager(mapView, mapboxMap, style)
+            lineManager = LineManager(mapView, mapboxMap, style)
+            circleManager = CircleManager(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -110,32 +107,32 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         // Used to detect when the map is ready in tests
-        mapView?.contentDescription = MAP_READY_DESCRIPTION
+        mapView.contentDescription = MAP_READY_DESCRIPTION
     }
 
-    fun onMapClicked(position: LatLng): Boolean{
-        if (waypoints.size < 4){
+    fun onMapClicked(position: LatLng): Boolean {
+        if (waypoints.size < 4) {
             waypoints.add(position)
             drawPinpoint(position)
 
-            if (waypoints.isNotEmpty()){
+            if (waypoints.isNotEmpty()) {
                 drawRegion(waypoints)
             }
 
-            if (waypoints.size == 4){
+            if (waypoints.size == 4) {
                 drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
             }
         }
         return true
     }
 
-    private fun drawPath(path: List<LatLng>){
+    private fun drawPath(path: List<LatLng>) {
         lineManager?.create(LineOptions()
                 .withLatLngs(path)
                 .withLineWidth(PATH_THICKNESS))
     }
 
-    private fun drawRegion(corners: List<LatLng>){
+    private fun drawRegion(corners: List<LatLng>) {
         // Draw the fill
         val fillOption = FillOptions()
                 .withLatLngs(listOf(waypoints))
@@ -158,7 +155,7 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
         lineManager?.create(lineOptions)
     }
 
-    private fun drawPinpoint(pinpoints: LatLng){
+    private fun drawPinpoint(pinpoints: LatLng) {
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
                 .withDraggable(true)
