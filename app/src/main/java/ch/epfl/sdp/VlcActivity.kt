@@ -16,7 +16,7 @@ class VlcActivity : AppCompatActivity() {
         private const val USE_TEXTURE_VIEW = false
         private const val ENABLE_SUBTITLES = false
         private const val ASSET_FILENAME = "rtsp://192.168.1.120:8554/live"
-        private val ARGS = arrayListOf("-vvv", "--live-caching=200")
+        private val ARGS = arrayListOf("-vvv")//, "--live-caching=200")
     }
 
     private lateinit var mVideoLayout: VLCVideoLayout
@@ -33,31 +33,37 @@ class VlcActivity : AppCompatActivity() {
         mVideoLayout = findViewById(R.id.video_layout)
     }
 
+    override fun onStart() {
+        super.onStart()
+        mMediaPlayer.attachViews(mVideoLayout, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+    }
+
     fun switchVideo(view: View) {
-        if (started) stopVideo()
+        started = if (started) stopVideo()
         else startVideo()
     }
 
-    private fun startVideo() {
-        mMediaPlayer.attachViews(mVideoLayout, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+    private fun startVideo(): Boolean {
         try {
             val media = Media(mLibVLC, Uri.parse(ASSET_FILENAME))
             mMediaPlayer.media = media
             media.release()
         } catch (e: IOException) {
-            throw RuntimeException("Invalid stream api")
+            return false
         }
         mMediaPlayer.play()
+        return true
     }
 
-    private fun stopVideo() {
+    private fun stopVideo(): Boolean {
         mMediaPlayer.stop()
-        mMediaPlayer.detachViews()
+        return false
     }
 
     override fun onStop() {
         super.onStop()
         if (started) stopVideo()
+        mMediaPlayer.detachViews()
     }
 
     override fun onDestroy() {

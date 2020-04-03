@@ -1,17 +1,20 @@
 package ch.epfl.sdp
 
-
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.doubleClick
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
+import androidx.test.rule.GrantPermissionRule
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.junit.Before
@@ -29,6 +32,10 @@ class MapActivityTest {
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
+
+    @Rule
+    @JvmField
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -64,7 +71,7 @@ class MapActivityTest {
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
         getInstrumentation().waitForIdleSync()
-        runOnUiThread{
+        runOnUiThread {
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
         getInstrumentation().waitForIdleSync()
@@ -83,5 +90,24 @@ class MapActivityTest {
         runOnUiThread {
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
         }
+    }
+
+    @Test
+    fun canUpdateUserLocation() {
+        mActivityRule.launchActivity(Intent())
+        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
+    }
+
+    @Test
+    fun canUpdateUserLocationTwice() {
+        mActivityRule.launchActivity(Intent())
+        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
+        CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST.toDouble(), -LONGITUDE_TEST.toDouble()))
+    }
+
+    @Test
+    fun canOnRequestPermissionResult() {
+        mActivityRule.launchActivity(Intent())
+        mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 }

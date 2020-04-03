@@ -16,7 +16,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.missionDesign.TrajectoryPlanningActivity
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -27,10 +26,8 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.mapbox.mapboxsdk.geometry.LatLng
-import io.mavsdk.mission.Mission
 
 class MainActivity : AppCompatActivity() {
-
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -72,6 +69,13 @@ class MainActivity : AppCompatActivity() {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
+    override fun onStart() {
+        super.onStart()
+        //val account = GoogleSignIn.getLastSignedInAccount(this)
+        //updateUserView(account?.displayName, account?.email)
+        CentralLocationManager.configure(this)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main3, menu)
@@ -108,8 +112,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateUserView(username: String?, userEmail: String?, userURL: String?) {
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 
+    fun updateUserView(username: String?, userEmail: String?, userURL: String?) {
         val usernameView: TextView = findViewById(R.id.nav_username)
         val userEmailView: TextView = findViewById(R.id.nav_user_email)
         val userImageView: ImageView = findViewById(R.id.nav_user_image)
@@ -118,7 +127,6 @@ class MainActivity : AppCompatActivity() {
         userEmailView.text = userEmail ?: "default_email"
 
         Glide.with(this).load(userURL).error(R.mipmap.ic_launcher_round).into(userImageView)
-
     }
 
     fun goToTrajectoryDesign(view: View) {
