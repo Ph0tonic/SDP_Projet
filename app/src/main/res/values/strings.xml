@@ -62,5 +62,8 @@
     <string name="start">Start</string>
     <string name="store">Store</string>
     <string name="clear">Clear</string>
+    <string name="prefs_latitude">latitude</string>
+    <string name="prefs_longitude">longitude</string>
+    <string name="prefs_zoom">zoom</string>
 
 </resources>

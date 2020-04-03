@@ -2,6 +2,7 @@ package ch.epfl.sdp.ui.maps
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -15,9 +16,13 @@ object MapUtils {
     private fun loadLastMapPositionFromPrefs(context: Context): LatLng {
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         val latitude: Double = defaultSharedPrefs
-                .getString("latitude", null)?.toDoubleOrNull() ?: DEFAULT_LATITUDE
+                .getString(context.getString(R.string.prefs_latitude), null)
+                ?.toDoubleOrNull()
+                ?: DEFAULT_LATITUDE
         val longitude: Double = defaultSharedPrefs
-                .getString("longitude", null)?.toDoubleOrNull() ?: DEFAULT_LONGITUDE
+                .getString(context.getString(R.string.prefs_longitude), null)
+                ?.toDoubleOrNull()
+                ?: DEFAULT_LONGITUDE
         return LatLng(latitude, longitude)
     }
 
@@ -26,15 +31,20 @@ object MapUtils {
      */
     fun saveCameraPositionAndZoomToPrefs(context: Context, mapboxMap: MapboxMap?) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putString("latitude", mapboxMap?.cameraPosition?.target?.latitude.toString())
-                .putString("longitude", mapboxMap?.cameraPosition?.target?.longitude.toString())
-                .putString("zoom", mapboxMap?.cameraPosition?.zoom.toString())
+                .putString(context.getString(R.string.prefs_latitude),
+                        mapboxMap?.cameraPosition?.target?.latitude.toString())
+                .putString(context.getString(R.string.prefs_longitude),
+                        mapboxMap?.cameraPosition?.target?.longitude.toString())
+                .putString(context.getString(R.string.prefs_zoom),
+                        mapboxMap?.cameraPosition?.zoom.toString())
                 .apply()
     }
 
     private fun loadLastMapZoomFromPrefs(context: Context): Double {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString("zoom", null)?.toDoubleOrNull() ?: DEFAULT_ZOOM
+                .getString(context.getString(R.string.prefs_zoom), null)
+                ?.toDoubleOrNull()
+                ?: DEFAULT_ZOOM
     }
 
     /**
@@ -50,13 +60,12 @@ object MapUtils {
     /**
      * Loads and applies the camera settings passed in parameters to the camera of the given map
      * @param mapboxMap
-     * @param latitude
-     * @param longitude
+     * @param latLng
      * @param zoom
      */
-    fun setupCameraWithParameters(mapboxMap: MapboxMap?, lat: LatLng, zoom: Double) {
+    fun setupCameraWithParameters(mapboxMap: MapboxMap?, latLng: LatLng, zoom: Double) {
         mapboxMap?.cameraPosition = CameraPosition.Builder()
-                .target(lat)
+                .target(latLng)
                 .zoom(zoom)
                 .build()
     }

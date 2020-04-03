@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
 import android.view.Gravity
 import androidx.preference.PreferenceManager
@@ -17,9 +18,8 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -28,13 +28,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
     private var mUiDevice: UiDevice? = null
 
-    @Rule @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @Rule
+    @JvmField
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION)
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MainActivity::class.java)
@@ -85,26 +85,25 @@ class MainActivityTest {
     }
 
 
-
     @Test
     fun canDisplayAMapAndReloadLocation() {
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("latitude", null) == null)
+                .getString(mActivityRule.activity.getString(R.string.prefs_latitude), null) == null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("longitude", null) == null)
+                .getString(mActivityRule.activity.getString(R.string.prefs_longitude), null) == null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("zoom", null) == null)
+                .getString(mActivityRule.activity.getString(R.string.prefs_zoom), null) == null)
 
         onView(withId(R.id.display_map)).perform(click())
         getInstrumentation().waitForIdleSync()
         mUiDevice?.pressBack()
 
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("latitude", null) != null)
+                .getString(mActivityRule.activity.getString(R.string.prefs_latitude), null) != null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("longitude", null) != null)
+                .getString(mActivityRule.activity.getString(R.string.prefs_longitude), null) != null)
         assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString("zoom", null) != null)
+                .getString(mActivityRule.activity.getString(R.string.prefs_zoom), null) != null)
 
         //Return on the view as to load the preferences this time
         getInstrumentation().waitForIdleSync()
