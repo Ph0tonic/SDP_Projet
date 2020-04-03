@@ -1,22 +1,16 @@
 package ch.epfl.sdp
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
-import ch.epfl.sdp.R.id.tv_latitude
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.OverflightStrategy
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle
-import ch.epfl.sdp.drone.pinPointsAmount
+import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle.Constraints.pinPointsAmount
 import ch.epfl.sdp.ui.maps.MapUtils
-import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -34,7 +28,6 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import kotlinx.android.synthetic.main.activity_map.*
 import java.text.DecimalFormat
 
 /**
@@ -46,9 +39,14 @@ import java.text.DecimalFormat
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
 
-    private var circleManager: CircleManager? = null
+    private var wayptCircleManager: CircleManager? = null
+    private var droneCircleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
+    private var lineManager: LineManager? = null
+    private var fillManager: FillManager? = null
+
+    var waypoints = arrayListOf<LatLng>()
 
     private var featureCollection: FeatureCollection? = null
     private var features = ArrayList<Feature>()
@@ -58,12 +56,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private val lightRed = Color.parseColor("#F9886C")
     private val orange = Color.parseColor("#FBB03B")
 
+    private val textPattern = "0.0000000"
+
     private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
 
-    //Trajectory Planning
-    private var lineManager: LineManager? = null
-    private var fillManager: FillManager? = null
-    var waypoints = arrayListOf<LatLng>()
+
+
 
 
     companion object {
@@ -80,8 +78,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
-        val button: Button = findViewById(R.id.start_mission_button)
-        button.setOnClickListener {
+        val startButton: Button = findViewById(R.id.start_mission_button)
+        startButton.setOnClickListener {
             val dme = DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints))
             dme.startMission()
         }
@@ -91,6 +89,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
+
+        val clearButton: Button = findViewById(R.id.start_mission_button)
+        clearButton.setOnClickListener {
+            clearWaypoints(R.id.mapView)
+        }
     }
 
     override fun onResume() {
@@ -119,11 +122,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
 
-            //symbolManager = SymbolManager(mapView!!, mapboxMap, style)
-            //circleManager = CircleManager(mapView!!, mapboxMap, style)
-            symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
+            symbolManager = SymbolManager(mapView, mapboxMap, style)
             symbolManager!!.iconAllowOverlap = true
-            circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
+            wayptCircleManager = CircleManager(mapView, mapboxMap, style)
+            droneCircleManager = CircleManager(mapView, mapboxMap, style)
             lineManager = LineManager(mapView, mapboxMap, style)
             fillManager = FillManager(mapView, mapboxMap, style)
 
@@ -142,15 +144,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
 
         // Load latest location
-        /** TrajectoryPlanningActivity was : MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)*/
-        val latitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("latitude", null)?.toDoubleOrNull() ?: -52.6885
-        val longitude: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("longitude", null)?.toDoubleOrNull() ?: -70.1395
-        val zoom: Double = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("zoom", null)?.toDoubleOrNull() ?: 9.0
-
-        setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
+        MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
 
         // Used to detect when the map is ready in tests
         mapView.contentDescription = MAP_READY_DESCRIPTION
@@ -163,7 +157,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateVehiclePosition(newLatLng: LatLng) {
-        if (mapboxMap == null || circleManager == null) {
+        if (mapboxMap == null || droneCircleManager == null) {
             // Not ready
             return
         }
@@ -172,21 +166,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (currentPositionMarker == null) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(newLatLng)
-            currentPositionMarker = circleManager!!.create(circleOptions)
+            currentPositionMarker = droneCircleManager!!.create(circleOptions)
 
             mapboxMap!!.moveCamera(CameraUpdateFactory.tiltTo(0.0))
             mapboxMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
             currentPositionMarker!!.latLng = newLatLng
-            circleManager!!.update(currentPositionMarker)
+            droneCircleManager!!.update(currentPositionMarker)
         }
 
         //display coordinates in the bar
-        val df = DecimalFormat("0.0000000");
+        val df = DecimalFormat(textPattern);
+
         val latView: TextView = findViewById(R.id.tv_latitude)
-        latView.text = ("LAT : " + df.format(newLatLng.latitude))
+        latView.text = (getString(R.string.lat) + df.format(newLatLng.latitude))
         val lonView: TextView = findViewById(R.id.tv_longitude)
-        lonView.text = ("LON : " + df.format(newLatLng.longitude))
+        lonView.text = (getString(R.string.lon) + df.format(newLatLng.longitude))
 
     }
 
@@ -242,17 +237,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
                 .withDraggable(true)
-        circleManager?.create(circleOptions)
+        wayptCircleManager?.create(circleOptions)
     }
 
-    /*
+
     fun clearWaypoints(view: View) {
 
-        //CAUTION : DELETES DRONE POSITION circleManager?.deleteAll()
+        wayptCircleManager?.deleteAll()
         lineManager?.deleteAll()
         fillManager?.deleteAll()
         waypoints.clear()
-    }*/
+    }
 
 
     private fun createLayersForHeatMap(style: Style) {

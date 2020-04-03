@@ -7,14 +7,18 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 interface OverflightStrategy {
-    fun createFlightPath(waypoints: List<LatLng>): List<LatLng>
+    fun createFlightPath(pinpoints: List<LatLng>): List<LatLng>
 }
 
 /**
  * Creates a path covering a quadrilateral in several passes
  */
-const val pinPointsAmount = 4
+
 class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStrategy{
+
+    companion object Constraints {
+        const val pinPointsAmount = 4
+    }
 
     private val maxDistBetweenLines: Double
     init {
