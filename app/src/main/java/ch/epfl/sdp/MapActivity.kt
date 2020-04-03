@@ -38,8 +38,10 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private var circleManager: CircleManager? = null
+    private var userCircleManager: CircleManager? = null
     private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
+    private var currentUserPositionMarker: Circle? = null
     private var featureCollection: FeatureCollection? = null
     private var features = ArrayList<Feature>()
     private var geoJsonSource: GeoJsonSource? = null
@@ -48,8 +50,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private val lightRed = Color.parseColor("#F9886C")
     private val orange = Color.parseColor("#FBB03B")
 
-    private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
+    private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
+    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
+
+    var userLatLng: LatLng = LatLng()
+        private set
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,19 +73,24 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offlineButton.setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
+        CentralLocationManager.configure(this)
     }
 
     override fun onResume() {
         super.onResume()
 
-        Drone.currentPositionLiveData.observe(this, currentPositionObserver)
+        CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
+
+        Drone.currentPositionLiveData.observe(this, dronePositionObserver)
         // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
     }
 
     override fun onPause() {
         super.onPause()
 
-        Drone.currentPositionLiveData.removeObserver(currentPositionObserver)
+        CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
+
+        Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
         //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
 
@@ -101,6 +113,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
             symbolManager!!.iconAllowOverlap = true
             circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
+            userCircleManager = mapView.let { CircleManager(it, mapboxMap, style) }
             createLayersForHeatMap(style)
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTER**/
             addPointToHeatMap(8.543434, 47.398979)
@@ -220,6 +233,23 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun updateUserPosition(userLatLng: LatLng) {
+        if (mapboxMap == null || userCircleManager == null) {
+            // Not ready
+            return
+        }
+
+        // Add a vehicle marker and move the camera
+        if (currentUserPositionMarker == null) {
+            val circleOptions = CircleOptions()
+            circleOptions.withLatLng(userLatLng)
+            currentUserPositionMarker = userCircleManager!!.create(circleOptions)
+        } else {
+            currentUserPositionMarker!!.latLng = userLatLng
+            userCircleManager!!.update(currentUserPositionMarker)
+        }
+    }
+
 //    /**
 //     * Update the [map] with the current mission plan waypoints.
 //     *
@@ -241,4 +271,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 //            circleManager?.create(circleOptions)
 //        }
 //    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 }

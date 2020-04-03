@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -67,12 +68,15 @@ class MainActivity : AppCompatActivity() {
                 .requestEmail()
                 .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+
+
     }
 
     override fun onStart() {
         super.onStart()
         //val account = GoogleSignIn.getLastSignedInAccount(this)
         //updateUserView(account?.displayName, account?.email)
+        CentralLocationManager.configure(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -109,6 +113,12 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == TRAJECTORY_PLANNING_REQUEST_CODE && resultCode == Activity.RESULT_OK){
             waypoints = data?.extras?.get("waypoints") as MutableList<LatLng>
         }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestCode,permissions, grantResults)
     }
 
     fun updateUserView(username: String?, userEmail: String?, userURL: String?){

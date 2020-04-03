@@ -1,6 +1,8 @@
 package ch.epfl.sdp
 
+import android.location.Location
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 
 /**
@@ -14,3 +16,4 @@ class ExampleUnitTest {
         Assert.assertEquals(4, 2 + 2.toLong())
     }
 }
+
