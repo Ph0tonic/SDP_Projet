@@ -31,7 +31,6 @@ class DroneMissionTest {
 
     @Test
     fun makeDroneMissionTest(){
-
         val positions = arrayListOf<LatLng>()
         positions.add(LatLng(47.398039859999997, 8.5455725400000002))
         positions.add(LatLng(47.398036222362471, 8.5450146439425509))
@@ -49,7 +48,6 @@ class DroneMissionTest {
         for((i, expectedMission) in expectedMissionItems.withIndex()){
             Assert.assertTrue(missionEquality(expectedMission, missionsItems[i]))
         }
-
     }
 
     fun missionEquality (m1 : Mission.MissionItem, m2 : Mission.MissionItem) : Boolean{

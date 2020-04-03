@@ -21,7 +21,6 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
 import java.nio.charset.Charset
-import java.util.*
 import kotlin.math.roundToInt
 
 /**
@@ -125,7 +124,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             metadata = try {
                 val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
-            } catch (exception: Exception) { Timber.e("Failed to encode metadata: %s", exception.message)
+            } catch (exception: Exception) {
+                Timber.e("Failed to encode metadata: %s", exception.message)
                 null
             }
             // Create the offline region and launch the download
@@ -134,7 +134,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     launchDownload(offlineRegion)
                 }
 
-                override fun onError(error: String) { Timber.e("Error: %s", error) }
+                override fun onError(error: String) {
+                    Timber.e("Error: %s", error)
+                }
             })
         }
     }
@@ -158,7 +160,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 Timber.e("onError message: %s", error.message)
             }
 
-            override fun mapboxTileCountLimitExceeded(limit: Long) { Timber.e("Mapbox tile count limit exceeded: %s", limit) }
+            override fun mapboxTileCountLimitExceeded(limit: Long) {
+                Timber.e("Mapbox tile count limit exceeded: %s", limit)
+            }
         })
         // Change the region state
         offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
@@ -176,16 +180,16 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     return
                 }
                 // Add all of the region names to a list
-                val offlineRegionsNames = ArrayList<String>()
-                for (offlineRegion in offlineRegions) {
-                    offlineRegionsNames.add(getRegionName(offlineRegion))
-                }
-                val items = offlineRegionsNames.toTypedArray<CharSequence>()
+                val items = offlineRegions
+                        .map { region -> getRegionName(region) }
+                        .toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
                 showDialog(items, offlineRegions)
             }
 
-            override fun onError(error: String) { Timber.e("Error: %s", error) }
+            override fun onError(error: String) {
+                Timber.e("Error: %s", error)
+            }
         })
     }
 
@@ -255,7 +259,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun endProgress(message: String) { // Don't notify more than once
-        if (isEndNotified) { return }
+        if (isEndNotified) {
+            return
+        }
         // Enable buttons
         downloadButton!!.isEnabled = true
         listButton!!.isEnabled = true

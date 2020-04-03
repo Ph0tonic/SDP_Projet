@@ -28,7 +28,9 @@ object DroneMission {
     }
 
     private fun addMissionItems(path: List<LatLng>) {
-        for(point in path) missionItems.add(generateMissionItem(point.latitude,point.longitude))
+        path.forEach { point ->
+            missionItems.add(generateMissionItem(point.latitude, point.longitude))
+        }
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {

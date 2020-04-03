@@ -54,17 +54,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var features = ArrayList<Feature>()
     private var geoJsonSource: GeoJsonSource? = null
 
-    private val darkRed = Color.parseColor("#E55E5E")
-    private val lightRed = Color.parseColor("#F9886C")
-    private val orange = Color.parseColor("#FBB03B")
-
-
-
-    private val decimalFormat = DecimalFormat(TEXT_PATTERN);
-
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
-    //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
+    //private var missionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
     var userLatLng: LatLng = LatLng()
         private set
@@ -75,8 +67,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         private const val PATH_THICKNESS: Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F
-        private const val TEXT_PATTERN = "0.0000000"
 
+        private val DECIMAL_FORMAT = DecimalFormat("0.0000000")
+        private val DARK_RED = Color.parseColor("#E55E5E")
+        private val LIGHT_RED = Color.parseColor("#F9886C")
+        private val ORANGE = Color.parseColor("#FBB03B")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,14 +100,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onResume()
         Drone.currentPositionLiveData.observe(this, dronePositionObserver)
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
-        // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
+        // viewModel.missionPlanLiveData.observe(this, currentMissionPlanObserver)
     }
 
     override fun onPause() {
         super.onPause()
         CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
         Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
-        //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
+        // Mission.missionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
 
     override fun onStop() {
@@ -136,6 +131,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
 
             createLayersForHeatMap(style)
+
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
             addPointToHeatMap(8.543434, 47.398979)
             addPointToHeatMap(8.543934, 47.398279)
@@ -150,6 +146,120 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapView.contentDescription = MAP_READY_DESCRIPTION
     }
 
+    private fun display(buttonId: Int, labelId: Int, value: Double) {
+        findViewById<TextView>(buttonId).text = (getString(labelId) + DECIMAL_FORMAT.format(value))
+    }
+
+    /** Trajectory Planning **/
+    fun onMapClicked(position: LatLng): Boolean {
+        if (waypoints.size < pinPointsAmount) {
+            waypoints.add(position)
+            drawPinpoint(position)
+
+            if (waypoints.isNotEmpty()) {
+                drawRegion(waypoints)
+            }
+
+            if (waypoints.size == pinPointsAmount) {
+                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
+            }
+        }
+        return true
+    }
+
+    private fun drawPath(path: List<LatLng>) {
+        lineManager?.create(LineOptions()
+                .withLatLngs(path)
+                .withLineWidth(PATH_THICKNESS))
+    }
+
+    private fun drawRegion(corners: List<LatLng>) {
+        // Draw the fill
+        val fillOption = FillOptions()
+                .withLatLngs(listOf(waypoints))
+                .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
+                .withFillOpacity(REGION_FILL_OPACITY)
+        fillManager?.deleteAll()
+        fillManager?.create(fillOption)
+
+        //Draw the borders
+        // Make it loop
+        val linePoints = arrayListOf<LatLng>().apply {
+            addAll(corners)
+            add(corners[0])
+        }
+        val lineOptions = LineOptions()
+                .withLatLngs(linePoints)
+                .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
+        lineManager?.deleteAll()
+        lineManager?.create(lineOptions)
+    }
+
+    private fun drawPinpoint(pinpoints: LatLng) {
+        val circleOptions = CircleOptions()
+                .withLatLng(pinpoints)
+                .withDraggable(true)
+        waypointCircleManager?.create(circleOptions)
+    }
+
+    private fun clearWaypoints() {
+        waypoints.clear()
+        waypointCircleManager?.deleteAll()
+        lineManager?.deleteAll()
+        fillManager?.deleteAll()
+    }
+
+    private fun createLayersForHeatMap(style: Style) {
+        createSourceData(style)
+        unclusteredLayerData(style)
+        clusteredLayerData(style)
+    }
+
+    fun addPointToHeatMap(longitude: Double, latitude: Double) {
+        features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
+        featureCollection = FeatureCollection.fromFeatures(features)
+        geoJsonSource!!.setGeoJson(featureCollection)
+    }
+
+    private fun createSourceData(style: Style) {
+        geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
+        geoJsonSource!!.setGeoJson(featureCollection)
+        style.addSource(geoJsonSource!!)
+    }
+
+    private fun unclusteredLayerData(style: Style) {
+        val unclustered = CircleLayer("unclustered-points", getString(R.string.heatmap_source_ID))
+        unclustered.setProperties(
+                circleColor(ORANGE),
+                circleRadius(20f),
+                circleBlur(1f))
+        unclustered.setFilter(neq(get("cluster"), literal(true)))
+        style.addLayerBelow(unclustered, getString(R.string.below_layer_id))
+    }
+
+    private fun clusteredLayerData(style: Style) {
+        val layers = arrayOf(
+                intArrayOf(4, DARK_RED),
+                intArrayOf(2, LIGHT_RED),
+                intArrayOf(0, ORANGE))
+        layers.indices.forEach { i ->
+            val circles = CircleLayer("cluster-$i", getString(R.string.heatmap_source_ID))
+            circles.setProperties(
+                    circleColor(layers[i][1]),
+                    circleRadius(60f),
+                    circleBlur(1f)
+            )
+            val pointCount: Expression = toNumber(get("point_count"))
+            circles.setFilter(
+                    if (i == 0) gte(pointCount, literal(layers[i][0]))
+                    else all(
+                            gte(pointCount, literal(layers[i][0])),
+                            lt(pointCount, literal(layers[i - 1][0]))
+                    )
+            )
+            style.addLayerBelow(circles, getString(R.string.below_layer_id))
+        }
+    }
 
     /**
      * Update [currentPositionMarker] position with a new [position].
@@ -176,125 +286,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             droneCircleManager!!.update(dronePositionMarker)
         }
 
-        display(R.id.tv_latitude , R.string.lat, newLatLng.latitude)
+        display(R.id.tv_latitude, R.string.lat, newLatLng.latitude)
         display(R.id.tv_longitude, R.string.lon, newLatLng.longitude)
-
-    }
-
-    private fun display(buttonId : Int, labelId : Int, value : Double){
-        findViewById<TextView>(buttonId).text = (getString(labelId) + decimalFormat.format(value))
-
-    }
-
-    /** Trajectory Planning **/
-    fun onMapClicked(position: LatLng): Boolean{
-        if (waypoints.size < pinPointsAmount){
-            waypoints.add(position)
-            drawPinpoint(position)
-
-            if (waypoints.isNotEmpty()){
-                drawRegion(waypoints)
-            }
-
-            if (waypoints.size == pinPointsAmount){
-                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
-            }
-        }
-        return true
-    }
-
-    private fun drawPath(path: List<LatLng>){
-        lineManager?.create(LineOptions()
-                .withLatLngs(path)
-                .withLineWidth(PATH_THICKNESS))
-    }
-
-    private fun drawRegion(corners: List<LatLng>){
-        // Draw the fill
-        val fillOption = FillOptions()
-                .withLatLngs(listOf(waypoints))
-                .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
-                .withFillOpacity(REGION_FILL_OPACITY)
-        fillManager?.deleteAll()
-        fillManager?.create(fillOption)
-
-        //Draw the borders
-        // Make it loop
-        val linePoints = arrayListOf<LatLng>().apply {
-            addAll(corners)
-            add(corners[0])
-        }
-        val lineOptions = LineOptions()
-                .withLatLngs(linePoints)
-                .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
-        lineManager?.deleteAll()
-        lineManager?.create(lineOptions)
-    }
-
-    private fun drawPinpoint(pinpoints: LatLng){
-        val circleOptions = CircleOptions()
-                .withLatLng(pinpoints)
-                .withDraggable(true)
-        waypointCircleManager?.create(circleOptions)
-    }
-
-    private fun clearWaypoints() {
-        waypoints.clear()
-        waypointCircleManager?.deleteAll()
-        lineManager?.deleteAll()
-        fillManager?.deleteAll()
-    }
-
-    private fun createLayersForHeatMap(style: Style) {
-        createSourceData(style)
-        unclusteredLayerData(style)
-        clusteredLayerData(style)
-    }
-
-    fun addPointToHeatMap(longitude: Double, latitude: Double) {
-        features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
-        featureCollection = FeatureCollection.fromFeatures(features)
-        geoJsonSource!!.setGeoJson(featureCollection)
-
-    }
-
-    private fun createSourceData(style: Style) {
-        geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
-        geoJsonSource!!.setGeoJson(featureCollection)
-        style.addSource(geoJsonSource!!)
-    }
-
-    private fun unclusteredLayerData(style: Style) {
-        val unclustered = CircleLayer("unclustered-points", getString(R.string.heatmap_source_ID))
-        unclustered.setProperties(
-                circleColor(orange),
-                circleRadius(20f),
-                circleBlur(1f))
-        unclustered.setFilter(neq(get("cluster"), literal(true)))
-        style.addLayerBelow(unclustered, getString(R.string.below_layer_id))
-    }
-
-    private fun clusteredLayerData(style: Style) {
-        val layers = arrayOf(
-                intArrayOf(4, darkRed),
-                intArrayOf(2, lightRed),
-                intArrayOf(0, orange))
-        for (i in layers.indices) {
-            val circles = CircleLayer("cluster-$i", getString(R.string.heatmap_source_ID))
-            circles.setProperties(
-                    circleColor(layers[i][1]),
-                    circleRadius(60f),
-                    circleBlur(1f)
-            )
-            val pointCount: Expression = toNumber(get("point_count"))
-            circles.setFilter(
-                    if (i == 0) gte(pointCount, literal(layers[i][0])) else all(
-                            gte(pointCount, literal(layers[i][0])),
-                            lt(pointCount, literal(layers[i - 1][0]))
-                    )
-            )
-            style.addLayerBelow(circles, getString(R.string.below_layer_id))
-        }
     }
 
     private fun updateUserPosition(userLatLng: LatLng) {
