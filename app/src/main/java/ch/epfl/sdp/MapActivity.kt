@@ -121,10 +121,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val lonString = getString(R.string.longitude)
         val zomString = getString(R.string.zoom)
 
-            PreferenceManager.getDefaultSharedPreferences(this).edit()
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putString(latString, mapboxMap?.cameraPosition?.target?.latitude.toString())
                 .putString(lonString, mapboxMap?.cameraPosition?.target?.longitude.toString())
                 .putString(zomString, mapboxMap?.cameraPosition?.zoom.toString())
+
                 .apply()
         super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
