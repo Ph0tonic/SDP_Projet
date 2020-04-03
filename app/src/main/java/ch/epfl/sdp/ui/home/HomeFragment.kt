@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ch.epfl.sdp.MapActivity
 import ch.epfl.sdp.R
+import ch.epfl.sdp.VlcActivity
 
 class HomeFragment : Fragment() {
 
@@ -33,7 +34,7 @@ class HomeFragment : Fragment() {
             startActivity(Intent(context, MapActivity::class.java))
         }
         root.findViewById<Button>(R.id.display_camera).setOnClickListener {
-            startActivity(Intent(context, CameraActivity::class.java))
+            startActivity(Intent(context, VlcActivity::class.java))
         }
 
         return root
