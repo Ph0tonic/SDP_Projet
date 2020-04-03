@@ -58,7 +58,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private val lightRed = Color.parseColor("#F9886C")
     private val orange = Color.parseColor("#FBB03B")
 
-    private var currentPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
+
+    private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
+    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
+    //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
+
+    var userLatLng: LatLng = LatLng()
+        private set
 
     companion object {
         private const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
@@ -69,12 +75,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val TEXT_PATTERN = "0.0000000"
     }
 
-    private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
-    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
-    //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
-    var userLatLng: LatLng = LatLng()
-        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,11 +90,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
 
-        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
-
         findViewById<Button>(R.id.clear_waypoints).setOnClickListener {
             clearWaypoints()
         }
+
+        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
+
+
 
         CentralLocationManager.configure(this)
 

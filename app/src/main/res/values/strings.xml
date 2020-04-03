@@ -52,8 +52,8 @@
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
 
-    <string name="lat">LAT : </string>
-    <string name="lon">LON : </string>
+    <string name="lat">LAT :\u0020</string>
+    <string name="lon">LON :\u0020</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="zoom">Zoom</string>
