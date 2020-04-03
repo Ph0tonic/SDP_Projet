@@ -7,7 +7,7 @@ import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.maps.MapView
 
 open class MapViewBaseActivity : AppCompatActivity() {
-    protected lateinit var mapView: MapView
+    lateinit var mapView: MapView
 
     protected fun initMapView(savedInstanceState: Bundle?, contentViewId: Int, mapViewId: Int) {
         // Mapbox access token is configured here. This needs to be called either in your application

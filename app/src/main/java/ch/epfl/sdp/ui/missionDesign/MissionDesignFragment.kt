@@ -14,7 +14,6 @@ class MissionDesignFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_mission_design, container, false)
-        return root
+        return inflater.inflate(R.layout.fragment_mission_design, container, false)
     }
 }

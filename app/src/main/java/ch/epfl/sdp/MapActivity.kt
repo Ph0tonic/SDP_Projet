@@ -20,7 +20,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Circle
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
 import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
@@ -39,9 +38,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private var circleManager: CircleManager? = null
     private var userCircleManager: CircleManager? = null
-    private var symbolManager: SymbolManager? = null
-    private var currentPositionMarker: Circle? = null
-    private var currentUserPositionMarker: Circle? = null
+
+    private var dronePositionMarker: Circle? = null
+    private var userPositionMarker: Circle? = null
+
     private var featureCollection: FeatureCollection? = null
     private var features = ArrayList<Feature>()
     private var geoJsonSource: GeoJsonSource? = null
@@ -57,20 +57,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     var userLatLng: LatLng = LatLng()
         private set
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
-        val button: Button = findViewById(R.id.start_mission_button)
-        button.setOnClickListener {
-            val dme = DroneMissionExample.makeDroneMission()
-            dme.startMission()
+        findViewById<Button>(R.id.start_mission_button).setOnClickListener {
+            DroneMissionExample.makeDroneMission().startMission()
         }
 
-        val offlineButton: Button = findViewById(R.id.stored_offline_map)
-        offlineButton.setOnClickListener {
+        findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
         CentralLocationManager.configure(this)
@@ -78,18 +74,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-
+        Drone.currentPositionLiveData.observe(this, dronePositionObserver)
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
 
-        Drone.currentPositionLiveData.observe(this, dronePositionObserver)
         // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
     }
 
     override fun onPause() {
         super.onPause()
-
         CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
-
         Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
         //Mission.currentMissionPlanLiveData.removeObserver(currentMissionPlanObserver)
     }
@@ -110,17 +103,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 //            style.addImage("marker-icon-id",
 //                    BitmapFactory.decodeResource(
 //                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
-            symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
-            symbolManager!!.iconAllowOverlap = true
-            circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
-            userCircleManager = mapView.let { CircleManager(it, mapboxMap, style) }
+            circleManager = CircleManager(mapView, mapboxMap, style)
+            userCircleManager = CircleManager(mapView, mapboxMap, style)
+
             createLayersForHeatMap(style)
-            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTER**/
+            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
             addPointToHeatMap(8.543434, 47.398979)
             addPointToHeatMap(8.543934, 47.398279)
             addPointToHeatMap(8.544867, 47.397426)
             addPointToHeatMap(8.543067, 47.397026)
-
         }
 
         // Load latest location
@@ -134,7 +125,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
 
         setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
-
     }
 
     private fun createLayersForHeatMap(style: Style) {
@@ -209,7 +199,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 //    }
 
     /**
-     * Update [currentPositionMarker] position with a new [position].
+     * Update [dronePositionMarker] position with a new [position].
      *
      * @param newLatLng new position of the vehicle
      */
@@ -220,16 +210,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
 
         // Add a vehicle marker and move the camera
-        if (currentPositionMarker == null) {
+        if (dronePositionMarker == null) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(newLatLng)
-            currentPositionMarker = circleManager!!.create(circleOptions)
+            dronePositionMarker = circleManager!!.create(circleOptions)
 
             mapboxMap!!.moveCamera(CameraUpdateFactory.tiltTo(0.0))
             mapboxMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
-            currentPositionMarker!!.latLng = newLatLng
-            circleManager!!.update(currentPositionMarker)
+            dronePositionMarker!!.latLng = newLatLng
+            circleManager!!.update(dronePositionMarker)
         }
     }
 
@@ -240,13 +230,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
 
         // Add a vehicle marker and move the camera
-        if (currentUserPositionMarker == null) {
+        if (userPositionMarker == null) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(userLatLng)
-            currentUserPositionMarker = userCircleManager!!.create(circleOptions)
+            userPositionMarker = userCircleManager!!.create(circleOptions)
         } else {
-            currentUserPositionMarker!!.latLng = userLatLng
-            userCircleManager!!.update(currentUserPositionMarker)
+            userPositionMarker!!.latLng = userLatLng
+            userCircleManager!!.update(userPositionMarker)
         }
     }
 

@@ -11,10 +11,10 @@ object DroneMissionExample {
         return this
     }
 
-    fun startMission(){
-        var drone = Drone.instance
-        var isConnectedCompletable = drone.getCore().getConnectionState()
-                .filter{state -> state.getIsConnected()}
+    fun startMission() {
+        val drone = Drone.instance
+        val isConnectedCompletable = drone.core.connectionState
+                .filter { state -> state.isConnected }
                 .firstOrError()
                 .toCompletable()
 

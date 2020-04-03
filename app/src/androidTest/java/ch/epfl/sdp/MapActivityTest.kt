@@ -17,25 +17,25 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
-import kotlinx.android.synthetic.main.activity_map.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
-const val LATITUDE_TEST = "42.125"
-const val LONGITUDE_TEST = "-30.229"
-const val ZOOM_TEST = "0.9"
-
 @RunWith(AndroidJUnit4::class)
 class MapActivityTest {
-    var preferencesEditor: SharedPreferences.Editor? = null
+
+    companion object {
+        const val LATITUDE_TEST = "42.125"
+        const val LONGITUDE_TEST = "-30.229"
+        const val ZOOM_TEST = "0.9"
+    }
+
+    private lateinit var preferencesEditor: SharedPreferences.Editor
 
     @Rule
     @JvmField
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
-
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -51,11 +51,11 @@ class MapActivityTest {
 
     @Test
     fun mapboxUseOurPreferences() {
-        preferencesEditor!!
+        preferencesEditor
                 .putString("latitude", LATITUDE_TEST)
                 .putString("longitude", LONGITUDE_TEST)
                 .putString("zoom", ZOOM_TEST)
-                .apply();
+                .apply()
 
         // Launch activity
         mActivityRule.launchActivity(Intent())
@@ -66,34 +66,22 @@ class MapActivityTest {
                 assert(mapboxMap.cameraPosition.target.longitude.toString() == LONGITUDE_TEST)
                 assert(mapboxMap.cameraPosition.zoom.toString() == ZOOM_TEST)
             }
-
-            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
+        }
+        runOnUiThread {
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
-    }
-
-    @Test
-    fun mapBoxCanAddMarker() {
-        mActivityRule.launchActivity(Intent())
-        onView(withId(R.id.mapView)).perform(click())
-        Thread.sleep(1000)
-        //click on the current marker once again to remove it
-        onView(withId(R.id.mapView)).perform(click())
-    }
-
-    @Test
-    fun mapBoxCanRemoveMarker() {
-        mActivityRule.launchActivity(Intent())
-        onView(withId(R.id.mapView)).perform(doubleClick())
+        getInstrumentation().waitForIdleSync()
+        runOnUiThread {
+            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
+        }
+        getInstrumentation().waitForIdleSync()
     }
 
     @Test
     fun canStartMission() {
         // Launch activity
         mActivityRule.launchActivity(Intent())
-
-        Espresso.onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
-
+        onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
     }
 
     @Test
@@ -103,7 +91,6 @@ class MapActivityTest {
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
         }
     }
-
 
     @Test
     fun canUpdateUserLocation() {

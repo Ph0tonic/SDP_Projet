@@ -80,6 +80,13 @@ class MainActivityTest {
     }
 
     @Test
+    fun canDisplayTheVideo() {
+        onView(withId(R.id.display_camera)).perform(click())
+        getInstrumentation().waitForIdleSync()
+        mUiDevice?.pressBack()
+    }
+
+    @Test
     fun canNavigateToMapsManaging() {
         openDrawer()
         onView(withId(R.id.nav_view))
