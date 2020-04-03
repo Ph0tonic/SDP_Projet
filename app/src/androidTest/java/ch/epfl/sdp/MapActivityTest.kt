@@ -97,6 +97,14 @@ class MapActivityTest {
 
     }
 
+    @Test
+    fun mapBoxCanAddPointToHeatMap() {
+        mActivityRule.launchActivity(Intent())
+        runOnUiThread {
+            mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
+        }
+    }
+
 
     @Test
     fun canUpdateUserLocation(){
