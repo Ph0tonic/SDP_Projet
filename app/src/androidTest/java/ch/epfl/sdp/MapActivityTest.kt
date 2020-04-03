@@ -1,4 +1,3 @@
-
 package ch.epfl.sdp
 
 import android.content.Context
@@ -6,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.doubleClick
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -65,12 +63,21 @@ class MapActivityTest {
         onView(withId(R.id.mapView)).perform(doubleClick())
     }
 
-    /*@Test
+    @Test
     fun canStartMission() {
         // Launch activity
         mActivityRule.launchActivity(Intent())
-        onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
-    }*/
+        // Add 4 points to the map for the strategy
+        runOnUiThread {
+            arrayListOf(
+                    LatLng(8.543434, 47.398979),
+                    LatLng(8.543934, 47.398279),
+                    LatLng(8.544867, 47.397426),
+                    LatLng(8.543067, 47.397026)
+            ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
+        }
+        onView(withId(R.id.start_mission_button)).perform(click())
+    }
 
     @Test
     fun mapboxUseOurPreferences() {
@@ -98,13 +105,6 @@ class MapActivityTest {
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
         getInstrumentation().waitForIdleSync()
-    }
-
-    @Test
-    fun canStartMission() {
-        // Launch activity
-        mActivityRule.launchActivity(Intent())
-        onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
     }
 
     @Test

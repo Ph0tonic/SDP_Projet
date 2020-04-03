@@ -18,16 +18,16 @@ import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 object CentralLocationManager {
+
+    private const val requestCode = 1011
     private lateinit var locationManager: LocationManager
     private lateinit var activity: Activity
-    private const val requestCode = 1011
     internal var currentUserPosition: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
 
 
     fun configure(activity: Activity) {
         this.activity = activity
         locationManager = this.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
 
         if (checkAndRequestPermission()) {
             locationManager.requestLocationUpdates(
