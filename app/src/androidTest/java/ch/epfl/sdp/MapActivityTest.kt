@@ -3,15 +3,12 @@ package ch.epfl.sdp
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.location.Criteria
-import android.location.Location
-import android.location.LocationManager
 import androidx.preference.PreferenceManager
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.doubleClick
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
@@ -21,7 +18,6 @@ import androidx.test.rule.GrantPermissionRule
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_map.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,8 +32,9 @@ const val ZOOM_TEST = "0.9"
 class MapActivityTest {
     var preferencesEditor: SharedPreferences.Editor? = null
 
-    @Rule @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @Rule
+    @JvmField
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
 
     @get:Rule
@@ -74,14 +71,16 @@ class MapActivityTest {
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
     }
+
     @Test
-    fun mapBoxCanAddMarker(){
+    fun mapBoxCanAddMarker() {
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.mapView)).perform(click())
         Thread.sleep(1000)
         //click on the current marker once again to remove it
         onView(withId(R.id.mapView)).perform(click())
     }
+
     @Test
     fun mapBoxCanRemoveMarker() {
         mActivityRule.launchActivity(Intent())
@@ -89,7 +88,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun canStartMission(){
+    fun canStartMission() {
         // Launch activity
         mActivityRule.launchActivity(Intent())
 
@@ -107,21 +106,21 @@ class MapActivityTest {
 
 
     @Test
-    fun canUpdateUserLocation(){
+    fun canUpdateUserLocation() {
         mActivityRule.launchActivity(Intent())
         CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
     }
 
     @Test
-    fun canUpdateUserLocationTwice(){
+    fun canUpdateUserLocationTwice() {
         mActivityRule.launchActivity(Intent())
         CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
         CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST.toDouble(), -LONGITUDE_TEST.toDouble()))
     }
 
     @Test
-    fun canOnRequestPermissionResult(){
+    fun canOnRequestPermissionResult() {
         mActivityRule.launchActivity(Intent())
-        mActivityRule.activity.onRequestPermissionsResult(1011,Array(0) {""},IntArray(0))
+        mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 }

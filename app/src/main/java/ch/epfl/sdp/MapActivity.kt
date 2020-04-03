@@ -1,7 +1,5 @@
 package ch.epfl.sdp
 
-import android.graphics.Color
-import android.location.Location
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -81,7 +79,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
 
-        CentralLocationManager.currentUserPosition.observe(this,userPositionObserver)
+        CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
 
         Drone.currentPositionLiveData.observe(this, dronePositionObserver)
         // viewModel.currentMissionPlanLiveData.observe(this, currentMissionPlanObserver)
@@ -235,7 +233,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun updateUserPosition(userLatLng: LatLng){
+    private fun updateUserPosition(userLatLng: LatLng) {
         if (mapboxMap == null || userCircleManager == null) {
             // Not ready
             return
@@ -277,6 +275,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        CentralLocationManager.onRequestPermissionsResult(requestCode,permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
