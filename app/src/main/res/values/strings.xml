@@ -1,4 +1,7 @@
 <resources>
+    <string name="mapbox_access_token">sk.eyJ1IjoibXlocmFlbCIsImEiOiJjazduaGgyOWowMTk1M2xsOHQ5d2N6MW02In0.mOwke6u2usaPmvK9asaXew</string>
+    <string name="google_signin_key">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
+
     <string name="app_name">Bootcamp</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="log_out">Log out</string>
@@ -27,7 +30,6 @@
     <string name="start_misson_button">Start mission</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="mapbox_access_token">sk.eyJ1IjoibXlocmFlbCIsImEiOiJjazduaGgyOWowMTk1M2xsOHQ5d2N6MW02In0.mOwke6u2usaPmvK9asaXew</string>
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
 
     <string name="end_progress_success">Region successfully downloaded.</string>
@@ -44,8 +46,11 @@
     <string name="toast_no_regions_yet">No regions yet</string>
     <string name="dialog_toast">Name cannot be empty</string>
     <string name="region_name">Region name error</string>
+    <string name="switch_video">Switch vidéo</string>
+
     <string name="below_layer_id">building</string>
     <string name="heatmap_source_ID">HeatMapSourceID</string>
+
 
     <string name="lat">LAT : </string>
     <string name="lon">LON : </string>

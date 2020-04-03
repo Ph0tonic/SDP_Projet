@@ -10,8 +10,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import ch.epfl.sdp.R
 import ch.epfl.sdp.MapActivity
+import ch.epfl.sdp.R
+import ch.epfl.sdp.VlcActivity
+
 
 class HomeFragment : Fragment() {
 
@@ -29,9 +31,11 @@ class HomeFragment : Fragment() {
             textView.text = it
         })
 
-        val button: Button = root.findViewById(R.id.display_map)
-        button.setOnClickListener {
+        root.findViewById<Button>(R.id.display_map).setOnClickListener {
             startActivity(Intent(context, MapActivity::class.java))
+        }
+        root.findViewById<Button>(R.id.display_camera).setOnClickListener {
+            startActivity(Intent(context, VlcActivity::class.java))
         }
 
         return root

@@ -28,12 +28,14 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 
 class MainActivity : AppCompatActivity() {
 
-    private val RC_SIGN_IN = 9001
-
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var mGoogleSignInClient: GoogleSignInClient
 
-    private val TRAJECTORY_PLANNING_REQUEST_CODE = 42
+    companion object {
+        private const val TRAJECTORY_PLANNING_REQUEST_CODE = 42
+        private const val RC_SIGN_IN = 9001
+    }
+
     var waypoints = mutableListOf<LatLng>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
@@ -57,10 +60,9 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-
         val gso = GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com")
+                .requestIdToken(getString(R.string.google_signin_key))
                 .requestEmail()
                 .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -70,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         //val account = GoogleSignIn.getLastSignedInAccount(this)
         //updateUserView(account?.displayName, account?.email)
+        CentralLocationManager.configure(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -84,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    fun openSettings(menuItem: MenuItem?){
+    fun openSettings(menuItem: MenuItem?) {
         startActivity(Intent(this, SettingsActivity::class.java))
     }
 
@@ -96,20 +99,25 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
             try {
-                val account : GoogleSignInAccount? = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+                val account: GoogleSignInAccount? = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
                 updateUserView(account?.displayName, account?.email, account?.photoUrl.toString())
             } catch (e: ApiException) {
                 Snackbar.make(findViewById(R.id.main_nav_header), "Could not sign in :(", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show()
             }
         }
-        if (requestCode == TRAJECTORY_PLANNING_REQUEST_CODE && resultCode == Activity.RESULT_OK){
+        if (requestCode == TRAJECTORY_PLANNING_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             waypoints = data?.extras?.get("waypoints") as MutableList<LatLng>
         }
     }
 
-    fun updateUserView(username: String?, userEmail: String?, userURL: String?){
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 
+    fun updateUserView(username: String?, userEmail: String?, userURL: String?) {
         val usernameView: TextView = findViewById(R.id.nav_username)
         val userEmailView: TextView = findViewById(R.id.nav_user_email)
         val userImageView: ImageView = findViewById(R.id.nav_user_image)
@@ -118,24 +126,5 @@ class MainActivity : AppCompatActivity() {
         userEmailView.text = userEmail ?: "default_email"
 
         Glide.with(this).load(userURL).error(R.mipmap.ic_launcher_round).into(userImageView)
-
     }
-
-    /*fun goToTrajectoryDesign(view: View) {
-        startActivityForResult(Intent(this, MapActivity::class.java), 42)
-    }
-
-    fun followWaypoints(view: View) {
-        Drone.instance.mission.uploadMission(waypoints.map { wp ->
-                    Mission.MissionItem(wp.latitude, wp.longitude, 10f,10f,
-                            true, Float.NaN, Float.NaN,
-                            Mission.MissionItem.CameraAction.NONE, Float.NaN, 1.0)
-                }).andThen(Drone.instance.mission.setReturnToLaunchAfterMission(true))
-                .andThen(Drone.instance.action.arm())
-                .andThen(Drone.instance.action.takeoff())
-                .andThen(Drone.instance.mission.startMission())
-                .subscribe()
-    }*/
 }
-
-

@@ -37,10 +37,12 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var downloadButton: Button? = null
     private var listButton: Button? = null
     private var isEndNotified = false
+
     private var regionSelected = 0
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var zoom: Double = 0.0
+
     // Offline objects
     private var offlineManager: OfflineManager? = null
 
@@ -128,8 +130,12 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
             // Create the offline region and launch the download
             offlineManager!!.createOfflineRegion(definition, metadata!!, object : CreateOfflineRegionCallback {
-                override fun onCreate(offlineRegion: OfflineRegion) { launchDownload(offlineRegion) }
-                override fun onError(error: String) { Timber.e("Error: %s", error) }})
+                override fun onCreate(offlineRegion: OfflineRegion) {
+                    launchDownload(offlineRegion)
+                }
+
+                override fun onError(error: String) { Timber.e("Error: %s", error) }
+            })
         }
     }
 
@@ -151,6 +157,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 Timber.e("onError reason: %s", error.reason)
                 Timber.e("onError message: %s", error.message)
             }
+
             override fun mapboxTileCountLimitExceeded(limit: Long) { Timber.e("Mapbox tile count limit exceeded: %s", limit) }
         })
         // Change the region state
@@ -170,7 +177,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
                 // Add all of the region names to a list
                 val offlineRegionsNames = ArrayList<String>()
-                for (offlineRegion in offlineRegions) { offlineRegionsNames.add(getRegionName(offlineRegion)) }
+                for (offlineRegion in offlineRegions) {
+                    offlineRegionsNames.add(getRegionName(offlineRegion))
+                }
                 val items = offlineRegionsNames.toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
                 showDialog(items, offlineRegions)
