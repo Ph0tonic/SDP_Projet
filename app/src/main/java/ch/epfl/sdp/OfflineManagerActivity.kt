@@ -125,8 +125,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             metadata = try {
                 val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
-            } catch (exception: Exception) {
-                Timber.e("Failed to encode metadata: %s", exception.message)
+            } catch (exception: Exception) { Timber.e("Failed to encode metadata: %s", exception.message)
                 null
             }
             // Create the offline region and launch the download
@@ -135,9 +134,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     launchDownload(offlineRegion)
                 }
 
-                override fun onError(error: String) {
-                    Timber.e("Error: %s", error)
-                }
+                override fun onError(error: String) { Timber.e("Error: %s", error) }
             })
         }
     }
@@ -161,9 +158,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 Timber.e("onError message: %s", error.message)
             }
 
-            override fun mapboxTileCountLimitExceeded(limit: Long) {
-                Timber.e("Mapbox tile count limit exceeded: %s", limit)
-            }
+            override fun mapboxTileCountLimitExceeded(limit: Long) { Timber.e("Mapbox tile count limit exceeded: %s", limit) }
         })
         // Change the region state
         offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
@@ -190,9 +185,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 showDialog(items, offlineRegions)
             }
 
-            override fun onError(error: String) {
-                Timber.e("Error: %s", error)
-            }
+            override fun onError(error: String) { Timber.e("Error: %s", error) }
         })
     }
 
@@ -262,9 +255,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun endProgress(message: String) { // Don't notify more than once
-        if (isEndNotified) {
-            return
-        }
+        if (isEndNotified) { return }
         // Enable buttons
         downloadButton!!.isEnabled = true
         listButton!!.isEnabled = true
