@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"
         android:orientation="horizontal"
-        android:weightSum="5"
+        android:weightSum="4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -36,7 +36,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="@string/locate"
             android:textColor="@android:color/white" />
@@ -66,7 +66,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="@string/clear"
             android:textColor="@android:color/white" />

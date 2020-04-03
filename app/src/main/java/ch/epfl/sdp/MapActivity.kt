@@ -90,9 +90,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
 
-        val clearButton: Button = findViewById(R.id.start_mission_button)
+        val clearButton: Button = findViewById(R.id.clear_waypoints)
         clearButton.setOnClickListener {
-            clearWaypoints(R.id.mapView)
+            clearWaypoints()
         }
     }
 
@@ -124,10 +124,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             symbolManager = SymbolManager(mapView, mapboxMap, style)
             symbolManager!!.iconAllowOverlap = true
+            fillManager = FillManager(mapView, mapboxMap, style)
+            lineManager = LineManager(mapView, mapboxMap, style)
             wayptCircleManager = CircleManager(mapView, mapboxMap, style)
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
-            lineManager = LineManager(mapView, mapboxMap, style)
-            fillManager = FillManager(mapView, mapboxMap, style)
+
+
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -166,6 +168,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (currentPositionMarker == null) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(newLatLng)
+            circleOptions.withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
             currentPositionMarker = droneCircleManager!!.create(circleOptions)
 
             mapboxMap!!.moveCamera(CameraUpdateFactory.tiltTo(0.0))
@@ -241,12 +244,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
 
-    fun clearWaypoints(view: View) {
-
+    private fun clearWaypoints() {
+        //FIXME : DOESN'T WORKS
+        waypoints.clear()
         wayptCircleManager?.deleteAll()
         lineManager?.deleteAll()
         fillManager?.deleteAll()
-        waypoints.clear()
+
     }
 
 
