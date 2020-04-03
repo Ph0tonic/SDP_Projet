@@ -80,7 +80,7 @@ class MainActivityTest {
         getInstrumentation().waitForIdleSync()
         mUiDevice?.pressBack()
     }
-    
+
     @Test
     fun canNavigateToMapsManaging() {
         openDrawer()
