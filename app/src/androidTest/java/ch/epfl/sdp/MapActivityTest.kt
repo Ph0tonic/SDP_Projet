@@ -19,6 +19,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.security.AccessController
 
 
 @RunWith(AndroidJUnit4::class)
@@ -82,9 +83,9 @@ class MapActivityTest {
     @Test
     fun mapboxUseOurPreferences() {
         preferencesEditor
-                .putString(getInstrumentation().context.getString(R.string.prefs_latitude), LATITUDE_TEST)
-                .putString(getInstrumentation().context.getString(R.string.prefs_longitude), LONGITUDE_TEST)
-                .putString(getInstrumentation().context.getString(R.string.prefs_zoom), ZOOM_TEST)
+                .putString("latitude", LATITUDE_TEST)
+                .putString("longitude", LONGITUDE_TEST)
+                .putString("zoom", ZOOM_TEST)
                 .apply()
 
         // Launch activity
