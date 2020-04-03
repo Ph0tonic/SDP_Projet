@@ -82,9 +82,9 @@ class MapActivityTest {
     @Test
     fun mapboxUseOurPreferences() {
         preferencesEditor
-                .putString("latitude", LATITUDE_TEST)
-                .putString("longitude", LONGITUDE_TEST)
-                .putString("zoom", ZOOM_TEST)
+                .putString(getInstrumentation().context.getString(R.string.prefs_latitude), LATITUDE_TEST)
+                .putString(getInstrumentation().context.getString(R.string.prefs_longitude), LONGITUDE_TEST)
+                .putString(getInstrumentation().context.getString(R.string.prefs_zoom), ZOOM_TEST)
                 .apply()
 
         // Launch activity
