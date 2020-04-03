@@ -36,9 +36,10 @@ import java.text.DecimalFormat
  * 3. Hit play to start mission.
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
-    private var mapboxMap: MapboxMap? = null
 
-    private var wayptCircleManager: CircleManager? = null
+    private lateinit var mapboxMap: MapboxMap
+
+    private var waypointCircleManager: CircleManager? = null
     private var droneCircleManager: CircleManager? = null
     private var userCircleManager: CircleManager? = null
 
@@ -96,10 +97,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
 
-
-
         CentralLocationManager.configure(this)
-
     }
 
     override fun onResume() {
@@ -117,16 +115,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     override fun onStop() {
-        val latString = getString(R.string.latitude)
-        val lonString = getString(R.string.longitude)
-        val zomString = getString(R.string.zoom)
-
-        PreferenceManager.getDefaultSharedPreferences(this).edit()
-                .putString(latString, mapboxMap?.cameraPosition?.target?.latitude.toString())
-                .putString(lonString, mapboxMap?.cameraPosition?.target?.longitude.toString())
-                .putString(zomString, mapboxMap?.cameraPosition?.zoom.toString())
-
-                .apply()
         super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
     }
@@ -137,7 +125,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             fillManager = FillManager(mapView, mapboxMap, style)
             lineManager = LineManager(mapView, mapboxMap, style)
-            wayptCircleManager = CircleManager(mapView, mapboxMap, style)
+            waypointCircleManager = CircleManager(mapView, mapboxMap, style)
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
             userCircleManager = CircleManager(mapView, mapboxMap, style)
 
@@ -168,7 +156,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateVehiclePosition(newLatLng: LatLng) {
-        if (mapboxMap == null || droneCircleManager == null) {
+        if (droneCircleManager == null) {
             // Not ready
             return
         }
@@ -180,8 +168,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             circleOptions.withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
             dronePositionMarker = droneCircleManager!!.create(circleOptions)
 
-            mapboxMap!!.moveCamera(CameraUpdateFactory.tiltTo(0.0))
-            mapboxMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
+            mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
             dronePositionMarker!!.latLng = newLatLng
             droneCircleManager!!.update(dronePositionMarker)
@@ -246,13 +234,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
                 .withDraggable(true)
-        wayptCircleManager?.create(circleOptions)
+        waypointCircleManager?.create(circleOptions)
     }
 
     private fun clearWaypoints() {
         //FIXME : DOESN'T WORKS
         waypoints.clear()
-        wayptCircleManager?.deleteAll()
+        waypointCircleManager?.deleteAll()
         lineManager?.deleteAll()
         fillManager?.deleteAll()
 
@@ -311,7 +299,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun updateUserPosition(userLatLng: LatLng) {
-        if (mapboxMap == null || userCircleManager == null) {
+        if (userCircleManager == null) {
             // Not ready
             return
         }
