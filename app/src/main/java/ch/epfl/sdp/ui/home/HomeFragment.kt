@@ -33,7 +33,7 @@ class HomeFragment : Fragment() {
             startActivity(Intent(context, MapActivity::class.java))
         }
         root.findViewById<Button>(R.id.display_camera).setOnClickListener {
-            startActivity(Intent(context, MapActivity::class.java))
+            startActivity(Intent(context, CameraActivity::class.java))
         }
 
         return root
