@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle.Constraints.pinPointsAmount
 import ch.epfl.sdp.ui.maps.MapUtils
@@ -117,15 +116,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     override fun onStop() {
-        val latString = getString(R.string.latitude)
-        val lonString = getString(R.string.longitude)
-        val zomString = getString(R.string.zoom)
-
-        PreferenceManager.getDefaultSharedPreferences(this).edit()
-                .putString(latString, mapboxMap?.cameraPosition?.target?.latitude.toString())
-                .putString(lonString, mapboxMap?.cameraPosition?.target?.longitude.toString())
-                .putString(zomString, mapboxMap?.cameraPosition?.zoom.toString())
-                .apply()
         super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
     }
