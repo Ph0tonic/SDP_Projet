@@ -81,10 +81,14 @@ class MapActivityTest {
 
     @Test
     fun mapboxUseOurPreferences() {
+        /* latStr = getString(R.string.latitude)
+        val lonStr = getString(R.string.longitude)
+        val zomStr = getString(R.string.zoom)*/
+
         preferencesEditor
-                .putString("latitude", LATITUDE_TEST)
-                .putString("longitude", LONGITUDE_TEST)
-                .putString("zoom", ZOOM_TEST)
+                .putString("Latitude", LATITUDE_TEST)
+                .putString("Longitude", LONGITUDE_TEST)
+                .putString("Zoom", ZOOM_TEST)
                 .apply()
 
         // Launch activity

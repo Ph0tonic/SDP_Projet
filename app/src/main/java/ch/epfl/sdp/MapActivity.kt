@@ -58,6 +58,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private val lightRed = Color.parseColor("#F9886C")
     private val orange = Color.parseColor("#FBB03B")
 
+
+
     private val decimalFormat = DecimalFormat(TEXT_PATTERN);
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
@@ -121,10 +123,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val lonString = getString(R.string.longitude)
         val zomString = getString(R.string.zoom)
 
-            PreferenceManager.getDefaultSharedPreferences(this).edit()
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putString(latString, mapboxMap?.cameraPosition?.target?.latitude.toString())
                 .putString(lonString, mapboxMap?.cameraPosition?.target?.longitude.toString())
                 .putString(zomString, mapboxMap?.cameraPosition?.zoom.toString())
+
                 .apply()
         super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
@@ -249,12 +252,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun clearWaypoints() {
-        //FIXME : DOESN'T WORKS
         waypoints.clear()
         wayptCircleManager?.deleteAll()
         lineManager?.deleteAll()
         fillManager?.deleteAll()
-
     }
 
     private fun createLayersForHeatMap(style: Style) {
