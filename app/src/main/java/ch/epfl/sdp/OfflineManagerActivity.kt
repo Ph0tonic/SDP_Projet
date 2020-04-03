@@ -30,20 +30,18 @@ import kotlin.math.roundToInt
  * TODO : show error when user try to download more than the limit
  */
 class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
-    // UI elements
-    private var map: MapboxMap? = null
-    private var progressBar: ProgressBar? = null
-    private var downloadButton: Button? = null
-    private var listButton: Button? = null
     private var isEndNotified = false
+
+    private lateinit var map: MapboxMap
+    private lateinit var progressBar: ProgressBar
+    private lateinit var downloadButton: Button
+    private lateinit var listButton: Button
+    private lateinit var offlineManager: OfflineManager
 
     private var regionSelected = 0
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var zoom: Double = 0.0
-
-    // Offline objects
-    private var offlineManager: OfflineManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,10 +63,10 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // Bottom navigation bar button clicks are handled here.
             // Download offline button
             downloadButton = findViewById(R.id.download_button)
-            downloadButton?.setOnClickListener { downloadRegionDialog() }
+            downloadButton.setOnClickListener { downloadRegionDialog() }
             // List offline regions
             listButton = findViewById(R.id.list_button)
-            listButton?.setOnClickListener { downloadedRegionList() }
+            listButton.setOnClickListener { downloadedRegionList() }
         }
         setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
     }
@@ -110,12 +108,12 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         startProgress()
         // Create offline definition using the current
         // style and boundaries of visible map area
-        map!!.getStyle { style ->
+        map.getStyle { style ->
             val maxZoom = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
             val definition = OfflineTilePyramidRegionDefinition(
                     style.uri,
-                    map!!.projection.visibleRegion.latLngBounds,
-                    map!!.cameraPosition.zoom, maxZoom,
+                    map.projection.visibleRegion.latLngBounds,
+                    map.cameraPosition.zoom, maxZoom,
                     this@OfflineManagerActivity.resources.displayMetrics.density)
             // Build a JSONObject using the user-defined offline region title,
             // convert it into string, and use it to create a metadata variable.
@@ -129,7 +127,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 null
             }
             // Create the offline region and launch the download
-            offlineManager!!.createOfflineRegion(definition, metadata!!, object : CreateOfflineRegionCallback {
+            offlineManager.createOfflineRegion(definition, metadata!!, object : CreateOfflineRegionCallback {
                 override fun onCreate(offlineRegion: OfflineRegion) {
                     launchDownload(offlineRegion)
                 }
@@ -150,8 +148,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     endProgress(getString(R.string.end_progress_success))
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
-                    progressBar!!.isIndeterminate = false
-                    progressBar!!.progress = percentage.roundToInt()
+                    progressBar.isIndeterminate = false
+                    progressBar.progress = percentage.roundToInt()
                 }
             }
 
@@ -172,7 +170,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Reset the region selected int to 0
         regionSelected = 0
         // Query the DB asynchronously
-        offlineManager!!.listOfflineRegions(object : ListOfflineRegionsCallback {
+        offlineManager.listOfflineRegions(object : ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
                 // downloaded yet, notify user and return
                 if (offlineRegions.isEmpty()) {
@@ -187,9 +185,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 showDialog(items, offlineRegions)
             }
 
-            override fun onError(error: String) {
-                Timber.e("Error: %s", error)
-            }
+            override fun onError(error: String) { Timber.e("Error: %s", error) }
         })
     }
 
@@ -206,8 +202,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // Make progressBar indeterminate and
                     // set it to visible to signal that
                     // the deletion process has begun
-                    progressBar!!.isIndeterminate = true
-                    progressBar!!.visibility = View.VISIBLE
+                    progressBar.isIndeterminate = true
+                    progressBar.visibility = View.VISIBLE
                     // Begin the deletion process
                     deleteOfflineRegion(offlineRegions[regionSelected])
                 }
@@ -221,15 +217,15 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offRegion.delete(object : OfflineRegionDeleteCallback {
             override fun onDelete() { // Once the region is deleted, remove the
                 // progressBar and display a toast
-                progressBar!!.visibility = View.INVISIBLE
-                progressBar!!.isIndeterminate = false
+                progressBar.visibility = View.INVISIBLE
+                progressBar.isIndeterminate = false
                 Toast.makeText(applicationContext, getString(R.string.toast_region_deleted),
                         Toast.LENGTH_LONG).show()
             }
 
             override fun onError(error: String) {
-                progressBar!!.visibility = View.INVISIBLE
-                progressBar!!.isIndeterminate = false
+                progressBar.visibility = View.INVISIBLE
+                progressBar.isIndeterminate = false
                 Timber.e("Error: %s", error)
             }
         })
@@ -250,25 +246,24 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     // Progress bar methods
     private fun startProgress() { // Disable buttons
-        downloadButton!!.isEnabled = false
-        listButton!!.isEnabled = false
+        downloadButton.isEnabled = false
+        listButton.isEnabled = false
         // Start and show the progress bar
         isEndNotified = false
-        progressBar!!.isIndeterminate = true
-        progressBar!!.visibility = View.VISIBLE
+        progressBar.isIndeterminate = true
+        progressBar.visibility = View.VISIBLE
     }
 
     private fun endProgress(message: String) { // Don't notify more than once
-        if (isEndNotified) {
-            return
-        }
+        if (isEndNotified) return
+
         // Enable buttons
-        downloadButton!!.isEnabled = true
-        listButton!!.isEnabled = true
+        downloadButton.isEnabled = true
+        listButton.isEnabled = true
         // Stop and hide the progress bar
         isEndNotified = true
-        progressBar!!.isIndeterminate = false
-        progressBar!!.visibility = View.GONE
+        progressBar.isIndeterminate = false
+        progressBar.visibility = View.GONE
         // Show a toast
         Toast.makeText(this@OfflineManagerActivity, message, Toast.LENGTH_LONG).show()
     }
