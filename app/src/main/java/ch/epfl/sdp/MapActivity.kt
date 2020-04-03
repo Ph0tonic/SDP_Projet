@@ -58,7 +58,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private val lightRed = Color.parseColor("#F9886C")
     private val orange = Color.parseColor("#FBB03B")
 
-
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
     //private var currentMissionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
@@ -74,9 +73,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val REGION_FILL_OPACITY: Float = 0.5F
         private const val TEXT_PATTERN = "0.0000000"
     }
-
-
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
