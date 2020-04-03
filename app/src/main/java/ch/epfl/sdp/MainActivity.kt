@@ -125,5 +125,3 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(Intent(this, TrajectoryPlanningActivity::class.java), 42)
     }
 }
-
-
