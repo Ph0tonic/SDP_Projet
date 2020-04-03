@@ -93,8 +93,8 @@ class TrajectoryPlanningActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
-        mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style? ->
-            fillManager = FillManager(mapView, mapboxMap, style!!)
+        mapboxMap.setStyle(Style.MAPBOX_STREETS) { style: Style ->
+            fillManager = FillManager(mapView, mapboxMap, style)
             lineManager = LineManager(mapView, mapboxMap, style)
             circleManager = CircleManager(mapView, mapboxMap, style)
 

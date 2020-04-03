@@ -34,8 +34,8 @@ class VlcActivity : AppCompatActivity() {
     }
 
     fun switchVideo(view: View) {
-        if (started) startVideo()
-        else stopVideo()
+        if (started) stopVideo()
+        else startVideo()
     }
 
     private fun startVideo() {

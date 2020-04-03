@@ -124,19 +124,6 @@ class MainActivity : AppCompatActivity() {
     fun goToTrajectoryDesign(view: View) {
         startActivityForResult(Intent(this, TrajectoryPlanningActivity::class.java), 42)
     }
-
-    fun followWaypoints(view: View) {
-        Drone.instance.mission.uploadMission(waypoints.map { wp ->
-            Mission.MissionItem(wp.latitude, wp.longitude, 10f, 10f,
-                    true, Float.NaN, Float.NaN,
-                    Mission.MissionItem.CameraAction.NONE, Float.NaN, 1.0)
-        }).andThen(Drone.instance.mission.setReturnToLaunchAfterMission(true))
-                .andThen(Drone.instance.action.arm())
-                .andThen(Drone.instance.action.takeoff())
-                .andThen(Drone.instance.mission.startMission())
-                .subscribe()
-    }
-
 }
 
 
