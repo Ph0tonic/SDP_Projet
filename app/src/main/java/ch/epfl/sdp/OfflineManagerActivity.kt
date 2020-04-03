@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import ch.epfl.sdp.ui.maps.MapUtils.setupCameraAsLastTimeUsed
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -39,18 +40,12 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var offlineManager: OfflineManager
 
     private var regionSelected = 0
-    private var latitude: Double = 0.0
-    private var longitude: Double = 0.0
-    private var zoom: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
         mapView.getMapAsync(this)
 
-        latitude = intent.getDoubleExtra("latitude", -52.6885)
-        longitude = intent.getDoubleExtra("longitude", -70.1395)
-        zoom = intent.getDoubleExtra("zoom", 10.0)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -68,7 +63,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             listButton = findViewById(R.id.list_button)
             listButton.setOnClickListener { downloadedRegionList() }
         }
-        setupCameraWithParameters(mapboxMap, LatLng(latitude, longitude), zoom)
+        setupCameraAsLastTimeUsed(this, mapboxMap)
     }
 
     private fun downloadRegionDialog() { // Set up download interaction. Display a dialog
