@@ -59,10 +59,15 @@ class MapActivityTest {
                 assert(mapboxMap.cameraPosition.target.longitude.toString() == LONGITUDE_TEST)
                 assert(mapboxMap.cameraPosition.zoom.toString() == ZOOM_TEST)
             }
-
-            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
+        }
+        runOnUiThread {
             Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
         }
+        getInstrumentation().waitForIdleSync()
+        runOnUiThread{
+            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
+        }
+        getInstrumentation().waitForIdleSync()
     }
 
     @Test

@@ -38,7 +38,6 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private var circleManager: CircleManager? = null
-    private var symbolManager: SymbolManager? = null
     private var currentPositionMarker: Circle? = null
     private var featureCollection: FeatureCollection? = null
     private var features = ArrayList<Feature>()
@@ -93,16 +92,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 //            style.addImage("marker-icon-id",
 //                    BitmapFactory.decodeResource(
 //                            this@MapsActivity.resources, R.drawable.mapbox_marker_icon_default))
-            symbolManager = mapView.let { SymbolManager(it, mapboxMap, style) }
-            symbolManager!!.iconAllowOverlap = true
-            circleManager = mapView.let { CircleManager(it, mapboxMap, style) }
+            circleManager = CircleManager(mapView, mapboxMap, style)
             createLayersForHeatMap(style)
-            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTER**/
+            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
             addPointToHeatMap(8.543434, 47.398979)
             addPointToHeatMap(8.543934, 47.398279)
             addPointToHeatMap(8.544867, 47.397426)
             addPointToHeatMap(8.543067, 47.397026)
-
         }
 
         // Load latest location
