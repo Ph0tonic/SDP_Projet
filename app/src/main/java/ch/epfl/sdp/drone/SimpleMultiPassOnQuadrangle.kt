@@ -13,6 +13,10 @@ import kotlin.math.max
 class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
+    companion object Constraints {
+        const val pinPointsAmount = 4
+    }
+
     init {
         require(maxDistBetweenLinesIn > 0.0) {
             "The maximum distance between passes must be strictly positive"

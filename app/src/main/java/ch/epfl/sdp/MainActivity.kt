@@ -16,7 +16,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import ch.epfl.sdp.ui.missionDesign.TrajectoryPlanningActivity
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -57,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_home, R.id.nav_misson_design, R.id.nav_maps_managing), drawerLayout)
+                R.id.nav_home, R.id.nav_maps_managing), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -127,9 +126,5 @@ class MainActivity : AppCompatActivity() {
         userEmailView.text = userEmail ?: "default_email"
 
         Glide.with(this).load(userURL).error(R.mipmap.ic_launcher_round).into(userImageView)
-    }
-
-    fun goToTrajectoryDesign(view: View) {
-        startActivityForResult(Intent(this, TrajectoryPlanningActivity::class.java), 42)
     }
 }

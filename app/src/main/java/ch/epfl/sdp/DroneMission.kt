@@ -1,13 +1,14 @@
 package ch.epfl.sdp
 
 import ch.epfl.sdp.drone.Drone
+import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
 
-object DroneMissionExample {
+object DroneMission {
     private val missionItems = arrayListOf<Mission.MissionItem>()
 
-    fun makeDroneMission(): DroneMissionExample {
-        addMissionItems()
+    fun makeDroneMission(path: List<LatLng>): DroneMission {
+        addMissionItems(path)
         return this
     }
 
@@ -26,11 +27,10 @@ object DroneMissionExample {
                 .subscribe()
     }
 
-    private fun addMissionItems() {
-        missionItems.add(generateMissionItem(47.398039859999997, 8.5455725400000002))
-        missionItems.add(generateMissionItem(47.398036222362471, 8.5450146439425509))
-        missionItems.add(generateMissionItem(47.397825620791885, 8.5450092830163271))
-        missionItems.add(generateMissionItem(47.397832880000003, 8.5455939999999995))
+    private fun addMissionItems(path: List<LatLng>) {
+        path.forEach { point ->
+            missionItems.add(generateMissionItem(point.latitude, point.longitude))
+        }
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {

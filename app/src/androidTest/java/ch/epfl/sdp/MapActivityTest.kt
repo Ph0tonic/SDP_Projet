@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.doubleClick
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -22,6 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
 @RunWith(AndroidJUnit4::class)
 class MapActivityTest {
 
@@ -31,11 +30,7 @@ class MapActivityTest {
         const val ZOOM_TEST = "0.9"
     }
 
-    private lateinit var preferencesEditor: SharedPreferences.Editor
-
-    @Rule
-    @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+    lateinit var preferencesEditor: SharedPreferences.Editor
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -43,10 +38,45 @@ class MapActivityTest {
             true,
             false) // Activity is not launched immediately
 
+    @Rule
+    @JvmField
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+
     @Before
     fun setUp() {
         val targetContext: Context = getInstrumentation().targetContext
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
+    }
+
+    @Test
+    fun mapBoxCanAddMarker() {
+        mActivityRule.launchActivity(Intent())
+        onView(withId(R.id.mapView)).perform(click())
+        Thread.sleep(1000)
+        //click on the current marker once again to remove it
+        onView(withId(R.id.mapView)).perform(click())
+    }
+
+    @Test
+    fun mapBoxCanRemoveMarker() {
+        mActivityRule.launchActivity(Intent())
+        onView(withId(R.id.mapView)).perform(doubleClick())
+    }
+
+    @Test
+    fun canStartMission() {
+        // Launch activity
+        mActivityRule.launchActivity(Intent())
+        // Add 4 points to the map for the strategy
+        runOnUiThread {
+            arrayListOf(
+                    LatLng(8.543434, 47.398979),
+                    LatLng(8.543934, 47.398279),
+                    LatLng(8.544867, 47.397426),
+                    LatLng(8.543067, 47.397026)
+            ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
+        }
+        onView(withId(R.id.start_mission_button)).perform(click())
     }
 
     @Test
@@ -78,16 +108,14 @@ class MapActivityTest {
     }
 
     @Test
-    fun canStartMission() {
-        // Launch activity
-        mActivityRule.launchActivity(Intent())
-        onView(withId(R.id.start_mission_button)).perform(ViewActions.click())
-    }
-
-    @Test
     fun mapBoxCanAddPointToHeatMap() {
         mActivityRule.launchActivity(Intent())
+        getInstrumentation().waitForIdleSync()
         runOnUiThread {
+            for (i in 0..30) {
+                if (mActivityRule.activity.isMapboxMapInitialized()) break
+                else Thread.sleep(100)
+            }
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
         }
     }

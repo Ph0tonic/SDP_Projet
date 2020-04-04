@@ -3,5 +3,5 @@ package ch.epfl.sdp.drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 interface OverflightStrategy {
-    fun createFlightPath(waypoints: List<LatLng>): List<LatLng>
+    fun createFlightPath(pinpoints: List<LatLng>): List<LatLng>
 }

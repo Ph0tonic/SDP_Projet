@@ -14,6 +14,7 @@ import ch.epfl.sdp.MapActivity
 import ch.epfl.sdp.R
 import ch.epfl.sdp.VlcActivity
 
+
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel

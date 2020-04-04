@@ -10,30 +10,7 @@
         android:name="ch.epfl.sdp.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home">
-
-        <action
-            android:id="@+id/action_HomeFragment_to_HomeSecondFragment"
-            app:destination="@id/nav_home_second" />
     </fragment>
-    <fragment
-        android:id="@+id/nav_home_second"
-        android:name="ch.epfl.sdp.ui.home.HomeSecondFragment"
-        android:label="@string/home_second"
-        tools:layout="@layout/fragment_home_second">
-        <action
-            android:id="@+id/action_HomeSecondFragment_to_HomeFragment"
-            app:destination="@id/nav_home" />
-
-        <argument
-            android:name="myArg"
-            app:argType="string" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/nav_misson_design"
-        android:name="ch.epfl.sdp.ui.missionDesign.MissionDesignFragment"
-        android:label="@string/menu_misson_design"
-        tools:layout="@layout/fragment_mission_design" />
 
     <fragment
         android:id="@+id/nav_maps_managing"
