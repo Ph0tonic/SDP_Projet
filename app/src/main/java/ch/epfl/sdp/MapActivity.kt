@@ -145,20 +145,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /** Trajectory Planning **/
-    fun onMapClicked(position: LatLng): Boolean {
+    fun onMapClicked(position: LatLng) {
         if (waypoints.size < pinPointsAmount) {
             waypoints.add(position)
             drawPinpoint(position)
-
-            if (waypoints.isNotEmpty()) {
-                drawRegion(waypoints)
-            }
+            drawRegion(waypoints)
 
             if (waypoints.size == pinPointsAmount) {
                 drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
             }
         }
-        return true
     }
 
     private fun drawPath(path: List<LatLng>) {

@@ -4,7 +4,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
 import org.junit.Assert
 import org.junit.Test
-import java.util.concurrent.ThreadLocalRandom
+import kotlin.random.Random.Default.nextDouble
 
 class DroneMissionTest {
 
@@ -12,8 +12,8 @@ class DroneMissionTest {
     fun generateMissionItemTest() {
         val n = 100
         for (x in 0..n) {
-            val randomLatitude = ThreadLocalRandom.current().nextDouble(-90.0, 90.0)
-            val randomLongitude = ThreadLocalRandom.current().nextDouble(0.0, 180.0)
+            val randomLatitude = nextDouble(-90.0, 90.0)
+            val randomLongitude = nextDouble(0.0, 180.0)
             val mission = Mission.MissionItem(
                     randomLatitude,
                     randomLongitude,
