@@ -59,9 +59,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
     //private var missionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
-    var userLatLng: LatLng = LatLng()
-        private set
-
     companion object {
         private const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         private const val MAP_READY_DESCRIPTION: String = "MAP READY"
@@ -282,9 +279,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             dronePositionMarker!!.latLng = newLatLng
             droneCircleManager!!.update(dronePositionMarker)
         }
-
-        display(R.id.tv_latitude, R.string.lat, newLatLng.latitude)
-        display(R.id.tv_longitude, R.string.lon, newLatLng.longitude)
     }
 
     private fun updateUserPosition(userLatLng: LatLng) {
@@ -302,6 +296,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             userPositionMarker!!.latLng = userLatLng
             userCircleManager!!.update(userPositionMarker)
         }
+        display(R.id.tv_latitude, R.string.lat, userLatLng.latitude)
+        display(R.id.tv_longitude, R.string.lon, userLatLng.longitude)
     }
 
 //    /**
