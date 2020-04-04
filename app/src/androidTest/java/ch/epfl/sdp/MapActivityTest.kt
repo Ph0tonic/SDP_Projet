@@ -111,6 +111,7 @@ class MapActivityTest {
     @Test
     fun mapBoxCanAddPointToHeatMap() {
         mActivityRule.launchActivity(Intent())
+        getInstrumentation().waitForIdleSync()
         runOnUiThread {
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
         }
