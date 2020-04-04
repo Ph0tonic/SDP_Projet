@@ -37,6 +37,7 @@ import java.text.DecimalFormat
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
+    fun isMapboxMapInitialized() = ::mapboxMap.isInitialized
 
     private var waypointCircleManager: CircleManager? = null
     private var droneCircleManager: CircleManager? = null

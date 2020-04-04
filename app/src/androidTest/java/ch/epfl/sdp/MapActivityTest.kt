@@ -19,7 +19,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.security.AccessController
 
 
 @RunWith(AndroidJUnit4::class)
@@ -113,6 +112,10 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         getInstrumentation().waitForIdleSync()
         runOnUiThread {
+            for (i in 0..30) {
+                if (mActivityRule.activity.isMapboxMapInitialized()) break
+                else Thread.sleep(100)
+            }
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
         }
     }

@@ -1,12 +1,7 @@
 package ch.epfl.sdp
 
-import android.app.Activity
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.ActivityResultMatchers.hasResultCode
-import androidx.test.espresso.contrib.ActivityResultMatchers.hasResultData
-import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,19 +32,19 @@ class TrajectoryPlanningActivityTest {
     }
 
     @Test
-    fun clickOnMapAddsWaypoint(){
-        assertThat(mActivityRule.activity.waypoints.size,equalTo(0))
+    fun clickOnMapAddsWaypoint() {
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
 
         // Wait for the map to load
-        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000);
+        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000)
 
         // Add a point
         //onView(withId(R.id.trajectory_planning_mapView)).perform(click())
-        runOnUiThread{
-            mActivityRule.activity.onMapClicked(LatLng(0.0,0.0))
+        runOnUiThread {
+            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
 
-        assertThat(mActivityRule.activity.waypoints.size,equalTo(1))
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
     }
 
     /*
@@ -94,7 +89,7 @@ class TrajectoryPlanningActivityTest {
     }*/
 
     @Test
-    fun mapIsVisible(){
+    fun mapIsVisible() {
         onView(withId(R.id.mapView)).check(matches(isDisplayed()))
     }
 }
