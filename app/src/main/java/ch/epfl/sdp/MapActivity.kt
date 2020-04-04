@@ -3,7 +3,6 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
@@ -141,7 +140,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun display(buttonId: Int, labelId: Int, value: Double) {
-        findViewById<TextView>(buttonId).text = (getString(labelId) + DECIMAL_FORMAT.format(value))
+        findViewById<TextView>(buttonId).text = (getString(labelId) + " " + DECIMAL_FORMAT.format(value))
     }
 
     /** Trajectory Planning **/

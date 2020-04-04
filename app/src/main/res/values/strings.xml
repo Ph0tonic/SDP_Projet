@@ -51,8 +51,8 @@
     <string name="below_layer_id">building</string>
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
-    <string name="lat">LAT :\u0020</string>
-    <string name="lon">LON :\u0020</string>
+    <string name="lat">LAT :</string>
+    <string name="lon">LON :</string>
 
     <string name="locate">Locate</string>
     <string name="start">Start</string>
