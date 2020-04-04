@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
@@ -108,10 +109,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
         Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
         // Mission.missionPlanLiveData.removeObserver(currentMissionPlanObserver)
-    }
-
-    override fun onStop() {
-        super.onStop()
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
     }
 
