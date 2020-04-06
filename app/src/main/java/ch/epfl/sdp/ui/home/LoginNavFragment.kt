@@ -7,9 +7,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import ch.epfl.sdp.Auth
 import ch.epfl.sdp.R
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -31,35 +34,38 @@ class LoginNavFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_login_nav, container, false)
+        return inflater.inflate(R.layout.fragment_login_nav, container, false)
+    }
+    
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         Log.e("DEBUG", "Set listener")
 
-        root.findViewById<TextView>(R.id.nav_login_button).setOnClickListener {
+        view.findViewById<TextView>(R.id.nav_login_button).setOnClickListener {
             startActivityForResult(mGoogleSignInClient.signInIntent, RC_SIGN_IN)
         }
+
         Auth.email.observe(viewLifecycleOwner, Observer { email ->
-            root.findViewById<TextView>(R.id.nav_username).text = email
+            view.findViewById<TextView>(R.id.nav_username).text = email
         })
         Auth.name.observe(viewLifecycleOwner, Observer { name ->
-            root.findViewById<TextView>(R.id.nav_username).text = name
+            view.findViewById<TextView>(R.id.nav_username).text = name
         })
         Auth.profileImageURL.observe(viewLifecycleOwner, Observer { imageURL ->
             Glide
                     .with(context)
-
                     .load(imageURL)
                     .error(R.mipmap.ic_launcher_round)
-                    .into(root.findViewById(R.id.nav_user_image))
+                    .into(view.findViewById(R.id.nav_user_image))
         })
         Auth.loggedIn.observe(viewLifecycleOwner, Observer { loggedIn ->
             val visibility = if (loggedIn) View.VISIBLE else View.GONE
-            root.findViewById<TextView>(R.id.nav_username).visibility = visibility
-            root.findViewById<TextView>(R.id.nav_user_email).visibility = visibility
-            root.findViewById<TextView>(R.id.nav_user_image).visibility = visibility
-            root.findViewById<TextView>(R.id.nav_login_button).visibility = if (loggedIn) View.VISIBLE else View.GONE
+            view.findViewById<TextView>(R.id.nav_username).visibility = visibility
+            view.findViewById<TextView>(R.id.nav_user_email).visibility = visibility
+            view.findViewById<ImageView>(R.id.nav_user_image).visibility = visibility
+            view.findViewById<Button>(R.id.nav_login_button).visibility = if (loggedIn) View.GONE else View.VISIBLE
         })
-        return root
     }
 
     override fun onAttach(context: Context) {

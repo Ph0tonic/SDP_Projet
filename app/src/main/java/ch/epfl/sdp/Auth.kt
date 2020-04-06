@@ -23,7 +23,6 @@ object Auth : ViewModel() {
     init {
         GoogleSignIn.getLastSignedInAccount(MainApplication.applicationContext())
                 .takeIf { account ->
-                    Log.e("DEBUG", "Filter logged in")
                     account != null
                 }
                 .run {
@@ -33,6 +32,5 @@ object Auth : ViewModel() {
                     loggedIn.postValue(true)
                     Log.e("DEBUG", "logged in")
                 }
-        Log.e("DEBUG", "INIT")
     }
 }
