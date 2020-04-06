@@ -36,18 +36,16 @@ class LoginNavFragment : Fragment() {
     ): View? {
         return inflater.inflate(R.layout.fragment_login_nav, container, false)
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Log.e("DEBUG", "Set listener")
 
         view.findViewById<TextView>(R.id.nav_login_button).setOnClickListener {
             startActivityForResult(mGoogleSignInClient.signInIntent, RC_SIGN_IN)
         }
 
         Auth.email.observe(viewLifecycleOwner, Observer { email ->
-            view.findViewById<TextView>(R.id.nav_username).text = email
+            view.findViewById<TextView>(R.id.nav_user_email).text = email
         })
         Auth.name.observe(viewLifecycleOwner, Observer { name ->
             view.findViewById<TextView>(R.id.nav_username).text = name

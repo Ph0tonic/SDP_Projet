@@ -28,6 +28,7 @@ object Auth : ViewModel() {
                 .run {
                     email.postValue(this?.email)
                     name.postValue(this?.displayName)
+                    Log.e("Image url", this?.photoUrl.toString())
                     profileImageURL.postValue(this?.photoUrl.toString())
                     loggedIn.postValue(true)
                     Log.e("DEBUG", "logged in")
