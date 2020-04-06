@@ -64,8 +64,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     //private var missionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
     companion object {
-        private const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
-        private const val MAP_READY_DESCRIPTION: String = "MAP READY"
+        const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
+        const val MAP_READY_DESCRIPTION: String = "MAP READY"
 
         private const val PATH_THICKNESS: Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F

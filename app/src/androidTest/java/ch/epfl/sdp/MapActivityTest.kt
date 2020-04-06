@@ -6,15 +6,20 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.doubleClick
+import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.maps.MapUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
+import org.hamcrest.Matchers.closeTo
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,12 +30,15 @@ import org.junit.runner.RunWith
 class MapActivityTest {
 
     companion object {
-        const val LATITUDE_TEST = "42.125"
-        const val LONGITUDE_TEST = "-30.229"
-        const val ZOOM_TEST = "0.9"
+        const val LATITUDE_TEST = 42.125
+        const val LONGITUDE_TEST = -30.229
+        const val ZOOM_TEST = 0.9
+        const val MAP_LOADING_TIMEOUT = 1000L
+        const val EPSILON = 1e-10
     }
 
     lateinit var preferencesEditor: SharedPreferences.Editor
+    private lateinit var mUiDevice: UiDevice
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -41,6 +49,12 @@ class MapActivityTest {
     @Rule
     @JvmField
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+    @Before
+    @Throws(Exception::class)
+    fun before() {
+        mUiDevice = UiDevice.getInstance(getInstrumentation())
+    }
 
     @Before
     fun setUp() {
@@ -65,62 +79,52 @@ class MapActivityTest {
     }
 
     @Test
-    fun mapboxUseOurPreferences() {
+    fun mapboxUsesOurPreferences() {
         preferencesEditor
-                .putString("latitude", LATITUDE_TEST)
-                .putString("longitude", LONGITUDE_TEST)
-                .putString("zoom", ZOOM_TEST)
+                .putString("latitude", LATITUDE_TEST.toString())
+                .putString("longitude", LONGITUDE_TEST.toString())
+                .putString("zoom", ZOOM_TEST.toString())
                 .apply()
 
-        // Launch activity
+        // Launch activity after setting preferences
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assert(mapboxMap.cameraPosition.target.latitude.toString() == LATITUDE_TEST)
-                assert(mapboxMap.cameraPosition.target.longitude.toString() == LONGITUDE_TEST)
-                assert(mapboxMap.cameraPosition.zoom.toString() == ZOOM_TEST)
+                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(LATITUDE_TEST, EPSILON))
+                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(LONGITUDE_TEST, EPSILON))
+                assertThat(mapboxMap.cameraPosition.zoom, closeTo(ZOOM_TEST, EPSILON))
             }
         }
-        runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
-        }
-        getInstrumentation().waitForIdleSync()
-        runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(47.398039859999997, 8.5455725400000002))
-        }
-        getInstrumentation().waitForIdleSync()
     }
 
     @Test
     fun mapBoxCanAddPointToHeatMap() {
         mActivityRule.launchActivity(Intent())
-        getInstrumentation().waitForIdleSync()
-        runOnUiThread {
-            for (i in 0..30) {
-                if (mActivityRule.activity.isMapboxMapInitialized()) break
-                else Thread.sleep(100)
-            }
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
+        runOnUiThread{
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
         }
     }
 
     @Test
     fun canUpdateUserLocation() {
-        mActivityRule.launchActivity(Intent())
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
+        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
     }
 
     @Test
     fun canUpdateUserLocationTwice() {
-        mActivityRule.launchActivity(Intent())
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST.toDouble(), LONGITUDE_TEST.toDouble()))
-        CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST.toDouble(), -LONGITUDE_TEST.toDouble()))
+        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
+        CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST, -LONGITUDE_TEST))
     }
 
     @Test
     fun canOnRequestPermissionResult() {
-        mActivityRule.launchActivity(Intent())
         mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
+    }
+
+    @Test
+    fun droneStatusIsVisible(){
+        onView(withId(R.id.drone_status))
     }
 }

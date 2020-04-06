@@ -9,9 +9,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 
 object MapUtils {
 
-    private const val DEFAULT_LATITUDE: Double = 47.39778846550371
-    private const val DEFAULT_LONGITUDE: Double = 8.545970150745575
-    private const val DEFAULT_ZOOM: Double = 9.0
+    const val DEFAULT_LATITUDE: Double = 47.39778846550371
+    const val DEFAULT_LONGITUDE: Double = 8.545970150745575
+    const val DEFAULT_ZOOM: Double = 9.0
 
     private fun loadLastMapPositionFromPrefs(context: Context): LatLng {
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
