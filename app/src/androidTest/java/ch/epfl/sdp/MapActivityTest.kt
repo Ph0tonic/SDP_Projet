@@ -6,8 +6,8 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.matcher.ViewMatchers.assertThat
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -16,10 +16,10 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.ui.maps.MapUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
+import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.closeTo
+import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -120,11 +120,30 @@ class MapActivityTest {
 
     @Test
     fun canOnRequestPermissionResult() {
+        mActivityRule.launchActivity(Intent())
         mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 
     @Test
     fun droneStatusIsVisible(){
-        onView(withId(R.id.drone_status))
+        mActivityRule.launchActivity(Intent())
+        onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun clickOnMapAddsWaypoint() {
+        mActivityRule.launchActivity(Intent())
+
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
+
+        // Wait for the map to load
+        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+
+        // Add a point
+        runOnUiThread {
+            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+        }
+
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
     }
 }

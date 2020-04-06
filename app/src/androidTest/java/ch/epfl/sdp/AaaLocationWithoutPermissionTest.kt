@@ -5,7 +5,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiSelector
-import org.junit.Assert
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +21,6 @@ class AaaLocationWithoutPermissionTest {
     @Throws(Exception::class)
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        //locationTestActivity = LocationTestActivity()
     }
     /*
     @Test
@@ -54,10 +54,7 @@ class AaaLocationWithoutPermissionTest {
         CentralLocationManager.configure(mActivityRule.activity)
 
         val allowPermissions: UiObject = mUiDevice.findObject(UiSelector().textMatches("(?i)deny"))
-        if (allowPermissions.exists()) {
-            allowPermissions.click()
-        }else{
-            Assert.fail("Permission Dialog doesn't exist")
-        }
+        assertThat(allowPermissions.exists(), equalTo(true))
+        allowPermissions.click()
     }
 }

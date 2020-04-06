@@ -10,6 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -53,7 +55,7 @@ class LocationWithPermissionTest {
     @Test
     fun checkLocationReturnsTrueIfLocationIsEnabled() {
         CentralLocationManager.configure(mActivityRule.activity)
-        Assert.assertTrue(CentralLocationManager.checkLocationSetting())
+        assertThat(CentralLocationManager.checkLocationSetting(), equalTo(true))
     }
 
     @Test

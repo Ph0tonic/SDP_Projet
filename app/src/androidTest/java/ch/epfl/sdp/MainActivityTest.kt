@@ -23,6 +23,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,34 +81,33 @@ class MainActivityTest {
     @Test
     fun canDisplayTheVideo() {
         onView(withId(R.id.display_camera)).perform(click())
-        getInstrumentation().waitForIdleSync()
-        mUiDevice?.pressBack()
+        onView(withId(R.id.video_layout)).check(matches(isDisplayed()))
     }
 
 
     @Test
     fun canDisplayAMapAndReloadLocation() {
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_latitude), null) == null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_longitude), null) == null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_zoom), null) == null)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext())
 
+        sharedPreferences.edit().clear().apply()
+
+        var longitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
+        var latitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
+        var zoom: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
+        assertThat(latitude, `is`(nullValue()))
+        assertThat(longitude, `is`(nullValue()))
+        assertThat(zoom, `is`(nullValue()))
+
+        // Trigger saving mechanism by opening map and coming back
         onView(withId(R.id.display_map)).perform(click())
-        getInstrumentation().waitForIdleSync()
         mUiDevice?.pressBack()
 
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_latitude), null) != null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_longitude), null) != null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_zoom), null) != null)
-
-        //Return on the view as to load the preferences this time
-        getInstrumentation().waitForIdleSync()
-        onView(withId(R.id.display_map)).perform(click())
+        longitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
+        latitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
+        zoom = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
+        assertThat(latitude, `is`(notNullValue()))
+        assertThat(longitude, `is`(notNullValue()))
+        assertThat(zoom, `is`(notNullValue()))
     }
 
     private fun getGSO(): GoogleSignInOptions {
@@ -125,6 +125,8 @@ class MainActivityTest {
 
         val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
         intended(filterEquals(mGoogleSignInClient.signInIntent))
+
+        // Leave the external popup
         mUiDevice?.pressBack()
     }
 
@@ -135,6 +137,8 @@ class MainActivityTest {
 
         val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
         intended(filterEquals(mGoogleSignInClient.signInIntent))
+
+        // Leave the external popup
         mUiDevice?.pressBack()
     }
 
@@ -145,6 +149,8 @@ class MainActivityTest {
 
         val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
         intended(filterEquals(mGoogleSignInClient.signInIntent))
+
+        // Leave the external popup
         mUiDevice?.pressBack()
     }
 
@@ -159,9 +165,17 @@ class MainActivityTest {
         runOnUiThread {
             mActivityRule.activity.updateUserView(dummyUserName, dummyEmail, dummyURL)
         }
-        getInstrumentation().waitForIdleSync()
+
         onView(withId(R.id.nav_username)).check(matches(withText(dummyUserName)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(dummyEmail)))
+    }
+
+    @Test
+    fun checkUserViewElementsAreVisible(){
+        openDrawer()
+        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
+        onView(withId(R.id.nav_username)).check(matches(isDisplayed()))
+        onView(withId(R.id.nav_user_email)).check(matches(isDisplayed()))
     }
 
     @Test
