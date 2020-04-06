@@ -3,11 +3,14 @@
     <string name="google_signin_key">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
 
     <string name="app_name">Fly2Find</string>
-    <string name="sign_in_with_google">Sign in with Google</string>
-    <string name="log_out">Log out</string>
-    <string name="title_activity_settings">Settings</string>
 
+    <string name="title_activity_settings">Settings</string>
     <string name="settings_button_text">Settings</string>
+
+    <!-- Sign in/out Stuff -->
+    <string name="auth_login">Sign in</string>
+    <string name="sign_out">Sign out</string>
+    <string name="sign_in_error">Could not sign in</string>
 
     <!-- Preference Titles -->
     <string name="languages_header">Languages</string>
@@ -62,7 +65,4 @@
     <string name="prefs_latitude">latitude</string>
     <string name="prefs_longitude">longitude</string>
     <string name="prefs_zoom">zoom</string>
-    <string name="auth_login">Sign in</string>
-    <string name="sign_out">Sign out</string>
-    <string name="sign_in_error">Could not sign in</string>
 </resources>
