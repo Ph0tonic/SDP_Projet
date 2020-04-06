@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
 object Auth : ViewModel() {
 
@@ -26,12 +27,21 @@ object Auth : ViewModel() {
                     account != null
                 }
                 .run {
-                    email.postValue(this?.email)
-                    name.postValue(this?.displayName)
-                    Log.e("Image url", this?.photoUrl.toString())
-                    profileImageURL.postValue(this?.photoUrl.toString())
-                    loggedIn.postValue(true)
-                    Log.e("DEBUG", "logged in")
+                    login(this!!)
                 }
+    }
+
+    fun logout() {
+        loggedIn.postValue(false)
+    }
+
+    fun login(account: GoogleSignInAccount) {
+        email.postValue(account.email)
+        name.postValue(account.displayName)
+        profileImageURL.postValue(account.photoUrl.toString())
+        loggedIn.postValue(true)
+
+        Log.e("Image url", account.photoUrl.toString())
+        Log.e("DEBUG", "logged in")
     }
 }

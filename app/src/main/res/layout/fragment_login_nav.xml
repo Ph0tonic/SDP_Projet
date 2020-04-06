@@ -14,6 +14,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
         android:text="@string/auth_login"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@android:color/white" />
 
     <com.mikhaellopez.circularimageview.CircularImageView

@@ -44,6 +44,12 @@ class LoginNavFragment : Fragment() {
             startActivityForResult(mGoogleSignInClient.signInIntent, RC_SIGN_IN)
         }
 
+        //TODO: Remove this
+        view.findViewById<ImageView>(R.id.nav_user_image).setOnClickListener {
+            mGoogleSignInClient.signOut()
+            Auth.logout()
+        }
+
         Auth.email.observe(viewLifecycleOwner, Observer { email ->
             view.findViewById<TextView>(R.id.nav_user_email).text = email
         })
@@ -81,8 +87,9 @@ class LoginNavFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
             try {
-                val account: GoogleSignInAccount? = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
-                //updateUserView(account?.displayName, account?.email, account?.photoUrl.toString())
+                GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+                        .takeIf { this != null }
+                        .run { Auth.login(this!!) }
             } catch (e: ApiException) {
 //                Snackbar.make(findViewById(R.id.main_nav_header), "Could not sign in :(", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show()
