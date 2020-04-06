@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
 import io.reactivex.disposables.Disposable
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 object Drone {
     //must be IP address where the mavsdk_server is running
@@ -15,7 +17,11 @@ object Drone {
     private const val DEFAULT_MAX_DIST_BETWEEN_PASSES: Double = 15.0
 
     private val disposables: MutableList<Disposable> = ArrayList()
-    val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
+    val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
+    val currentBatteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
+    val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> =  MutableLiveData()
+    val currentRelativeAltitudeLiveData: MutableLiveData<Float> =  MutableLiveData()
+    val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
 
     var overflightStrategy: OverflightStrategy
 
@@ -31,8 +37,17 @@ object Drone {
         disposables.add(instance.telemetry.position.subscribe { position ->
             val latLng = LatLng(position.latitudeDeg, position.longitudeDeg)
             currentPositionLiveData.postValue(latLng)
+            currentAbsoluteAltitudeLiveData.postValue(position.absoluteAltitudeM)
+            currentRelativeAltitudeLiveData.postValue(position.relativeAltitudeM)
         })
-
+        disposables.add(instance.telemetry.battery.subscribe { battery ->
+            currentBatteryLevelLiveData.postValue(battery.remainingPercent)
+        })
+        disposables.add(instance.telemetry.groundSpeedNed.subscribe {groundSpeed ->
+            val speed = sqrt(groundSpeed.velocityEastMS.pow(2) +
+                    groundSpeed.velocityEastMS.pow(2))
+            currentSpeedLiveData.postValue(speed)
+        })
         overflightStrategy = SimpleMultiPassOnQuadrangle(DEFAULT_MAX_DIST_BETWEEN_PASSES)
     }
 }

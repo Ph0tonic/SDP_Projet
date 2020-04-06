@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
 import java.text.DecimalFormat
+import ch.epfl.sdp.R
 
 /**
  * Main Activity to display map and create missions.
@@ -57,6 +58,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
+    private var droneBatteryObserver = Observer<Float> {newBatteryLevel: Float? -> newBatteryLevel?.let { updateDroneBatteryLevel(it) }}
+    private var droneAltitudeObserver = Observer<Float> {newAltitude: Float? -> newAltitude?.let { updateDroneAltitude(it) }}
+    private var droneSpeedObserver = Observer<Float> {newSpeed: Float? -> newSpeed?.let { updateDroneSpeed(it) }}
     //private var missionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
 
     companion object {
@@ -97,6 +101,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         Drone.currentPositionLiveData.observe(this, dronePositionObserver)
+        Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
+        Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
+        Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
         // viewModel.missionPlanLiveData.observe(this, currentMissionPlanObserver)
     }
@@ -105,6 +112,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onPause()
         CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
         Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
+        Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
+        Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
+        Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
         // Mission.missionPlanLiveData.removeObserver(currentMissionPlanObserver)
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
     }
@@ -275,6 +285,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             dronePositionMarker!!.latLng = newLatLng
             droneCircleManager!!.update(dronePositionMarker)
         }
+
+        CentralLocationManager.currentUserPosition.value?.let {
+            val distToUser = it.distanceTo(newLatLng)
+            findViewById<TextView>(R.id.distance_to_user).text = " %.1f m".format(distToUser)
+        }
     }
 
     private fun updateUserPosition(userLatLng: LatLng) {
@@ -294,6 +309,25 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
         display(R.id.tv_latitude, R.string.lat, userLatLng.latitude)
         display(R.id.tv_longitude, R.string.lon, userLatLng.longitude)
+        Drone.currentPositionLiveData.value?.let {
+            val distToUser = it.distanceTo(userLatLng)
+            findViewById<TextView>(R.id.distance_to_user).text = " %.1f m".format(distToUser)
+        }
+    }
+
+    private fun updateDroneBatteryLevel(newBatteryLevel: Float){
+        //TODO Maybe store the view instead of searching it again each time
+        findViewById<TextView>(R.id.battery_level).text = " %.0f%%".format(newBatteryLevel*100)
+    }
+
+    private fun updateDroneAltitude(newAltitude: Float){
+        //TODO Maybe store the view instead of searching it again each time
+        findViewById<TextView>(R.id.altitude).text = " %.1f m".format(newAltitude)
+    }
+
+    private fun updateDroneSpeed(newSpeed: Float){
+        //TODO Maybe store the view instead of searching it again each time
+        findViewById<TextView>(R.id.speed).text = " %.1f m/s".format(newSpeed)
     }
 
 //    /**
