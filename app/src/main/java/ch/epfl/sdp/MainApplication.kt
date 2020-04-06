@@ -16,6 +16,10 @@ class MainApplication : Application() {
         fun applicationContext(): Context {
             return instance!!.applicationContext
         }
+
+        fun applicationInstance(): MainApplication {
+            return instance!!
+        }
     }
 
     override fun onCreate() {
