@@ -31,11 +31,6 @@ class LoginNavFragment : Fragment() {
             Auth.login(this)
         }
 
-        //TODO: Add logout button
-        view.findViewById<ImageView>(R.id.nav_user_image).setOnClickListener {
-            Auth.logout()
-        }
-
         Auth.email.observe(viewLifecycleOwner, Observer { email ->
             view.findViewById<TextView>(R.id.nav_user_email).text = email
         })
@@ -52,12 +47,13 @@ class LoginNavFragment : Fragment() {
                     .into(view.findViewById(R.id.nav_user_image))
         })
 
+        val visibility: (Boolean) -> Int = { visible -> if (visible) View.VISIBLE else View.GONE }
         Auth.loggedIn.observe(viewLifecycleOwner, Observer { loggedIn ->
-            val visibility = if (loggedIn) View.VISIBLE else View.GONE
-            view.findViewById<TextView>(R.id.nav_username).visibility = visibility
-            view.findViewById<TextView>(R.id.nav_user_email).visibility = visibility
-            view.findViewById<ImageView>(R.id.nav_user_image).visibility = visibility
-            view.findViewById<Button>(R.id.nav_login_button).visibility = if (loggedIn) View.GONE else View.VISIBLE
+            view.findViewById<TextView>(R.id.nav_username).visibility = visibility(loggedIn)
+            view.findViewById<TextView>(R.id.nav_user_email).visibility = visibility(loggedIn)
+            view.findViewById<ImageView>(R.id.nav_user_image).visibility = visibility(loggedIn)
+            view.findViewById<ImageView>(R.id.nav_user_image_default).visibility = visibility(!loggedIn)
+            view.findViewById<Button>(R.id.nav_login_button).visibility = visibility(!loggedIn)
         })
     }
 

@@ -1,58 +1,56 @@
 package ch.epfl.sdp
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.mapbox.mapboxsdk.geometry.LatLng
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    companion object {
-        private const val TRAJECTORY_PLANNING_REQUEST_CODE = 42
-    }
-
-    var waypoints = mutableListOf<LatLng>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
 
-        //val fab: FloatingActionButton = findViewById(R.id.fab)
-        /*fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }*/
+        setSupportActionBar(findViewById(R.id.toolbar))
+
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_home, R.id.nav_maps_managing), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(
+                setOf(R.id.nav_home, R.id.nav_maps_managing, R.id.nav_logout),
+                drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        Auth.loggedIn.observe(this, Observer {
+            navView.menu.findItem(R.id.nav_logout).isVisible = it
+            navView.menu.findItem(R.id.nav_logout).isEnabled = it
+        })
+
+        navView.menu.findItem(R.id.nav_logout).setOnMenuItemClickListener {
+            Auth.logout()
+            drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        //val account = GoogleSignIn.getLastSignedInAccount(this)
-        //updateUserView(account?.displayName, account?.email)
         CentralLocationManager.configure(this)
     }
 
@@ -70,13 +68,6 @@ class MainActivity : AppCompatActivity() {
 
     fun openSettings(menuItem: MenuItem?) {
         startActivity(Intent(this, SettingsActivity::class.java))
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == TRAJECTORY_PLANNING_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            waypoints = data?.extras?.get("waypoints") as MutableList<LatLng>
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,

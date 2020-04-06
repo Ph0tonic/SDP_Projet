@@ -6,11 +6,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 
 object Auth : ViewModel() {
 
@@ -23,7 +23,7 @@ object Auth : ViewModel() {
     val name: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     init {
-        val context = MainApplication.applicationContext()
+        val context = applicationContext()
         GoogleSignIn.getLastSignedInAccount(context)
                 .runCatching {
                     updateLoginStateFromAccount(this!!)
@@ -38,7 +38,7 @@ object Auth : ViewModel() {
 
     /**
      *  Allow to launch the connect from a Fragment or anActivity
-     *  Need to verride onActivityResult and call Auth.onActivityResult
+     *  Need to override onActivityResult and call Auth.onActivityResult
      */
     fun login(fragment: Fragment) {
         fragment.startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
@@ -50,18 +50,18 @@ object Auth : ViewModel() {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
-            try {
-                GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
-                        .runCatching { updateLoginStateFromAccount(this!!) }
-            } catch (e: ApiException) {
-                Toast.makeText(MainApplication.applicationContext(), "Could not sign in :(", Toast.LENGTH_SHORT).show()
-            }
+            val context = applicationContext()
+            GoogleSignIn.getSignedInAccountFromIntent(data)
+                    .addOnSuccessListener {
+                        updateLoginStateFromAccount(it)
+                    }.addOnFailureListener {
+                        Toast.makeText(context, context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
+                    }
         }
     }
 
     fun logout() {
-        googleSignInClient.signOut()
-                .addOnSuccessListener { loggedIn.postValue(false) }
+        googleSignInClient.signOut().addOnSuccessListener { loggedIn.postValue(false) }
     }
 
     private fun updateLoginStateFromAccount(account: GoogleSignInAccount) {

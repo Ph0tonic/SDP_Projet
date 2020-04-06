@@ -62,5 +62,7 @@
     <string name="prefs_latitude">latitude</string>
     <string name="prefs_longitude">longitude</string>
     <string name="prefs_zoom">zoom</string>
-    <string name="auth_login">Login</string>
+    <string name="auth_login">Sign in</string>
+    <string name="sign_out">Sign out</string>
+    <string name="sign_in_error">Could not sign in</string>
 </resources>

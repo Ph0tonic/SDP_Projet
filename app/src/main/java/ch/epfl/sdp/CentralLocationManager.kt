@@ -28,8 +28,8 @@ object CentralLocationManager {
     internal var currentUserPosition: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
 
     fun configure(activity: Activity) {
-        this.activity = activity
-        locationManager = this.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        CentralLocationManager.activity = activity
+        locationManager = CentralLocationManager.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (checkAndRequestPermission()) {
             locationManager.requestLocationUpdates(
@@ -78,7 +78,7 @@ object CentralLocationManager {
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == this.requestCode && checkPermission()) {
+        if (requestCode == CentralLocationManager.requestCode && checkPermission()) {
             locationManager.requestLocationUpdates(
                     GPS_PROVIDER, 500, 10f, CentralLocationListener)
         }
