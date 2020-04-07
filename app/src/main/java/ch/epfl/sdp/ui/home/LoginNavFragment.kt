@@ -27,7 +27,7 @@ class LoginNavFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<TextView>(R.id.nav_login_button).setOnClickListener {
+        view.findViewById<TextView>(R.id.nav_signin_button).setOnClickListener {
             Auth.login(this)
         }
 
@@ -53,7 +53,7 @@ class LoginNavFragment : Fragment() {
             view.findViewById<TextView>(R.id.nav_user_email).visibility = visibility(loggedIn)
             view.findViewById<ImageView>(R.id.nav_user_image).visibility = visibility(loggedIn)
             view.findViewById<ImageView>(R.id.nav_user_image_default).visibility = visibility(!loggedIn)
-            view.findViewById<Button>(R.id.nav_login_button).visibility = visibility(!loggedIn)
+            view.findViewById<Button>(R.id.nav_signin_button).visibility = visibility(!loggedIn)
         })
     }
 
