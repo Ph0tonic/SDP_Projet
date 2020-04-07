@@ -110,10 +110,14 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
 
         onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
-        openDrawer()
+        runOnUiThread {
+            Auth.logout()
+            Auth.loggedIn.postValue(false)
+        }
 
+        openDrawer()
         mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signin))), TIMEOUT)
-        onView(withId(R.id.nav_signin_button)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+        onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
 
         mUiDevice.pressBack()
     }
