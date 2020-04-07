@@ -5,7 +5,6 @@
     <string name="app_name">Fly2Find</string>
 
     <string name="title_activity_settings">Settings</string>
-    <string name="settings_button_text">Settings</string>
 
     <!-- Sign in/out Stuff -->
     <string name="auth_signin">Sign in</string>
@@ -13,24 +12,15 @@
     <string name="sign_in_error">Could not sign in</string>
 
     <!-- Preference Titles -->
-    <string name="languages_header">Languages</string>
     <string name="maps_header">Maps</string>
 
-    <string name="my_pref_string">lang</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_misson_design">Mission design</string>
     <string name="menu_maps_managing">Maps managing</string>
-
-    <string name="home_second">Home Second</string>
-    <string name="start_misson_button">Start mission</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
@@ -65,4 +55,8 @@
     <string name="prefs_latitude">latitude</string>
     <string name="prefs_longitude">longitude</string>
     <string name="prefs_zoom">zoom</string>
+    <string name="camera_button">Camera</string>
+    <string name="map_button">Map</string>
+    <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
+    <string name="enter_name">Enter Name</string>
 </resources>

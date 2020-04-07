@@ -15,7 +15,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 object Auth : ViewModel() {
 
     private const val RC_SIGN_IN = 9001
-    private var googleSignInClient: GoogleSignInClient
 
     val loggedIn: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val email: MutableLiveData<String> by lazy { MutableLiveData<String>() }
@@ -23,16 +22,18 @@ object Auth : ViewModel() {
     val name: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     init {
-        val context = applicationContext()
-        GoogleSignIn.getLastSignedInAccount(context)
+        GoogleSignIn.getLastSignedInAccount(applicationContext())
                 .runCatching { updateLoginStateFromAccount(this!!) }
+    }
 
+    private fun createGoogleSignClient(): GoogleSignInClient {
+        val context = applicationContext()
         val gso = GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(context.getString(R.string.google_signin_key))
                 .requestEmail()
                 .build()
-        googleSignInClient = GoogleSignIn.getClient(context, gso)
+        return GoogleSignIn.getClient(context, gso)
     }
 
     /**
@@ -40,11 +41,11 @@ object Auth : ViewModel() {
      *  Need to override onActivityResult and call Auth.onActivityResult
      */
     fun login(fragment: Fragment) {
-        fragment.startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
+        fragment.startActivityForResult(createGoogleSignClient().signInIntent, RC_SIGN_IN)
     }
 
     fun login(activity: Activity) {
-        activity.startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
+        activity.startActivityForResult(createGoogleSignClient().signInIntent, RC_SIGN_IN)
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -60,7 +61,7 @@ object Auth : ViewModel() {
     }
 
     fun logout() {
-        googleSignInClient.signOut().addOnSuccessListener { loggedIn.postValue(false) }
+        createGoogleSignClient().signOut().addOnSuccessListener { loggedIn.postValue(false) }
     }
 
     private fun updateLoginStateFromAccount(account: GoogleSignInAccount) {

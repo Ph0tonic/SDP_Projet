@@ -23,7 +23,7 @@ class MapsManagingFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_maps_managing, container, false)
         val textView: TextView = root.findViewById(R.id.text_slideshow)
         mapsManagingViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = "Maps managing fragment\n(get offline maps here)"
+            textView.text = getString(R.string.maps_managing)
         })
         return root
     }
