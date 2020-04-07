@@ -16,10 +16,11 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers
-import org.hamcrest.Matchers.closeTo
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
+import org.hamcrest.core.IsNot
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -137,7 +138,7 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
 
         // Wait for the map to load
-        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+        mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
 
         // Add a point
         runOnUiThread {
@@ -145,5 +146,102 @@ class MapActivityTest {
         }
 
         assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
+    }
+
+    @Test
+    fun deleteButtonRemovesWaypoints(){
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+
+        runOnUiThread {
+            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+        }
+
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
+
+        onView(withId(R.id.clear_waypoints)).perform(click())
+
+        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
+
+    }
+
+    @Test
+    fun updateDroneBatteryChangesDroneStatus(){
+        mActivityRule.launchActivity(Intent())
+
+        Drone.currentBatteryLevelLiveData.postValue(null)
+
+        onView(withId(R.id.battery_level)).check(matches(withText(R.string.no_info)))
+
+        Drone.currentBatteryLevelLiveData.postValue(1F)
+        onView(withId(R.id.battery_level)).check(matches(withText(" 100%")))
+
+        Drone.currentBatteryLevelLiveData.postValue(0F)
+        onView(withId(R.id.battery_level)).check(matches(withText(" 0%")))
+
+        Drone.currentBatteryLevelLiveData.postValue(0.5F)
+        onView(withId(R.id.battery_level)).check(matches(withText(" 50%")))
+    }
+
+    @Test
+    fun updateDroneAltitudeChangesDroneStatus(){
+        mActivityRule.launchActivity(Intent())
+
+        Drone.currentAbsoluteAltitudeLiveData.postValue(null)
+
+        onView(withId(R.id.altitude)).check(matches(withText(R.string.no_info)))
+
+        Drone.currentAbsoluteAltitudeLiveData.postValue(0F)
+        onView(withId(R.id.altitude)).check(matches(withText(" 0.0 m")))
+
+        Drone.currentAbsoluteAltitudeLiveData.postValue(1.123F)
+        onView(withId(R.id.altitude)).check(matches(withText(" 1.1 m")))
+
+        Drone.currentAbsoluteAltitudeLiveData.postValue(10F)
+        onView(withId(R.id.altitude)).check(matches(withText(" 10.0 m")))
+    }
+
+    @Test
+    fun updateDroneSpeedChangesDroneStatus(){
+        mActivityRule.launchActivity(Intent())
+
+        Drone.currentSpeedLiveData.postValue(null)
+
+        onView(withId(R.id.speed)).check(matches(withText(R.string.no_info)))
+
+        Drone.currentSpeedLiveData.postValue(0F)
+        onView(withId(R.id.speed)).check(matches(withText(" 0.0 m/s")))
+
+        Drone.currentSpeedLiveData.postValue(1.123F)
+        onView(withId(R.id.speed)).check(matches(withText(" 1.1 m/s")))
+
+        Drone.currentSpeedLiveData.postValue(5.2F)
+        onView(withId(R.id.speed)).check(matches(withText(" 5.2 m/s")))
+    }
+
+    @Test
+    fun updateDronePositionChangesDistToUser(){
+        mActivityRule.launchActivity(Intent())
+
+        CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
+
+        Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
+
+        Drone.currentPositionLiveData.postValue(LatLng(1.0,0.0))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
+    }
+
+    @Test
+    fun updateUserPositionChangesDistToUser(){
+        mActivityRule.launchActivity(Intent())
+
+        Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
+
+        CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
+
+        CentralLocationManager.currentUserPosition.postValue(LatLng(1.0,0.0))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
     }
 }
