@@ -39,10 +39,7 @@ class LoginNavFragment : Fragment() {
                 }
 
         Auth.profileImageURL.observe(viewLifecycleOwner, Observer { imageURL ->
-            Glide
-                    .with(context)
-                    .load(imageURL)
-                    .error(R.mipmap.ic_launcher_round)
+            Glide.with(context).load(imageURL).error(R.mipmap.ic_launcher_round)
                     .into(view.findViewById(R.id.nav_user_image))
         })
 
