@@ -55,6 +55,7 @@ class LoginNavFragmentTest {
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
                 .perform(DrawerActions.open())
 
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         onView(withId(R.id.nav_signin_button)).perform(click())
 
         val mGoogleSignInClient = GoogleSignIn.getClient(MainApplication.applicationContext(), getGSO())
