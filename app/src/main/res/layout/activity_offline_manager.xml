@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context="ch.epfl.sdp.OfflineManagerActivity">
 
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        mapbox:mapbox_cameraZoom="15.27"
+        mapbox:mapbox_cameraZoomMin="10" />
+
     <EditText
         android:id="@+id/editName"
         android:layout_width="wrap_content"
@@ -14,6 +21,17 @@
         android:importantForAutofill="no"
         android:inputType="text"
         android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
@@ -50,21 +68,4 @@
 
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
-        android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        android:visibility="gone" />
-
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        mapbox:mapbox_cameraZoom="15.27"
-        mapbox:mapbox_cameraZoomMin="10"></com.mapbox.mapboxsdk.maps.MapView>
 </RelativeLayout>
