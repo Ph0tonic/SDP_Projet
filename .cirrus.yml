@@ -39,6 +39,10 @@ connected_check_task:
     - ./cc-test-reporter upload-coverage
 
 android_lint_task:
+  container:
+    image: cirrusci/android-sdk:29
+    cpu: 4
+    memory: 10G
   name: Android Lint
   lint_script: ./gradlew lintDebug
   always:
