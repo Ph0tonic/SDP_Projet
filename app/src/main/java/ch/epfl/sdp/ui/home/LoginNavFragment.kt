@@ -31,13 +31,12 @@ class LoginNavFragment : Fragment() {
             Auth.login(this)
         }
 
-        Auth.email.observe(viewLifecycleOwner, Observer { email ->
-            view.findViewById<TextView>(R.id.nav_user_email).text = email
-        })
-
-        Auth.name.observe(viewLifecycleOwner, Observer { name ->
-            view.findViewById<TextView>(R.id.nav_username).text = name
-        })
+        setOf(Auth.email, Auth.name).zip(setOf(R.id.nav_user_email, R.id.nav_username))
+                .forEach {
+                    it.first.observe(viewLifecycleOwner, Observer { value ->
+                        view.findViewById<TextView>(it.second).text = value
+                    })
+                }
 
         Auth.profileImageURL.observe(viewLifecycleOwner, Observer { imageURL ->
             Glide
@@ -49,10 +48,13 @@ class LoginNavFragment : Fragment() {
 
         val visibility: (Boolean) -> Int = { visible -> if (visible) View.VISIBLE else View.GONE }
         Auth.loggedIn.observe(viewLifecycleOwner, Observer { loggedIn ->
-            view.findViewById<TextView>(R.id.nav_username).visibility = visibility(loggedIn)
-            view.findViewById<TextView>(R.id.nav_user_email).visibility = visibility(loggedIn)
-            view.findViewById<ImageView>(R.id.nav_user_image).visibility = visibility(loggedIn)
-            view.findViewById<ImageView>(R.id.nav_user_image_default).visibility = visibility(!loggedIn)
+            setOf(R.id.nav_username, R.id.nav_user_email)
+                    .forEach { view.findViewById<TextView>(it).visibility = visibility(loggedIn) }
+
+            setOf(R.id.nav_user_image, R.id.nav_user_image_default)
+                    .zip(setOf(loggedIn, !loggedIn).map { visibility(it) })
+                    .forEach { view.findViewById<ImageView>(it.first).visibility = it.second }
+
             view.findViewById<Button>(R.id.nav_signin_button).visibility = visibility(!loggedIn)
         })
     }
