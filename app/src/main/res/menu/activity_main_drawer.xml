@@ -21,7 +21,7 @@
         android:id="@+id/nav_group_logout"
         android:checkableBehavior="none">
         <item
-            android:id="@+id/nav_logout"
+            android:id="@+id/nav_signout_button"
             android:icon="@drawable/ic_exit_to_app_white_24dp"
             android:title="@string/sign_out"/>
     </group>

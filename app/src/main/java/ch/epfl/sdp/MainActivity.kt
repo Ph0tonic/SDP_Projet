@@ -32,17 +32,17 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
-                setOf(R.id.nav_home, R.id.nav_maps_managing, R.id.nav_logout),
+                setOf(R.id.nav_home, R.id.nav_maps_managing, R.id.nav_signout_button),
                 drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         Auth.loggedIn.observe(this, Observer {
-            navView.menu.findItem(R.id.nav_logout).isVisible = it
-            navView.menu.findItem(R.id.nav_logout).isEnabled = it
+            navView.menu.findItem(R.id.nav_signout_button).isVisible = it
+            navView.menu.findItem(R.id.nav_signout_button).isEnabled = it
         })
 
-        navView.menu.findItem(R.id.nav_logout).setOnMenuItemClickListener {
+        navView.menu.findItem(R.id.nav_signout_button).setOnMenuItemClickListener {
             Auth.logout()
             drawerLayout.closeDrawer(GravityCompat.START)
             true

@@ -19,6 +19,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
 import org.junit.Before
 import org.junit.Rule
@@ -27,11 +28,12 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
+
     private var mUiDevice: UiDevice? = null
 
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION)
+    val grantPermissionRule: GrantPermissionRule? = grant(ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION)
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MainActivity::class.java)
@@ -46,17 +48,17 @@ class MainActivityTest {
         return getInstrumentation().targetContext
     }
 
+    private fun openDrawer() {
+        onView(withId(R.id.drawer_layout))
+                .check(matches(isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
+                .perform(DrawerActions.open())
+    }
+
     @Test
     fun canOpenSettings() {
         openActionBarOverflowOrOptionsMenu(getContext())
         onView(withText("Settings")).perform(click())
         intended(hasComponent(SettingsActivity::class.qualifiedName))
-    }
-
-    private fun openDrawer() {
-        onView(withId(R.id.drawer_layout))
-                .check(matches(isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
-                .perform(DrawerActions.open())
     }
 
     @Test
