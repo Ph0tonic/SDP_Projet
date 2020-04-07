@@ -32,7 +32,7 @@ import org.junit.runner.RunWith
 class LoginNavFragmentTest {
 
     companion object {
-        private const val TIMEOUT:Long = 2000
+        private const val TIMEOUT: Long = 2000
         private const val FAKE_NAME = "Fake Girl"
         private const val FAKE_EMAIL = "fake@fake.com"
         private const val FAKE_PROFILE_IMAGE_URL = "https://fakeimg.pl/80x80/"
@@ -51,7 +51,9 @@ class LoginNavFragmentTest {
     @Throws(Exception::class)
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        Auth.logout()
+        runOnUiThread {
+            Auth.logout()
+        }
     }
 
     private fun getGSO(): GoogleSignInOptions {
@@ -108,10 +110,9 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
 
         mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signout))), TIMEOUT)
-        onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_signout_button))
-
+        onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
         openDrawer()
+
         mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signin))), TIMEOUT)
         onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
 
