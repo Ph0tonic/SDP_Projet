@@ -8,8 +8,8 @@
     <string name="settings_button_text">Settings</string>
 
     <!-- Sign in/out Stuff -->
-    <string name="auth_login">Sign in</string>
-    <string name="sign_out">Sign out</string>
+    <string name="auth_signin">Sign in</string>
+    <string name="auth_signout">Sign out</string>
     <string name="sign_in_error">Could not sign in</string>
 
     <!-- Preference Titles -->
