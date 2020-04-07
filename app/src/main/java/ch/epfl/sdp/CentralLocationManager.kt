@@ -22,14 +22,15 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 object CentralLocationManager {
 
     private const val requestCode = 1011
+    private val requiredPermissions = setOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
 
     private lateinit var locationManager: LocationManager
     private lateinit var activity: Activity
     internal var currentUserPosition: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
 
     fun configure(activity: Activity) {
-        CentralLocationManager.activity = activity
-        locationManager = CentralLocationManager.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        this.activity = activity
+        locationManager = this.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (checkAndRequestPermission()) {
             locationManager.requestLocationUpdates(
@@ -66,19 +67,19 @@ object CentralLocationManager {
     }
 
     private fun checkPermission(): Boolean {
-        return checkPermission(ACCESS_FINE_LOCATION) && checkPermission(ACCESS_COARSE_LOCATION)
+        return requiredPermissions.all { checkPermissions(it) }
     }
 
-    private fun checkPermission(permission: String): Boolean {
+    private fun checkPermissions(permission: String): Boolean {
         return ActivityCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermissions() {
-        ActivityCompat.requestPermissions(activity, arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION), requestCode)
+        ActivityCompat.requestPermissions(activity, requiredPermissions.toTypedArray(), requestCode)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == CentralLocationManager.requestCode && checkPermission()) {
+        if (requestCode == this.requestCode && checkPermission()) {
             locationManager.requestLocationUpdates(
                     GPS_PROVIDER, 500, 10f, CentralLocationListener)
         }
@@ -87,19 +88,20 @@ object CentralLocationManager {
     private fun isLocationEnabled(): Boolean {
         return locationManager.isProviderEnabled(GPS_PROVIDER)
     }
+
+    private object CentralLocationListener : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            currentUserPosition.postValue(LatLng(location))
+        }
+
+        override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {}
+        override fun onProviderEnabled(s: String) {}
+
+        @RequiresApi(Build.VERSION_CODES.M)
+        override fun onProviderDisabled(s: String) {
+            checkLocationSetting()
+        }
+    }
 }
 
-private object CentralLocationListener : LocationListener {
 
-    override fun onLocationChanged(location: Location) {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(location))
-    }
-
-    override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {}
-    override fun onProviderEnabled(s: String) {}
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    override fun onProviderDisabled(s: String) {
-        CentralLocationManager.checkLocationSetting()
-    }
-}

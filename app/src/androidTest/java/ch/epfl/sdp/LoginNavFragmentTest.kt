@@ -3,13 +3,13 @@ package ch.epfl.sdp
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
@@ -22,6 +22,12 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LoginNavFragmentTest {
+
+    companion object {
+        private const val FAKE_NAME = "Fake Girl"
+        private const val FAKE_EMAIL = "fake@fake.com"
+        private const val FAKE_PROFILE_IMAGE_URL = "https://fakeimg.pl/80x80/"
+    }
 
     private lateinit var mUiDevice: UiDevice
 
@@ -44,9 +50,9 @@ class LoginNavFragmentTest {
     }
 
     @Test
-    fun testEventFragment() {
+    fun clickSignInShouldLaunchIntent() {
         onView(withId(R.id.drawer_layout))
-                .check(ViewAssertions.matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
+                .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
                 .perform(DrawerActions.open())
 
         onView(withId(R.id.nav_signin_button)).perform(click())
@@ -56,55 +62,23 @@ class LoginNavFragmentTest {
         mUiDevice.pressBack()
     }
 
-//    @Test
-//    fun clickOnUserProfilePictureOpensLoginMenu() {
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_user_image)).perform(ViewActions.click())
-//
-//        val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
-//        Intents.intended(IntentMatchers.filterEquals(mGoogleSignInClient.signInIntent))
-//        mUiDevice.pressBack()
-//    }
+    @Test
+    fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
+        onView(withId(R.id.drawer_layout))
+                .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
+                .perform(DrawerActions.open())
 
-//    @Test
-//    fun clickOnUserEmailOpensLoginMenu() {
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_user_email)).perform(ViewActions.click())
-//
-//        val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
-//        Intents.intended(IntentMatchers.filterEquals(mGoogleSignInClient.signInIntent))
-//        mUiDevice.pressBack()
-//    }
+        onView(withId(R.id.nav_signin_button)).check(matches(isClickable()))
 
-//    @Test
-//    fun clickOnUsernameOpensLoginMenu() {
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_signin_button)).perform(ViewActions.click())
-//
-//        val mGoogleSignInClient = GoogleSignIn.getClient(getContext(), getGSO())
-//        Intents.intended(IntentMatchers.filterEquals(mGoogleSignInClient.signInIntent))
-//        mUiDevice.pressBack()
-//    }
+        Auth.email.postValue(FAKE_EMAIL)
+        Auth.name.postValue(FAKE_NAME)
+        Auth.profileImageURL.postValue(FAKE_PROFILE_IMAGE_URL)
+        Auth.loggedIn.postValue(true)
 
-//    @Test
-//    fun updateUserViewUpdatesUserInformationInDrawer() {
-//        val dummyUserName: String? = "dummy_username"
-//        val dummyEmail: String? = "dummy_email"
-//        val dummyURL: String? = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
-//
-//        UiThreadStatement.runOnUiThread {
-//            mActivityRule.activity.updateUserView(dummyUserName, dummyEmail, dummyURL)
-//        }
-//        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_username)).check(ViewAssertions.matches(ViewMatchers.withText(dummyUserName)))
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_user_email)).check(ViewAssertions.matches(ViewMatchers.withText(dummyEmail)))
-//    }
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
-//    @Test
-//    fun updateUserViewWithNullStringsUpdatesUserInformationInDrawer() {
-//        UiThreadStatement.runOnUiThread {
-//            mActivityRule.activity.updateUserView(null, null, null)
-//        }
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_username)).check(ViewAssertions.matches(ViewMatchers.withText("default_username")))
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_user_email)).check(ViewAssertions.matches(ViewMatchers.withText("default_email")))
-//        Espresso.onView(ViewMatchers.withId(R.id.nav_user_image)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-//    }
-
+        onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
+        onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
+        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
+    }
 }

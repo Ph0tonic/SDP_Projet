@@ -25,9 +25,8 @@ object Auth : ViewModel() {
     init {
         val context = applicationContext()
         GoogleSignIn.getLastSignedInAccount(context)
-                .runCatching {
-                    updateLoginStateFromAccount(this!!)
-                }
+                .runCatching { updateLoginStateFromAccount(this!!) }
+
         val gso = GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(context.getString(R.string.google_signin_key))
