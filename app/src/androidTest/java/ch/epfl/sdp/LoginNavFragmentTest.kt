@@ -77,7 +77,8 @@ class LoginNavFragmentTest {
 
         onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
-        onView(withId(R.id.nav_user_image)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
+        mUiDevice.pressBack()
     }
 
 }
