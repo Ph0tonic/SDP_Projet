@@ -62,23 +62,23 @@ class LoginNavFragmentTest {
         mUiDevice.pressBack()
     }
 
-    @Test
-    fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
-        onView(withId(R.id.drawer_layout))
-                .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
-                .perform(DrawerActions.open())
-
-        Auth.email.postValue(FAKE_EMAIL)
-        Auth.name.postValue(FAKE_NAME)
-        Auth.profileImageURL.postValue(FAKE_PROFILE_IMAGE_URL)
-        Auth.loggedIn.postValue(true)
-
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-
-        onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
-        onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
-        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
-        mUiDevice.pressBack()
-    }
+//    @Test
+//    fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
+//        onView(withId(R.id.drawer_layout))
+//                .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
+//                .perform(DrawerActions.open())
+//
+//        Auth.email.postValue(FAKE_EMAIL)
+//        Auth.name.postValue(FAKE_NAME)
+//        Auth.profileImageURL.postValue(FAKE_PROFILE_IMAGE_URL)
+//        Auth.loggedIn.postValue(true)
+//
+//        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+//
+//        onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
+//        onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
+//        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
+//        mUiDevice.pressBack()
+//    }
 
 }
