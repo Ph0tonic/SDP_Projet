@@ -55,8 +55,7 @@ class LoginNavFragmentTest {
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
                 .perform(DrawerActions.open())
 
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        onView(withId(R.id.nav_signin_button)).perform(click())
+        onView(withId(R.id.nav_signin_button)).check(matches(isClickable())).perform(click())
 
         val mGoogleSignInClient = GoogleSignIn.getClient(MainApplication.applicationContext(), getGSO())
         Intents.intended(IntentMatchers.filterEquals(mGoogleSignInClient.signInIntent))
@@ -69,8 +68,6 @@ class LoginNavFragmentTest {
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
                 .perform(DrawerActions.open())
 
-        onView(withId(R.id.nav_signin_button)).check(matches(isClickable()))
-
         Auth.email.postValue(FAKE_EMAIL)
         Auth.name.postValue(FAKE_NAME)
         Auth.profileImageURL.postValue(FAKE_PROFILE_IMAGE_URL)
@@ -80,6 +77,7 @@ class LoginNavFragmentTest {
 
         onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
-        onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
+        onView(withId(R.id.nav_user_image)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
     }
+
 }
