@@ -8,7 +8,6 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
-import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -104,17 +103,17 @@ class LoginNavFragmentTest {
             Auth.profileImageURL.postValue(FAKE_PROFILE_IMAGE_URL)
             Auth.loggedIn.postValue(true)
         }
+        mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signout))), TIMEOUT)
 
         onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
 
-        mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signout))), TIMEOUT)
         onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
         openDrawer()
 
         mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signin))), TIMEOUT)
-        onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
+        onView(withId(R.id.nav_signin_button)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
 
         mUiDevice.pressBack()
     }
