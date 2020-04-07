@@ -73,14 +73,12 @@ class MainActivityTest {
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
     }
 
-
     @Test
     fun canDisplayTheVideo() {
         onView(withId(R.id.display_camera)).perform(click())
         getInstrumentation().waitForIdleSync()
         mUiDevice?.pressBack()
     }
-
 
     @Test
     fun canDisplayAMapAndReloadLocation() {
@@ -113,6 +111,7 @@ class MainActivityTest {
             mActivityRule.activity.onSupportNavigateUp()
         }
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
+        mUiDevice?.pressBack()
     }
 
 }
