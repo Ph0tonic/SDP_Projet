@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import android.content.Intent
-import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
@@ -57,23 +56,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     lateinit var droneSpeedTextView: TextView
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateVehiclePosition(it) } }
+        newLatLng?.let { updateVehiclePosition(it) }
+    }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it) } }
-    private var droneBatteryObserver = Observer<Float> {newBatteryLevel: Float? ->
-        newBatteryLevel?.let {
-            updateTextView(droneBatteryLevelTextView, (it*100).toDouble(), PERCENTAGE_FORMAT)
-        }
+        newLatLng?.let { updateUserPosition(it) }
     }
-    private var droneAltitudeObserver = Observer<Float> {newAltitude: Float? ->
-        newAltitude?.let {
-            updateTextView(droneAltitudeTextView, it.toDouble(), DISTANCE_FORMAT)
-        }
+    private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
+        newBatteryLevel?.let { updateTextView(droneBatteryLevelTextView, (it * 100).toDouble(), PERCENTAGE_FORMAT) }
     }
-    private var droneSpeedObserver = Observer<Float> {newSpeed: Float? ->
-        newSpeed?.let {
-            updateTextView(droneSpeedTextView, it.toDouble(), SPEED_FORMAT)
-        }
+    private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? ->
+        newAltitude?.let { updateTextView(droneAltitudeTextView, it.toDouble(), DISTANCE_FORMAT) }
+    }
+    private var droneSpeedObserver = Observer<Float> { newSpeed: Float? ->
+        newSpeed?.let { updateTextView(droneSpeedTextView, it.toDouble(), SPEED_FORMAT) }
     }
 
     companion object {
@@ -172,7 +167,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         findViewById<TextView>(buttonId).text = (getString(labelId) + " " + DECIMAL_FORMAT.format(value))
     }
 
-    private fun updateTextView(textView: TextView, value: Double,formatString: String){
+    private fun updateTextView(textView: TextView, value: Double, formatString: String) {
         textView.text = formatString.format(value)
     }
 
