@@ -22,6 +22,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 object CentralLocationManager {
 
     private const val requestCode = 1011
+    private val requiredPermissions = setOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
 
     private lateinit var locationManager: LocationManager
     private lateinit var activity: Activity
@@ -66,15 +67,13 @@ object CentralLocationManager {
     }
 
     private fun checkPermission(): Boolean {
-        return checkPermission(ACCESS_FINE_LOCATION) && checkPermission(ACCESS_COARSE_LOCATION)
-    }
-
-    private fun checkPermission(permission: String): Boolean {
-        return ActivityCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED
+        return requiredPermissions.all {
+            ActivityCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     private fun requestPermissions() {
-        ActivityCompat.requestPermissions(activity, arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION), requestCode)
+        ActivityCompat.requestPermissions(activity, requiredPermissions.toTypedArray(), requestCode)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -87,19 +86,20 @@ object CentralLocationManager {
     private fun isLocationEnabled(): Boolean {
         return locationManager.isProviderEnabled(GPS_PROVIDER)
     }
+
+    private object CentralLocationListener : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            currentUserPosition.postValue(LatLng(location))
+        }
+
+        override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {}
+        override fun onProviderEnabled(s: String) {}
+
+        @RequiresApi(Build.VERSION_CODES.M)
+        override fun onProviderDisabled(s: String) {
+            checkLocationSetting()
+        }
+    }
 }
 
-private object CentralLocationListener : LocationListener {
 
-    override fun onLocationChanged(location: Location) {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(location))
-    }
-
-    override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {}
-    override fun onProviderEnabled(s: String) {}
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    override fun onProviderDisabled(s: String) {
-        CentralLocationManager.checkLocationSetting()
-    }
-}

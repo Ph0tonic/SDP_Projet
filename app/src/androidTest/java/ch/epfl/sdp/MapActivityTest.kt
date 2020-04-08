@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -13,6 +14,8 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiT
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.rule.GrantPermissionRule.*
+import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.junit.Before
@@ -40,7 +43,7 @@ class MapActivityTest {
 
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+    val grantPermissionRule: GrantPermissionRule = grant(permission.ACCESS_FINE_LOCATION, permission.ACCESS_FINE_LOCATION)
 
     @Before
     fun setUp() {
@@ -53,6 +56,7 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.mapView)).perform(click())
         Thread.sleep(1000)
+
         //click on the current marker once again to remove it
         onView(withId(R.id.mapView)).perform(click())
     }
@@ -82,9 +86,9 @@ class MapActivityTest {
     @Test
     fun mapboxUseOurPreferences() {
         preferencesEditor
-                .putString("latitude", LATITUDE_TEST)
-                .putString("longitude", LONGITUDE_TEST)
-                .putString("zoom", ZOOM_TEST)
+                .putString(applicationContext().getString(R.string.prefs_latitude), LATITUDE_TEST)
+                .putString(applicationContext().getString(R.string.prefs_longitude), LONGITUDE_TEST)
+                .putString(applicationContext().getString(R.string.prefs_zoom), ZOOM_TEST)
                 .apply()
 
         // Launch activity
