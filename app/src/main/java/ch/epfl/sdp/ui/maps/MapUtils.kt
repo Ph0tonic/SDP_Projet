@@ -1,11 +1,9 @@
 package ch.epfl.sdp.ui.maps
 
-import android.content.Context
-import android.content.res.Resources
 import android.graphics.Color
 import androidx.preference.PreferenceManager
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
-import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -13,8 +11,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
-import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
 object MapUtils {
 
@@ -26,7 +22,8 @@ object MapUtils {
     private val LIGHT_RED = Color.parseColor("#F9886C")
     private val ORANGE = Color.parseColor("#FBB03B")
 
-    private fun loadLastMapPositionFromPrefs(context: Context): LatLng {
+    private fun loadLastMapPositionFromPrefs(): LatLng {
+        val context = MainApplication.applicationContext()
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         val latitude: Double = defaultSharedPrefs
                 .getString(context.getString(R.string.prefs_latitude), null)
@@ -42,8 +39,9 @@ object MapUtils {
     /**
      * Saves the camera position and zoom to the shared preferences
      */
-    fun saveCameraPositionAndZoomToPrefs(context: Context, mapboxMap: MapboxMap?) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit()
+    fun saveCameraPositionAndZoomToPrefs(mapboxMap: MapboxMap?) {
+        val context = MainApplication.applicationContext()
+        PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext()).edit()
                 .putString(context.getString(R.string.prefs_latitude),
                         mapboxMap?.cameraPosition?.target?.latitude.toString())
                 .putString(context.getString(R.string.prefs_longitude),
@@ -53,9 +51,9 @@ object MapUtils {
                 .apply()
     }
 
-    private fun loadLastMapZoomFromPrefs(context: Context): Double {
-        return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(context.getString(R.string.prefs_zoom), null)
+    private fun loadLastMapZoomFromPrefs(): Double {
+        return PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
+                .getString(MainApplication.applicationContext().getString(R.string.prefs_zoom), null)
                 ?.toDoubleOrNull()
                 ?: DEFAULT_ZOOM
     }
@@ -63,10 +61,10 @@ object MapUtils {
     /**
      * Returns the last camera state stored in the preferences
      */
-    fun getLastCameraState(context: Context): CameraPosition{
+    fun getLastCameraState(): CameraPosition {
         return CameraPosition.Builder()
-                .target(loadLastMapPositionFromPrefs(context))
-                .zoom(loadLastMapZoomFromPrefs(context))
+                .target(loadLastMapPositionFromPrefs())
+                .zoom(loadLastMapZoomFromPrefs())
                 .build()
     }
 
@@ -76,8 +74,8 @@ object MapUtils {
      * @param latLng
      * @param zoom
      */
-    fun setupCameraWithParameters(mapboxMap: MapboxMap?, latLng: LatLng, zoom: Double) {
-        mapboxMap?.cameraPosition = CameraPosition.Builder()
+    fun getCameraWithParameters(latLng: LatLng, zoom: Double): CameraPosition {
+        return CameraPosition.Builder()
                 .target(latLng)
                 .zoom(zoom)
                 .build()
@@ -86,32 +84,31 @@ object MapUtils {
     /**
      * Creates and adds the layers necessary to display the heatmap information of the signal
      */
-    //TODO replace context with call to MainApplication.getContext()
-    fun createLayersForHeatMap(style: Style, context: Context) {
-        unclusteredLayerData(style, context)
-        clusteredLayerData(style, context)
+    fun createLayersForHeatMap(style: Style) {
+        unclusteredLayerData(style)
+        clusteredLayerData(style)
     }
 
-    private fun unclusteredLayerData(style: Style, context: Context) {
+    private fun unclusteredLayerData(style: Style) {
         val unclustered = CircleLayer("unclustered-points",
-                context.getString(R.string.heatmap_source_ID))
+                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         unclustered.setProperties(
                 PropertyFactory.circleColor(ORANGE),
                 PropertyFactory.circleRadius(20f),
                 PropertyFactory.circleBlur(1f))
         unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
-                context.getString(R.string.heatmap_source_ID))
+                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }
 
-    private fun clusteredLayerData(style: Style, context: Context) {
+    private fun clusteredLayerData(style: Style) {
         val layers = arrayOf(
                 intArrayOf(4, DARK_RED),
                 intArrayOf(2, LIGHT_RED),
                 intArrayOf(0, ORANGE))
         layers.indices.forEach { i ->
             val circles = CircleLayer("cluster-$i",
-                    context.getString(R.string.heatmap_source_ID))
+                    MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
             circles.setProperties(
                     PropertyFactory.circleColor(layers[i][1]),
                     PropertyFactory.circleRadius(60f),
@@ -126,7 +123,7 @@ object MapUtils {
                     )
             )
             style.addLayerBelow(circles,
-                    context.getString(R.string.heatmap_source_ID))
+                    MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         }
     }
 }

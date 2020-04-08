@@ -55,6 +55,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     lateinit var droneAltitudeTextView: TextView
     lateinit var droneSpeedTextView: TextView
 
+    lateinit var userLatitudeTextView: TextView
+    lateinit var userLongitudeTextView: TextView
+
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { updateVehiclePosition(it) }
     }
@@ -78,11 +81,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val PATH_THICKNESS: Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F
 
-        private val DECIMAL_FORMAT = DecimalFormat("0.0000000")
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
-
+        private const val COORDINATE_FORMAT = " %.7f"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,6 +107,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             clearWaypoints()
         }
 
+        userLatitudeTextView = findViewById(R.id.tv_latitude)
+        userLongitudeTextView = findViewById(R.id.tv_longitude)
+
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
 
         CentralLocationManager.configure(this)
@@ -126,7 +131,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
-        MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
+        MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -152,19 +157,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             addPointToHeatMap(8.544867, 47.397426)
             addPointToHeatMap(8.543067, 47.397026)
 
-
-            MapUtils.createLayersForHeatMap(style, this)
+            MapUtils.createLayersForHeatMap(style)
         }
 
         // Load latest location
-        mapboxMap.cameraPosition = MapUtils.getLastCameraState(this)
+        mapboxMap.cameraPosition = MapUtils.getLastCameraState()
 
         // Used to detect when the map is ready in tests
         mapView.contentDescription = MAP_READY_DESCRIPTION
-    }
-
-    private fun display(buttonId: Int, labelId: Int, value: Double) {
-        findViewById<TextView>(buttonId).text = (getString(labelId) + " " + DECIMAL_FORMAT.format(value))
     }
 
     private fun updateTextView(textView: TextView, value: Double, formatString: String) {
@@ -303,35 +303,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             userPositionMarker!!.latLng = userLatLng
             userCircleManager!!.update(userPositionMarker)
         }
-        display(R.id.tv_latitude, R.string.lat, userLatLng.latitude)
-        display(R.id.tv_longitude, R.string.lon, userLatLng.longitude)
+
+        updateTextView(userLatitudeTextView, userLatLng.latitude, getString(R.string.lat) + COORDINATE_FORMAT)
+        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lat) + COORDINATE_FORMAT)
+
         Drone.currentPositionLiveData.value?.let {
             val distToUser = it.distanceTo(userLatLng)
             updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
         }
     }
-
-//    /**
-//     * Update the [map] with the current mission plan waypoints.
-//     *
-//     * @param latLngs current mission waypoints
-//     */
-//    private fun updateMarkers(latLngs: List<LatLng>) {
-//        if (circleManager != null) {
-//            circleManager!!.delete(waypoints)
-//            waypoints.clear()
-//        }
-//        for (latLng in latLngs) {
-//            val circleOptions: CircleOptions = CircleOptions()
-//                    .withLatLng(latLng)
-//                    .withCircleColor(ColorUtils.colorToRgbaString(Color.BLUE))
-//                    .withCircleStrokeColor(ColorUtils.colorToRgbaString(Color.BLACK))
-//                    .withCircleStrokeWidth(1.0f)
-//                    .withCircleRadius(12f)
-//                    .withDraggable(false)
-//            circleManager?.create(circleOptions)
-//        }
-//    }
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {

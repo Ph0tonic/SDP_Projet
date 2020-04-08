@@ -7,8 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-import ch.epfl.sdp.ui.maps.MapUtils.getLastCameraState
-import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
+import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -63,7 +62,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             listButton = findViewById(R.id.list_button)
             listButton.setOnClickListener { downloadedRegionList() }
         }
-        mapboxMap.cameraPosition =  getLastCameraState(this)
+        mapboxMap.cameraPosition =  MapUtils.getLastCameraState()
     }
 
     private fun downloadRegionDialog() { // Set up download interaction. Display a dialog
@@ -191,7 +190,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     Toast.makeText(this@OfflineManagerActivity, items[regionSelected], Toast.LENGTH_LONG).show()
                     // Create new camera position
                     val definition = offlineRegions[regionSelected].definition
-                    setupCameraWithParameters(map, LatLng(definition.bounds.latitudeSpan, definition.bounds.longitudeSpan), definition.minZoom)
+                    map.cameraPosition = MapUtils.getCameraWithParameters(
+                            LatLng(definition.bounds.latitudeSpan, definition.bounds.longitudeSpan),
+                            definition.minZoom)
                 }
                 .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
                     // Make progressBar indeterminate and

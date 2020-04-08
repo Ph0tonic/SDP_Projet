@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import android.content.Context
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -27,7 +26,7 @@ import org.junit.runners.MethodSorters
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class OfflineManagerActivityTest {
 
-    companion object{
+    companion object {
         private const val ZOOM = 10.0
         private const val NAME = "Crans-Montana"
 
@@ -35,8 +34,8 @@ class OfflineManagerActivityTest {
         private const val OCEAN_LONGITUDE = -31.697953
         private const val TIMEOUT: Long = 2000
     }
-    private lateinit var mUiDevice: UiDevice
 
+    private lateinit var mUiDevice: UiDevice
 
 
     @Before
@@ -45,7 +44,7 @@ class OfflineManagerActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                MapUtils.setupCameraWithParameters(mapboxMap, LatLng(OCEAN_LATITUDE, OCEAN_LONGITUDE), ZOOM)
+                mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(LatLng(OCEAN_LATITUDE, OCEAN_LONGITUDE), ZOOM)
             }
         }
     }
@@ -53,18 +52,13 @@ class OfflineManagerActivityTest {
     @get:Rule
     var mActivityRule = IntentsTestRule(OfflineManagerActivity::class.java)
 
-    private fun getContext(): Context {
-        return InstrumentationRegistry.getInstrumentation().targetContext
-    }
-
     @Test
     fun canOpenDownloadDialog() {
         mUiDevice.wait(Until.hasObject(By.desc("DOWNLOAD").clickable(true)), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
         mUiDevice.wait(Until.hasObject(By.desc("Enter")), TIMEOUT)
-        onView(withId(R.id.dialog_textfield_id))
-                .check(matches(isDisplayed()))
+        onView(withId(R.id.dialog_textfield_id)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -73,8 +67,7 @@ class OfflineManagerActivityTest {
         onView(withId(R.id.list_button)).perform(click())
 
         mUiDevice.wait(Until.hasObject(By.desc("List")), TIMEOUT)
-        onView(withText(R.string.navigate_title))
-                .check(matches(isDisplayed()))
+        onView(withText(R.string.navigate_title)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -118,29 +111,6 @@ class OfflineManagerActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc("DELETE")), TIMEOUT)
         onView(withText(R.string.navigate_neutral_button_title)).perform(click())
     }
-
-    /*
-    @Test
-    fun canDeleteMap(){
-
-        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), timeout)
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-
-        mUiDevice?.wait(Until.hasObject(By.desc("Enter")), timeout)
-        onView(withId(R.id.dialog_textfield_id)).perform(typeText(name))
-
-        mUiDevice?.pressBack()
-
-        mUiDevice?.wait(Until.hasObject(By.desc("DOWNLOAD").clickable(true)), timeout)
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-
-        mUiDevice?.wait(Until.hasObject(By.desc("List").clickable(true)),  timeout * 300)
-        onView(withId(R.id.list_button)).perform(click())
-
-        mUiDevice?.wait(Until.hasObject(By.desc("DELETE").clickable(true)), timeout)
-        onView(withText(R.string.navigate_neutral_button_title)).perform(click())
-    }
-     */
 
     @Test
     fun canNavigateTo() {
