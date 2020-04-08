@@ -1,12 +1,12 @@
 package ch.epfl.sdp.drone
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
 import io.reactivex.disposables.Disposable
 import kotlin.math.pow
 import kotlin.math.sqrt
+import timber.log.Timber
 
 object Drone {
     //must be IP address where the mavsdk_server is running
@@ -20,7 +20,6 @@ object Drone {
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
     val currentBatteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> =  MutableLiveData()
-    val currentRelativeAltitudeLiveData: MutableLiveData<Float> =  MutableLiveData()
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
 
     var overflightStrategy: OverflightStrategy
@@ -31,14 +30,13 @@ object Drone {
         instance = System(BACKEND_IP_ADDRESS, BACKEND_PORT)
 
         disposables.add(instance.telemetry.flightMode.distinct()
-                .subscribe { flightMode -> Log.d("DRONE", "flight mode: $flightMode") })
+                .subscribe { flightMode -> Timber.d("flight mode: $flightMode") })
         disposables.add(instance.telemetry.armed.distinct()
-                .subscribe { armed -> Log.d("DRONE", "armed: $armed") })
+                .subscribe { armed -> Timber.d("armed: $armed") })
         disposables.add(instance.telemetry.position.subscribe { position ->
             val latLng = LatLng(position.latitudeDeg, position.longitudeDeg)
             currentPositionLiveData.postValue(latLng)
             currentAbsoluteAltitudeLiveData.postValue(position.absoluteAltitudeM)
-            currentRelativeAltitudeLiveData.postValue(position.relativeAltitudeM)
         })
         disposables.add(instance.telemetry.battery.subscribe { battery ->
             currentBatteryLevelLiveData.postValue(battery.remainingPercent)

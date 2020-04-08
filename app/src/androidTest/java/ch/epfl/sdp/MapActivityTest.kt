@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -13,14 +14,14 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiT
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
-import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
-import org.hamcrest.core.IsNot
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,7 +50,7 @@ class MapActivityTest {
 
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+    val grantPermissionRule: GrantPermissionRule = grant(permission.ACCESS_FINE_LOCATION, permission.ACCESS_FINE_LOCATION)
 
     @Before
     @Throws(Exception::class)
@@ -82,9 +83,9 @@ class MapActivityTest {
     @Test
     fun mapboxUsesOurPreferences() {
         preferencesEditor
-                .putString("latitude", LATITUDE_TEST.toString())
-                .putString("longitude", LONGITUDE_TEST.toString())
-                .putString("zoom", ZOOM_TEST.toString())
+                .putString(applicationContext().getString(R.string.prefs_latitude), LATITUDE_TEST.toString())
+                .putString(applicationContext().getString(R.string.prefs_longitude), LONGITUDE_TEST.toString())
+                .putString(applicationContext().getString(R.string.prefs_zoom), ZOOM_TEST.toString())
                 .apply()
 
         // Launch activity after setting preferences

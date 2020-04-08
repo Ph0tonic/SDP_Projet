@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/nav_group_main"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
             android:icon="@android:drawable/ic_menu_camera"
@@ -12,5 +15,14 @@
             android:id="@+id/nav_maps_managing"
             android:icon="@android:drawable/ic_dialog_map"
             android:title="@string/menu_maps_managing" />
+    </group>
+
+    <group
+        android:id="@+id/nav_group_logout"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_signout_button"
+            android:icon="@drawable/ic_exit_to_app_white_24dp"
+            android:title="@string/auth_signout"/>
     </group>
 </menu>
