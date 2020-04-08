@@ -19,15 +19,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.expressions.Expression
-import com.mapbox.mapboxsdk.style.expressions.Expression.*
-import com.mapbox.mapboxsdk.style.layers.CircleLayer
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
-import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
 import java.text.DecimalFormat
-import ch.epfl.sdp.R
 
 /**
  * Main Activity to display map and create missions.
@@ -71,9 +65,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val REGION_FILL_OPACITY: Float = 0.5F
 
         private val DECIMAL_FORMAT = DecimalFormat("0.0000000")
-        private val DARK_RED = Color.parseColor("#E55E5E")
-        private val LIGHT_RED = Color.parseColor("#F9886C")
-        private val ORANGE = Color.parseColor("#FBB03B")
+        private const val DISTANCE_FORMAT = " %.1f m"
+        private const val PERCENTAGE_FORMAT = " %.0f%%"
+        private const val SPEED_FORMAT = " %.1f m/s"
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,7 +129,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            createLayersForHeatMap(style)
+            MapUtils.createLayersForHeatMap(style, featureCollection!!)
 
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
             addPointToHeatMap(8.543434, 47.398979)
@@ -144,7 +139,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
 
         // Load latest location
-        MapUtils.setupCameraAsLastTimeUsed(this, mapboxMap)
+        mapboxMap.cameraPosition = MapUtils.getLastCameraState(this)
 
         // Used to detect when the map is ready in tests
         mapView.contentDescription = MAP_READY_DESCRIPTION
@@ -167,14 +162,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Draws the path given by the list of positions
+     */
     private fun drawPath(path: List<LatLng>) {
         lineManager?.create(LineOptions()
                 .withLatLngs(path)
                 .withLineWidth(PATH_THICKNESS))
     }
 
+    /**
+     * Fills the regions described by the list of positions
+     */
     private fun drawRegion(corners: List<LatLng>) {
-        // Draw the fill
         val fillOption = FillOptions()
                 .withLatLngs(listOf(waypoints))
                 .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
@@ -183,6 +183,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         fillManager?.create(fillOption)
 
         //Draw the borders
+
         // Make it loop
         val linePoints = arrayListOf<LatLng>().apply {
             addAll(corners)
@@ -195,6 +196,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         lineManager?.create(lineOptions)
     }
 
+    /**
+     * Draws a pinpoint on the map at the given position
+     */
     private fun drawPinpoint(pinpoints: LatLng) {
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
@@ -202,6 +206,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         waypointCircleManager?.create(circleOptions)
     }
 
+    /**
+     * Clears the waypoints list and removes all the lines and points related to waypoints
+     */
     private fun clearWaypoints() {
         waypoints.clear()
         waypointCircleManager?.deleteAll()
@@ -209,56 +216,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         fillManager?.deleteAll()
     }
 
-    private fun createLayersForHeatMap(style: Style) {
-        createSourceData(style)
-        unclusteredLayerData(style)
-        clusteredLayerData(style)
-    }
-
+    /**
+     * Adds a heat point to the heatmap
+     */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
         features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
         featureCollection = FeatureCollection.fromFeatures(features)
         geoJsonSource!!.setGeoJson(featureCollection)
-    }
-
-    private fun createSourceData(style: Style) {
-        geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
-        geoJsonSource!!.setGeoJson(featureCollection)
-        style.addSource(geoJsonSource!!)
-    }
-
-    private fun unclusteredLayerData(style: Style) {
-        val unclustered = CircleLayer("unclustered-points", getString(R.string.heatmap_source_ID))
-        unclustered.setProperties(
-                circleColor(ORANGE),
-                circleRadius(20f),
-                circleBlur(1f))
-        unclustered.setFilter(neq(get("cluster"), literal(true)))
-        style.addLayerBelow(unclustered, getString(R.string.below_layer_id))
-    }
-
-    private fun clusteredLayerData(style: Style) {
-        val layers = arrayOf(
-                intArrayOf(4, DARK_RED),
-                intArrayOf(2, LIGHT_RED),
-                intArrayOf(0, ORANGE))
-        layers.indices.forEach { i ->
-            val circles = CircleLayer("cluster-$i", getString(R.string.heatmap_source_ID))
-            circles.setProperties(
-                    circleColor(layers[i][1]),
-                    circleRadius(60f),
-                    circleBlur(1f)
-            )
-            val pointCount: Expression = toNumber(get("point_count"))
-            circles.setFilter(
-                    if (i == 0) gte(pointCount, literal(layers[i][0]))
-                    else all(
-                            gte(pointCount, literal(layers[i][0])),
-                            lt(pointCount, literal(layers[i - 1][0]))
-                    )
-            )
-            style.addLayerBelow(circles, getString(R.string.below_layer_id))
-        }
     }
 
     /**
@@ -292,6 +256,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Updates the user position if the drawing managers are ready
+     */
     private fun updateUserPosition(userLatLng: LatLng) {
         if (userCircleManager == null) {
             // Not ready
@@ -311,23 +278,23 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         display(R.id.tv_longitude, R.string.lon, userLatLng.longitude)
         Drone.currentPositionLiveData.value?.let {
             val distToUser = it.distanceTo(userLatLng)
-            findViewById<TextView>(R.id.distance_to_user).text = " %.1f m".format(distToUser)
+            findViewById<TextView>(R.id.distance_to_user).text = DISTANCE_FORMAT.format(distToUser)
         }
     }
 
     private fun updateDroneBatteryLevel(newBatteryLevel: Float){
         //TODO Maybe store the view instead of searching it again each time
-        findViewById<TextView>(R.id.battery_level).text = " %.0f%%".format(newBatteryLevel*100)
+        findViewById<TextView>(R.id.battery_level).text = PERCENTAGE_FORMAT.format(newBatteryLevel*100)
     }
 
     private fun updateDroneAltitude(newAltitude: Float){
         //TODO Maybe store the view instead of searching it again each time
-        findViewById<TextView>(R.id.altitude).text = " %.1f m".format(newAltitude)
+        findViewById<TextView>(R.id.altitude).text = DISTANCE_FORMAT.format(newAltitude)
     }
 
     private fun updateDroneSpeed(newSpeed: Float){
         //TODO Maybe store the view instead of searching it again each time
-        findViewById<TextView>(R.id.speed).text = " %.1f m/s".format(newSpeed)
+        findViewById<TextView>(R.id.speed).text = SPEED_FORMAT.format(newSpeed)
     }
 
 //    /**

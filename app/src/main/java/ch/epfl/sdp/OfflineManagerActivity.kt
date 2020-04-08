@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-import ch.epfl.sdp.ui.maps.MapUtils.setupCameraAsLastTimeUsed
+import ch.epfl.sdp.ui.maps.MapUtils.getLastCameraState
 import ch.epfl.sdp.ui.maps.MapUtils.setupCameraWithParameters
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -63,7 +63,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             listButton = findViewById(R.id.list_button)
             listButton.setOnClickListener { downloadedRegionList() }
         }
-        setupCameraAsLastTimeUsed(this, mapboxMap)
+        mapboxMap.cameraPosition =  getLastCameraState(this)
     }
 
     private fun downloadRegionDialog() { // Set up download interaction. Display a dialog
