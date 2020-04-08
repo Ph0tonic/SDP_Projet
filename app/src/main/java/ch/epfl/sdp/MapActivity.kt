@@ -50,12 +50,30 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var features = ArrayList<Feature>()
     private var geoJsonSource: GeoJsonSource? = null
 
-    private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateVehiclePosition(it) } }
-    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? -> newLatLng?.let { updateUserPosition(it) } }
-    private var droneBatteryObserver = Observer<Float> {newBatteryLevel: Float? -> newBatteryLevel?.let { updateDroneBatteryLevel(it) }}
-    private var droneAltitudeObserver = Observer<Float> {newAltitude: Float? -> newAltitude?.let { updateDroneAltitude(it) }}
-    private var droneSpeedObserver = Observer<Float> {newSpeed: Float? -> newSpeed?.let { updateDroneSpeed(it) }}
-    //private var missionPlanObserver = Observer { latLngs: List<LatLng> -> updateMarkers(latLngs) }
+    lateinit var distanceToUserTextView: TextView
+    lateinit var droneBatteryLevelTextView: TextView
+    lateinit var droneAltitudeTextView: TextView
+    lateinit var droneSpeedTextView: TextView
+
+    private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
+        newLatLng?.let { updateVehiclePosition(it) } }
+    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
+        newLatLng?.let { updateUserPosition(it) } }
+    private var droneBatteryObserver = Observer<Float> {newBatteryLevel: Float? ->
+        newBatteryLevel?.let {
+            updateTextView(droneBatteryLevelTextView, it.toDouble(), PERCENTAGE_FORMAT)
+        }
+    }
+    private var droneAltitudeObserver = Observer<Float> {newAltitude: Float? ->
+        newAltitude?.let {
+            updateTextView(droneAltitudeTextView, it.toDouble(), DISTANCE_FORMAT)
+        }
+    }
+    private var droneSpeedObserver = Observer<Float> {newSpeed: Float? ->
+        newSpeed?.let {
+            updateTextView(droneSpeedTextView, it.toDouble(), SPEED_FORMAT)
+        }
+    }
 
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
@@ -73,6 +91,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        droneBatteryLevelTextView = findViewById(R.id.battery_level)
+        droneAltitudeTextView = findViewById(R.id.altitude)
+
+        distanceToUserTextView = findViewById(R.id.distance_to_user)
+        droneSpeedTextView = findViewById(R.id.speed)
+
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
@@ -147,6 +172,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun display(buttonId: Int, labelId: Int, value: Double) {
         findViewById<TextView>(buttonId).text = (getString(labelId) + " " + DECIMAL_FORMAT.format(value))
+    }
+
+    private fun updateTextView(textView: TextView, value: Double,formatString: String){
+        textView.text = formatString.format(value)
     }
 
     /** Trajectory Planning **/
@@ -282,17 +311,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun updateDroneBatteryLevel(newBatteryLevel: Float){
+    private fun updateDroneBatteryLevel(newBatteryLevel: Double){
         //TODO Maybe store the view instead of searching it again each time
         findViewById<TextView>(R.id.battery_level).text = PERCENTAGE_FORMAT.format(newBatteryLevel*100)
     }
 
-    private fun updateDroneAltitude(newAltitude: Float){
+    private fun updateDroneAltitude(newAltitude: Double){
+        updateTextView(droneAltitudeTextView, newAltitude, DISTANCE_FORMAT)
         //TODO Maybe store the view instead of searching it again each time
         findViewById<TextView>(R.id.altitude).text = DISTANCE_FORMAT.format(newAltitude)
     }
 
-    private fun updateDroneSpeed(newSpeed: Float){
+    private fun updateDroneSpeed(newSpeed: Double){
         //TODO Maybe store the view instead of searching it again each time
         findViewById<TextView>(R.id.speed).text = SPEED_FORMAT.format(newSpeed)
     }
