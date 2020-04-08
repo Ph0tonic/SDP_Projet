@@ -91,6 +91,8 @@ class MapActivityTest {
         // Launch activity after setting preferences
         mActivityRule.launchActivity(Intent())
 
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
+
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
                 assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(LATITUDE_TEST, EPSILON))

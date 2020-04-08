@@ -32,9 +32,8 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
-    fun isMapboxMapInitialized() = ::mapboxMap.isInitialized
 
-    private var isMapReady = false
+    private var isStyleReady = false
 
     private lateinit var waypointCircleManager: CircleManager
     private lateinit var droneCircleManager: CircleManager
@@ -112,7 +111,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         userLongitudeTextView = findViewById(R.id.tv_longitude)
 
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
-        isMapReady = true
 
         CentralLocationManager.configure(this)
     }
@@ -160,13 +158,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             addPointToHeatMap(8.543067, 47.397026)
 
             MapUtils.createLayersForHeatMap(style)
+
+            // Load latest location
+            mapboxMap.cameraPosition = MapUtils.getLastCameraState()
+
+            // Used to detect when the map is ready in tests
+            mapView.contentDescription = MAP_READY_DESCRIPTION
+
+            isStyleReady = true
         }
-
-        // Load latest location
-        mapboxMap.cameraPosition = MapUtils.getLastCameraState()
-
-        // Used to detect when the map is ready in tests
-        mapView.contentDescription = MAP_READY_DESCRIPTION
     }
 
     private fun updateTextView(textView: TextView, value: Double, formatString: String) {
@@ -190,7 +190,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Draws the path given by the list of positions
      */
     private fun drawPath(path: List<LatLng>) {
-        if(!isMapReady) return
+        if(!isStyleReady) return
 
         lineManager?.create(LineOptions()
                 .withLatLngs(path)
@@ -201,7 +201,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Fills the regions described by the list of positions
      */
     private fun drawRegion(corners: List<LatLng>) {
-        if(!isMapReady) return
+        if(!isStyleReady) return
 
         val fillOption = FillOptions()
                 .withLatLngs(listOf(waypoints))
@@ -228,7 +228,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Draws a pinpoint on the map at the given position
      */
     private fun drawPinpoint(pinpoints: LatLng) {
-        if(!isMapReady) return
+        if(!isStyleReady) return
 
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
@@ -240,8 +240,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Clears the waypoints list and removes all the lines and points related to waypoints
      */
     private fun clearWaypoints() {
-        if(!isMapReady) return
-        
+        if(!isStyleReady) return
+
         waypoints.clear()
         waypointCircleManager?.deleteAll()
         lineManager?.deleteAll()
@@ -270,7 +270,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateVehiclePosition(newLatLng: LatLng) {
-        if(!isMapReady) return
+        if(!isStyleReady) return
 
         // Add a vehicle marker and move the camera
         if (dronePositionMarker == null) {
@@ -296,16 +296,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Updates the user position if the drawing managers are ready
      */
     private fun updateUserPosition(userLatLng: LatLng) {
-        if(!isMapReady) return
+        if(!isStyleReady) return
 
         // Add a vehicle marker and move the camera
         if (userPositionMarker == null) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(userLatLng)
-            userPositionMarker = userCircleManager!!.create(circleOptions)
+            userPositionMarker = userCircleManager.create(circleOptions)
         } else {
             userPositionMarker!!.latLng = userLatLng
-            userCircleManager!!.update(userPositionMarker)
+            userCircleManager.update(userPositionMarker)
         }
 
         updateTextView(userLatitudeTextView, userLatLng.latitude, getString(R.string.lat) + COORDINATE_FORMAT)
