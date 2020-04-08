@@ -81,7 +81,7 @@ class LoginNavFragmentTest {
         }
 
         openDrawer()
-        mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signin))), TIMEOUT)
+        //mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signin))), TIMEOUT)
         onView(withId(R.id.nav_signin_button)).check(matches(isClickable())).perform(click())
 
         val mGoogleSignInClient = GoogleSignIn.getClient(MainApplication.applicationContext(), getGSO())
@@ -103,7 +103,7 @@ class LoginNavFragmentTest {
             Auth.profileImageURL.postValue(FAKE_PROFILE_IMAGE_URL)
             Auth.loggedIn.postValue(true)
         }
-        mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signout))), TIMEOUT)
+        //mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signout))), TIMEOUT)
 
         onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
@@ -116,7 +116,7 @@ class LoginNavFragmentTest {
         }
 
         openDrawer()
-        mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signin))), TIMEOUT)
+        //mUiDevice.wait(Until.hasObject(By.text(getContext().getString(R.string.auth_signin))), TIMEOUT)
         onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
 
         mUiDevice.pressBack()

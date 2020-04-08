@@ -30,7 +30,6 @@ class LoginNavFragment : Fragment() {
         view.findViewById<TextView>(R.id.nav_signin_button).setOnClickListener {
             Auth.login(this)
         }
-
         setOf(Auth.email, Auth.name).zip(setOf(R.id.nav_user_email, R.id.nav_username))
                 .forEach {
                     it.first.observe(viewLifecycleOwner, Observer { value ->
@@ -44,6 +43,7 @@ class LoginNavFragment : Fragment() {
         })
 
         val visibility: (Boolean) -> Int = { visible -> if (visible) View.VISIBLE else View.GONE }
+
         Auth.loggedIn.observe(viewLifecycleOwner, Observer { loggedIn ->
             setOf(R.id.nav_username, R.id.nav_user_email)
                     .forEach { view.findViewById<TextView>(it).visibility = visibility(loggedIn) }

@@ -14,6 +14,7 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiT
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.rule.GrantPermissionRule.*
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -42,8 +43,7 @@ class MapActivityTest {
 
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule
-            .grant(permission.ACCESS_FINE_LOCATION, permission.ACCESS_FINE_LOCATION)
+    val grantPermissionRule: GrantPermissionRule = grant(permission.ACCESS_FINE_LOCATION, permission.ACCESS_FINE_LOCATION)
 
     @Before
     fun setUp() {

@@ -33,7 +33,7 @@ class MainActivityTest {
 
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule? = grant(ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION)
+    val grantPermissionRule: GrantPermissionRule = grant(ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION)
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MainActivity::class.java)
