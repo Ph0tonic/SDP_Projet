@@ -222,13 +222,15 @@ class MapActivityTest {
     @Test
     fun updateDronePositionChangesDistToUser(){
         mActivityRule.launchActivity(Intent())
-
-        CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
-
-        Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
+        runOnUiThread {
+            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
+        }
         onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
 
-        Drone.currentPositionLiveData.postValue(LatLng(1.0,0.0))
+        runOnUiThread {
+            Drone.currentPositionLiveData.postValue(LatLng(1.0,0.0))
+        }
         onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
     }
 

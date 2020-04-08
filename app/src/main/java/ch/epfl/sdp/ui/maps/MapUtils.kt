@@ -86,40 +86,32 @@ object MapUtils {
     /**
      * Creates and adds the layers necessary to display the heatmap information of the signal
      */
-    fun createLayersForHeatMap(style: Style, featureCollection: FeatureCollection) {
-        createSourceData(style, featureCollection)
-        unclusteredLayerData(style)
-        clusteredLayerData(style)
+    //TODO replace context with call to MainApplication.getContext()
+    fun createLayersForHeatMap(style: Style, context: Context) {
+        unclusteredLayerData(style, context)
+        clusteredLayerData(style, context)
     }
 
-    private fun createSourceData(style: Style, featureCollection: FeatureCollection) {
-        val geoJsonSource = GeoJsonSource(
-                Resources.getSystem().getString(R.string.heatmap_source_ID),
-                GeoJsonOptions().withCluster(true))
-        geoJsonSource.setGeoJson(featureCollection)
-        style.addSource(geoJsonSource)
-    }
-
-    private fun unclusteredLayerData(style: Style) {
+    private fun unclusteredLayerData(style: Style, context: Context) {
         val unclustered = CircleLayer("unclustered-points",
-                Resources.getSystem().getString(R.string.heatmap_source_ID))
+                context.getString(R.string.heatmap_source_ID))
         unclustered.setProperties(
                 PropertyFactory.circleColor(ORANGE),
                 PropertyFactory.circleRadius(20f),
                 PropertyFactory.circleBlur(1f))
         unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
-                Resources.getSystem().getString(R.string.heatmap_source_ID))
+                context.getString(R.string.heatmap_source_ID))
     }
 
-    private fun clusteredLayerData(style: Style) {
+    private fun clusteredLayerData(style: Style, context: Context) {
         val layers = arrayOf(
                 intArrayOf(4, DARK_RED),
                 intArrayOf(2, LIGHT_RED),
                 intArrayOf(0, ORANGE))
         layers.indices.forEach { i ->
             val circles = CircleLayer("cluster-$i",
-                    Resources.getSystem().getString(R.string.heatmap_source_ID))
+                    context.getString(R.string.heatmap_source_ID))
             circles.setProperties(
                     PropertyFactory.circleColor(layers[i][1]),
                     PropertyFactory.circleRadius(60f),
@@ -134,7 +126,7 @@ object MapUtils {
                     )
             )
             style.addLayerBelow(circles,
-                    Resources.getSystem().getString(R.string.heatmap_source_ID))
+                    context.getString(R.string.heatmap_source_ID))
         }
     }
 }

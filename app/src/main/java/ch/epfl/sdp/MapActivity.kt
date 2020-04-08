@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
@@ -19,6 +20,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
 import java.text.DecimalFormat
@@ -46,7 +48,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     var waypoints = arrayListOf<LatLng>()
 
-    private var featureCollection: FeatureCollection? = null
     private var features = ArrayList<Feature>()
     private var geoJsonSource: GeoJsonSource? = null
 
@@ -61,7 +62,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newLatLng?.let { updateUserPosition(it) } }
     private var droneBatteryObserver = Observer<Float> {newBatteryLevel: Float? ->
         newBatteryLevel?.let {
-            updateTextView(droneBatteryLevelTextView, it.toDouble(), PERCENTAGE_FORMAT)
+            updateTextView(droneBatteryLevelTextView, (it*100).toDouble(), PERCENTAGE_FORMAT)
         }
     }
     private var droneAltitudeObserver = Observer<Float> {newAltitude: Float? ->
@@ -91,24 +92,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
+        mapView.getMapAsync(this)
 
         droneBatteryLevelTextView = findViewById(R.id.battery_level)
         droneAltitudeTextView = findViewById(R.id.altitude)
-
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
-
-        super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
-        mapView.getMapAsync(this)
 
         findViewById<Button>(R.id.start_mission_button).setOnClickListener {
             DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
         }
-
         findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
-
         findViewById<Button>(R.id.clear_waypoints).setOnClickListener {
             clearWaypoints()
         }
@@ -125,7 +122,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
-        // viewModel.missionPlanLiveData.observe(this, currentMissionPlanObserver)
     }
 
     override fun onPause() {
@@ -135,7 +131,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
-        // Mission.missionPlanLiveData.removeObserver(currentMissionPlanObserver)
         MapUtils.saveCameraPositionAndZoomToPrefs(this, mapboxMap)
     }
 
@@ -154,13 +149,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            MapUtils.createLayersForHeatMap(style, featureCollection!!)
+            createSourceData(style)
 
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
             addPointToHeatMap(8.543434, 47.398979)
             addPointToHeatMap(8.543934, 47.398279)
             addPointToHeatMap(8.544867, 47.397426)
             addPointToHeatMap(8.543067, 47.397026)
+
+
+            MapUtils.createLayersForHeatMap(style, this)
         }
 
         // Load latest location
@@ -250,8 +248,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
         features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
-        featureCollection = FeatureCollection.fromFeatures(features)
-        geoJsonSource!!.setGeoJson(featureCollection)
+        geoJsonSource!!.setGeoJson(FeatureCollection.fromFeatures(features))
+    }
+
+    private fun createSourceData(style: Style) {
+        geoJsonSource = GeoJsonSource(
+                getString(R.string.heatmap_source_ID),
+                GeoJsonOptions().withCluster(true))
+        geoJsonSource!!.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
+        style.addSource(geoJsonSource!!)
     }
 
     /**
