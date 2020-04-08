@@ -22,7 +22,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import java.text.DecimalFormat
 
 /**
  * Main Activity to display map and create missions.
@@ -35,15 +34,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
     fun isMapboxMapInitialized() = ::mapboxMap.isInitialized
 
-    private var waypointCircleManager: CircleManager? = null
-    private var droneCircleManager: CircleManager? = null
-    private var userCircleManager: CircleManager? = null
+    private var isMapReady = false
+
+    private lateinit var waypointCircleManager: CircleManager
+    private lateinit var droneCircleManager: CircleManager
+    private lateinit var userCircleManager: CircleManager
+
+    private lateinit var lineManager: LineManager
+    private lateinit var fillManager: FillManager
 
     private var dronePositionMarker: Circle? = null
     private var userPositionMarker: Circle? = null
-
-    private var lineManager: LineManager? = null
-    private var fillManager: FillManager? = null
 
     var waypoints = arrayListOf<LatLng>()
 
@@ -111,6 +112,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         userLongitudeTextView = findViewById(R.id.tv_longitude)
 
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
+        isMapReady = true
 
         CentralLocationManager.configure(this)
     }
@@ -188,6 +190,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Draws the path given by the list of positions
      */
     private fun drawPath(path: List<LatLng>) {
+        if(!isMapReady) return
+
         lineManager?.create(LineOptions()
                 .withLatLngs(path)
                 .withLineWidth(PATH_THICKNESS))
@@ -197,6 +201,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Fills the regions described by the list of positions
      */
     private fun drawRegion(corners: List<LatLng>) {
+        if(!isMapReady) return
+
         val fillOption = FillOptions()
                 .withLatLngs(listOf(waypoints))
                 .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
@@ -222,16 +228,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Draws a pinpoint on the map at the given position
      */
     private fun drawPinpoint(pinpoints: LatLng) {
+        if(!isMapReady) return
+
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
                 .withDraggable(true)
-        waypointCircleManager?.create(circleOptions)
+        waypointCircleManager.create(circleOptions)
     }
 
     /**
      * Clears the waypoints list and removes all the lines and points related to waypoints
      */
     private fun clearWaypoints() {
+        if(!isMapReady) return
+        
         waypoints.clear()
         waypointCircleManager?.deleteAll()
         lineManager?.deleteAll()
@@ -260,23 +270,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateVehiclePosition(newLatLng: LatLng) {
-        if (droneCircleManager == null) {
-            // Not ready
-            return
-        }
+        if(!isMapReady) return
 
         // Add a vehicle marker and move the camera
         if (dronePositionMarker == null) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(newLatLng)
             circleOptions.withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
-            dronePositionMarker = droneCircleManager!!.create(circleOptions)
+            dronePositionMarker = droneCircleManager.create(circleOptions)
 
             mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
             dronePositionMarker!!.latLng = newLatLng
-            droneCircleManager!!.update(dronePositionMarker)
+            droneCircleManager.update(dronePositionMarker)
         }
 
         CentralLocationManager.currentUserPosition.value?.let {
@@ -289,10 +296,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Updates the user position if the drawing managers are ready
      */
     private fun updateUserPosition(userLatLng: LatLng) {
-        if (userCircleManager == null) {
-            // Not ready
-            return
-        }
+        if(!isMapReady) return
 
         // Add a vehicle marker and move the camera
         if (userPositionMarker == null) {
