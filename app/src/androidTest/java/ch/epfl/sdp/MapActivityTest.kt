@@ -169,17 +169,25 @@ class MapActivityTest {
     fun updateDroneBatteryChangesDroneStatus(){
         mActivityRule.launchActivity(Intent())
 
-        Drone.currentBatteryLevelLiveData.postValue(null)
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(null)
+        }
 
         onView(withId(R.id.battery_level)).check(matches(withText(R.string.no_info)))
 
-        Drone.currentBatteryLevelLiveData.postValue(1F)
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(1F)
+        }
         onView(withId(R.id.battery_level)).check(matches(withText(" 100%")))
 
-        Drone.currentBatteryLevelLiveData.postValue(0F)
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(0F)
+        }
         onView(withId(R.id.battery_level)).check(matches(withText(" 0%")))
 
-        Drone.currentBatteryLevelLiveData.postValue(0.5F)
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(0.5F)
+        }
         onView(withId(R.id.battery_level)).check(matches(withText(" 50%")))
     }
 
@@ -187,17 +195,25 @@ class MapActivityTest {
     fun updateDroneAltitudeChangesDroneStatus(){
         mActivityRule.launchActivity(Intent())
 
-        Drone.currentAbsoluteAltitudeLiveData.postValue(null)
+        runOnUiThread {
+            Drone.currentAbsoluteAltitudeLiveData.postValue(null)
+        }
 
         onView(withId(R.id.altitude)).check(matches(withText(R.string.no_info)))
 
-        Drone.currentAbsoluteAltitudeLiveData.postValue(0F)
+        runOnUiThread {
+            Drone.currentAbsoluteAltitudeLiveData.postValue(0F)
+        }
         onView(withId(R.id.altitude)).check(matches(withText(" 0.0 m")))
 
-        Drone.currentAbsoluteAltitudeLiveData.postValue(1.123F)
+        runOnUiThread {
+            Drone.currentAbsoluteAltitudeLiveData.postValue(1.123F)
+        }
         onView(withId(R.id.altitude)).check(matches(withText(" 1.1 m")))
 
-        Drone.currentAbsoluteAltitudeLiveData.postValue(10F)
+        runOnUiThread {
+            Drone.currentAbsoluteAltitudeLiveData.postValue(10F)
+        }
         onView(withId(R.id.altitude)).check(matches(withText(" 10.0 m")))
     }
 
@@ -205,17 +221,25 @@ class MapActivityTest {
     fun updateDroneSpeedChangesDroneStatus(){
         mActivityRule.launchActivity(Intent())
 
-        Drone.currentSpeedLiveData.postValue(null)
+        runOnUiThread{
+            Drone.currentSpeedLiveData.postValue(null)
+        }
 
         onView(withId(R.id.speed)).check(matches(withText(R.string.no_info)))
 
-        Drone.currentSpeedLiveData.postValue(0F)
+        runOnUiThread{
+            Drone.currentSpeedLiveData.postValue(0F)
+        }
         onView(withId(R.id.speed)).check(matches(withText(" 0.0 m/s")))
 
-        Drone.currentSpeedLiveData.postValue(1.123F)
+        runOnUiThread {
+            Drone.currentSpeedLiveData.postValue(1.123F)
+        }
         onView(withId(R.id.speed)).check(matches(withText(" 1.1 m/s")))
 
-        Drone.currentSpeedLiveData.postValue(5.2F)
+        runOnUiThread {
+            Drone.currentSpeedLiveData.postValue(5.2F)
+        }
         onView(withId(R.id.speed)).check(matches(withText(" 5.2 m/s")))
     }
 
@@ -237,13 +261,15 @@ class MapActivityTest {
     @Test
     fun updateUserPositionChangesDistToUser(){
         mActivityRule.launchActivity(Intent())
-
-        Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
-
-        CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
+        runOnUiThread {
+            Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
+            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
+        }
         onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
 
-        CentralLocationManager.currentUserPosition.postValue(LatLng(1.0,0.0))
+        runOnUiThread {
+            CentralLocationManager.currentUserPosition.postValue(LatLng(1.0,0.0))
+        }
         onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
     }
 }
