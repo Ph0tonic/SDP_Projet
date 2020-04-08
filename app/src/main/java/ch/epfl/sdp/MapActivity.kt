@@ -281,7 +281,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         CentralLocationManager.currentUserPosition.value?.let {
             val distToUser = it.distanceTo(newLatLng)
-            findViewById<TextView>(R.id.distance_to_user).text = " %.1f m".format(distToUser)
+            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
         }
     }
 
@@ -307,24 +307,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         display(R.id.tv_longitude, R.string.lon, userLatLng.longitude)
         Drone.currentPositionLiveData.value?.let {
             val distToUser = it.distanceTo(userLatLng)
-            findViewById<TextView>(R.id.distance_to_user).text = DISTANCE_FORMAT.format(distToUser)
+            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
         }
-    }
-
-    private fun updateDroneBatteryLevel(newBatteryLevel: Double){
-        //TODO Maybe store the view instead of searching it again each time
-        findViewById<TextView>(R.id.battery_level).text = PERCENTAGE_FORMAT.format(newBatteryLevel*100)
-    }
-
-    private fun updateDroneAltitude(newAltitude: Double){
-        updateTextView(droneAltitudeTextView, newAltitude, DISTANCE_FORMAT)
-        //TODO Maybe store the view instead of searching it again each time
-        findViewById<TextView>(R.id.altitude).text = DISTANCE_FORMAT.format(newAltitude)
-    }
-
-    private fun updateDroneSpeed(newSpeed: Double){
-        //TODO Maybe store the view instead of searching it again each time
-        findViewById<TextView>(R.id.speed).text = SPEED_FORMAT.format(newSpeed)
     }
 
 //    /**
