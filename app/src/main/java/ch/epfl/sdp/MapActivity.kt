@@ -33,7 +33,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
 
-    private var isStyleReady = false
+    private var isMapReady = false
 
     private lateinit var waypointCircleManager: CircleManager
     private lateinit var droneCircleManager: CircleManager
@@ -48,21 +48,21 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     var waypoints = arrayListOf<LatLng>()
 
     private var features = ArrayList<Feature>()
-    private var geoJsonSource: GeoJsonSource? = null
+    private lateinit var geoJsonSource: GeoJsonSource
 
-    lateinit var distanceToUserTextView: TextView
-    lateinit var droneBatteryLevelTextView: TextView
-    lateinit var droneAltitudeTextView: TextView
-    lateinit var droneSpeedTextView: TextView
+    private lateinit var distanceToUserTextView: TextView
+    private lateinit var droneBatteryLevelTextView: TextView
+    private lateinit var droneAltitudeTextView: TextView
+    private lateinit var droneSpeedTextView: TextView
 
-    lateinit var userLatitudeTextView: TextView
-    lateinit var userLongitudeTextView: TextView
+    private lateinit var userLatitudeTextView: TextView
+    private lateinit var userLongitudeTextView: TextView
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateVehiclePosition(it) }
+        newLatLng?.let { updateDronePosition(it); updateDronePositionOnMap(it) }
     }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it) }
+        newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
         newBatteryLevel?.let { updateTextView(droneBatteryLevelTextView, (it * 100).toDouble(), PERCENTAGE_FORMAT) }
@@ -149,7 +149,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            createSourceData(style)
+            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
+            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
+            style.addSource(geoJsonSource)
 
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
             addPointToHeatMap(8.543434, 47.398979)
@@ -165,7 +167,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // Used to detect when the map is ready in tests
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
-            isStyleReady = true
+            isMapReady = true
         }
     }
 
@@ -190,9 +192,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Draws the path given by the list of positions
      */
     private fun drawPath(path: List<LatLng>) {
-        if(!isStyleReady) return
+        if (!isMapReady) return
 
-        lineManager?.create(LineOptions()
+        lineManager.create(LineOptions()
                 .withLatLngs(path)
                 .withLineWidth(PATH_THICKNESS))
     }
@@ -201,14 +203,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Fills the regions described by the list of positions
      */
     private fun drawRegion(corners: List<LatLng>) {
-        if(!isStyleReady) return
+        if (!isMapReady) return
 
         val fillOption = FillOptions()
                 .withLatLngs(listOf(waypoints))
                 .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
                 .withFillOpacity(REGION_FILL_OPACITY)
-        fillManager?.deleteAll()
-        fillManager?.create(fillOption)
+        fillManager.deleteAll()
+        fillManager.create(fillOption)
 
         //Draw the borders
 
@@ -220,15 +222,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val lineOptions = LineOptions()
                 .withLatLngs(linePoints)
                 .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
-        lineManager?.deleteAll()
-        lineManager?.create(lineOptions)
+        lineManager.deleteAll()
+        lineManager.create(lineOptions)
     }
 
     /**
      * Draws a pinpoint on the map at the given position
      */
     private fun drawPinpoint(pinpoints: LatLng) {
-        if(!isStyleReady) return
+        if (!isMapReady) return
 
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
@@ -240,28 +242,21 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Clears the waypoints list and removes all the lines and points related to waypoints
      */
     private fun clearWaypoints() {
-        if(!isStyleReady) return
+        if (!isMapReady) return
 
         waypoints.clear()
-        waypointCircleManager?.deleteAll()
-        lineManager?.deleteAll()
-        fillManager?.deleteAll()
+        waypointCircleManager.deleteAll()
+        lineManager.deleteAll()
+        fillManager.deleteAll()
     }
 
     /**
      * Adds a heat point to the heatmap
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
+        if(!isMapReady) return
         features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
-        geoJsonSource!!.setGeoJson(FeatureCollection.fromFeatures(features))
-    }
-
-    private fun createSourceData(style: Style) {
-        geoJsonSource = GeoJsonSource(
-                getString(R.string.heatmap_source_ID),
-                GeoJsonOptions().withCluster(true))
-        geoJsonSource!!.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
-        style.addSource(geoJsonSource!!)
+        geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
 
     /**
@@ -269,8 +264,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      *
      * @param newLatLng new position of the vehicle
      */
-    private fun updateVehiclePosition(newLatLng: LatLng) {
-        if(!isStyleReady) return
+    private fun updateDronePosition(newLatLng: LatLng) {
+        CentralLocationManager.currentUserPosition.value?.let {
+            val distToUser = it.distanceTo(newLatLng)
+            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
+        }
+    }
+
+    private fun updateDronePositionOnMap(newLatLng: LatLng) {
+        if (!isMapReady) return
 
         // Add a vehicle marker and move the camera
         if (dronePositionMarker == null) {
@@ -285,18 +287,23 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             dronePositionMarker!!.latLng = newLatLng
             droneCircleManager.update(dronePositionMarker)
         }
-
-        CentralLocationManager.currentUserPosition.value?.let {
-            val distToUser = it.distanceTo(newLatLng)
-            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
-        }
     }
 
     /**
      * Updates the user position if the drawing managers are ready
      */
     private fun updateUserPosition(userLatLng: LatLng) {
-        if(!isStyleReady) return
+        updateTextView(userLatitudeTextView, userLatLng.latitude, getString(R.string.lat) + COORDINATE_FORMAT)
+        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lat) + COORDINATE_FORMAT)
+
+        Drone.currentPositionLiveData.value?.let {
+            val distToUser = it.distanceTo(userLatLng)
+            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
+        }
+    }
+
+    private fun updateUserPositionOnMap(userLatLng: LatLng) {
+        if (!isMapReady) return
 
         // Add a vehicle marker and move the camera
         if (userPositionMarker == null) {
@@ -306,14 +313,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         } else {
             userPositionMarker!!.latLng = userLatLng
             userCircleManager.update(userPositionMarker)
-        }
-
-        updateTextView(userLatitudeTextView, userLatLng.latitude, getString(R.string.lat) + COORDINATE_FORMAT)
-        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lat) + COORDINATE_FORMAT)
-
-        Drone.currentPositionLiveData.value?.let {
-            val distToUser = it.distanceTo(userLatLng)
-            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
         }
     }
 
