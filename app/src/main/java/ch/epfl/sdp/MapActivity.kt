@@ -42,8 +42,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var lineManager: LineManager
     private lateinit var fillManager: FillManager
 
-    private var dronePositionMarker: Circle? = null
-    private var userPositionMarker: Circle? = null
+    private lateinit var dronePositionMarker: Circle
+    private lateinit var userPositionMarker: Circle
 
     var waypoints = arrayListOf<LatLng>()
 
@@ -275,7 +275,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (!isMapReady) return
 
         // Add a vehicle marker and move the camera
-        if (dronePositionMarker == null) {
+        if (!::dronePositionMarker.isInitialized) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(newLatLng)
             circleOptions.withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
@@ -284,7 +284,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
-            dronePositionMarker!!.latLng = newLatLng
+            dronePositionMarker.latLng = newLatLng
             droneCircleManager.update(dronePositionMarker)
         }
     }
@@ -306,12 +306,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (!isMapReady) return
 
         // Add a vehicle marker and move the camera
-        if (userPositionMarker == null) {
+        if (!::userPositionMarker.isInitialized) {
             val circleOptions = CircleOptions()
             circleOptions.withLatLng(userLatLng)
             userPositionMarker = userCircleManager.create(circleOptions)
         } else {
-            userPositionMarker!!.latLng = userLatLng
+            userPositionMarker.latLng = userLatLng
             userCircleManager.update(userPositionMarker)
         }
     }
