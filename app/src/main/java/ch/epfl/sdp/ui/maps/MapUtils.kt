@@ -93,8 +93,15 @@ object MapUtils {
         val unclustered = CircleLayer("unclustered-points",
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         unclustered.setProperties(
-                PropertyFactory.circleColor(ORANGE),
-                PropertyFactory.circleRadius(20f),
+                PropertyFactory.circleColor(
+
+                        Expression.interpolate(Expression.linear(),Expression.get("intensity"),
+                                Expression.stop(1.0, Expression.rgb(255,0,0)),
+                                Expression.stop(2.0, Expression.rgb(0,255,0)),
+                                Expression.stop(3.0, Expression.rgb(0,0,255))
+                        )
+                ),
+                PropertyFactory.circleRadius(10f),
                 PropertyFactory.circleBlur(1f))
         unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
@@ -105,16 +112,32 @@ object MapUtils {
         val layers = arrayOf(
                 intArrayOf(4, DARK_RED),
                 intArrayOf(2, LIGHT_RED),
-                intArrayOf(0, ORANGE))
+                intArrayOf(1, ORANGE))
         layers.indices.forEach { i ->
             val circles = CircleLayer("cluster-$i",
                     MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
             circles.setProperties(
-                    PropertyFactory.circleColor(layers[i][1]),
+                    PropertyFactory.circleColor(
+
+                            Expression.interpolate(Expression.linear(),Expression.get("intensities"),
+                                    Expression.stop(1.0, Expression.rgb(255,0,0)),
+                                    Expression.stop(2.0, Expression.rgb(0,255,0)),
+                                    Expression.stop(3.0, Expression.rgb(0,0,255))
+                            )
+
+                    ),
+
+
+
+                    //PropertyFactory.circleColor(layers[i][1]),
+
+
                     PropertyFactory.circleRadius(60f),
                     PropertyFactory.circleBlur(1f)
             )
+
             val pointCount: Expression = Expression.toNumber(Expression.get("point_count"))
+            circles.setFilter(Expression.gte(pointCount,Expression.literal(1)))
             circles.setFilter(
                     if (i == 0) Expression.gte(pointCount, Expression.literal(layers[i][0]))
                     else Expression.all(
@@ -122,7 +145,6 @@ object MapUtils {
                             Expression.lt(pointCount, Expression.literal(layers[i - 1][0]))
                     )
             )
-
             style.addLayerBelow(circles,
                     MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         }

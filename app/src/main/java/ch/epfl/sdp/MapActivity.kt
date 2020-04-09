@@ -19,6 +19,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
+import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
@@ -149,7 +150,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
+            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
+                    .withCluster(true)
+                    .withClusterProperty("intensities", Expression.literal("+") ,Expression.get("intensity"))
+                    )
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
             style.addSource(geoJsonSource)
 
@@ -168,9 +172,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
 
             addPointToHeatMap(8.544867, 47.397426,1.0)
-            addPointToHeatMap(8.543067, 47.397026,1.0)
-            addPointToHeatMap(8.543434, 47.398979,1.0)
+            addPointToHeatMap(8.543067, 47.397026,2.0)
+            addPointToHeatMap(8.543434, 47.398979,2.0)
             addPointToHeatMap(8.543934, 47.398279,1.0)
+            
         }
     }
 
