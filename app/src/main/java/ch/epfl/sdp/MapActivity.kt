@@ -150,16 +150,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
 
             geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
-            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
+            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
             style.addSource(geoJsonSource)
 
-            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-            addPointToHeatMap(8.543434, 47.398979)
-            addPointToHeatMap(8.543934, 47.398279)
-            addPointToHeatMap(8.544867, 47.397426)
-            addPointToHeatMap(8.543067, 47.397026)
 
             MapUtils.createLayersForHeatMap(style)
+
+
 
             // Load latest location
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
@@ -168,6 +165,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
             isMapReady = true
+            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
+
+            addPointToHeatMap(8.544867, 47.397426,1.0)
+            addPointToHeatMap(8.543067, 47.397026,1.0)
+            addPointToHeatMap(8.543434, 47.398979,1.0)
+            addPointToHeatMap(8.543934, 47.398279,1.0)
         }
     }
 
@@ -253,9 +256,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     /**
      * Adds a heat point to the heatmap
      */
-    fun addPointToHeatMap(longitude: Double, latitude: Double) {
+    fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
         if(!isMapReady) return
-        features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
+        var feature : Feature = Feature.fromGeometry(Point.fromLngLat(longitude,latitude))
+        feature.addNumberProperty("intensity", intensity)
+        features.add(feature)
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
 
