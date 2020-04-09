@@ -122,7 +122,7 @@ object MapUtils {
                             Expression.lt(pointCount, Expression.literal(layers[i - 1][0]))
                     )
             )
-            
+
             style.addLayerBelow(circles,
                     MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         }
