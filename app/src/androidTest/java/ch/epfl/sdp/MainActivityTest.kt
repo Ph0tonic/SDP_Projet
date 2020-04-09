@@ -21,6 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
+import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -78,33 +79,32 @@ class MainActivityTest {
     @Test
     fun canDisplayTheVideo() {
         onView(withId(R.id.display_camera)).perform(click())
-        getInstrumentation().waitForIdleSync()
-        mUiDevice?.pressBack()
+        onView(withId(R.id.video_layout)).check(matches(isDisplayed()))
     }
 
     @Test
     fun canDisplayAMapAndReloadLocation() {
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_latitude), null) == null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_longitude), null) == null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_zoom), null) == null)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext())
 
+        sharedPreferences.edit().clear().apply()
+
+        var longitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
+        var latitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
+        var zoom: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
+        assertThat(latitude, `is`(nullValue()))
+        assertThat(longitude, `is`(nullValue()))
+        assertThat(zoom, `is`(nullValue()))
+
+        // Trigger saving mechanism by opening map and coming back
         onView(withId(R.id.display_map)).perform(click())
-        getInstrumentation().waitForIdleSync()
         mUiDevice?.pressBack()
 
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_latitude), null) != null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_longitude), null) != null)
-        assert(PreferenceManager.getDefaultSharedPreferences(getContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_zoom), null) != null)
-
-        //Return on the view as to load the preferences this time
-        getInstrumentation().waitForIdleSync()
-        onView(withId(R.id.display_map)).perform(click())
+        longitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
+        latitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
+        zoom = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
+        assertThat(latitude, `is`(notNullValue()))
+        assertThat(longitude, `is`(notNullValue()))
+        assertThat(zoom, `is`(notNullValue()))
     }
 
     @Test
