@@ -96,12 +96,11 @@ object MapUtils {
                 PropertyFactory.circleColor(
 
                         Expression.interpolate(Expression.linear(),Expression.get("intensity"),
-                                Expression.stop(1.0, Expression.rgb(255,0,0)),
-                                Expression.stop(2.0, Expression.rgb(0,255,0)),
-                                Expression.stop(3.0, Expression.rgb(0,0,255))
+                                Expression.stop(1.0, Expression.rgb(255,255,0)),
+                                Expression.stop(11.0, Expression.rgb(255,0,0))
                         )
                 ),
-                PropertyFactory.circleRadius(10f),
+                PropertyFactory.circleRadius(20f),
                 PropertyFactory.circleBlur(1f))
         unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
@@ -110,13 +109,14 @@ object MapUtils {
 
     private fun clusteredLayerData(style: Style) {
         val layers = arrayOf(
-                intArrayOf(4, DARK_RED),
-                intArrayOf(2, LIGHT_RED),
-                intArrayOf(1, ORANGE))
+                intArrayOf(15, DARK_RED),
+                intArrayOf(10, LIGHT_RED),
+                intArrayOf(2, ORANGE))
         layers.indices.forEach { i ->
             val circles = CircleLayer("cluster-$i",
                     MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
             circles.setProperties(
+                    /*
                     PropertyFactory.circleColor(
 
                             Expression.interpolate(Expression.linear(),Expression.get("intensities"),
@@ -127,12 +127,9 @@ object MapUtils {
 
                     ),
 
-
-
-                    //PropertyFactory.circleColor(layers[i][1]),
-
-
-                    PropertyFactory.circleRadius(60f),
+                     */
+                    PropertyFactory.circleColor(layers[i][1]),
+                    PropertyFactory.circleRadius(100f),
                     PropertyFactory.circleBlur(1f)
             )
 

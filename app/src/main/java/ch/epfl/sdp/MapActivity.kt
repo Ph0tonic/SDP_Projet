@@ -23,6 +23,8 @@ import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Main Activity to display map and create missions.
@@ -153,6 +155,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
                     .withCluster(true)
                     .withClusterProperty("intensities", Expression.literal("+") ,Expression.get("intensity"))
+
                     )
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
             style.addSource(geoJsonSource)
@@ -170,12 +173,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
+            for(i in 0..1000){
 
+                    addPointToHeatMap((Random().nextInt(10000)+854300)/100000.0, (Random().nextInt(10000)+4739600)/100000.0, (Random().nextInt(10)+1)/1.0)
+                }
+            /*
             addPointToHeatMap(8.544867, 47.397426,1.0)
             addPointToHeatMap(8.543067, 47.397026,2.0)
             addPointToHeatMap(8.543434, 47.398979,2.0)
             addPointToHeatMap(8.543934, 47.398279,1.0)
-            
+            */
         }
     }
 
