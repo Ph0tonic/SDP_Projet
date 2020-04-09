@@ -96,12 +96,15 @@ object MapUtils {
                 PropertyFactory.circleColor(
 
                         Expression.interpolate(Expression.linear(),Expression.get("intensity"),
-                                Expression.stop(1.0, Expression.rgb(255,255,0)),
-                                Expression.stop(11.0, Expression.rgb(255,0,0))
+                                Expression.stop(8, Expression.rgb(0,0,255)),
+                                Expression.stop(8.5, Expression.rgb(0,255,255)),
+                                Expression.stop(9, Expression.rgb(0,255,0)),
+                                Expression.stop(9.5, Expression.rgb(255,255,0)),
+                                Expression.stop(10.0, Expression.rgb(255,0,0))
                         )
                 ),
-                PropertyFactory.circleRadius(20f),
-                PropertyFactory.circleBlur(1f))
+                PropertyFactory.circleRadius(40f),
+                PropertyFactory.circleBlur(1.5f))
         unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))

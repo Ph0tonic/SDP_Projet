@@ -155,7 +155,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
                     .withCluster(true)
                     .withClusterProperty("intensities", Expression.literal("+") ,Expression.get("intensity"))
-
+                    .withClusterMaxZoom(1)
                     )
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
             style.addSource(geoJsonSource)
@@ -173,16 +173,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-            for(i in 0..1000){
-
-                    addPointToHeatMap((Random().nextInt(10000)+854300)/100000.0, (Random().nextInt(10000)+4739600)/100000.0, (Random().nextInt(10)+1)/1.0)
+            val long=8.5445
+            val lat=47.3975
+            //precision should be 0.00003
+            for(i in 0..10){
+                for(j in 0..10){
+                     val newlong= 8.544 + i/10000.0
+                    val newlat=47.397 + j/10000.0
+                     val intensity=10-Math.sqrt((long-newlong)*(long-newlong)*10000000 + (lat-newlat)*(lat-newlat)*10000000)
+                    addPointToHeatMap(newlong,newlat,intensity)
                 }
-            /*
-            addPointToHeatMap(8.544867, 47.397426,1.0)
-            addPointToHeatMap(8.543067, 47.397026,2.0)
-            addPointToHeatMap(8.543434, 47.398979,2.0)
-            addPointToHeatMap(8.543934, 47.398279,1.0)
-            */
+            }
+
         }
     }
 
