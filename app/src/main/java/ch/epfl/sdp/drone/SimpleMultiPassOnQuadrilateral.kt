@@ -1,5 +1,8 @@
 package ch.epfl.sdp.drone
 
+import ch.epfl.sdp.searcharea.PolygonArea
+import ch.epfl.sdp.searcharea.QuadrilateralArea
+import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 import kotlin.collections.ArrayList
@@ -10,7 +13,7 @@ import kotlin.math.max
 /**
  * Creates a path covering a quadrilateral in several passes
  */
-class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStrategy {
+class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
     companion object Constraints {
@@ -24,14 +27,16 @@ class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStr
         this.maxDistBetweenLines = maxDistBetweenLinesIn
     }
 
+    override fun acceptArea(searchArea: SearchArea): Boolean {
+        return searchArea.isComplete() && (searchArea is QuadrilateralArea || searchArea is PolygonArea && searchArea.getNbAngles() == 4)
+    }
+
     @Throws(IllegalArgumentException::class)
-    override fun createFlightPath(waypoints: List<LatLng>): List<LatLng> {
-        require(waypoints.size == 4) {
-            "This strategy requires exactly 4 pinpoints, ${waypoints.size} given."
-        }
+    override fun createFlightPath(searchArea: SearchArea): List<LatLng> {
+        require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
 
         // Make a mutable copy of the waypoints to be able to reorder them
-        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(waypoints) }
+        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(searchArea.getLatLng()) }
 
         val steps = max(2, ceil(max(
                 waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,

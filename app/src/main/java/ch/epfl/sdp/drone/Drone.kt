@@ -3,10 +3,11 @@ package ch.epfl.sdp.drone
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
+import io.mavsdk.mission.Mission
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
-import timber.log.Timber
 
 object Drone {
     //must be IP address where the mavsdk_server is running
@@ -19,7 +20,7 @@ object Drone {
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
     val currentBatteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
-    val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> =  MutableLiveData()
+    val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
 
     var overflightStrategy: OverflightStrategy
@@ -41,11 +42,25 @@ object Drone {
         disposables.add(instance.telemetry.battery.subscribe { battery ->
             currentBatteryLevelLiveData.postValue(battery.remainingPercent)
         })
-        disposables.add(instance.telemetry.groundSpeedNed.subscribe {groundSpeed ->
+        disposables.add(instance.telemetry.groundSpeedNed.subscribe { groundSpeed ->
             val speed = sqrt(groundSpeed.velocityEastMS.pow(2) +
                     groundSpeed.velocityEastMS.pow(2))
             currentSpeedLiveData.postValue(speed)
         })
-        overflightStrategy = SimpleMultiPassOnQuadrangle(DEFAULT_MAX_DIST_BETWEEN_PASSES)
+        overflightStrategy = SimpleMultiPassOnQuadrilateral(DEFAULT_MAX_DIST_BETWEEN_PASSES)
+    }
+
+    fun startMission(mission: List<Mission.MissionItem>) {
+        val isConnectedCompletable = instance.core.connectionState
+                .filter { state -> state.isConnected }
+                .firstOrError()
+                .toCompletable()
+
+        isConnectedCompletable
+                .andThen(instance.mission.setReturnToLaunchAfterMission(true))
+                .andThen(instance.mission.uploadMission(mission))
+                .andThen(instance.action.arm())
+                .andThen(instance.mission.startMission())
+                .subscribe()
     }
 }

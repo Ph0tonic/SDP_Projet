@@ -7,7 +7,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle.Constraints.pinPointsAmount
+import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral.Constraints.pinPointsAmount
+import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.geojson.Feature
@@ -45,7 +46,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePositionMarker: Circle
     private lateinit var userPositionMarker: Circle
 
-    var waypoints = arrayListOf<LatLng>()
+    private var searchArea = QuadrilateralArea()
 
     private var features = ArrayList<Feature>()
     private lateinit var geoJsonSource: GeoJsonSource
@@ -98,7 +99,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneSpeedTextView = findViewById(R.id.speed)
 
         findViewById<Button>(R.id.start_mission_button).setOnClickListener {
-            DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
+            Drone.startMission(DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(searchArea)).getMissionItems())
         }
         findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
@@ -177,66 +178,63 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     /** Trajectory Planning **/
     fun onMapClicked(position: LatLng) {
-        if (waypoints.size < pinPointsAmount) {
-            waypoints.add(position)
-            drawPinpoint(position)
-            drawRegion(waypoints)
-
-            if (waypoints.size == pinPointsAmount) {
-                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
-            }
-        }
+        if(!searchArea.isComplete()) searchArea.addAngle(position)
+        // TODO: Auto update of map with search area using reactive programming and drawpath method
+//            if (waypoints.size == pinPointsAmount) {
+//                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
+//            }
+        // TODO: Update strategy choice regarding current searchArea
     }
 
-    /**
-     * Draws the path given by the list of positions
-     */
-    private fun drawPath(path: List<LatLng>) {
-        if (!isMapReady) return
+//    /**
+//     * Draws the path given by the list of positions
+//     */
+//    private fun drawPath(path: List<LatLng>) {
+//        if (!isMapReady) return
+//
+//        lineManager.create(LineOptions()
+//                .withLatLngs(path)
+//                .withLineWidth(PATH_THICKNESS))
+//    }
+//
+//    /**
+//     * Fills the regions described by the list of positions
+//     */
+//    private fun drawRegion(corners: List<LatLng>) {
+//        if (!isMapReady) return
+//
+//        val fillOption = FillOptions()
+//                .withLatLngs(listOf(waypoints))
+//                .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
+//                .withFillOpacity(REGION_FILL_OPACITY)
+//        fillManager.deleteAll()
+//        fillManager.create(fillOption)
+//
+//        //Draw the borders
+//
+//        // Make it loop
+//        val linePoints = arrayListOf<LatLng>().apply {
+//            addAll(corners)
+//            add(corners[0])
+//        }
+//        val lineOptions = LineOptions()
+//                .withLatLngs(linePoints)
+//                .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
+//        lineManager.deleteAll()
+//        lineManager.create(lineOptions)
+//    }
 
-        lineManager.create(LineOptions()
-                .withLatLngs(path)
-                .withLineWidth(PATH_THICKNESS))
-    }
-
-    /**
-     * Fills the regions described by the list of positions
-     */
-    private fun drawRegion(corners: List<LatLng>) {
-        if (!isMapReady) return
-
-        val fillOption = FillOptions()
-                .withLatLngs(listOf(waypoints))
-                .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
-                .withFillOpacity(REGION_FILL_OPACITY)
-        fillManager.deleteAll()
-        fillManager.create(fillOption)
-
-        //Draw the borders
-
-        // Make it loop
-        val linePoints = arrayListOf<LatLng>().apply {
-            addAll(corners)
-            add(corners[0])
-        }
-        val lineOptions = LineOptions()
-                .withLatLngs(linePoints)
-                .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
-        lineManager.deleteAll()
-        lineManager.create(lineOptions)
-    }
-
-    /**
-     * Draws a pinpoint on the map at the given position
-     */
-    private fun drawPinpoint(pinpoints: LatLng) {
-        if (!isMapReady) return
-
-        val circleOptions = CircleOptions()
-                .withLatLng(pinpoints)
-                .withDraggable(true)
-        waypointCircleManager.create(circleOptions)
-    }
+//    /**
+//     * Draws a pinpoint on the map at the given position
+//     */
+//    private fun drawPinpoint(pinpoints: LatLng) {
+//        if (!isMapReady) return
+//
+//        val circleOptions = CircleOptions()
+//                .withLatLng(pinpoints)
+//                .withDraggable(true)
+//        waypointCircleManager.create(circleOptions)
+//    }
 
     /**
      * Clears the waypoints list and removes all the lines and points related to waypoints
@@ -244,7 +242,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun clearWaypoints() {
         if (!isMapReady) return
 
-        waypoints.clear()
+        searchArea = QuadrilateralArea()
         waypointCircleManager.deleteAll()
         lineManager.deleteAll()
         fillManager.deleteAll()

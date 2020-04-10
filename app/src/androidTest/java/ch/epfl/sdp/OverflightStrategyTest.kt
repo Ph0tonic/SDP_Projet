@@ -1,7 +1,7 @@
 package ch.epfl.sdp
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle
+import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -13,23 +13,23 @@ class OverflightStrategyTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun simpleMultiPassOnQuadrangleDoesNotAcceptNegativeMaxDistance(){
-        SimpleMultiPassOnQuadrangle(-10.0)
+        SimpleMultiPassOnQuadrilateral(-10.0)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun simpleMultiPassOnQuadrangleDoesNotAcceptZeroMaxDistance(){
-        SimpleMultiPassOnQuadrangle(0.0)
+        SimpleMultiPassOnQuadrilateral(0.0)
     }
 
     @Test(expected = java.lang.IllegalArgumentException::class)
     fun simpleMultiPassOnQuadrangleDoesNotAcceptCreatingPathWithLessThanFourPositions(){
-        SimpleMultiPassOnQuadrangle(-10.0)
+        SimpleMultiPassOnQuadrilateral(-10.0)
                 .createFlightPath(listOf(LatLng(0.0,0.0)))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun simpleMultiPassOnQuadrangleDoesNotAcceptCreatingPathWithMoreThanFourPositions(){
-        SimpleMultiPassOnQuadrangle(-10.0)
+        SimpleMultiPassOnQuadrilateral(-10.0)
                 .createFlightPath(listOf(
                         LatLng(0.0,0.0),
                         LatLng(0.0,0.0),
@@ -40,7 +40,7 @@ class OverflightStrategyTest {
 
     @Test
     fun simpleMultiPassCreatesGoodNumberOfPointsForSmallArea(){
-        val strategy = SimpleMultiPassOnQuadrangle(1000000000000.0)
+        val strategy = SimpleMultiPassOnQuadrilateral(1000000000000.0)
         val path = strategy.createFlightPath(listOf(
                         LatLng(0.0,0.0),
                         LatLng(1.0,0.0),

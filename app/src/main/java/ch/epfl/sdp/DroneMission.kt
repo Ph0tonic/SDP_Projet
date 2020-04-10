@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
 
@@ -10,21 +9,6 @@ object DroneMission {
     fun makeDroneMission(path: List<LatLng>): DroneMission {
         addMissionItems(path)
         return this
-    }
-
-    fun startMission() {
-        val drone = Drone.instance
-        val isConnectedCompletable = drone.core.connectionState
-                .filter { state -> state.isConnected }
-                .firstOrError()
-                .toCompletable()
-
-        isConnectedCompletable
-                .andThen(drone.mission.setReturnToLaunchAfterMission(true))
-                .andThen(drone.mission.uploadMission(missionItems))
-                .andThen(drone.action.arm())
-                .andThen(drone.mission.startMission())
-                .subscribe()
     }
 
     private fun addMissionItems(path: List<LatLng>) {

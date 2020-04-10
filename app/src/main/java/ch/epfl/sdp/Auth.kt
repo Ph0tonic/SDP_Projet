@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -22,12 +21,12 @@ object Auth : ViewModel() {
     val name: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     init {
-        GoogleSignIn.getLastSignedInAccount(applicationContext())
+        GoogleSignIn.getLastSignedInAccount(MainApplication.applicationContext())
                 .runCatching { updateLoginStateFromAccount(this!!) }
     }
 
     private fun createGoogleSignClient(): GoogleSignInClient {
-        val context = applicationContext()
+        val context = MainApplication.applicationContext()
         val gso = GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(context.getString(R.string.google_signin_key))
@@ -50,7 +49,7 @@ object Auth : ViewModel() {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
-            val context = applicationContext()
+            val context = MainApplication.applicationContext()
             GoogleSignIn.getSignedInAccountFromIntent(data)
                     .addOnSuccessListener {
                         updateLoginStateFromAccount(it)
@@ -61,7 +60,11 @@ object Auth : ViewModel() {
     }
 
     fun logout() {
-        createGoogleSignClient().signOut().addOnSuccessListener { loggedIn.postValue(false) }
+        createGoogleSignClient().signOut().addOnSuccessListener {
+            val context = MainApplication.applicationContext()
+            loggedIn.postValue(false)
+            Toast.makeText(context, context.getString(R.string.sign_out_success), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateLoginStateFromAccount(account: GoogleSignInAccount) {
