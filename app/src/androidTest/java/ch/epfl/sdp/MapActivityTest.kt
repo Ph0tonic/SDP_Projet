@@ -107,7 +107,7 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
         runOnUiThread{
-            mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
+            mActivityRule.activity.addPointToHeatMap(10.0, 10.0, 10.0)
         }
     }
 
