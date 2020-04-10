@@ -54,7 +54,8 @@
             android:focusable="true"
             android:text="@string/dialog_positive_button"
             android:textAllCaps="false"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:onClick="downloadRegionDialog"/>
 
         <Button
             android:id="@+id/list_button"
@@ -64,7 +65,8 @@
             android:layout_weight="1"
             android:text="@string/navigate_title"
             android:textAllCaps="false"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:onClick="downloadedRegionList"/>
 
     </LinearLayout>
 

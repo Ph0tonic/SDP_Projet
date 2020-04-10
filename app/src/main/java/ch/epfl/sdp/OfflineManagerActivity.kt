@@ -44,7 +44,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
         mapView.getMapAsync(this)
-
+        downloadButton = findViewById(R.id.download_button)
+        listButton = findViewById(R.id.list_button)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -54,18 +55,11 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             progressBar = findViewById(R.id.progress_bar)
             // Set up the offlineManager
             offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
-            // Bottom navigation bar button clicks are handled here.
-            // Download offline button
-            downloadButton = findViewById(R.id.download_button)
-            downloadButton.setOnClickListener { downloadRegionDialog() }
-            // List offline regions
-            listButton = findViewById(R.id.list_button)
-            listButton.setOnClickListener { downloadedRegionList() }
         }
         mapboxMap.cameraPosition =  MapUtils.getLastCameraState()
     }
 
-    private fun downloadRegionDialog() { // Set up download interaction. Display a dialog
+    fun downloadRegionDialog(v : View) { // Set up download interaction. Display a dialog
         // when the user clicks download button and require
         // a user-provided region name
         val builder = AlertDialog.Builder(this@OfflineManagerActivity)
@@ -98,7 +92,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Define offline region parameters, including bounds,
      * min/max zoom, and metadata
      */
-    private fun downloadRegion(regionName: String) {
+     private fun downloadRegion(regionName: String) {
         startProgress()
         // Create offline definition using the current
         // style and boundaries of visible map area
@@ -160,7 +154,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
     }
 
-    private fun downloadedRegionList() { // Build a region list when the user clicks the list button
+    fun downloadedRegionList(v : View) { // Build a region list when the user clicks the list button
         // Reset the region selected int to 0
         regionSelected = 0
         // Query the DB asynchronously
@@ -205,7 +199,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
                 // When the user cancels, don't do anything.
                 // The dialog will automatically close
-                .setNegativeButton(getString(R.string.navigate_negative_button_title)
+                .setNegativeButton(getString(R.string.dialog_negative_button)
                 ) { _, _ -> }.create().show()
     }
 

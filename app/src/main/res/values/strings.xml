@@ -31,8 +31,8 @@
     <string name="dialog_positive_button">Download</string>
     <string name="dialog_negative_button">Cancel</string>
     <string name="navigate_title">List</string>
-    <string name="navigate_positive_button">Navigate to</string>
     <string name="navigate_negative_button_title">Cancel</string>
+    <string name="navigate_positive_button">Navigate To</string>
     <string name="navigate_neutral_button_title">Delete</string>
     <string name="toast_region_deleted">Region Deleted</string>
     <string name="toast_no_regions_yet">No regions yet</string>

@@ -28,11 +28,13 @@ class OfflineManagerActivityTest {
 
     companion object {
         private const val ZOOM = 10.0
-        private const val NAME = "Crans-Montana"
+        private const val NAME = "Ocean"
 
         private const val OCEAN_LATITUDE = 46.399111
         private const val OCEAN_LONGITUDE = -31.697953
         private const val TIMEOUT: Long = 2000
+
+        private const val list  = "List"
     }
 
     private lateinit var mUiDevice: UiDevice
@@ -55,27 +57,20 @@ class OfflineManagerActivityTest {
     @Test
     fun canOpenDownloadDialog() {
         mUiDevice.wait(Until.hasObject(By.desc("Download").clickable(true)), TIMEOUT)
+
         onView(withText(R.string.dialog_positive_button)).perform(click())
+        onView(withId(R.id.dialog_textfield_id)).perform(typeText(NAME))
 
-        mUiDevice.wait(Until.hasObject(By.desc("Enter")), TIMEOUT)
-        onView(withId(R.id.dialog_textfield_id)).check(matches(isDisplayed()))
-    }
+        mUiDevice.pressBack() //hide the keyboard
 
-    @Test
-    fun canOpenListDialog() {
-        mUiDevice.wait(Until.hasObject(By.desc("List")), TIMEOUT)
-        onView(withId(R.id.list_button)).perform(click())
-
-        mUiDevice.wait(Until.hasObject(By.desc("List")), TIMEOUT)
-        onView(withText(R.string.navigate_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.dialog_positive_button)).perform(click())
     }
 
     @Test
     fun canCancelDownload() {
-        mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
-
         mUiDevice.wait(Until.hasObject(By.desc("Cancel")), TIMEOUT)
+
         onView(withText(R.string.dialog_negative_button)).perform(click())
     }
 
@@ -119,7 +114,13 @@ class OfflineManagerActivityTest {
 
         mUiDevice.wait(Until.hasObject(By.desc("Navigate to")), TIMEOUT)
         onView(withText(R.string.navigate_positive_button)).perform(click())
+        mUiDevice.wait(Until.hasObject(By.desc(list).clickable(true)), TIMEOUT)
+        onView(withText(R.string.navigate_title)).perform(click())
+        onView(withText(R.string.dialog_negative_button)).perform(click())
     }
+
+
+
 
     @Test
     fun cannotEmptyDownloadName() {
@@ -127,6 +128,15 @@ class OfflineManagerActivityTest {
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
         mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
+
         onView(withText(R.string.dialog_positive_button)).perform(click())
+    }
+
+    @Test
+    fun z_canDeleteMap() {
+        mUiDevice.wait(Until.hasObject(By.desc(list)), TIMEOUT)
+
+        onView(withText(R.string.navigate_title)).perform(click())
+        onView(withText(R.string.navigate_neutral_button_title)).perform(click())
     }
 }
