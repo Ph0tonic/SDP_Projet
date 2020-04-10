@@ -60,10 +60,10 @@ class OfflineManagerActivityTest {
     fun b_canDownloadMap() {
         clickOnDownloadButton()
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(NAME))
-
         mUiDevice.pressBack() //hide the keyboard
 
         clickOnDownloadButton()
+        isToastMessageDisplayed(R.string.end_progress_success)
     }
 
     @Test
@@ -82,12 +82,12 @@ class OfflineManagerActivityTest {
     fun canNavigateTo() {
         clickOnListButton()
         onView(withText(R.string.navigate_positive_button)).perform(click())
-    }
+        onView(withText(NAME)).inRoot(ToastMatcher())
+                .check(matches(isDisplayed()))    }
 
     @Test
     fun canOpenDownloadDialog() {
         clickOnDownloadButton()
-        clickOnDownloadButton() //normal duplicate
         onView(withId(R.id.dialog_textfield_id)).check(matches(isDisplayed()))
     }
 
@@ -103,6 +103,7 @@ class OfflineManagerActivityTest {
     @Test
     fun cannotEmptyDownloadName() {
         clickOnDownloadButton()
+        clickOnDownloadButton()
         isToastMessageDisplayed(R.string.dialog_toast)
     }
 
@@ -110,6 +111,7 @@ class OfflineManagerActivityTest {
     fun z_canDeleteMap() {
         clickOnListButton()
         onView(withText(R.string.navigate_neutral_button_title)).perform(click())
+        isToastMessageDisplayed(R.string.toast_region_deleted)
     }
 
     private fun isToastMessageDisplayed(textId: Int) {
