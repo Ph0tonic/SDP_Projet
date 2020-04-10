@@ -119,12 +119,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/battery_level_label"
+                <ImageView
+                    android:id="@+id/battery_level_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/battery_level"
-                    android:textColor="@color/colorPrimaryDark" />
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_battery1" />
 
                 <TextView
                     android:id="@+id/battery_level"
