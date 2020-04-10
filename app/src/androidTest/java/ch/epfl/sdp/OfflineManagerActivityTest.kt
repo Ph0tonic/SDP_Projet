@@ -1,19 +1,22 @@
 package ch.epfl.sdp
 
+import android.content.Intent
+import android.os.IBinder
+import android.view.WindowManager
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Root
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import ch.epfl.sdp.ui.maps.MapUtils
-import com.mapbox.mapboxsdk.geometry.LatLng
+import org.hamcrest.Description
+import org.hamcrest.TypeSafeMatcher
 import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Rule
@@ -27,14 +30,7 @@ import org.junit.runners.MethodSorters
 class OfflineManagerActivityTest {
 
     companion object {
-        private const val ZOOM = 10.0
-        private const val NAME = "Ocean"
-
-        private const val OCEAN_LATITUDE = 46.399111
-        private const val OCEAN_LONGITUDE = -31.697953
-        private const val TIMEOUT: Long = 2000
-
-        private const val list  = "List"
+        private const val NAME = "RandomName"
     }
 
     private lateinit var mUiDevice: UiDevice
@@ -44,79 +40,61 @@ class OfflineManagerActivityTest {
     @Throws(Exception::class)
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        runOnUiThread {
-            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(LatLng(OCEAN_LATITUDE, OCEAN_LONGITUDE), ZOOM)
-            }
-        }
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MapActivityTest.MAP_LOADING_TIMEOUT)
     }
 
     @get:Rule
-    var mActivityRule = IntentsTestRule(OfflineManagerActivity::class.java)
+    var mActivityRule = ActivityTestRule(
+            OfflineManagerActivity::class.java,
+            true,
+            false) // Activity is not launched immediately
 
     @Test
-    fun canOpenDownloadDialog() {
-        mUiDevice.wait(Until.hasObject(By.desc("Download").clickable(true)), TIMEOUT)
+    fun a_cannotListWhenNoMap() {
+        clickOnListButton()
+        isToastMessageDisplayed(R.string.toast_no_regions_yet)
+    }
 
-        onView(withText(R.string.dialog_positive_button)).perform(click())
+    @Test
+    fun b_canDownloadMap() {
+        clickOnDownloadButton()
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(NAME))
 
         mUiDevice.pressBack() //hide the keyboard
 
-        onView(withText(R.string.dialog_positive_button)).perform(click())
+        clickOnDownloadButton()
     }
 
     @Test
     fun canCancelDownload() {
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-        mUiDevice.wait(Until.hasObject(By.desc("Cancel")), TIMEOUT)
-
+        clickOnDownloadButton()
         onView(withText(R.string.dialog_negative_button)).perform(click())
     }
 
     @Test
     fun canCancelList() {
-        mUiDevice.wait(Until.hasObject(By.desc("List").clickable(true)), TIMEOUT)
-        onView(withId(R.id.list_button)).perform(click())
-
-        mUiDevice.wait(Until.hasObject(By.desc("Cancel").clickable(true)), TIMEOUT)
-        onView(withText(R.string.navigate_negative_button_title)).perform(click())
-    }
-
-    @Test
-    fun a_canDownloadMap() {
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), TIMEOUT)
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-
-        mUiDevice.wait(Until.hasObject(By.desc("Enter")), TIMEOUT)
-        onView(withId(R.id.dialog_textfield_id)).perform(typeText(NAME))
-
-        mUiDevice.pressBack()
-
-        mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-    }
-
-    @Test
-    fun z_canDeleteOceanMap() {
-
-        mUiDevice.wait(Until.hasObject(By.desc("List")), TIMEOUT)
-        onView(withId(R.id.list_button)).perform(click())
-
-        mUiDevice.wait(Until.hasObject(By.desc("Delete")), TIMEOUT)
-        onView(withText(R.string.navigate_neutral_button_title)).perform(click())
+        clickOnListButton()
+        onView(withText(R.string.dialog_negative_button)).perform(click())
     }
 
     @Test
     fun canNavigateTo() {
-        mUiDevice.wait(Until.hasObject(By.desc("List")), TIMEOUT)
-        onView(withId(R.id.list_button)).perform(click())
-
-        mUiDevice.wait(Until.hasObject(By.desc("Navigate to")), TIMEOUT)
+        clickOnListButton()
         onView(withText(R.string.navigate_positive_button)).perform(click())
-        mUiDevice.wait(Until.hasObject(By.desc(list).clickable(true)), TIMEOUT)
-        onView(withText(R.string.navigate_title)).perform(click())
-        onView(withText(R.string.dialog_negative_button)).perform(click())
+    }
+
+    @Test
+    fun canOpenDownloadDialog() {
+        clickOnDownloadButton()
+        clickOnDownloadButton() //normal duplicate
+        onView(withId(R.id.dialog_textfield_id)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun canOpenListDialog() {
+        clickOnListButton()
+        onView(withText(R.string.navigate_title)).check(matches(isDisplayed()))
     }
 
 
@@ -124,19 +102,46 @@ class OfflineManagerActivityTest {
 
     @Test
     fun cannotEmptyDownloadName() {
-        mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
-        onView(withText(R.string.dialog_positive_button)).perform(click())
-
-        mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
-
-        onView(withText(R.string.dialog_positive_button)).perform(click())
+        clickOnDownloadButton()
+        isToastMessageDisplayed(R.string.dialog_toast)
     }
 
     @Test
     fun z_canDeleteMap() {
-        mUiDevice.wait(Until.hasObject(By.desc(list)), TIMEOUT)
-
-        onView(withText(R.string.navigate_title)).perform(click())
+        clickOnListButton()
         onView(withText(R.string.navigate_neutral_button_title)).perform(click())
+    }
+
+    private fun isToastMessageDisplayed(textId: Int) {
+        onView(withText(textId)).inRoot(ToastMatcher())
+                .check(matches(isDisplayed()))
+    }
+
+    private fun clickOnDownloadButton() {
+        onView(withText(R.string.dialog_positive_button)).perform(click())
+    }
+
+    private fun clickOnListButton() {
+        onView(withText(R.string.navigate_title)).perform(click())
+    }
+}
+
+class ToastMatcher : TypeSafeMatcher<Root>() {
+    override fun describeTo(description: Description) {
+        description.appendText("is toast")
+    }
+
+    @Suppress("DEPRECATION")
+    public override fun matchesSafely(root: Root): Boolean {
+        val type: Int = root.windowLayoutParams.get().type
+        if (type == WindowManager.LayoutParams.TYPE_TOAST) {
+            val windowToken: IBinder = root.decorView.windowToken
+            val appToken: IBinder = root.decorView.applicationWindowToken
+            if (windowToken === appToken) { // windowToken == appToken means this window isn't contained by any other windows.
+                // if it was a window for an activity, it would have TYPE_BASE_APPLICATION.
+                return true
+            }
+        }
+        return false
     }
 }
