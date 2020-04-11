@@ -79,21 +79,24 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
+        // Always update the text string
+        updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
+
+        // Only update the icon if the battery level is not null
         newBatteryLevel?.let {
-            updateTextView(droneBatteryLevelTextView, (it * 100).toDouble(), PERCENTAGE_FORMAT)
             val newBatteryDrawable = droneBatteryLevelDrawables
                     .filter { x -> x.first <= newBatteryLevel }
                     .maxBy { x -> x.first }!!
                     .second
             droneBatteryLevelImageView.setImageResource(newBatteryDrawable)
-            droneBatteryLevelImageView.setTag(newBatteryDrawable)
+            droneBatteryLevelImageView.tag = newBatteryDrawable
         }
     }
     private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? ->
-        newAltitude?.let { updateTextView(droneAltitudeTextView, it.toDouble(), DISTANCE_FORMAT) }
+        updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT)
     }
     private var droneSpeedObserver = Observer<Float> { newSpeed: Float? ->
-        newSpeed?.let { updateTextView(droneSpeedTextView, it.toDouble(), SPEED_FORMAT) }
+        updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
 
     companion object {
@@ -155,6 +158,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
+        if(!isMapReady) return
         MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
     }
 
@@ -192,13 +196,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
             isMapReady = true
-
-            Drone.currentBatteryLevelLiveData.postValue(null)
         }
     }
 
-    private fun updateTextView(textView: TextView, value: Double, formatString: String) {
-        textView.text = formatString.format(value)
+    /**
+     * Updates the text of the given textView with the given value and format, or the default string
+     * if the value is null
+     */
+    private fun updateTextView(textView: TextView, value: Double?, formatString: String) {
+        textView.text = value?.let {
+              formatString.format(it)
+        } ?: getString(R.string.no_info)
     }
 
     /** Trajectory Planning **/
