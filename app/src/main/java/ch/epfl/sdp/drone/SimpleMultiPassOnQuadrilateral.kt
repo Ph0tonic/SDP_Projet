@@ -1,6 +1,5 @@
 package ch.epfl.sdp.drone
 
-import ch.epfl.sdp.searcharea.PolygonArea
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -28,15 +27,17 @@ class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : Overflight
     }
 
     override fun acceptArea(searchArea: SearchArea): Boolean {
-        return searchArea.isComplete() && (searchArea is QuadrilateralArea || searchArea is PolygonArea && searchArea.getNbAngles() == 4)
+        return searchArea.isComplete() && (searchArea is QuadrilateralArea)
     }
 
     @Throws(IllegalArgumentException::class)
-    override fun createFlightPath(searchArea: SearchArea): List<LatLng> {
+    override fun createFlightPath(startingPoint: LatLng, searchArea: SearchArea): List<LatLng> {
         require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
 
         // Make a mutable copy of the waypoints to be able to reorder them
         val waypointsCopied = mutableListOf<LatLng>().apply { addAll(searchArea.getLatLng().value!!) }
+        val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
+        Collections.rotate(waypointsCopied, -startingIndex)
 
         val steps = max(2, ceil(max(
                 waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,

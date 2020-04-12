@@ -22,10 +22,11 @@ object Drone {
     val currentBatteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
+    val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
 
     var overflightStrategy: OverflightStrategy
 
-    val instance: System
+    private val instance: System
 
     init {
         instance = System(BACKEND_IP_ADDRESS, BACKEND_PORT)
@@ -51,6 +52,7 @@ object Drone {
     }
 
     fun startMission(mission: List<Mission.MissionItem>) {
+        this.currentMissionLiveData.postValue(mission)
         val isConnectedCompletable = instance.core.connectionState
                 .filter { state -> state.isConnected }
                 .firstOrError()
