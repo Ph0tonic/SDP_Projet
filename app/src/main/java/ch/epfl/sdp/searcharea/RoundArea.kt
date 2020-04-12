@@ -1,14 +1,21 @@
 package ch.epfl.sdp.searcharea
 
-import kotlin.reflect.KClass
+import androidx.lifecycle.MutableLiveData
+import com.mapbox.mapboxsdk.geometry.LatLng
 
-class RoundArea: SearchArea {
+class RoundArea(private val center: LatLng, private val radius: Double) : SearchArea {
 
-    fun test(): List<KClass<out SearchArea>> {
-        return listOf(RoundArea::class, QuadrilateralArea::class)
+    private val angles: MutableLiveData<MutableList<LatLng>> = MutableLiveData(mutableListOf(center))
+
+    init {
+
     }
 
     override fun isComplete(): Boolean {
         TODO("Not yet implemented")
+    }
+
+    override fun getLatLng(): MutableLiveData<MutableList<LatLng>> {
+        return angles
     }
 }

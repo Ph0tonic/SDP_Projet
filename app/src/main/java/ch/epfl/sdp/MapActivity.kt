@@ -7,7 +7,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral.Constraints.pinPointsAmount
+import ch.epfl.sdp.map.MapBoxEventManager
+import ch.epfl.sdp.map.MapBoxQuadrilateralBuilder
+import ch.epfl.sdp.map.MapBoxQuadrilateralDrawer
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -32,6 +34,11 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
+    //TODO: Update
+    private var searchArea = QuadrilateralArea()
+    private val mapBoxEventManager: MapBoxEventManager = MapBoxQuadrilateralBuilder(searchArea)
+    private var searchAreaDrawer: MapBoxQuadrilateralDrawer = MapBoxQuadrilateralDrawer(searchArea)
+
     private lateinit var mapboxMap: MapboxMap
 
     private var isMapReady = false
@@ -45,8 +52,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var dronePositionMarker: Circle
     private lateinit var userPositionMarker: Circle
-
-    private var searchArea = QuadrilateralArea()
 
     private var features = ArrayList<Feature>()
     private lateinit var geoJsonSource: GeoJsonSource
@@ -145,8 +150,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
             userCircleManager = CircleManager(mapView, mapboxMap, style)
 
-            mapboxMap.addOnMapClickListener { position ->
-                onMapClicked(position)
+            mapboxMap.addOnMapClickListener {
+                onMapClicked(it)
+                true
+            }
+            mapboxMap.addOnMapLongClickListener {
+                onMapLongClicked(it)
                 true
             }
 
@@ -169,6 +178,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
             isMapReady = true
+
+            searchAreaDrawer.mount(this, mapView, mapboxMap, style)
         }
     }
 
@@ -177,13 +188,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /** Trajectory Planning **/
-    fun onMapClicked(position: LatLng) {
-        if(!searchArea.isComplete()) searchArea.addAngle(position)
-        // TODO: Auto update of map with search area using reactive programming and drawpath method
-//            if (waypoints.size == pinPointsAmount) {
-//                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
-//            }
-        // TODO: Update strategy choice regarding current searchArea
+    private fun onMapClicked(position: LatLng) {
+        mapBoxEventManager.onMapClicked(position)
+    }
+
+    /** Trajectory Planning **/
+    private fun onMapLongClicked(position: LatLng) {
+        mapBoxEventManager.onMapLongClicked(position)
     }
 
 //    /**
@@ -252,7 +263,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Adds a heat point to the heatmap
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
-        if(!isMapReady) return
+        if (!isMapReady) return
         features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }

@@ -3,7 +3,6 @@ package ch.epfl.sdp
 import android.app.Application
 import android.content.Context
 
-// Not object class. AndroidManifest.xml error happen.
 class MainApplication : Application() {
 
     init {

@@ -36,7 +36,7 @@ class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : Overflight
         require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
 
         // Make a mutable copy of the waypoints to be able to reorder them
-        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(searchArea.getLatLng()) }
+        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(searchArea.getLatLng().value!!) }
 
         val steps = max(2, ceil(max(
                 waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,

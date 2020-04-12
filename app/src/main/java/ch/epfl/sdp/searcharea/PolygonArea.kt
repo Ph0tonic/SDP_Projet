@@ -1,25 +1,26 @@
 package ch.epfl.sdp.searcharea
 
+import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 class PolygonArea : SearchArea {
 
-    private val angles = mutableListOf<LatLng>()
+    private val angles: MutableLiveData<MutableList<LatLng>> = MutableLiveData(mutableListOf())
 
     fun getNbAngles(): Int {
-        return angles.size
+        return angles.value?.size!!
     }
 
     fun addAngle(angle: LatLng) {
-        require(angles.size < 4) { "Max number of angles reached" }
-        angles.add(angle)
+        angles.value?.add(angle)
+        angles.notifyObserver()
     }
 
     override fun isComplete(): Boolean {
-        return angles.size >= 3
+        return angles.value?.size!! >= 3
     }
 
-    override fun getLatLng(): List<LatLng> {
+    override fun getLatLng(): MutableLiveData<MutableList<LatLng>> {
         return angles
     }
 }
