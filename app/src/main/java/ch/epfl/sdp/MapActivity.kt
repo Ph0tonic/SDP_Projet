@@ -79,6 +79,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
+
+        require(newBatteryLevel == null || newBatteryLevel >= 0)
+
         // Always update the text string
         updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
 
@@ -158,8 +161,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
-        if(!isMapReady) return
-        MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
+        if(isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
