@@ -23,7 +23,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import kotlinx.android.synthetic.main.activity_map.*
 
 /**
  * Main Activity to display map and create missions.
@@ -161,7 +160,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
-        if(isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
+        if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -183,12 +182,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
             style.addSource(geoJsonSource)
 
-            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-            addPointToHeatMap(8.543434, 47.398979)
-            addPointToHeatMap(8.543934, 47.398279)
-            addPointToHeatMap(8.544867, 47.397426)
-            addPointToHeatMap(8.543067, 47.397026)
-
             MapUtils.createLayersForHeatMap(style)
 
             // Load latest location
@@ -206,9 +199,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * if the value is null
      */
     private fun updateTextView(textView: TextView, value: Double?, formatString: String) {
-        textView.text = value?.let {
-              formatString.format(it)
-        } ?: getString(R.string.no_info)
+        textView.text = value?.let { formatString.format(it) } ?: getString(R.string.no_info)
     }
 
     /** Trajectory Planning **/
@@ -270,7 +261,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
-                .withDraggable(true)
         waypointCircleManager.create(circleOptions)
     }
 
@@ -290,7 +280,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Adds a heat point to the heatmap
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
-        if(!isMapReady) return
+        if (!isMapReady) return
         features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
@@ -302,8 +292,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     private fun updateDronePosition(newLatLng: LatLng) {
         CentralLocationManager.currentUserPosition.value?.let {
-            val distToUser = it.distanceTo(newLatLng)
-            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
+            updateTextView(distanceToUserTextView, it.distanceTo(newLatLng), DISTANCE_FORMAT)
         }
     }
 
@@ -313,8 +302,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Add a vehicle marker and move the camera
         if (!::dronePositionMarker.isInitialized) {
             val circleOptions = CircleOptions()
-            circleOptions.withLatLng(newLatLng)
-            circleOptions.withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
+                    .withLatLng(newLatLng)
+                    .withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
             dronePositionMarker = droneCircleManager.create(circleOptions)
 
             mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
@@ -330,11 +319,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     private fun updateUserPosition(userLatLng: LatLng) {
         updateTextView(userLatitudeTextView, userLatLng.latitude, getString(R.string.lat) + COORDINATE_FORMAT)
-        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lat) + COORDINATE_FORMAT)
+        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lon) + COORDINATE_FORMAT)
 
         Drone.currentPositionLiveData.value?.let {
-            val distToUser = it.distanceTo(userLatLng)
-            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
+            updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
         }
     }
 
@@ -344,7 +332,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Add a vehicle marker and move the camera
         if (!::userPositionMarker.isInitialized) {
             val circleOptions = CircleOptions()
-            circleOptions.withLatLng(userLatLng)
+                    .withLatLng(userLatLng)
             userPositionMarker = userCircleManager.create(circleOptions)
         } else {
             userPositionMarker.latLng = userLatLng
