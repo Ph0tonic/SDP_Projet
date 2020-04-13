@@ -79,15 +79,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
 
-        require(newBatteryLevel == null || newBatteryLevel >= 0)
-
         // Always update the text string
         updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
 
         // Only update the icon if the battery level is not null
         newBatteryLevel?.let {
             val newBatteryDrawable = droneBatteryLevelDrawables
-                    .filter { x -> x.first <= newBatteryLevel }
+                    .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
                     .maxBy { x -> x.first }!!
                     .second
             droneBatteryLevelImageView.setImageResource(newBatteryDrawable)
