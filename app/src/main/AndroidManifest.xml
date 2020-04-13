@@ -12,7 +12,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
         <activity
             android:name=".VlcActivity"
             android:parentActivityName=".MainActivity" />
@@ -26,8 +27,8 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.Launcher">
-            <!--android:theme="@style/AppTheme.NoActionBar"-->
-
+            <!-- The theme set here is launcher, but it gets set to no_actionBar in MainActivity.kt
+             when the activity is launched -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
