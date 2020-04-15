@@ -33,7 +33,7 @@ import kotlin.math.roundToInt
 class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var isEndNotified = false
 
-    private lateinit var map: MapboxMap
+    private lateinit var mapboxMap: MapboxMap
     private lateinit var progressBar: ProgressBar
     private lateinit var downloadButton: Button
     private lateinit var listButton: Button
@@ -50,7 +50,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
-        map = mapboxMap
+        this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
             // Assign progressBar for later use
             progressBar = findViewById(R.id.progress_bar)
@@ -97,12 +97,12 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         startProgress()
         // Create offline definition using the current
         // style and boundaries of visible map area
-        map.getStyle { style ->
+        mapboxMap.getStyle { style ->
             val maxZoom = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
             val definition = OfflineTilePyramidRegionDefinition(
                     style.uri,
-                    map.projection.visibleRegion.latLngBounds,
-                    map.cameraPosition.zoom, maxZoom,
+                    mapboxMap.projection.visibleRegion.latLngBounds,
+                    mapboxMap.cameraPosition.zoom, maxZoom,
                     this@OfflineManagerActivity.resources.displayMetrics.density)
             // Build a JSONObject using the user-defined offline region title,
             // convert it into string, and use it to create a metadata variable.
@@ -185,7 +185,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     Toast.makeText(this@OfflineManagerActivity, items[regionSelected], Toast.LENGTH_LONG).show()
                     // Create new camera position
                     val definition = offlineRegions[regionSelected].definition
-                    map.cameraPosition = MapUtils.getCameraWithParameters(
+                    mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(
                             LatLng(definition.bounds.center.latitude, definition.bounds.center.longitude),
                             definition.minZoom)
                 }
