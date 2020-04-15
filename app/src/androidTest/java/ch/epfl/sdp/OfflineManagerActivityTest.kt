@@ -13,6 +13,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import ch.epfl.sdp.MapActivityTest.Companion.MAP_LOADING_TIMEOUT
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -52,7 +53,7 @@ class OfflineManagerActivityTest {
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         mActivityRule.launchActivity(Intent())
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MapActivityTest.MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
     }
 
     @get:Rule
@@ -69,16 +70,16 @@ class OfflineManagerActivityTest {
 
     @Test
     fun canDownloadAndThenDeleteMap(){
-        canDownloadMap()
+        downloadMap()
 
-        canNavigateToDownloadedMap()
+        navigateToDownloadedMap()
 
-        canClickOnCancelListDialog()
+        clickOnCancelInListDialog()
 
-        canDeleteMap()
+        deleteMap()
     }
 
-    private fun canDownloadMap(){
+    private fun downloadMap(){
         clickOnDownloadButton()
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(NAME))
         mUiDevice.pressBack() //hide the keyboard
@@ -87,19 +88,19 @@ class OfflineManagerActivityTest {
         isToastMessageDisplayed(R.string.end_progress_success)
     }
 
-    private fun canNavigateToDownloadedMap(){
+    private fun navigateToDownloadedMap(){
         clickOnListButton()
         onView(withText(R.string.navigate_positive_button)).perform(click())
         onView(withText(NAME)).inRoot(ToastMatcher())
                 .check(matches(isDisplayed()))
     }
 
-    private fun canClickOnCancelListDialog(){
+    private fun clickOnCancelInListDialog(){
         clickOnListButton()
         onView(withText(R.string.dialog_negative_button)).perform(click())
     }
 
-    private fun canDeleteMap(){
+    private fun deleteMap(){
         clickOnListButton()
         onView(withText(R.string.navigate_neutral_button_title)).perform(click())
         isToastMessageDisplayed(R.string.toast_region_deleted)

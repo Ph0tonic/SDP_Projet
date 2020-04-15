@@ -138,6 +138,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offlineRegion.setObserver(object : OfflineRegionObserver {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
+                Log.d("123456", "statusRequiredResCount : " + status.completedTileCount)
                 if (status.isComplete) { // Download complete
                     endProgress(getString(R.string.end_progress_success))
                     return
@@ -153,7 +154,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
 
             override fun mapboxTileCountLimitExceeded(limit: Long) {
-                Timber.e("Mapbox tile count limit exceeded: %s", limit)
+                Log.e("Error","Mapbox tile count limit exceeded: %s$limit")
+                Toast.makeText(applicationContext, "Too many downloaded regions", Toast.LENGTH_SHORT).show()
             }
         })
         // Change the region state
@@ -201,7 +203,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     progressBar.isIndeterminate = true
                     progressBar.visibility = View.VISIBLE
                     // Begin the deletion process
-                    deleteOfflineRegion(offlineRegions[regionSelected])
+
+                   deleteOfflineRegion(offlineRegions[regionSelected])
                 }
                 // When the user cancels, don't do anything.
                 // The dialog will automatically close
