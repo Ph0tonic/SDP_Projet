@@ -10,6 +10,9 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
+import ch.epfl.sdp.ui.maps.OfflineManagerUtils
+import ch.epfl.sdp.ui.maps.OfflineManagerUtils.endProgress
+import ch.epfl.sdp.ui.maps.OfflineManagerUtils.startProgress
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -99,7 +102,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * min/max zoom, and metadata
      */
      private fun downloadRegion(regionName: String) {
-        startProgress()
+        isEndNotified = startProgress(downloadButton, listButton, progressBar)
         // Create offline definition using the current
         // style and boundaries of visible map area
         mapboxMap.getStyle { style ->
@@ -138,9 +141,12 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offlineRegion.setObserver(object : OfflineRegionObserver {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
-                Log.d("123456", "statusRequiredResCount : " + status.completedTileCount)
-                if (status.isComplete) { // Download complete
-                    endProgress(getString(R.string.end_progress_success))
+                if (status.isComplete && !isEndNotified) { // Download complete
+                    isEndNotified = endProgress(getString(R.string.end_progress_success),
+                            downloadButton,
+                            listButton,
+                            progressBar,
+                            this@OfflineManagerActivity)
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     progressBar.isIndeterminate = false
@@ -241,30 +247,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             String.format(getString(R.string.region_name), offlineRegion.id)
         }
         return regionName
-    }
-
-    // Progress bar methods
-    private fun startProgress() { // Disable buttons
-        downloadButton.isEnabled = false
-        listButton.isEnabled = false
-        // Start and show the progress bar
-        isEndNotified = false
-        progressBar.isIndeterminate = true
-        progressBar.visibility = View.VISIBLE
-    }
-
-    private fun endProgress(message: String) { // Don't notify more than once
-        if (isEndNotified) return
-
-        // Enable buttons
-        downloadButton.isEnabled = true
-        listButton.isEnabled = true
-        // Stop and hide the progress bar
-        isEndNotified = true
-        progressBar.isIndeterminate = false
-        progressBar.visibility = View.GONE
-        // Show a toast
-        Toast.makeText(this@OfflineManagerActivity, message, Toast.LENGTH_LONG).show()
     }
 
     companion object {
