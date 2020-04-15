@@ -186,7 +186,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // Create new camera position
                     val definition = offlineRegions[regionSelected].definition
                     map.cameraPosition = MapUtils.getCameraWithParameters(
-                            LatLng(definition.bounds.latitudeSpan, definition.bounds.longitudeSpan),
+                            LatLng(definition.bounds.center.latitude, definition.bounds.center.longitude),
                             definition.minZoom)
                 }
                 .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
