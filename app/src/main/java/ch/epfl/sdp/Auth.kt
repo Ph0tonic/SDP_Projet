@@ -6,6 +6,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+
+import ch.epfl.sdp.ui.maps.OfflineManagerUtils.showToast
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -54,7 +57,7 @@ object Auth : ViewModel() {
                     .addOnSuccessListener {
                         updateLoginStateFromAccount(it)
                     }.addOnFailureListener {
-                        Toast.makeText(context, context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
+                        showToast(context.getString(R.string.sign_in_error), context)
                     }
         }
     }

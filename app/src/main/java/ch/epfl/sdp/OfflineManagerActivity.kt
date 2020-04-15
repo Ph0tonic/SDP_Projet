@@ -141,11 +141,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete && !isEndNotified) { // Download complete
-                    isEndNotified = endProgress(getString(R.string.end_progress_success),
-                            downloadButton,
-                            listButton,
-                            progressBar,
-                            this@OfflineManagerActivity)
+                    isEndNotified = endProgress(downloadButton, listButton, progressBar, this@OfflineManagerActivity)
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     progressBar.isIndeterminate = false

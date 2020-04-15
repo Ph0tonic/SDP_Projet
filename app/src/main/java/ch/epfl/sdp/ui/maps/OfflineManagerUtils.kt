@@ -25,7 +25,7 @@ object OfflineManagerUtils {
         return false //isEndNotified = false
     }
 
-    fun endProgress(message: String, downloadButton: Button, listButton: Button, progressBar: ProgressBar, context: Context): Boolean { // Don't notify more than once
+    fun endProgress(downloadButton: Button, listButton: Button, progressBar: ProgressBar, context: Context): Boolean { // Don't notify more than once
         // Enable buttons
         downloadButton.isEnabled = true
         listButton.isEnabled = true
@@ -33,7 +33,7 @@ object OfflineManagerUtils {
         progressBar.isIndeterminate = false
         progressBar.visibility = View.GONE
         // Show a toast
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        showToast(context.getString(R.string.end_progress_success),context)
         return true
     }
 
@@ -67,6 +67,10 @@ object OfflineManagerUtils {
             String.format(context.getString(R.string.region_name), offlineRegion.id)
         }
         return regionName
+    }
+
+    fun showToast(message : String, context: Context){
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
 }
