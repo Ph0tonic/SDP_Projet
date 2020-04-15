@@ -60,6 +60,11 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapboxMap.cameraPosition =  MapUtils.getLastCameraState()
     }
 
+    override fun onPause(){
+        super.onPause()
+        MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
+    }
+
     fun downloadRegionDialog(v : View) { // Set up download interaction. Display a dialog
         // when the user clicks download button and require
         // a user-provided region name
