@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import android.content.Intent
-
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -19,7 +18,10 @@ import ch.epfl.sdp.MapActivityTest.Companion.MAP_LOADING_TIMEOUT
 import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers
-import org.junit.*
+import org.junit.Before
+import org.junit.FixMethodOrder
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
@@ -31,7 +33,7 @@ class OfflineManagerActivityTest {
     companion object {
         private const val RANDOM_NAME = "RandomName"
         private const val CMA_NAME = "CMA"
-        private val CMA : LatLng = LatLng(46.317261, 7.485201)
+        private val CMA: LatLng = LatLng(46.317261, 7.485201)
         private lateinit var mUiDevice: UiDevice
         const val EPSILON = 1e-3
 
@@ -55,7 +57,7 @@ class OfflineManagerActivityTest {
                     .check(matches(isDisplayed()))
         }
 
-        private fun downloadMap(name: String){
+        private fun downloadMap(name: String) {
             clickOnDownloadButton()
             onView(withId(R.id.dialog_textfield_id)).perform(typeText(name))
             mUiDevice.pressBack() //hide the keyboard
@@ -64,19 +66,19 @@ class OfflineManagerActivityTest {
             isToastMessageDisplayed(R.string.end_progress_success)
         }
 
-        private fun navigateToDownloadedMap(name: String){
+        private fun navigateToDownloadedMap(name: String) {
             clickOnListButton()
             onView(withText(R.string.navigate_positive_button)).perform(click())
             onView(withText(name)).inRoot(ToastMatcher())
                     .check(matches(isDisplayed()))
         }
 
-        private fun clickOnCancelInListDialog(){
+        private fun clickOnCancelInListDialog() {
             clickOnListButton()
             onView(withText(R.string.dialog_negative_button)).perform(click())
         }
 
-        private fun deleteMap(){
+        private fun deleteMap() {
             clickOnListButton()
             onView(withText(R.string.navigate_neutral_button_title)).perform(click())
             isToastMessageDisplayed(R.string.toast_region_deleted)
@@ -104,7 +106,7 @@ class OfflineManagerActivityTest {
     }
 
     @Test
-    fun canDownloadAndThenDeleteMap(){
+    fun canDownloadAndThenDeleteMap() {
         downloadMap(RANDOM_NAME)
 
         navigateToDownloadedMap(RANDOM_NAME)
@@ -121,7 +123,7 @@ class OfflineManagerActivityTest {
      * And finally we try to navigate back to CMA
      */
     @Test
-    fun canNavigateToDownloadedMap(){
+    fun canNavigateToDownloadedMap() {
         val rdmLatLng = LatLng((-90..90).random().toDouble(), (-180..180).random().toDouble())
 
         moveCameraToPosition(CMA)
@@ -159,10 +161,10 @@ class OfflineManagerActivityTest {
         isToastMessageDisplayed(R.string.dialog_toast)
     }
 
-    private fun moveCameraToPosition(pos : LatLng){
+    private fun moveCameraToPosition(pos: LatLng) {
         UiThreadStatement.runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition =  getCameraWithParameters(pos, 15.0)
+                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
             }
         }
     }

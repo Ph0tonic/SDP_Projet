@@ -160,7 +160,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
 
             override fun mapboxTileCountLimitExceeded(limit: Long) {
-                Log.e("Error", "Mapbox tile count limit exceeded: %s$limit")
+                Timber.e("Error", "Mapbox tile count limit exceeded: %s$limit")
                 Toast.makeText(applicationContext, "Too many downloaded regions", Toast.LENGTH_SHORT).show()
             }
         })
