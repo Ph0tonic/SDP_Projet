@@ -34,8 +34,6 @@ import kotlin.math.roundToInt
  * TODO : show error when user try to download more than the limit
  */
 class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
-    private var isEndNotified = false
-
     private lateinit var mapboxMap: MapboxMap
     private lateinit var progressBar: ProgressBar
     private lateinit var downloadButton: Button
@@ -106,7 +104,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * min/max zoom, and metadata
      */
     private fun downloadRegion(regionName: String) {
-        isEndNotified = startProgress(downloadButton, listButton, progressBar)
+        startProgress(downloadButton, listButton, progressBar)
         // Create offline definition using the current
         // style and boundaries of visible map area
         mapboxMap.getStyle { style ->
@@ -145,8 +143,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offlineRegion.setObserver(object : OfflineRegionObserver {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
-                if (status.isComplete && !isEndNotified) { // Download complete
-                    isEndNotified = endProgress(downloadButton, listButton, progressBar, this@OfflineManagerActivity)
+                if (status.isComplete) { // Download complete
+                    endProgress(downloadButton, listButton, progressBar)
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     progressBar.isIndeterminate = false
@@ -212,7 +210,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     progressBar.visibility = View.VISIBLE
                     // Begin the deletion process
 
-                    deleteOfflineRegion(offlineRegions[regionSelected], progressBar, applicationContext)
+                    deleteOfflineRegion(offlineRegions[regionSelected], progressBar)
                 }
                 // When the user cancels, don't do anything.
                 // The dialog will automatically close
