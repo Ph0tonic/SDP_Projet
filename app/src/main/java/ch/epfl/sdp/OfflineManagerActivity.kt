@@ -181,7 +181,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
                 // Add all of the region names to a list
                 val items = offlineRegions
-                        .map { region -> getRegionName(region, applicationContext) }
+                        .map { region -> getRegionName(region) }
                         .toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
                 showDialog(items, offlineRegions)

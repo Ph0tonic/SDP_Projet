@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.OfflineManagerActivity
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.offline.OfflineRegion
@@ -33,7 +34,7 @@ object OfflineManagerUtils {
         progressBar.isIndeterminate = false
         progressBar.visibility = View.GONE
         // Show a toast
-        showToast(context.getString(R.string.end_progress_success),context)
+        showToast(context.getString(R.string.end_progress_success))
         return true
     }
 
@@ -57,20 +58,20 @@ object OfflineManagerUtils {
 
 
     // Get the region name from the offline region metadata
-    fun getRegionName(offlineRegion: OfflineRegion, context: Context): String {
+    fun getRegionName(offlineRegion: OfflineRegion): String {
         val regionName: String
         regionName = try {
             JSONObject(String(offlineRegion.metadata, Charset.forName(OfflineManagerActivity.JSON_CHARSET)))
                     .getString(OfflineManagerActivity.JSON_FIELD_REGION_NAME)
         } catch (exception: Exception) {
             Timber.e("Failed to decode metadata: %s", exception.message)
-            String.format(context.getString(R.string.region_name), offlineRegion.id)
+            String.format(MainApplication.applicationContext().getString(R.string.region_name), offlineRegion.id)
         }
         return regionName
     }
 
-    fun showToast(message : String, context: Context){
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    fun showToast(message : String){
+        Toast.makeText(MainApplication.applicationContext(), message, Toast.LENGTH_LONG).show()
     }
 
 }

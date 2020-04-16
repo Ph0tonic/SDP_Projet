@@ -57,7 +57,7 @@ object Auth : ViewModel() {
                     .addOnSuccessListener {
                         updateLoginStateFromAccount(it)
                     }.addOnFailureListener {
-                        showToast(context.getString(R.string.sign_in_error), context)
+                        showToast(context.getString(R.string.sign_in_error))
                     }
         }
     }
