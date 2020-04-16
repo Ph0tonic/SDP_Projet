@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.maps.OfflineManagerUtils.deleteOfflineRegion
@@ -60,6 +61,10 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
         }
         mapboxMap.cameraPosition = MapUtils.getLastCameraState()
+
+        // Used to detect when the map is ready in tests
+        mapView.contentDescription = MAP_READY_DESCRIPTION
+
     }
 
     override fun onPause() {

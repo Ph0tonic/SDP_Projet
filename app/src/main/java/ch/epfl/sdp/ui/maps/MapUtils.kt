@@ -69,8 +69,7 @@ object MapUtils {
     }
 
     /**
-     * Loads and applies the camera settings passed in parameters to the camera of the given map
-     * @param mapboxMap
+     * Loads the camera settings passed in parameters to the camera
      * @param latLng
      * @param zoom
      */
