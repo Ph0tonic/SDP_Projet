@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.screen.landscape"/>
 
     <application
         android:name="ch.epfl.sdp.MainApplication"
@@ -16,10 +17,12 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".VlcActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".MapActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape" />
+        <!-- android:configChanges="orientation"-->
         <activity
             android:name=".OfflineManagerActivity"
             android:parentActivityName=".MainActivity" />
