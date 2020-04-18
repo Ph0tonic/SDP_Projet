@@ -1,12 +1,16 @@
 package ch.epfl.sdp.ui.maps
 
 import com.mapbox.mapboxsdk.geometry.LatLng
+import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.math.min
 
+//Adapted from : https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 object IntersectionTools {
     // Given three colinear points p, q, r, the function checks if
     // point q lies on line segment 'pr'
-    fun onSegment(p: LatLng, q: LatLng, r: LatLng): Boolean {
-        return q.latitude <= Math.max(p.latitude, r.latitude) && q.latitude >= Math.min(p.latitude, r.latitude) && q.longitude <= Math.max(p.longitude, r.longitude) && q.longitude >= Math.min(p.longitude, r.longitude)
+    private fun onSegment(p: LatLng, q: LatLng, r: LatLng): Boolean {
+        return q.latitude <= max(p.latitude, r.latitude) && q.latitude >= min(p.latitude, r.latitude) && q.longitude <= max(p.longitude, r.longitude) && q.longitude >= min(p.longitude, r.longitude)
     }
 
     // To find orientation of ordered triplet (p, q, r).
@@ -14,12 +18,12 @@ object IntersectionTools {
     // 0 --> p, q and r are colinear
     // 1 --> Clockwise
     // 2 --> Counterclockwise
-    fun orientation(p: LatLng, q: LatLng, r: LatLng): Int {
+    private fun orientation(p: LatLng, q: LatLng, r: LatLng): Int {
         // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
         // for details of below formula.
         val res = (q.longitude - p.longitude) * (r.latitude - q.latitude) -
                 (q.latitude - p.latitude) * (r.longitude - q.longitude)
-        if (res.equals(0.0)) return 0 // colinear
+        if (res.absoluteValue.equals(0.0)) return 0 // colinear absoluteValue is needed in case of "-0.0" value
         return if (res > 0) 1 else 2 // clock or counterclock wise
     }
 
@@ -50,5 +54,4 @@ object IntersectionTools {
         return o4 == 0 && onSegment(p2, q1, q2)
         // Doesn't fall in any of the above cases
     }
-
 }
