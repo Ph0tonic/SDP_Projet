@@ -8,16 +8,11 @@ import kotlin.collections.ArrayList
 import kotlin.math.ceil
 import kotlin.math.max
 
-
 /**
  * Creates a path covering a quadrilateral in several passes
  */
 class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
-
-    companion object Constraints {
-        const val pinPointsAmount = 4
-    }
 
     init {
         require(maxDistBetweenLinesIn > 0.0) {
