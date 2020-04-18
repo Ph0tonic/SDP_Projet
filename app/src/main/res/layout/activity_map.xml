@@ -23,8 +23,8 @@
 
         <ImageButton
             android:id="@+id/start_mission_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_weight="1"
             android:gravity="center"
             android:adjustViewBounds="true"
@@ -34,8 +34,8 @@
 
         <ImageButton
             android:id="@+id/clear_waypoints"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_weight="1"
             android:gravity="center"
             android:adjustViewBounds="true"
@@ -45,8 +45,8 @@
 
         <ImageButton
             android:id="@+id/locate_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_weight="1"
             android:gravity="center"
             android:adjustViewBounds="true"
@@ -56,8 +56,8 @@
 
         <ImageButton
             android:id="@+id/stored_offline_map"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_weight="1"
             android:gravity="center"
             android:adjustViewBounds="true"

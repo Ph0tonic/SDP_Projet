@@ -3,9 +3,10 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.Button
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
@@ -24,6 +25,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
+
 
 /**
  * Main Activity to display map and create missions.
@@ -128,12 +130,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         findViewById<ImageButton>(R.id.start_mission_button).setOnClickListener {
             DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
         }
-        findViewById<ImageButton>(R.id.stored_offline_map).setOnClickListener {
-            startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
-        }
         findViewById<ImageButton>(R.id.clear_waypoints).setOnClickListener {
             clearWaypoints()
         }
+        findViewById<ImageButton>(R.id.locate_button).setOnClickListener {
+            Log.d("Test","Hey, I pushed a button !")
+        }
+        findViewById<ImageButton>(R.id.stored_offline_map).setOnClickListener {
+            startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
+        }
+
+
+
 
         userLatitudeTextView = findViewById(R.id.tv_latitude)
         userLongitudeTextView = findViewById(R.id.tv_longitude)
@@ -344,4 +352,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
+    /**
+    @Suppress("DEPRECATION")
+    private fun scaleButtonsSize(){
+        val buttons = 4;
+        val layout = findViewById<LinearLayout>(R.id.linearLayout)
+        val params = layout.layoutParams
+        params.height = getWindowManager().getDefaultDisplay().height
+        params.width = params.height/buttons
+        Log.d("Test", ""+params.height)
+        Log.d("Test", ""+params.width)
+        layout.setLayoutParams(params)
+    }**/
 }
