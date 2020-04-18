@@ -11,4 +11,5 @@ interface SearchArea {
 
     fun isComplete(): Boolean
     fun getLatLng(): MutableLiveData<MutableList<LatLng>>
+    fun getAdditionalProps(): MutableLiveData<MutableMap<String,Double>>
 }

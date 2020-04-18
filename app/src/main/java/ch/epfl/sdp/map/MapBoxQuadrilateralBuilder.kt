@@ -4,6 +4,7 @@ import android.graphics.Color
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.searcharea.QuadrilateralArea
+import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -11,7 +12,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-class MapBoxQuadrilateralBuilder(private val searchArea: QuadrilateralArea) : MapBoxEventManager {
+class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
 
     override fun onMapClicked(position: LatLng) {
         if (!searchArea.isComplete()) searchArea.addAngle(position)
@@ -34,19 +35,21 @@ class MapBoxQuadrilateralBuilder(private val searchArea: QuadrilateralArea) : Ma
     private lateinit var lineArea: Line
 
     private var movingWaypoint: Boolean = false
+    val searchArea = QuadrilateralArea()
+
+    private lateinit var observer: Observer<MutableList<LatLng>>
 
     override fun mount(lifecycleOwner: LifecycleOwner, mapView: MapView, mapboxMap: MapboxMap, style: Style) {
-
         fillManager = FillManager(mapView, mapboxMap, style)
         lineManager = LineManager(mapView, mapboxMap, style)
         circleManager = CircleManager(mapView, mapboxMap, style)
 
-        searchArea.getLatLng().observe(lifecycleOwner, Observer {
-            //Create a marker for each point
+        observer = Observer {
 //            drawPath(it)
             drawRegion(it)
             drawPinpoint(it)
-        })
+        }
+        searchArea.getLatLng().observe(lifecycleOwner, this.observer)
 
         circleManager.addDragListener(object : OnCircleDragListener {
             lateinit var location: LatLng
@@ -66,13 +69,16 @@ class MapBoxQuadrilateralBuilder(private val searchArea: QuadrilateralArea) : Ma
         })
     }
 
-    /**
-     * Draws the path given by the list of positions
-     */
-    private fun drawPath(path: List<LatLng>) {
-        lineManager.create(LineOptions()
-                .withLatLngs(path)
-                .withLineWidth(PATH_THICKNESS))
+    override fun unMount() {
+        circleManager.deleteAll()
+        lineManager.deleteAll()
+        fillManager.deleteAll()
+
+        searchArea.getLatLng().removeObserver(observer)
+    }
+
+    override fun searchArea(): SearchArea {
+        return searchArea
     }
 
     /**
@@ -126,5 +132,4 @@ class MapBoxQuadrilateralBuilder(private val searchArea: QuadrilateralArea) : Ma
             circleManager.create(circleOptions)
         }
     }
-
 }

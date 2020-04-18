@@ -22,7 +22,7 @@ class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : Overflight
     }
 
     override fun acceptArea(searchArea: SearchArea): Boolean {
-        return searchArea.isComplete() && (searchArea is QuadrilateralArea)
+        return searchArea is QuadrilateralArea
     }
 
     @Throws(IllegalArgumentException::class)
