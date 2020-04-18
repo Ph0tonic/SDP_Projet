@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.Observer
@@ -124,13 +125,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
 
-        findViewById<Button>(R.id.start_mission_button).setOnClickListener {
+        findViewById<ImageButton>(R.id.start_mission_button).setOnClickListener {
             DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
         }
-        findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
+        findViewById<ImageButton>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
-        findViewById<Button>(R.id.clear_waypoints).setOnClickListener {
+        findViewById<ImageButton>(R.id.clear_waypoints).setOnClickListener {
             clearWaypoints()
         }
 
