@@ -275,4 +275,50 @@ class MapActivityTest {
         }
         onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
     }
+
+    @Test
+    fun updateBatteryLevelChangesBatteryLevelIcon(){
+        mActivityRule.launchActivity(Intent())
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.00f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery1))))
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.10f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery2))))
+
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.30f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery3))))
+
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.50f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery4))))
+
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.70f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery5))))
+
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.90f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery6))))
+
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.98f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
+
+    }
 }
