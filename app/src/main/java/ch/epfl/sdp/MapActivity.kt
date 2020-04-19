@@ -208,10 +208,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // Used to detect when the map is ready in tests
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
-            isMapReady = true
-
             missionBuilder.mount(mapView, mapboxMap, style)
             mapBoxSearchAreaBuilder.mount(this, mapView, mapboxMap, style)
+
+            isMapReady = true
         }
     }
 
