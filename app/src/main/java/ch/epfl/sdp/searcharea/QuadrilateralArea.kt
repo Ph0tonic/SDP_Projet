@@ -54,6 +54,7 @@ class QuadrilateralArea : SearchArea {
     }
 
     override fun reset() {
-        angles.postValue(mutableListOf())
+        angles.value?.clear()
+        angles.notifyObserver()
     }
 }
