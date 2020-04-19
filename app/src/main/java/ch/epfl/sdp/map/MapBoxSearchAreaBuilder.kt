@@ -15,5 +15,7 @@ interface MapBoxSearchAreaBuilder {
     fun mount(lifecycleOwner: LifecycleOwner, mapView: MapView, mapboxMap: MapboxMap, style: Style)
     fun unMount()
 
+    fun resetSearchArea()
+
     fun searchArea(): SearchArea
 }

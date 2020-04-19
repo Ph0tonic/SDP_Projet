@@ -15,7 +15,7 @@ object Drone {
     private const val BACKEND_PORT = 50051
 
     // Maximum distance betwen passes in the strategy
-    private const val DEFAULT_MAX_DIST_BETWEEN_PASSES: Double = 15.0
+    const val CAPTEUR_HORIZONTAL_SCOPE: Double = 15.0
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -23,8 +23,6 @@ object Drone {
     val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
-
-    var overflightStrategy: OverflightStrategy
 
     private val instance: System
 
@@ -48,7 +46,6 @@ object Drone {
                     groundSpeed.velocityEastMS.pow(2))
             currentSpeedLiveData.postValue(speed)
         })
-        overflightStrategy = SimpleMultiPassOnQuadrilateral(DEFAULT_MAX_DIST_BETWEEN_PASSES)
     }
 
     fun startMission(mission: List<Mission.MissionItem>) {

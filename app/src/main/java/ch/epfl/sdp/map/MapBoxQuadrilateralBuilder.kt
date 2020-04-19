@@ -77,6 +77,10 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
         searchArea.getLatLng().removeObserver(observer)
     }
 
+    override fun resetSearchArea() {
+        searchArea.reset()
+    }
+
     override fun searchArea(): SearchArea {
         return searchArea
     }

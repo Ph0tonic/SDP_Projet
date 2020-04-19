@@ -2,6 +2,7 @@ package ch.epfl.sdp.drone
 
 import android.graphics.Color
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -13,63 +14,87 @@ import com.mapbox.mapboxsdk.plugins.annotation.LineManager
 import com.mapbox.mapboxsdk.plugins.annotation.LineOptions
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-object MissionBuilder {
-    private const val PATH_THICKNESS: Float = 2F
-    private const val REGION_FILL_OPACITY: Float = 0.5F
+class MissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocation: LiveData<LatLng>, private val searchArea: LiveData<SearchArea>, private val strategy: LiveData<OverflightStrategy>) {
+    companion object {
+        private const val PATH_THICKNESS: Float = 2F
+    }
 
-    var strategy: OverflightStrategy? = null
-    var searchArea: SearchArea? = null
-    var startingLocation: LatLng? = null
+    enum class MissionBuilderStatus {
+        UNINITIALIZED, INCOMPATIBLE_STRATEGY_AND_SEARCHAREA, OK
+    }
 
-    var generalObserver: Observer<Any>
-//    var latLngObserver: Observer<MutableList<LatLng>>
-//    var additionalPropsObserver: Observer<MutableMap<String, Double>>
+    var status = MissionBuilderStatus.UNINITIALIZED
+    private var mounted: Boolean = false
 
-    var path: List<LatLng>? = null
+    private lateinit var cachedSearchArea: SearchArea
+
+    private var generalObserver: Observer<Any>
 
     private lateinit var lineManager: LineManager
     private lateinit var lineArea: Line
+
+    private lateinit var path: List<LatLng>
 
     init {
         generalObserver = Observer {
             computeMissionPath()
         }
+        val strategyObserver = Observer<OverflightStrategy> {
+            if (!it.acceptArea(searchArea.value!!)) {
+                status = MissionBuilderStatus.INCOMPATIBLE_STRATEGY_AND_SEARCHAREA
+            } else {
+                computeMissionPath()
+            }
+        }
+        val searchAreaObserver = Observer<SearchArea> {
+            if (::cachedSearchArea.isInitialized) {
+                //Remove old observers
+                cachedSearchArea.getAdditionalProps().removeObserver(this.generalObserver)
+                cachedSearchArea.getLatLng().removeObserver(this.generalObserver)
+            }
+            this.cachedSearchArea = it
+            cachedSearchArea.getAdditionalProps().observe(lifecycleOwner, this.generalObserver)
+            cachedSearchArea.getLatLng().observe(lifecycleOwner, this.generalObserver)
+
+            computeMissionPath()
+        }
+
+        startingLocation.observe(lifecycleOwner, generalObserver)
+        strategy.observe(lifecycleOwner, strategyObserver)
+        searchArea.observe(lifecycleOwner, searchAreaObserver)
+
+        if (searchArea.value != null) {
+            searchArea.value!!.getLatLng().observe(lifecycleOwner, this.generalObserver)
+            searchArea.value!!.getAdditionalProps().observe(lifecycleOwner, this.generalObserver)
+        }
     }
 
-    fun mount(lifecycleOwner: LifecycleOwner, mapView: MapView, mapboxMap: MapboxMap, style: Style) {
+    fun mount(mapView: MapView, mapboxMap: MapboxMap, style: Style) {
+        require(!mounted) { "A mission builder cannot be mounted twice" }
         lineManager = LineManager(mapView, mapboxMap, style)
-
-        searchArea?.getLatLng()?.observe(lifecycleOwner, this.generalObserver)
-        searchArea?.getAdditionalProps()?.observe(lifecycleOwner, this.generalObserver)
-    }
-
-    fun changeSearchArea(lifecycleOwner: LifecycleOwner, newSearchArea: SearchArea) {
-        searchArea?.getAdditionalProps()?.removeObserver(generalObserver)
-        searchArea?.getLatLng()?.removeObserver(generalObserver)
-
-        searchArea = newSearchArea
-
-        searchArea?.getAdditionalProps()?.observe(lifecycleOwner, generalObserver)
-        searchArea?.getLatLng()?.observe(lifecycleOwner, generalObserver)
+        mounted = true
 
         computeMissionPath()
     }
 
-    fun changeStrategy(lifecycleOwner: LifecycleOwner, newStrategy: OverflightStrategy) {
-
-    }
-
     fun getMission(): List<LatLng> {
-        return path!!
+        return path
     }
 
     private fun computeMissionPath() {
-        path = strategy?.createFlightPath(startingLocation!!, searchArea!!)
-        displayStrategyPath(path!!)
+        if (
+                status == MissionBuilderStatus.OK &&
+                searchArea.value != null && searchArea.value?.isComplete()!!
+                && startingLocation.value != null
+                && strategy.value != null
+        ) {
+            path = strategy.value!!.createFlightPath(startingLocation.value!!, searchArea.value!!)
+            displayStrategyPath(path)
+        }
     }
 
     private fun displayStrategyPath(path: List<LatLng>) {
-        if (path.isEmpty()) return
+        if (!mounted || path.isEmpty()) return
 
         if (!::lineArea.isInitialized) {
             lineManager.deleteAll()
@@ -83,5 +108,4 @@ object MissionBuilder {
             lineManager.update(lineArea)
         }
     }
-
 }

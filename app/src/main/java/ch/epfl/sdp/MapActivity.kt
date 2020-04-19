@@ -6,11 +6,18 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.drone.MissionBuilder
+import ch.epfl.sdp.drone.OverflightStrategy
+import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.map.MapBoxEventManager
 import ch.epfl.sdp.map.MapBoxQuadrilateralBuilder
+import ch.epfl.sdp.map.MapBoxSearchAreaBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralArea
+import ch.epfl.sdp.searcharea.SearchArea
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.geojson.Feature
@@ -26,6 +33,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
+import io.mavsdk.mission.Mission
 
 /**
  * Main Activity to display map and create missions.
@@ -36,8 +44,12 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     //TODO: Update
-    private var searchArea = QuadrilateralArea()
-    private val mapBoxEventManager: MapBoxEventManager = MapBoxQuadrilateralBuilder(searchArea)
+    private val mapBoxSearchAreaBuilder: MapBoxSearchAreaBuilder
+    private val missionBuilder: MissionBuilder
+
+    private var startingLocation: MutableLiveData<LatLng>
+    private var searchArea: MutableLiveData<SearchArea>
+    private var strategy: MutableLiveData<OverflightStrategy>
 
     private lateinit var mapboxMap: MapboxMap
 
@@ -58,6 +70,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneSpeedTextView: TextView
 
     private lateinit var droneBatteryLevelImageView: ImageView
+
+    init {
+        mapBoxSearchAreaBuilder = MapBoxQuadrilateralBuilder()
+
+        searchArea = MutableLiveData(mapBoxSearchAreaBuilder.searchArea())
+        strategy = MutableLiveData(SimpleMultiPassOnQuadrilateral(Drone.CAPTEUR_HORIZONTAL_SCOPE))
+        startingLocation = MutableLiveData(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
+
+        missionBuilder = MissionBuilder(this, startingLocation, searchArea, strategy)
+    }
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -125,7 +147,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         findViewById<Button>(R.id.start_mission_button).setOnClickListener {
             Drone.startMission(DroneMission.makeDroneMission(
-                    Drone.overflightStrategy.createFlightPath(Drone.currentPositionLiveData.value!!, searchArea)
+                    missionBuilder.getMission()
             ).getMissionItems())
         }
         findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
@@ -194,7 +216,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             isMapReady = true
 
             //searchAreaDrawer.mount(this, mapView, mapboxMap, style)
-            mapBoxEventManager.mount(this, mapView, mapboxMap, style)
+            mapBoxSearchAreaBuilder.mount(this, mapView, mapboxMap, style)
+            missionBuilder.mount(mapView, mapboxMap, style)
         }
     }
 
@@ -208,12 +231,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     /** Trajectory Planning **/
     private fun onMapClicked(position: LatLng) {
-        mapBoxEventManager.onMapClicked(position)
+        mapBoxSearchAreaBuilder.onMapClicked(position)
     }
 
     /** Trajectory Planning **/
     private fun onMapLongClicked(position: LatLng) {
-        mapBoxEventManager.onMapLongClicked(position)
+        mapBoxSearchAreaBuilder.onMapLongClicked(position)
     }
 
     /**
@@ -222,8 +245,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun clearWaypoints() {
         if (!isMapReady) return
 
-        //TODO: Clean Builder
-        searchArea = QuadrilateralArea()
+        mapBoxSearchAreaBuilder.resetSearchArea()
     }
 
     /**

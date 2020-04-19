@@ -6,6 +6,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 class PolygonArea : SearchArea {
 
     private val angles: MutableLiveData<MutableList<LatLng>> = MutableLiveData(mutableListOf())
+    private val props: MutableLiveData<MutableMap<String, Double>> = MutableLiveData(mutableMapOf())
 
     fun getNbAngles(): Int {
         return angles.value?.size!!
@@ -22,5 +23,13 @@ class PolygonArea : SearchArea {
 
     override fun getLatLng(): MutableLiveData<MutableList<LatLng>> {
         return angles
+    }
+
+    override fun getAdditionalProps(): MutableLiveData<MutableMap<String, Double>> {
+        return props
+    }
+
+    override fun reset() {
+        angles.postValue(mutableListOf())
     }
 }
