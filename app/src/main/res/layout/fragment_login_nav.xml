@@ -7,9 +7,10 @@
     android:gravity="bottom|center_horizontal"
     android:minHeight="@dimen/nav_header_height"
     android:orientation="vertical"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:textColor="@android:color/black" >
 
-    <com.mikhaellopez.circularimageview.CircularImageView
+
+<com.mikhaellopez.circularimageview.CircularImageView
         android:id="@+id/nav_user_image_default"
         android:layout_width="75dp"
         android:layout_height="75dp"

@@ -3,9 +3,6 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.Observer
@@ -19,7 +16,6 @@ import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -27,7 +23,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import kotlinx.android.synthetic.main.activity_map.*
 
 
 /**
@@ -66,7 +61,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneBatteryLevelImageView: ImageView
 
     private val droneBatteryLevelDrawables = listOf(
-            Pair(.0, R.drawable.ic_battery1),
+            Pair(.0,  R.drawable.ic_battery1),
             Pair(.05, R.drawable.ic_battery2),
             Pair(.23, R.drawable.ic_battery3),
             Pair(.41, R.drawable.ic_battery4),
@@ -93,7 +88,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newBatteryLevel?.let {
             val newBatteryDrawable = droneBatteryLevelDrawables
                     .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
-                    .maxBy { x -> x.first }!!
+                    .maxBy  { x -> x.first }!!
                     .second
             droneBatteryLevelImageView.setImageResource(newBatteryDrawable)
             droneBatteryLevelImageView.tag = newBatteryDrawable
@@ -123,14 +118,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
-
-        droneBatteryLevelTextView = findViewById(R.id.battery_level)
-        droneAltitudeTextView = findViewById(R.id.altitude)
-        distanceToUserTextView = findViewById(R.id.distance_to_user)
-        droneSpeedTextView = findViewById(R.id.speed)
+        initButtons()
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
+        droneBatteryLevelTextView  = findViewById(R.id.battery_level)
+        droneAltitudeTextView      = findViewById(R.id.altitude)
+        distanceToUserTextView     = findViewById(R.id.distance_to_user)
+        droneSpeedTextView         = findViewById(R.id.speed)
+        userLatitudeTextView       = findViewById(R.id.tv_latitude)
+        userLongitudeTextView      = findViewById(R.id.tv_longitude)
 
+        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
+
+        CentralLocationManager.configure(this)
+    }
+
+    private fun initButtons(){
         findViewById<FloatingActionButton>(R.id.start_or_return_button).setOnClickListener {
             if(isDroneFlying) {
                 //TODO : return to user
@@ -138,27 +141,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 isDroneFlying = true
                 DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
             }
-            updateStartButton() //
+            updateStartButton()
         }
-        findViewById<FloatingActionButton>(R.id.clear_button).setOnClickListener {
-            clearWaypoints()
-        }
-        findViewById<FloatingActionButton>(R.id.locate_button).setOnClickListener {
-            centerCameraOnDrone()
-        }
-        findViewById<FloatingActionButton>(R.id.store_button).setOnClickListener {
-            startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
-        }
-
-
-
-
-        userLatitudeTextView = findViewById(R.id.tv_latitude)
-        userLongitudeTextView = findViewById(R.id.tv_longitude)
-
-        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
-
-        CentralLocationManager.configure(this)
+        findViewById<FloatingActionButton>(R.id.clear_button ).setOnClickListener { clearWaypoints() }
+        findViewById<FloatingActionButton>(R.id.locate_button).setOnClickListener { centerCameraOnDrone() }
+        findViewById<FloatingActionButton>(R.id.store_button ).setOnClickListener { startActivity(Intent(applicationContext, OfflineManagerActivity::class.java)) }
     }
 
     override fun onResume() {
@@ -256,8 +243,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         fillManager.deleteAll()
         fillManager.create(fillOption)
 
-        //Draw the borders
-
         // Make it loop
         val linePoints = arrayListOf<LatLng>().apply {
             addAll(corners)
@@ -291,18 +276,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         waypointCircleManager.deleteAll()
         lineManager.deleteAll()
         fillManager.deleteAll()
-    }
-
-    /**
-     * Toggles the waypoints visibility
-     * @return : true if the waypoints are now visible, false if they are not
-     */
-    private fun toggleWaypointsVisibility()  {
-        waypointCircleManager.deleteAll()
-        lineManager.deleteAll()
-        fillManager.deleteAll()
-
-        //drawPath()
     }
 
     /**
@@ -343,12 +316,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Centers the camera on the drone
+     */
     private fun centerCameraOnDrone(){
         if(::dronePositionMarker.isInitialized){
         mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, 14.0))
         }
     }
-
 
     /**
      * Updates the user position if the drawing managers are ready
@@ -381,7 +356,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
 
     private fun updateStartButton(){
         findViewById<FloatingActionButton>(R.id.start_or_return_button).setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start )

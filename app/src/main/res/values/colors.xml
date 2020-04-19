@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorBlack">#000000</color>
     <color name="colorWhite">#FFFFFF</color>
-    <color name="colorLightGray">#A0A0A0</color>
-    <color name="colorPrimary">#0E518C</color>
-    <color name="colorPrimaryDark">#031647</color>
-    <color name="colorAccent">#FF0051</color>
+    <color name="colorLightGray">#A0A0A0</color>   <!--dark theme below-->
+    <color name="colorPrimary">#DCEFFF</color>     <!-- #0E518C -->
+    <color name="colorPrimaryDark">#9AADE1</color> <!-- #031647 -->
+    <color name="colorAccent">#000560</color>
 
 </resources>
