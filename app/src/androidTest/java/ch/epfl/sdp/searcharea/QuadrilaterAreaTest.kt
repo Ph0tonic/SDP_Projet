@@ -1,6 +1,7 @@
 package ch.epfl.sdp.searcharea
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import ch.epfl.sdp.ui.maps.IntersectionTools
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert.assertThat
@@ -15,7 +16,7 @@ class QuadrilaterAreaTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Test
-    fun CanAddFourAngles() {
+    fun canAddFourAngles() {
         val size = 4
         val area = QuadrilateralArea()
         for (i in 1..size) {
@@ -25,7 +26,7 @@ class QuadrilaterAreaTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun CannotAddMoreThanFourAngles() {
+    fun cannotAddMoreThanFourAngles() {
         val area = QuadrilateralArea()
         for (i in 0..4) {
             area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
@@ -34,7 +35,7 @@ class QuadrilaterAreaTest {
     }
 
     @Test
-    fun IsCompleteWhenFourAngle() {
+    fun isCompleteWhenFourAngle() {
         val area = QuadrilateralArea()
         assertThat(area.isComplete(), CoreMatchers.equalTo(false))
 
@@ -52,7 +53,7 @@ class QuadrilaterAreaTest {
     }
 
     @Test
-    fun ResetIsPerformed() {
+    fun resetIsPerformed() {
         val area = QuadrilateralArea()
 
         area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
@@ -62,13 +63,20 @@ class QuadrilaterAreaTest {
     }
 
     @Test
-    fun GetPropsShouldBeEmpty() {
+    fun getPropsShouldBeEmpty() {
         val area = QuadrilateralArea()
         assertThat(area.getAdditionalProps().value, equalTo(mutableMapOf()))
     }
 
     @Test
-    fun WhenAddingSomePointsShouldReorderThem() {
-        TODO("Implement this test")
+    fun whenAddingSomePointsShouldPathShouldNotIntersect() {
+        val area = QuadrilateralArea()
+        area.addAngle(LatLng(0.0, 0.0))
+        area.addAngle(LatLng(1.0, 0.0))
+        area.addAngle(LatLng(0.0, 1.0))
+        area.addAngle(LatLng(1.0, 1.0))
+
+        val corners = area.getLatLng().value!!
+        assertThat(IntersectionTools.doIntersect(corners[0],corners[1], corners[2],corners[3]), equalTo(false))
     }
 }

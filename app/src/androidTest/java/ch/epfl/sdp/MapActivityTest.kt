@@ -140,10 +140,6 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         val searchAreaBuilder = mActivityRule.activity.mapBoxSearchAreaBuilder
-        runOnUiThread {
-            searchAreaBuilder.resetSearchArea()
-        }
-        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(0))
 
         // Wait for the map to load
         mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
