@@ -27,7 +27,14 @@ class QuadrilaterAreaTest {
 
     @Test
     fun canMovePreviouslyAddedAngle() {
-        TODO("Move a corner")
+        val area = QuadrilateralArea()
+        area.addAngle(LatLng(0.0, 0.0))
+        area.addAngle(LatLng(1.0, 0.0))
+
+        area.moveAngle(LatLng(0.0, 0.0), LatLng(1.0, 1.0))
+
+        val corners = area.getLatLng().value!!
+        assertThat(corners, equalTo(listOf(LatLng(1.0, 0.0), LatLng(1.0, 1.0))))
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -82,6 +89,6 @@ class QuadrilaterAreaTest {
         area.addAngle(LatLng(1.0, 1.0))
 
         val corners = area.getLatLng().value!!
-        assertThat(IntersectionTools.doIntersect(corners[0],corners[1], corners[2],corners[3]), equalTo(false))
+        assertThat(IntersectionTools.doIntersect(corners[0], corners[1], corners[2], corners[3]), equalTo(false))
     }
 }
