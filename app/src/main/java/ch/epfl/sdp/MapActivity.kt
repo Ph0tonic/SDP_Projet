@@ -6,17 +6,14 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.MissionBuilder
 import ch.epfl.sdp.drone.OverflightStrategy
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.map.MapBoxEventManager
 import ch.epfl.sdp.map.MapBoxQuadrilateralBuilder
 import ch.epfl.sdp.map.MapBoxSearchAreaBuilder
-import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -33,7 +30,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import io.mavsdk.mission.Mission
 
 /**
  * Main Activity to display map and create missions.

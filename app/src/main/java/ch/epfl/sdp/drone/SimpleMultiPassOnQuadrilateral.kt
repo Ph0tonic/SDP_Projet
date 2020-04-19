@@ -27,7 +27,7 @@ class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : Overflight
 
     @Throws(IllegalArgumentException::class)
     override fun createFlightPath(startingPoint: LatLng, searchArea: SearchArea): List<LatLng> {
-        require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
+        require(acceptArea(searchArea) && searchArea.isComplete()) { "This strategy does not accept this type of area" }
 
         // Make a mutable copy of the waypoints to be able to reorder them
         val waypointsCopied = mutableListOf<LatLng>().apply { addAll(searchArea.getLatLng().value!!) }
