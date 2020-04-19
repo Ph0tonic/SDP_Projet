@@ -3,27 +3,19 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle.Constraints.pinPointsAmount
-import ch.epfl.sdp.ui.maps.MapUtils
-import ch.epfl.sdp.ui.maps.MapViewBaseActivity
+import ch.epfl.sdp.ui.maps.*
 import com.getbase.floatingactionbutton.FloatingActionButton
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.Point
+import com.mapbox.geojson.*
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.maps.*
 import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.style.sources.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
-
 
 /**
  * Main Activity to display map and create missions.
@@ -171,11 +163,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            fillManager = FillManager(mapView, mapboxMap, style)
-            lineManager = LineManager(mapView, mapboxMap, style)
+            fillManager           = FillManager  (mapView, mapboxMap, style)
+            lineManager           = LineManager  (mapView, mapboxMap, style)
             waypointCircleManager = CircleManager(mapView, mapboxMap, style)
-            droneCircleManager = CircleManager(mapView, mapboxMap, style)
-            userCircleManager = CircleManager(mapView, mapboxMap, style)
+            droneCircleManager    = CircleManager(mapView, mapboxMap, style)
+            userCircleManager     = CircleManager(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -185,14 +177,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
             style.addSource(geoJsonSource)
-
             MapUtils.createLayersForHeatMap(style)
-
-            // Load latest location
-            mapboxMap.cameraPosition = MapUtils.getLastCameraState()
-
-            // Used to detect when the map is ready in tests
-            mapView.contentDescription = MAP_READY_DESCRIPTION
+            mapboxMap.cameraPosition = MapUtils.getLastCameraState()// Load latest location
+            mapView.contentDescription = MAP_READY_DESCRIPTION// Used to detect when the map is ready in tests
 
             isMapReady = true
         }
