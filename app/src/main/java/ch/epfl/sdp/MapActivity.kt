@@ -25,32 +25,27 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
-    private lateinit var mapboxMap: MapboxMap
-
-    private var isMapReady = false
+    private var isMapReady    = false
     private var isDroneFlying = false
 
     private lateinit var waypointCircleManager: CircleManager
-    private lateinit var droneCircleManager: CircleManager
-    private lateinit var userCircleManager: CircleManager
-
-    private lateinit var lineManager: LineManager
-    private lateinit var fillManager: FillManager
-
-    private lateinit var dronePositionMarker: Circle
-    private lateinit var userPositionMarker: Circle
+    private lateinit var droneCircleManager:    CircleManager
+    private lateinit var userCircleManager:     CircleManager
+    private lateinit var lineManager:           LineManager
+    private lateinit var fillManager:           FillManager
+    private lateinit var dronePositionMarker:   Circle
+    private lateinit var userPositionMarker:    Circle
 
     var waypoints = arrayListOf<LatLng>()
-
     private var features = ArrayList<Feature>()
     private lateinit var geoJsonSource: GeoJsonSource
-
-    private lateinit var distanceToUserTextView: TextView
-    private lateinit var droneBatteryLevelTextView: TextView
-    private lateinit var droneAltitudeTextView: TextView
-    private lateinit var droneSpeedTextView: TextView
+    private lateinit var mapboxMap: MapboxMap
 
     private lateinit var droneBatteryLevelImageView: ImageView
+    private lateinit var droneBatteryLevelTextView:  TextView
+    private lateinit var droneAltitudeTextView:      TextView
+    private lateinit var droneSpeedTextView:         TextView
+    private lateinit var distanceToUserTextView:     TextView
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0,  R.drawable.ic_battery1),
@@ -72,12 +67,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
-
-        // Always update the text string
-        updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
-
-        // Only update the icon if the battery level is not null
-        newBatteryLevel?.let {
+        updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT) // Always update the text string
+        newBatteryLevel?.let { // Only update the icon if the battery level is not null
             val newBatteryDrawable = droneBatteryLevelDrawables
                     .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
                     .maxBy  { x -> x.first }!!
@@ -95,14 +86,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
-        const val MAP_READY_DESCRIPTION: String = "MAP READY"
+        const val MAP_READY_DESCRIPTION:     String = "MAP READY"
 
-        private const val PATH_THICKNESS: Float = 5F
+        private const val PATH_THICKNESS:      Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F
 
-        private const val DISTANCE_FORMAT = " %.1f m"
+        private const val DISTANCE_FORMAT   = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
-        private const val SPEED_FORMAT = " %.1f m/s"
+        private const val SPEED_FORMAT      = " %.1f m/s"
         private const val COORDINATE_FORMAT = " %.7f"
     }
 
@@ -127,9 +118,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun initButtons(){
         findViewById<FloatingActionButton>(R.id.start_or_return_button).setOnClickListener {
-            if(isDroneFlying) {
-                //TODO : return to user
-            } else {
+            if(!isDroneFlying) { //TODO : return to user else
                 isDroneFlying = true
                 DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
             }
@@ -142,10 +131,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        Drone.currentPositionLiveData.observe(this, dronePositionObserver)
-        Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
-        Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
-        Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
+        Drone.currentPositionLiveData             .observe(this, dronePositionObserver)
+        Drone.currentBatteryLevelLiveData         .observe(this, droneBatteryObserver)
+        Drone.currentAbsoluteAltitudeLiveData     .observe(this, droneAltitudeObserver)
+        Drone.currentSpeedLiveData                .observe(this, droneSpeedObserver)
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
     }
 
