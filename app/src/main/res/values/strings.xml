@@ -28,7 +28,7 @@
     <string name="dialog_title">Name new Region</string>
     <string name="dialog_message">Download the map region you currently are viewing</string>
     <string name="set_region_name_hint">Enter name</string>
-    <string name="dialog_positive_button">DOWNLOAD</string>
+    <string name="dialog_positive_button">Download</string>
     <string name="dialog_negative_button">CANCEL</string>
     <string name="navigate_title">List</string>
     <string name="navigate_positive_button">NAVIGATE TO</string>
@@ -63,7 +63,7 @@
     <string name="prefs_longitude">longitude</string>
     <string name="prefs_zoom">zoom</string>
     <string name="camera_button">Camera</string>
-    <string name="map_button">Map</string>
+    <string name="map_button">Start new mission</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="enter_name">Enter Name</string>
 </resources>

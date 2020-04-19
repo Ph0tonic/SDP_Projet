@@ -20,6 +20,7 @@
         android:hint="@string/enter_name"
         android:importantForAutofill="no"
         android:inputType="text"
+        android:background="@color/colorPrimaryDark"
         android:visibility="invisible" />
 
     <ProgressBar
@@ -52,6 +53,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
+            android:textColor="@color/colorWhite"
             android:text="@string/dialog_positive_button"
             android:textAllCaps="false"
             android:textSize="12sp" />
@@ -62,6 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textColor="@color/colorWhite"
             android:text="@string/navigate_title"
             android:textAllCaps="false"
             android:textSize="12sp" />

@@ -2,11 +2,8 @@
 <resources>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorLightGray">#A0A0A0</color>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorAccentLight">#F83B80</color>
-    <color name="colorCyan">#0080B0</color>
-    <color name="colorCyanLight">#20A0FF</color>
+    <color name="colorPrimary">#0E518C</color>
+    <color name="colorPrimaryDark">#031647</color>
+    <color name="colorAccent">#FF0051</color>
 
 </resources>
