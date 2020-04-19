@@ -25,6 +25,11 @@ class QuadrilaterAreaTest {
         assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(size))
     }
 
+    @Test
+    fun canMovePreviouslyAddedAngle() {
+        TODO("Move a corner")
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun cannotAddMoreThanFourAngles() {
         val area = QuadrilateralArea()

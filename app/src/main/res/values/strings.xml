@@ -40,7 +40,6 @@
     <string name="region_name">Region name error</string>
     <string name="switch_video">Switch video</string>
 
-    <string name="below_layer_id">building</string>
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
     <string name="lat">LAT :</string>

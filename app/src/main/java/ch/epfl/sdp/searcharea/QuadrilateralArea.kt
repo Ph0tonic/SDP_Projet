@@ -6,29 +6,26 @@ import ch.epfl.sdp.ui.maps.IntersectionTools
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 
-class QuadrilateralArea : SearchArea {
-
-    private val angles: MutableLiveData<MutableList<LatLng>> = MutableLiveData(mutableListOf())
-    private val props: MutableLiveData<MutableMap<String, Double>> = MutableLiveData(mutableMapOf())
+class QuadrilateralArea : SearchArea() {
 
     fun addAngle(angle: LatLng) {
-        require(angles.value?.size!! < 4) { "Max number of angles reached" }
-        angles.value?.add(angle)
-        orderAngles()
-        angles.notifyObserver()
+        require(latLngs.value?.size!! < 4) { "Max number of latLngs reached" }
+        latLngs.value?.add(angle)
+        orderlatLngs()
+        latLngs.notifyObserver()
     }
 
     fun moveAngle(old: LatLng, new: LatLng) {
-        val oldIndex = angles.value?.withIndex()?.minBy { it.value.distanceTo(old) }?.index
-        angles.value?.removeAt(oldIndex!!)
-        angles.value?.add(new)
-        orderAngles()
-        angles.notifyObserver()
+        val oldIndex = latLngs.value?.withIndex()?.minBy { it.value.distanceTo(old) }?.index
+        latLngs.value?.removeAt(oldIndex!!)
+        latLngs.value?.add(new)
+        orderlatLngs()
+        latLngs.notifyObserver()
     }
 
-    private fun orderAngles() {
-        if (angles.value != null && angles.value?.size == 4) {
-            val data = angles.value!!
+    private fun orderlatLngs() {
+        if (latLngs.value != null && latLngs.value?.size == 4) {
+            val data = latLngs.value!!
 
             // Diagonals should intersect
             if (!IntersectionTools.doIntersect(data[0], data[2], data[1], data[3])) {
@@ -42,19 +39,11 @@ class QuadrilateralArea : SearchArea {
     }
 
     override fun isComplete(): Boolean {
-        return angles.value?.size == 4
-    }
-
-    override fun getLatLng(): MutableLiveData<MutableList<LatLng>> {
-        return angles
-    }
-
-    override fun getAdditionalProps(): MutableLiveData<MutableMap<String, Double>> {
-        return props
+        return latLngs.value?.size == 4
     }
 
     override fun reset() {
-        angles.value?.clear()
-        angles.notifyObserver()
+        latLngs.value?.clear()
+        latLngs.notifyObserver()
     }
 }
