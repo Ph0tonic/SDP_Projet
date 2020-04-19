@@ -1,19 +1,24 @@
 package ch.epfl.sdp.searcharea
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.junit.Rule
 import org.junit.Test
 import kotlin.random.Random
 
 class QuadrilaterAreaTest {
 
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
     @Test
     fun CanAddFourAngles() {
         val size = 4
         val area = QuadrilateralArea()
-        for (i in 0..size) {
+        for (i in 1..size) {
             area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(size))

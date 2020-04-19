@@ -1,9 +1,11 @@
 package ch.epfl.sdp.searcharea
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.random.Random
@@ -11,18 +13,21 @@ import kotlin.random.Random
 @RunWith(AndroidJUnit4::class)
 class PolygonAreaTest {
 
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
     @Test
-    fun CanAddHundredAngles() {
+    fun canAddHundredAngles() {
         val size = 100
         val area = PolygonArea()
-        for (i in 0..size) {
+        for (i in 1..size) {
             area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         assertThat(area.getNbAngles(), equalTo(size))
     }
 
     @Test
-    fun IsCompleteWhenAtLeastThreeAngle() {
+    fun isCompleteWhenAtLeastThreeAngle() {
         val area = PolygonArea()
         assertThat(area.isComplete(), equalTo(false))
 
@@ -40,7 +45,7 @@ class PolygonAreaTest {
     }
 
     @Test
-    fun ResetIsPerformed() {
+    fun resetIsPerformed() {
         val area = PolygonArea()
 
         area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
@@ -50,7 +55,7 @@ class PolygonAreaTest {
     }
 
     @Test
-    fun GetPropsShouldBeEmpty() {
+    fun getPropsShouldBeEmpty() {
         val area = PolygonArea()
         assertThat(area.getAdditionalProps().value, equalTo(mutableMapOf()))
     }
