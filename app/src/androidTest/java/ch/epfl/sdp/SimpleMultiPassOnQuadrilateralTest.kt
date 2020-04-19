@@ -10,7 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class OverflightStrategyTest {
+class SimpleMultiPassOnQuadrilateralTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun simpleMultiPassOnQuadrangleDoesNotAcceptNegativeMaxDistance() {
@@ -38,7 +38,7 @@ class OverflightStrategyTest {
         searchArea.addAngle(LatLng(1.0, 1.0))
         searchArea.addAngle(LatLng(0.0, 1.0))
         val strategy = SimpleMultiPassOnQuadrilateral(1000000000000.0)
-        val path = strategy.createFlightPath(LatLng(0.0,0.0), searchArea)
+        val path = strategy.createFlightPath(LatLng(0.0, 0.0), searchArea)
         val pathSize = path.size
         assertThat(pathSize, equalTo(4))
     }

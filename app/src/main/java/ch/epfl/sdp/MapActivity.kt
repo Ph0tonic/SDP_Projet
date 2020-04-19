@@ -39,9 +39,8 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
-    //TODO: Update
-    private val mapBoxSearchAreaBuilder: MapBoxSearchAreaBuilder
-    private val missionBuilder: MissionBuilder
+    val mapBoxSearchAreaBuilder: MapBoxSearchAreaBuilder
+    val missionBuilder: MissionBuilder
 
     private var startingLocation: MutableLiveData<LatLng>
     private var searchArea: MutableLiveData<SearchArea>

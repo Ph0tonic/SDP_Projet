@@ -319,6 +319,5 @@ class MapActivityTest {
             Drone.currentBatteryLevelLiveData.postValue(.98f)
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
-
     }
 }

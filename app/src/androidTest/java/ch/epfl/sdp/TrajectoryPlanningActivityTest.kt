@@ -33,7 +33,8 @@ class TrajectoryPlanningActivityTest {
 
     @Test
     fun clickOnMapAddsWaypoint() {
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
+        val searchArea = mActivityRule.activity.mapBoxSearchAreaBuilder.searchArea()
+        assertThat(searchArea.getLatLng().value?.size!!, equalTo(0))
 
         // Wait for the map to load
         mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000)
@@ -44,7 +45,7 @@ class TrajectoryPlanningActivityTest {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
 
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
+        assertThat(searchArea.getLatLng().value?.size!!, equalTo(1))
     }
 
     /*
