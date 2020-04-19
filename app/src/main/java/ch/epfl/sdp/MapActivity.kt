@@ -13,6 +13,7 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle.Constraints.pinPointsAmount
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
+import com.getbase.floatingactionbutton.FloatingActionButton
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
@@ -129,16 +130,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
 
-        findViewById<ImageButton>(R.id.start_mission_button).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.start_mission_button).setOnClickListener {
             DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
         }
-        findViewById<ImageButton>(R.id.clear_waypoints).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.clear_waypoints).setOnClickListener {
             clearWaypoints()
         }
-        findViewById<ImageButton>(R.id.locate_button).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.locate_button).setOnClickListener {
             centerCameraOnDrone()
         }
-        findViewById<ImageButton>(R.id.stored_offline_map).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
 
