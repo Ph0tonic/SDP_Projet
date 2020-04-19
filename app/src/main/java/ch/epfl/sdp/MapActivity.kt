@@ -39,13 +39,6 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
-    val mapBoxSearchAreaBuilder: MapBoxSearchAreaBuilder
-    val missionBuilder: MapBoxMissionBuilder
-
-    private var startingLocation: MutableLiveData<LatLng>
-    private var searchArea: MutableLiveData<SearchArea>
-    private var strategy: MutableLiveData<OverflightStrategy>
-
     private lateinit var mapboxMap: MapboxMap
 
     private var isMapReady = false
@@ -65,6 +58,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneSpeedTextView: TextView
 
     private lateinit var droneBatteryLevelImageView: ImageView
+
+    val mapBoxSearchAreaBuilder: MapBoxSearchAreaBuilder
+    val missionBuilder: MapBoxMissionBuilder
+
+    private var startingLocation: MutableLiveData<LatLng>
+    private var searchArea: MutableLiveData<SearchArea>
+    private var strategy: MutableLiveData<OverflightStrategy>
 
     init {
         mapBoxSearchAreaBuilder = MapBoxQuadrilateralBuilder()

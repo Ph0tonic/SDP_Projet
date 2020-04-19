@@ -35,6 +35,7 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
     private lateinit var lineArea: Line
 
     private var movingWaypoint: Boolean = false
+    private var mounted: Boolean = false
     private var reseted: Boolean = false
     val searchArea = QuadrilateralArea()
 
@@ -68,6 +69,7 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
                 movingWaypoint = false
             }
         })
+        mounted = true
     }
 
     override fun unMount() {
@@ -95,7 +97,7 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
      * Fills the regions described by the list of positions
      */
     private fun drawRegion(corners: List<LatLng>) {
-        if (corners.isEmpty()) return
+        if (!mounted || corners.isEmpty()) return
 
         if (!::fillArea.isInitialized || reseted) {
             fillManager.deleteAll()
@@ -133,7 +135,7 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
      * Draws a pinpoint on the map at the given position
      */
     private fun drawPinpoint(corners: List<LatLng>) {
-        if (movingWaypoint) return
+        if (!mounted || movingWaypoint) return
 
         circleManager.deleteAll()
 
