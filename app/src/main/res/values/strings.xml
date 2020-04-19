@@ -43,13 +43,14 @@
     <string name="below_layer_id">building</string>
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
-    <string name="lat">LAT :</string>
-    <string name="lon">LON :</string>
+    <string name="lat">LAT</string>
+    <string name="lon">LON</string>
 
-    <string name="no_info">no information</string>
+    <string name="no_info">No data</string>
     <string name="battery_level">Battery level:</string>
     <string name="altitude">Altitude:</string>
     <string name="speed">Ground speed:</string>
+    <string name="met_per_sec"><sup>m</sup>⁄<sub>s</sub></string>
     <string name="distance_to_user">Dist. to user:</string>
     <string name="distance_to_base">Dist. to base:</string>
 

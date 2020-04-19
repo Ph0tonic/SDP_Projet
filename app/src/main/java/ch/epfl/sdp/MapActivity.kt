@@ -4,9 +4,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
@@ -18,6 +18,7 @@ import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -25,6 +26,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
+import kotlinx.android.synthetic.main.activity_map.*
 
 
 /**
@@ -134,7 +136,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             clearWaypoints()
         }
         findViewById<ImageButton>(R.id.locate_button).setOnClickListener {
-            Log.d("Test","Hey, I pushed a button !")
+            centerCameraOnDrone()
         }
         findViewById<ImageButton>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
@@ -321,12 +323,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun centerCameraOnDrone(){
+        if(::dronePositionMarker.isInitialized){
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, 14.0))
+        }
+    }
+
     /**
      * Updates the user position if the drawing managers are ready
      */
     private fun updateUserPosition(userLatLng: LatLng) {
-        updateTextView(userLatitudeTextView, userLatLng.latitude, getString(R.string.lat) + COORDINATE_FORMAT)
-        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lon) + COORDINATE_FORMAT)
+        updateTextView(userLatitudeTextView, userLatLng.latitude, COORDINATE_FORMAT)
+        updateTextView(userLongitudeTextView, userLatLng.longitude,COORDINATE_FORMAT)
 
         Drone.currentPositionLiveData.value?.let {
             updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
