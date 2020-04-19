@@ -31,26 +31,23 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var isDroneFlying = false
 
     private lateinit var waypointCircleManager: CircleManager
-    private lateinit var droneCircleManager: CircleManager
-    private lateinit var userCircleManager: CircleManager
-
-    private lateinit var lineManager: LineManager
-    private lateinit var fillManager: FillManager
-
-    private lateinit var dronePositionMarker: Circle
-    private lateinit var userPositionMarker: Circle
+    private lateinit var droneCircleManager:    CircleManager
+    private lateinit var userCircleManager:     CircleManager
+    private lateinit var lineManager:           LineManager
+    private lateinit var fillManager:           FillManager
+    private lateinit var dronePositionMarker:   Circle
+    private lateinit var userPositionMarker:    Circle
 
     var waypoints = arrayListOf<LatLng>()
 
     private var features = ArrayList<Feature>()
     private lateinit var geoJsonSource: GeoJsonSource
 
-    private lateinit var distanceToUserTextView: TextView
-    private lateinit var droneBatteryLevelTextView: TextView
-    private lateinit var droneAltitudeTextView: TextView
-    private lateinit var droneSpeedTextView: TextView
-
     private lateinit var droneBatteryLevelImageView: ImageView
+    private lateinit var droneBatteryLevelTextView:  TextView
+    private lateinit var droneAltitudeTextView:      TextView
+    private lateinit var droneSpeedTextView:         TextView
+    private lateinit var distanceToUserTextView:     TextView
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0,  R.drawable.ic_battery1),
