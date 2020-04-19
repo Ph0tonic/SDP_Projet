@@ -77,12 +77,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             droneBatteryLevelImageView.tag = newBatteryDrawable
         }
     }
-    private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? ->
-        updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT)
-    }
-    private var droneSpeedObserver = Observer<Float> { newSpeed: Float? ->
-        updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
-    }
+    private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? -> updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT) }
+    private var droneSpeedObserver = Observer<Float>    { newSpeed:    Float? -> updateTextView(droneSpeedTextView,    newSpeed   ?.toDouble(), SPEED_FORMAT   ) }
 
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
