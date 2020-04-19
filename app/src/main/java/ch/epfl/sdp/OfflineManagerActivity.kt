@@ -2,12 +2,12 @@ package ch.epfl.sdp
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import ch.epfl.sdp.MapActivity.Companion.MAP_NOT_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -48,6 +48,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         downloadButton = findViewById(R.id.download_button)
         listButton = findViewById(R.id.list_button)
+        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -89,7 +90,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // If the user-provided string is empty, display
                     // a toast message and do not begin download.
                     if (regionName.isEmpty()) {
-                        Toast.makeText(this@OfflineManagerActivity, getString(R.string.dialog_toast), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@OfflineManagerActivity, R.string.dialog_toast, Toast.LENGTH_SHORT).show()
                     } else { // Begin download process
                         downloadRegion(regionName)
                     }
@@ -159,7 +160,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             override fun mapboxTileCountLimitExceeded(limit: Long) {
                 Timber.e("Mapbox tile count limit exceeded : %s", limit)
-                Toast.makeText(applicationContext, "Too many downloaded regions", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.too_many_regions , Toast.LENGTH_SHORT).show()
             }
         })
         // Change the region state
@@ -174,7 +175,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
                 // downloaded yet, notify user and return
                 if (offlineRegions.isEmpty()) {
-                    Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, R.string.toast_no_regions_yet, Toast.LENGTH_SHORT).show()
                     return
                 }
                 // Add all of the region names to a list

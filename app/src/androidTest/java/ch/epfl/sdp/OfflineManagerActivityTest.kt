@@ -36,6 +36,9 @@ class OfflineManagerActivityTest {
         private val CMA: LatLng = LatLng(46.317261, 7.485201)
         private lateinit var mUiDevice: UiDevice
         const val EPSILON = 1e-3
+        private const val positiveButtonId: Int = android.R.id.button1
+        const val negativeButtonId: Int = android.R.id.button2
+        private const val neutralButtonId: Int = android.R.id.button3
 
 
         @get:Rule
@@ -45,15 +48,21 @@ class OfflineManagerActivityTest {
                 false) // Activity is not launched immediately
 
         private fun clickOnDownloadButton() {
-            onView(withText(R.string.dialog_positive_button)).perform(click())
+            // android.R.id.button2 = negative button
+            onView(withId(R.id.download_button)).perform(click())
+        }
+
+        private fun clickOnDownloadButtonInDialog() {
+            // android.R.id.button1 = positive button
+            onView(withId(positiveButtonId)).perform(click())
         }
 
         private fun clickOnListButton() {
-            onView(withText(R.string.navigate_title)).perform(click())
+            onView(withId(R.id.list_button)).perform(click())
         }
 
-        private fun isToastMessageDisplayed(textId: Int) {
-            onView(withText(textId)).inRoot(ToastMatcher())
+        private fun isToastMessageDisplayed(message : String) {
+            onView(withText(message)).inRoot(ToastMatcher())
                     .check(matches(isDisplayed()))
         }
 
@@ -62,26 +71,26 @@ class OfflineManagerActivityTest {
             onView(withId(R.id.dialog_textfield_id)).perform(typeText(name))
             mUiDevice.pressBack() //hide the keyboard
 
-            clickOnDownloadButton()
-            isToastMessageDisplayed(R.string.end_progress_success)
+            clickOnDownloadButtonInDialog()
+            isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.end_progress_success))
         }
 
         private fun navigateToDownloadedMap(name: String) {
             clickOnListButton()
-            onView(withText(R.string.navigate_positive_button)).perform(click())
+            onView(withId(positiveButtonId)).perform(click())
             onView(withText(name)).inRoot(ToastMatcher())
                     .check(matches(isDisplayed()))
         }
 
         private fun clickOnCancelInListDialog() {
             clickOnListButton()
-            onView(withText(R.string.dialog_negative_button)).perform(click())
+            onView(withId(negativeButtonId)).perform(click())
         }
 
         private fun deleteMap() {
             clickOnListButton()
-            onView(withText(R.string.navigate_neutral_button_title)).perform(click())
-            isToastMessageDisplayed(R.string.toast_region_deleted)
+            onView(withId(neutralButtonId)).perform(click())
+            isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
         }
     }
 
@@ -102,7 +111,7 @@ class OfflineManagerActivityTest {
     @Test
     fun cannotListWhenNoMap() {
         clickOnListButton()
-        isToastMessageDisplayed(R.string.toast_no_regions_yet)
+        isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_no_regions_yet))
     }
 
     @Test
@@ -148,7 +157,7 @@ class OfflineManagerActivityTest {
     @Test
     fun canClickOnCancelDownloadDialog() {
         clickOnDownloadButton()
-        onView(withText(R.string.dialog_negative_button)).perform(click())
+        onView(withId(negativeButtonId)).perform(click())
     }
 
 
@@ -157,8 +166,8 @@ class OfflineManagerActivityTest {
     @Test
     fun cannotEmptyDownloadName() {
         clickOnDownloadButton()
-        clickOnDownloadButton()
-        isToastMessageDisplayed(R.string.dialog_toast)
+        clickOnDownloadButtonInDialog()
+        isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.dialog_toast))
     }
 
     private fun moveCameraToPosition(pos: LatLng) {

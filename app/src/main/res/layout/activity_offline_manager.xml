@@ -13,15 +13,6 @@
         mapbox:mapbox_cameraZoom="15.27"
         mapbox:mapbox_cameraZoomMin="10" />
 
-    <EditText
-        android:id="@+id/editName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="@string/enter_name"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:visibility="invisible" />
-
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
