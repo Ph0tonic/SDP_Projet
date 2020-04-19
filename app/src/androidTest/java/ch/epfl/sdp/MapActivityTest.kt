@@ -91,7 +91,7 @@ class MapActivityTest {
         // Launch activity after setting preferences
         mActivityRule.launchActivity(Intent())
 
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
@@ -105,8 +105,8 @@ class MapActivityTest {
     @Test
     fun mapBoxCanAddPointToHeatMap() {
         mActivityRule.launchActivity(Intent())
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
-        runOnUiThread{
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        runOnUiThread {
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
         }
     }
@@ -129,16 +129,21 @@ class MapActivityTest {
     }
 
     @Test
-    fun droneStatusIsVisible(){
+    fun droneStatusIsVisible() {
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun clickOnMapAddsWaypoint() {
+    fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
         mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
+        val searchAreaBuilder = mActivityRule.activity.mapBoxSearchAreaBuilder
+        runOnUiThread {
+            searchAreaBuilder.resetSearchArea()
+        }
+        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(0))
 
         // Wait for the map to load
         mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
@@ -148,28 +153,33 @@ class MapActivityTest {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
 
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
+        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(1))
+        runOnUiThread {
+            searchAreaBuilder.resetSearchArea()
+        }
+        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(0))
     }
 
     @Test
-    fun deleteButtonRemovesWaypoints(){
+    fun deleteButtonRemovesWaypoints() {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
 
+        val searchAreaBuilder = mActivityRule.activity.mapBoxSearchAreaBuilder
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
-
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
+        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(1))
 
         onView(withId(R.id.clear_waypoints)).perform(click())
 
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
-
+        runOnUiThread {
+            assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(0))
+        }
     }
 
     @Test
-    fun updateDroneBatteryChangesDroneStatus(){
+    fun updateDroneBatteryChangesDroneStatus() {
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {
@@ -195,7 +205,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun updateDroneAltitudeChangesDroneStatus(){
+    fun updateDroneAltitudeChangesDroneStatus() {
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {
@@ -221,16 +231,16 @@ class MapActivityTest {
     }
 
     @Test
-    fun updateDroneSpeedChangesDroneStatus(){
+    fun updateDroneSpeedChangesDroneStatus() {
         mActivityRule.launchActivity(Intent())
 
-        runOnUiThread{
+        runOnUiThread {
             Drone.currentSpeedLiveData.postValue(null)
         }
 
         onView(withId(R.id.speed)).check(matches(withText(R.string.no_info)))
 
-        runOnUiThread{
+        runOnUiThread {
             Drone.currentSpeedLiveData.postValue(0F)
         }
         onView(withId(R.id.speed)).check(matches(withText(" 0.0 m/s")))
@@ -247,37 +257,37 @@ class MapActivityTest {
     }
 
     @Test
-    fun updateDronePositionChangesDistToUser(){
+    fun updateDronePositionChangesDistToUser() {
         mActivityRule.launchActivity(Intent())
         runOnUiThread {
-            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
-            Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
+            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
         }
         onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
 
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(1.0,0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(1.0, 0.0))
         }
         onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
     }
 
     @Test
-    fun updateUserPositionChangesDistToUser(){
+    fun updateUserPositionChangesDistToUser() {
         mActivityRule.launchActivity(Intent())
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
-            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
+            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
         }
         onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
 
         runOnUiThread {
-            CentralLocationManager.currentUserPosition.postValue(LatLng(1.0,0.0))
+            CentralLocationManager.currentUserPosition.postValue(LatLng(1.0, 0.0))
         }
         onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
     }
 
     @Test
-    fun updateBatteryLevelChangesBatteryLevelIcon(){
+    fun updateBatteryLevelChangesBatteryLevelIcon() {
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {

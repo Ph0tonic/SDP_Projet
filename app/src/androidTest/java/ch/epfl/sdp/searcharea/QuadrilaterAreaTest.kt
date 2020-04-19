@@ -2,7 +2,8 @@ package ch.epfl.sdp.searcharea
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import kotlin.random.Random
 
@@ -15,7 +16,7 @@ class QuadrilaterAreaTest {
         for (i in 0..size) {
             area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
-        MatcherAssert.assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(size))
+        assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(size))
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -30,19 +31,19 @@ class QuadrilaterAreaTest {
     @Test
     fun IsCompleteWhenFourAngle() {
         val area = QuadrilateralArea()
-        MatcherAssert.assertThat(area.isComplete(), CoreMatchers.equalTo(false))
+        assertThat(area.isComplete(), CoreMatchers.equalTo(false))
 
         area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
-        MatcherAssert.assertThat(area.isComplete(), CoreMatchers.equalTo(false))
+        assertThat(area.isComplete(), CoreMatchers.equalTo(false))
 
         area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
-        MatcherAssert.assertThat(area.isComplete(), CoreMatchers.equalTo(false))
+        assertThat(area.isComplete(), CoreMatchers.equalTo(false))
 
         area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
-        MatcherAssert.assertThat(area.isComplete(), CoreMatchers.equalTo(false))
+        assertThat(area.isComplete(), CoreMatchers.equalTo(false))
 
         area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
-        MatcherAssert.assertThat(area.isComplete(), CoreMatchers.equalTo(true))
+        assertThat(area.isComplete(), CoreMatchers.equalTo(true))
     }
 
     @Test
@@ -50,14 +51,19 @@ class QuadrilaterAreaTest {
         val area = QuadrilateralArea()
 
         area.addAngle(LatLng(Random.nextDouble(), Random.nextDouble()))
-        MatcherAssert.assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(1))
+        assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(1))
         area.reset()
-        MatcherAssert.assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(0))
+        assertThat(area.getLatLng().value?.size, CoreMatchers.equalTo(0))
     }
 
     @Test
     fun GetPropsShouldBeEmpty() {
         val area = QuadrilateralArea()
-        MatcherAssert.assertThat(area.getAdditionalProps(), CoreMatchers.equalTo(mutableMapOf<String, Double>()))
+        assertThat(area.getAdditionalProps().value, equalTo(mutableMapOf()))
+    }
+
+    @Test
+    fun WhenAddingSomePointsShouldReorderThem() {
+        TODO("Implement this test")
     }
 }

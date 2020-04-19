@@ -52,6 +52,6 @@ class PolygonAreaTest {
     @Test
     fun GetPropsShouldBeEmpty() {
         val area = PolygonArea()
-        assertThat(area.getAdditionalProps(), equalTo(mutableMapOf<String, Double>()))
+        assertThat(area.getAdditionalProps().value, equalTo(mutableMapOf()))
     }
 }

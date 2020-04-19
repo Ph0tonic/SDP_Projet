@@ -1,9 +1,10 @@
-package ch.epfl.sdp.drone
+package ch.epfl.sdp.map
 
 import android.graphics.Color
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import ch.epfl.sdp.drone.OverflightStrategy
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -14,7 +15,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.LineManager
 import com.mapbox.mapboxsdk.plugins.annotation.LineOptions
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-class MissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocation: LiveData<LatLng>, private val searchArea: LiveData<SearchArea>, private val strategy: LiveData<OverflightStrategy>) {
+class MapBoxMissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocation: LiveData<LatLng>, private val searchArea: LiveData<SearchArea>, private val strategy: LiveData<OverflightStrategy>) {
     companion object {
         private const val PATH_THICKNESS: Float = 2F
     }

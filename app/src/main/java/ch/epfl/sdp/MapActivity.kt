@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.MissionBuilder
+import ch.epfl.sdp.map.MapBoxMissionBuilder
 import ch.epfl.sdp.drone.OverflightStrategy
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.map.MapBoxQuadrilateralBuilder
@@ -40,7 +40,7 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     val mapBoxSearchAreaBuilder: MapBoxSearchAreaBuilder
-    val missionBuilder: MissionBuilder
+    val missionBuilder: MapBoxMissionBuilder
 
     private var startingLocation: MutableLiveData<LatLng>
     private var searchArea: MutableLiveData<SearchArea>
@@ -73,7 +73,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         strategy = MutableLiveData(SimpleMultiPassOnQuadrilateral(Drone.CAPTEUR_HORIZONTAL_SCOPE))
         startingLocation = MutableLiveData(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
 
-        missionBuilder = MissionBuilder(this, startingLocation, searchArea, strategy)
+        missionBuilder = MapBoxMissionBuilder(this, startingLocation, searchArea, strategy)
     }
 
     private val droneBatteryLevelDrawables = listOf(
@@ -223,13 +223,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         textView.text = value?.let { formatString.format(it) } ?: getString(R.string.no_info)
     }
 
-    /** Trajectory Planning **/
-    private fun onMapClicked(position: LatLng) {
+    /**
+     * Map clic to current eventListener
+     */
+    fun onMapClicked(position: LatLng) {
         mapBoxSearchAreaBuilder.onMapClicked(position)
     }
 
-    /** Trajectory Planning **/
-    private fun onMapLongClicked(position: LatLng) {
+    /**
+     * Map long clic to current eventListener
+     */
+    fun onMapLongClicked(position: LatLng) {
         mapBoxSearchAreaBuilder.onMapLongClicked(position)
     }
 
