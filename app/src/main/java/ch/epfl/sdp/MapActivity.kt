@@ -137,10 +137,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onPause() {
         super.onPause()
         CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
-        Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
-        Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
-        Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
-        Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
+        Drone.currentPositionLiveData.             removeObserver(dronePositionObserver)
+        Drone.currentBatteryLevelLiveData.         removeObserver(droneSpeedObserver)
+        Drone.currentAbsoluteAltitudeLiveData.     removeObserver(droneAltitudeObserver)
+        Drone.currentSpeedLiveData.                removeObserver(droneSpeedObserver)
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
     }
 

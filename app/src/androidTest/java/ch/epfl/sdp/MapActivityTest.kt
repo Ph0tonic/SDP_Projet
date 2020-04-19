@@ -77,7 +77,7 @@ class MapActivityTest {
                     LatLng(8.543067, 47.397026)
             ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
         }
-        onView(withId(R.id.start_mission_button)).perform(click())
+        onView(withId(R.id.start_or_return_button)).perform(click())
     }
 
     @Test
@@ -162,7 +162,7 @@ class MapActivityTest {
 
         assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
 
-        onView(withId(R.id.clear_waypoints)).perform(click())
+        onView(withId(R.id.clear_button)).perform(click())
 
         assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
 
