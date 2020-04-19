@@ -215,9 +215,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
 
-            //searchAreaDrawer.mount(this, mapView, mapboxMap, style)
-            mapBoxSearchAreaBuilder.mount(this, mapView, mapboxMap, style)
             missionBuilder.mount(mapView, mapboxMap, style)
+            mapBoxSearchAreaBuilder.mount(this, mapView, mapboxMap, style)
         }
     }
 

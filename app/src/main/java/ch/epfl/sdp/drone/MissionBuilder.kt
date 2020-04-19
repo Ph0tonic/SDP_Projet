@@ -25,6 +25,7 @@ class MissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocatio
 
     var status = MissionBuilderStatus.UNINITIALIZED
     private var mounted: Boolean = false
+    private var reseted: Boolean = false
 
     private lateinit var cachedSearchArea: SearchArea
 
@@ -37,14 +38,12 @@ class MissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocatio
 
     init {
         generalObserver = Observer {
+            updateStatus()
             computeMissionPath()
         }
         val strategyObserver = Observer<OverflightStrategy> {
-            if (!it.acceptArea(searchArea.value!!)) {
-                status = MissionBuilderStatus.INCOMPATIBLE_STRATEGY_AND_SEARCHAREA
-            } else {
-                computeMissionPath()
-            }
+            updateStatus()
+            computeMissionPath()
         }
         val searchAreaObserver = Observer<SearchArea> {
             if (::cachedSearchArea.isInitialized) {
@@ -56,6 +55,7 @@ class MissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocatio
             cachedSearchArea.getAdditionalProps().observe(lifecycleOwner, this.generalObserver)
             cachedSearchArea.getLatLng().observe(lifecycleOwner, this.generalObserver)
 
+            updateStatus()
             computeMissionPath()
         }
 
@@ -74,6 +74,7 @@ class MissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocatio
         lineManager = LineManager(mapView, mapboxMap, style)
         mounted = true
 
+        updateStatus()
         computeMissionPath()
     }
 
@@ -81,28 +82,37 @@ class MissionBuilder(lifecycleOwner: LifecycleOwner, private val startingLocatio
         return path
     }
 
+    private fun updateStatus() {
+        status = if (searchArea.value == null || strategy.value == null || !searchArea.value?.isComplete()!!) {
+            MissionBuilderStatus.UNINITIALIZED
+        } else if (strategy.value?.acceptArea(searchArea.value!!)!!) {
+            MissionBuilderStatus.OK
+        } else {
+            MissionBuilderStatus.INCOMPATIBLE_STRATEGY_AND_SEARCHAREA
+        }
+    }
+
     private fun computeMissionPath() {
-        if (
-                status == MissionBuilderStatus.OK &&
-                searchArea.value != null && searchArea.value?.isComplete()!!
-                && startingLocation.value != null
-                && strategy.value != null
-        ) {
+        if (status == MissionBuilderStatus.OK) {
             path = strategy.value!!.createFlightPath(startingLocation.value!!, searchArea.value!!)
             displayStrategyPath(path)
+        } else if(mounted) {
+            lineManager.deleteAll()
+            reseted = true
         }
     }
 
     private fun displayStrategyPath(path: List<LatLng>) {
         if (!mounted || path.isEmpty()) return
 
-        if (!::lineArea.isInitialized) {
+        if (!::lineArea.isInitialized || reseted) {
             lineManager.deleteAll()
             val lineOptions = LineOptions()
                     .withLatLngs(path)
                     .withLineWidth(PATH_THICKNESS)
-                    .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
+                    .withLineColor(ColorUtils.colorToRgbaString(Color.RED))
             lineArea = lineManager.create(lineOptions)
+            reseted = false
         } else {
             lineArea.latLngs = path
             lineManager.update(lineArea)

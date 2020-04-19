@@ -35,6 +35,7 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
     private lateinit var lineArea: Line
 
     private var movingWaypoint: Boolean = false
+    private var reseted: Boolean = false
     val searchArea = QuadrilateralArea()
 
     private lateinit var observer: Observer<MutableList<LatLng>>
@@ -79,6 +80,11 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
 
     override fun resetSearchArea() {
         searchArea.reset()
+
+        circleManager.deleteAll()
+        lineManager.deleteAll()
+        fillManager.deleteAll()
+        reseted = true
     }
 
     override fun searchArea(): SearchArea {
@@ -91,34 +97,36 @@ class MapBoxQuadrilateralBuilder : MapBoxSearchAreaBuilder {
     private fun drawRegion(corners: List<LatLng>) {
         if (corners.isEmpty()) return
 
-        if (!::fillArea.isInitialized) {
+        if (!::fillArea.isInitialized || reseted) {
             fillManager.deleteAll()
             val fillOption = FillOptions()
                     .withLatLngs(listOf(corners))
                     .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
                     .withFillOpacity(REGION_FILL_OPACITY)
             fillArea = fillManager.create(fillOption)
+            reseted = false
         } else {
             fillArea.latLngs = listOf(corners)
             fillManager.update(fillArea)
         }
 
-        //Draw the borders
-        val linePoints = arrayListOf<LatLng>().apply {
-            addAll(corners)
-            add(corners.first())
-        }
-        if (!::lineArea.isInitialized) {
-            lineManager.deleteAll()
-            val lineOptions = LineOptions()
-                    .withLatLngs(linePoints)
-                    .withLineWidth(PATH_THICKNESS)
-                    .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
-            lineArea = lineManager.create(lineOptions)
-        } else {
-            lineArea.latLngs = linePoints
-            lineManager.update(lineArea)
-        }
+//        //Draw the borders
+//        val linePoints = arrayListOf<LatLng>().apply {
+//            addAll(corners)
+//            add(corners.first())
+//        }
+//        if (!::lineArea.isInitialized || reseted) {
+//            lineManager.deleteAll()
+//            val lineOptions = LineOptions()
+//                    .withLatLngs(linePoints)
+//                    .withLineWidth(PATH_THICKNESS)
+//                    .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
+//            lineArea = lineManager.create(lineOptions)
+//            reseted = false
+//        } else {
+//            lineArea.latLngs = linePoints
+//            lineManager.update(lineArea)
+//        }
     }
 
     /**
