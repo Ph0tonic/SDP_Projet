@@ -41,6 +41,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
 
     private var isMapReady = false
+    private var isDroneFlying = false
 
     private lateinit var waypointCircleManager: CircleManager
     private lateinit var droneCircleManager: CircleManager
@@ -130,16 +131,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
 
-        findViewById<FloatingActionButton>(R.id.start_mission_button).setOnClickListener {
-            DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
+        findViewById<FloatingActionButton>(R.id.start_or_return_button).setOnClickListener {
+            if(isDroneFlying) {
+                //TODO : return to user
+            } else {
+                isDroneFlying = true
+                DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
+            }
+            updateStartButton() //
         }
-        findViewById<FloatingActionButton>(R.id.clear_waypoints).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.clear_button).setOnClickListener {
             clearWaypoints()
         }
         findViewById<FloatingActionButton>(R.id.locate_button).setOnClickListener {
             centerCameraOnDrone()
         }
-        findViewById<FloatingActionButton>(R.id.stored_offline_map).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.store_button).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
 
@@ -287,6 +294,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /**
+     * Toggles the waypoints visibility
+     * @return : true if the waypoints are now visible, false if they are not
+     */
+    private fun toggleWaypointsVisibility()  {
+        waypointCircleManager.deleteAll()
+        lineManager.deleteAll()
+        fillManager.deleteAll()
+
+        //drawPath()
+    }
+
+    /**
      * Adds a heat point to the heatmap
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
@@ -330,6 +349,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
+
     /**
      * Updates the user position if the drawing managers are ready
      */
@@ -362,16 +382,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    /**
-    @Suppress("DEPRECATION")
-    private fun scaleButtonsSize(){
-        val buttons = 4;
-        val layout = findViewById<LinearLayout>(R.id.linearLayout)
-        val params = layout.layoutParams
-        params.height = getWindowManager().getDefaultDisplay().height
-        params.width = params.height/buttons
-        Log.d("Test", ""+params.height)
-        Log.d("Test", ""+params.width)
-        layout.setLayoutParams(params)
-    }**/
+
+    private fun updateStartButton(){
+        findViewById<FloatingActionButton>(R.id.start_or_return_button).setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start )
+    }
 }

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -14,10 +15,8 @@
         style="?android:attr/buttonBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorLightGray"
         android:orientation="vertical"
-        android:weightSum="4"
-        android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -29,7 +28,8 @@
             android:id="@+id/drone_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp"
+            android:background="@color/colorPrimary"
+            android:padding="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -43,24 +43,15 @@
 
                 <TextView
                     android:id="@+id/latitude_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorWhite"
+                    android:theme="@style/InformationDisplayTheme"
                     android:text="@string/lat"/>
 
                 <TextView
                     android:id="@+id/tv_latitude"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorLightGray"
-                    android:text="@string/no_info"
-                    />
+                    android:theme="@style/InformationDisplayTheme"
+                    android:text="@string/no_info"/>
+
+
             </TableRow>
 
             <TableRow
@@ -69,24 +60,14 @@
 
                 <TextView
                     android:id="@+id/longitude_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorWhite"
+                    android:theme="@style/InformationDisplayTheme"
                     android:text="@string/lon"/>
 
                 <TextView
                     android:id="@+id/tv_longitude"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorLightGray"
-                    android:text="@string/no_info"
-                    />
+                    android:theme="@style/InformationDisplayTheme"
+                    android:text="@string/no_info"/>
+
             </TableRow>
 
             <TableRow
@@ -97,18 +78,15 @@
                     android:id="@+id/battery_level_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:padding="5dp"
+                    android:padding="2dp"
+                    android:rotation="90"
                     app:srcCompat="@drawable/ic_battery1" />
 
                 <TextView
                     android:id="@+id/battery_level"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorLightGray"
-                    android:text="@string/no_info" />
+                    android:theme="@style/InformationDisplayTheme"
+                    android:text="@string/no_info"/>
+
             </TableRow>
 
             <TableRow
@@ -119,18 +97,14 @@
                     android:id="@+id/imageView4"
                     android:layout_width="21dp"
                     android:layout_height="match_parent"
-                    android:padding="5dp"
+                    android:padding="2dp"
                     app:srcCompat="@drawable/ic_altitude" />
 
                 <TextView
                     android:id="@+id/altitude"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorLightGray"
-                    android:text="@string/no_info" />
+                    android:theme="@style/InformationDisplayTheme"
+                    android:text="@string/no_info"/>
+
             </TableRow>
 
             <TableRow
@@ -141,18 +115,13 @@
                     android:id="@+id/imageView2"
                     android:layout_width="18dp"
                     android:layout_height="match_parent"
-                    android:padding="5dp"
+                    android:padding="2dp"
                     app:srcCompat="@drawable/ic_speed" />
 
                 <TextView
                     android:id="@+id/speed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorLightGray"
-                    android:text="@string/no_info" />
+                    android:theme="@style/InformationDisplayTheme"
+                    android:text="@string/no_info"/>
             </TableRow>
 
             <TableRow
@@ -163,18 +132,14 @@
                     android:id="@+id/imageView3"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:padding="5dp"
+                    android:paddingVertical="2dp"
                     app:srcCompat="@drawable/ic_distancetodrone" />
 
                 <TextView
                     android:id="@+id/distance_to_user"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorLightGray"
-                    android:text="@string/no_info" />
+                    android:theme="@style/InformationDisplayTheme"
+                    android:text="@string/no_info"/>
+
             </TableRow>
 
             <TableRow
@@ -185,29 +150,23 @@
                     android:id="@+id/imageView5"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:padding="5dp"
+                    android:paddingVertical="2dp"
                     app:srcCompat="@drawable/ic_distancetohome" />
 
                 <TextView
                     android:id="@+id/distance_to_base"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorLightGray"
-                    android:text="@string/no_info" />
+                    android:theme="@style/InformationDisplayTheme"
+                    android:text="@string/no_info"/>
+
             </TableRow>
 
 
-            <org.videolan.libvlc.util.VLCVideoLayout
-                android:id="@+id/video_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="25dp"/>
-
-
         </TableLayout>
+        <org.videolan.libvlc.util.VLCVideoLayout
+            android:id="@+id/video_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </org.videolan.libvlc.util.VLCVideoLayout>
 
     </LinearLayout>
 
@@ -227,58 +186,58 @@
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1">
 
-        <com.getbase.floatingactionbutton.FloatingActionsMenu
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            app:fab_addButtonColorNormal="@color/colorPrimaryDark"
-            app:fab_addButtonColorPressed="@color/colorPrimary"
-            app:fab_addButtonPlusIconColor="@color/colorWhite"
-            >
 
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/start_mission_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_addButtonColorNormal="@color/colorWhite"
-                app:fab_addButtonColorPressed="@color/colorLightGray"
-                app:fab_icon="@drawable/ic_start"
-                app:fab_size="normal"/>
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/clear_waypoints"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_addButtonColorNormal="@color/colorWhite"
-                app:fab_addButtonColorPressed="@color/colorLightGray"
-                app:fab_icon="@drawable/ic_clear"
-                app:fab_size="normal"/>
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/locate_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_addButtonColorNormal="@color/colorWhite"
-                app:fab_addButtonColorPressed="@color/colorLightGray"
-                app:fab_icon="@drawable/ic_locate"
-                app:fab_size="normal"/>
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/stored_offline_map"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_addButtonColorNormal="@color/colorWhite"
-                app:fab_addButtonColorPressed="@color/colorLightGray"
-                app:fab_icon="@drawable/ic_store"
-                app:fab_size="normal"/>
-
-        </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 
     </com.mapbox.mapboxsdk.maps.MapView>
 
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        app:fab_addButtonColorNormal="@color/colorPrimaryDark"
+        app:fab_addButtonColorPressed="@color/colorPrimary"
+        app:fab_addButtonPlusIconColor="@color/colorWhite"
+        app:fab_expandDirection="left"
+        >
 
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/start_or_return_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorPrimary"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_start"
+            app:fab_size="normal"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/clear_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_clear"
+            app:fab_size="normal"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/locate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_locate"
+            app:fab_size="normal"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/store_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_store"
+            app:fab_size="normal"/>
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

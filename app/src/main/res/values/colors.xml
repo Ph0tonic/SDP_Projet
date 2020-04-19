@@ -5,6 +5,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="colorAccentDark">#880B30</color>
     <color name="colorAccentLight">#F83B80</color>
+    <color name="colorCyan">#0080B0</color>
+    <color name="colorCyanLight">#20A0FF</color>
+
 </resources>
