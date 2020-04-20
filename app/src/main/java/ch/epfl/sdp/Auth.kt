@@ -50,7 +50,7 @@ object Auth : ViewModel() {
         activity.startActivityForResult(createGoogleSignClient().signInIntent, RC_SIGN_IN)
     }
 
-    fun onActivityResult(requestCode: Int, data: Intent?) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
             val context = MainApplication.applicationContext()
             GoogleSignIn.getSignedInAccountFromIntent(data)

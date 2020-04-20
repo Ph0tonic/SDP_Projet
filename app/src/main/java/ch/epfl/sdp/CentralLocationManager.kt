@@ -76,7 +76,7 @@ object CentralLocationManager {
         ActivityCompat.requestPermissions(activity, requiredPermissions.toTypedArray(), requestCode)
     }
 
-    fun onRequestPermissionsResult(requestCode: Int) {
+    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == this.requestCode && checkPermission()) {
             locationManager.requestLocationUpdates(
                     GPS_PROVIDER, 500, 10f, CentralLocationListener)
