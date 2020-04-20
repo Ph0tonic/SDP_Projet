@@ -315,9 +315,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
+    override fun onRequestPermissionsResult(requestid: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        CentralLocationManager.onRequestPermissionsResult(requestCode)
+        super.onRequestPermissionsResult(requestid, permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestid)
     }
+
 }
