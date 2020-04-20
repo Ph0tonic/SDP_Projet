@@ -23,6 +23,6 @@ class MainApplication : Application() {
 
         // Use ApplicationContext.
         // example: SharedPreferences etc...
-        val context: Context = applicationContext()
+        //val context: Context = applicationContext()
     }
 }
