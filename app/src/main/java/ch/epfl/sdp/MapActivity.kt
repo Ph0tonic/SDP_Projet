@@ -301,7 +301,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Updates the user position if the drawing managers are ready
      */
     private fun updateUserPosition(userLatLng: LatLng) {
-        updateTextView(userLatitudeTextView, userLatLng.latitude, COORDINATE_FORMAT)
+        updateTextView(userLatitudeTextView,  userLatLng.latitude, COORDINATE_FORMAT)
         updateTextView(userLongitudeTextView, userLatLng.longitude,COORDINATE_FORMAT)
 
         Drone.currentPositionLiveData.value?.let {
