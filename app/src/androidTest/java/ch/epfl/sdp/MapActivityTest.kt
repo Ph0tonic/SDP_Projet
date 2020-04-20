@@ -163,6 +163,7 @@ class MapActivityTest {
 
         assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
 
+        onView(withId(R.id.floating_menu_button)).perform(click())
         onView(withId(R.id.clear_button)).perform(click())
 
         assertThat(mActivityRule.activity.waypoints.size, equalTo(0))

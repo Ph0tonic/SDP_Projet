@@ -14,7 +14,7 @@
     <!-- Preference Titles -->
     <string name="maps_header">Maps</string>
 
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Fly2Find</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="action_settings">Settings</string>
