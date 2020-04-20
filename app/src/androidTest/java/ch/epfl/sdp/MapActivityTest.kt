@@ -30,7 +30,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MapActivityTest {
-    /*
+
     companion object {
         const val LATITUDE_TEST = 42.125
         const val LONGITUDE_TEST = -30.229
@@ -320,5 +320,5 @@ class MapActivityTest {
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
 
-    }*/
+    }
 }
