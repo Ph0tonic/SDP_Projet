@@ -13,8 +13,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.google.android.material.navigation.NavigationView
+import ch.epfl.sdp.CentralLocationManager as CLM
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        CentralLocationManager.configure(this)
+        CLM.configure(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -75,6 +75,6 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        CentralLocationManager.onRequestPermissionsResult(requestCode)
+        CLM.onRequestPermissionsResult(requestCode)
     }
 }
