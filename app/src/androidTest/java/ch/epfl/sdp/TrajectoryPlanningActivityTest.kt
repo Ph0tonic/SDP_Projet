@@ -20,7 +20,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TrajectoryPlanningActivityTest {
 
-    private var mUiDevice: UiDevice? = null
+    private lateinit var mUiDevice: UiDevice
+
+    companion object {
+        const val MAP_LOADING_TIMEOUT = 1000L
+    }
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MapActivity::class.java)
@@ -37,7 +41,7 @@ class TrajectoryPlanningActivityTest {
         assertThat(searchArea.getLatLng().value?.size!!, equalTo(0))
 
         // Wait for the map to load
-        mUiDevice?.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         // Add a point
         //onView(withId(R.id.trajectory_planning_mapView)).perform(click())
