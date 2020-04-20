@@ -18,10 +18,9 @@ class ToastMatcher : TypeSafeMatcher<Root>() {
         description.appendText("is toast")
     }
 
-    @Suppress("DEPRECATION")
     public override fun matchesSafely(root: Root): Boolean {
         val type: Int = root.windowLayoutParams.get().type
-        if (type == WindowManager.LayoutParams.TYPE_TOAST) {
+        if (type == WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY) {
             val windowToken: IBinder = root.decorView.windowToken
             val appToken: IBinder = root.decorView.applicationWindowToken
             if (windowToken === appToken) { // windowToken == appToken means this window isn't contained by any other windows.
