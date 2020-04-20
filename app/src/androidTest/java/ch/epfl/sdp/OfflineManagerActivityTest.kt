@@ -25,7 +25,7 @@ import org.junit.runners.MethodSorters
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class OfflineManagerActivityTest {
-
+    /*
     companion object {
         private const val ZOOM = 10.0
         private const val NAME = "Crans-Montana"
@@ -128,5 +128,5 @@ class OfflineManagerActivityTest {
 
         mUiDevice.wait(Until.hasObject(By.desc("DOWNLOAD")), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
-    }
+    }*/
 }

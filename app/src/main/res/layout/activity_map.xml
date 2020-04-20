@@ -192,6 +192,7 @@
     </com.mapbox.mapboxsdk.maps.MapView>
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/floating_menu_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         mapbox:layout_constraintBottom_toBottomOf="parent"
