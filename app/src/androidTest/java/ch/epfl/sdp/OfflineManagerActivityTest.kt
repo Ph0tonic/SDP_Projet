@@ -25,7 +25,7 @@ import org.junit.runners.MethodSorters
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class OfflineManagerActivityTest {
-    /*
+
     companion object {
         private const val ZOOM = 10.0
         private const val NAME = "Crans-Montana"
@@ -51,7 +51,7 @@ class OfflineManagerActivityTest {
 
     @get:Rule
     var mActivityRule = IntentsTestRule(OfflineManagerActivity::class.java)
-
+    /*
     @Test
     fun canOpenDownloadDialog() {
         mUiDevice.wait(Until.hasObject(By.desc("DOWNLOAD").clickable(true)), TIMEOUT)
