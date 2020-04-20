@@ -37,9 +37,10 @@ class MapActivityTest {
         const val ZOOM_TEST = 0.9
         const val MAP_LOADING_TIMEOUT = 1000L
         const val EPSILON = 1e-10
+        const val DEFAULT_ALTITUDE = " 0.0 m"
     }
 
-    lateinit var preferencesEditor: SharedPreferences.Editor
+    private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
 
     @get:Rule
@@ -90,7 +91,6 @@ class MapActivityTest {
 
         // Launch activity after setting preferences
         mActivityRule.launchActivity(Intent())
-
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         runOnUiThread {
@@ -141,9 +141,6 @@ class MapActivityTest {
 
         val searchAreaBuilder = mActivityRule.activity.mapBoxSearchAreaBuilder
 
-        // Wait for the map to load
-        mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
-
         // Add a point
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
@@ -159,7 +156,7 @@ class MapActivityTest {
     @Test
     fun deleteButtonRemovesWaypoints() {
         mActivityRule.launchActivity(Intent())
-        mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         val searchAreaBuilder = mActivityRule.activity.mapBoxSearchAreaBuilder
         runOnUiThread {
@@ -181,7 +178,6 @@ class MapActivityTest {
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(null)
         }
-
         onView(withId(R.id.battery_level)).check(matches(withText(R.string.no_info)))
 
         runOnUiThread {
@@ -213,7 +209,7 @@ class MapActivityTest {
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.postValue(0F)
         }
-        onView(withId(R.id.altitude)).check(matches(withText(" 0.0 m")))
+        onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.postValue(1.123F)
@@ -259,12 +255,12 @@ class MapActivityTest {
             CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
             Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
             Drone.currentPositionLiveData.postValue(LatLng(1.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
     }
 
     @Test
@@ -274,18 +270,17 @@ class MapActivityTest {
             Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
             CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
             CentralLocationManager.currentUserPosition.postValue(LatLng(1.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
     }
 
     @Test
     fun updateBatteryLevelChangesBatteryLevelIcon() {
         mActivityRule.launchActivity(Intent())
-
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.00f)
         }
@@ -296,30 +291,25 @@ class MapActivityTest {
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery2))))
 
-
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.30f)
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery3))))
-
 
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.50f)
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery4))))
 
-
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.70f)
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery5))))
 
-
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.90f)
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery6))))
-
 
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.98f)
