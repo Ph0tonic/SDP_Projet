@@ -38,7 +38,7 @@ class QuadrilaterAreaBuilderTest {
         assertThat(corners, equalTo(listOf(LatLng(1.0, 0.0), LatLng(1.0, 1.0))))
     }
 
-    @Test()
+    @Test
     fun cannotAddMoreThanFourAngles() {
         val area = QuadrilateralBuilder()
         for (i in 0..4) {
