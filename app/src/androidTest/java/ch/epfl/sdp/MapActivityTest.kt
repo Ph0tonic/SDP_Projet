@@ -164,7 +164,7 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
 
         onView(withId(R.id.floating_menu_button)).perform(click())
-        while (mActivityRule.activity.waypoints.size>0) onView(withId(R.id.clear_button)).perform(click())
+        while (mActivityRule.activity.waypoints.size>0) onView(withId(R.id.clear_button)).perform(click()) //button is not instantly visible because it is appearing, so we try to click until we success.
 
         assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
 
