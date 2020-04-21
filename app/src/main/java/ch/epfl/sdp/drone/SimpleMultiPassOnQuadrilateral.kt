@@ -1,7 +1,7 @@
 package ch.epfl.sdp.drone
 
-import ch.epfl.sdp.searcharea.QuadrilateralArea
-import ch.epfl.sdp.searcharea.SearchArea
+import ch.epfl.sdp.searchareabuilder.QuadrilateralArea
+import ch.epfl.sdp.searchareabuilder.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 import kotlin.collections.ArrayList
@@ -11,14 +11,18 @@ import kotlin.math.max
 /**
  * Creates a path covering a quadrilateral in several passes
  */
-class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : OverflightStrategy {
+class SimpleMultiPassOnQuadrilateral(maxDistBetweenLines: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
+    companion object {
+        const val DEFAULT_DIST_BETWEEN_LINES: Double = 15.0
+    }
+
     init {
-        require(maxDistBetweenLinesIn > 0.0) {
+        require(maxDistBetweenLines > 0.0) {
             "The maximum distance between passes must be strictly positive"
         }
-        this.maxDistBetweenLines = maxDistBetweenLinesIn
+        this.maxDistBetweenLines = maxDistBetweenLines
     }
 
     override fun acceptArea(searchArea: SearchArea): Boolean {
@@ -27,10 +31,10 @@ class SimpleMultiPassOnQuadrilateral(maxDistBetweenLinesIn: Double) : Overflight
 
     @Throws(IllegalArgumentException::class)
     override fun createFlightPath(startingPoint: LatLng, searchArea: SearchArea): List<LatLng> {
-        require(acceptArea(searchArea) && searchArea.isComplete()) { "This strategy does not accept this type of area" }
-
+        require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
+        val quadrilateralArea = searchArea as QuadrilateralArea
         // Make a mutable copy of the waypoints to be able to reorder them
-        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(searchArea.getLatLng().value!!) }
+        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(quadrilateralArea.vertices) }
         val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
         Collections.rotate(waypointsCopied, -startingIndex)
 

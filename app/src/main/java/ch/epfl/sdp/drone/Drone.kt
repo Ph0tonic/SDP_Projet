@@ -15,7 +15,7 @@ object Drone {
     private const val BACKEND_PORT = 50051
 
     // Maximum distance betwen passes in the strategy
-    const val CAPTEUR_HORIZONTAL_SCOPE: Double = 15.0
+    const val GROUND_SENSOR_SCOPE: Double = 15.0
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()

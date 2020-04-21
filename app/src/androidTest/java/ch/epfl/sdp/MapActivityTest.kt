@@ -139,18 +139,18 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
-        val searchAreaBuilder = mActivityRule.activity.mapBoxSearchAreaBuilder
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
 
         // Add a point
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
 
-        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(1))
+        assertThat(searchAreaBuilder.vertices.size, equalTo(1))
         runOnUiThread {
-            searchAreaBuilder.resetSearchArea()
+            searchAreaBuilder.reset()
         }
-        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(0))
+        assertThat(searchAreaBuilder.vertices.size, equalTo(0))
     }
 
     @Test
@@ -158,16 +158,16 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
-        val searchAreaBuilder = mActivityRule.activity.mapBoxSearchAreaBuilder
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
-        assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(1))
+        assertThat(searchAreaBuilder.vertices.size, equalTo(1))
 
         onView(withId(R.id.clear_waypoints)).perform(click())
 
         runOnUiThread {
-            assertThat(searchAreaBuilder.searchArea().getLatLng().value?.size, equalTo(0))
+            assertThat(searchAreaBuilder.vertices.size, equalTo(0))
         }
     }
 

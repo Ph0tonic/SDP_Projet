@@ -7,14 +7,10 @@ object DroneMission {
     private val missionItems = arrayListOf<Mission.MissionItem>()
 
     fun makeDroneMission(path: List<LatLng>): DroneMission {
-        addMissionItems(path)
-        return this
-    }
-
-    private fun addMissionItems(path: List<LatLng>) {
         path.forEach { point ->
             missionItems.add(generateMissionItem(point.latitude, point.longitude))
         }
+        return this
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {

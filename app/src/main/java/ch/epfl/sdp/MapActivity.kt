@@ -6,15 +6,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.MutableLiveData
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.map.MapBoxMissionBuilder
-import ch.epfl.sdp.drone.OverflightStrategy
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.map.MapBoxQuadrilateralBuilder
-import ch.epfl.sdp.map.MapBoxSearchAreaBuilder
-import ch.epfl.sdp.searcharea.SearchArea
+import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.geojson.Feature
@@ -49,32 +45,26 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePositionMarker: Circle
     private lateinit var userPositionMarker: Circle
 
-    private var features = ArrayList<Feature>()
     private lateinit var geoJsonSource: GeoJsonSource
-
-    private lateinit var distanceToUserTextView: TextView
-    private lateinit var droneBatteryLevelTextView: TextView
-    private lateinit var droneAltitudeTextView: TextView
-    private lateinit var droneSpeedTextView: TextView
+    private var features = ArrayList<Feature>()
 
     private lateinit var droneBatteryLevelImageView: ImageView
+    private lateinit var droneBatteryLevelTextView: TextView
+    private lateinit var distanceToUserTextView: TextView
+    private lateinit var userLongitudeTextView: TextView
+    private lateinit var droneAltitudeTextView: TextView
+    private lateinit var userLatitudeTextView: TextView
+    private lateinit var droneSpeedTextView: TextView
 
-    val mapBoxSearchAreaBuilder: MapBoxSearchAreaBuilder
-    val missionBuilder: MapBoxMissionBuilder
+    /** Builders */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var searchAreaBuilder: SearchAreaBuilder
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var missionBuilder: MissionBuilder
 
-    private var startingLocation: MutableLiveData<LatLng>
-    private var searchArea: MutableLiveData<SearchArea>
-    private var strategy: MutableLiveData<OverflightStrategy>
-
-    init {
-        mapBoxSearchAreaBuilder = MapBoxQuadrilateralBuilder()
-
-        searchArea = MutableLiveData(mapBoxSearchAreaBuilder.searchArea())
-        strategy = MutableLiveData(SimpleMultiPassOnQuadrilateral(Drone.CAPTEUR_HORIZONTAL_SCOPE))
-        startingLocation = MutableLiveData(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-
-        missionBuilder = MapBoxMissionBuilder(this, startingLocation, searchArea, strategy)
-    }
+    /** Painters */
+    private lateinit var searchAreaPainter: MapBoxSearchAreaPainter
+    private lateinit var missionPainter: MapBoxMissionPainter
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -85,9 +75,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Pair(.77, R.drawable.ic_battery6),
             Pair(.95, R.drawable.ic_battery7)
     )
-
-    private lateinit var userLatitudeTextView: TextView
-    private lateinit var userLongitudeTextView: TextView
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { updateDronePosition(it); updateDronePositionOnMap(it) }
@@ -142,7 +129,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         findViewById<Button>(R.id.start_mission_button).setOnClickListener {
             Drone.startMission(DroneMission.makeDroneMission(
-                    missionBuilder.getMission()
+                    missionBuilder.build()
             ).getMissionItems())
         }
         findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
@@ -186,6 +173,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
             userCircleManager = CircleManager(mapView, mapboxMap, style)
+            missionPainter = MapBoxMissionPainter(mapView, mapboxMap, style)
+            searchAreaPainter = MapBoxQuadrilateralPainter(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener {
                 onMapClicked(it)
@@ -208,8 +197,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // Used to detect when the map is ready in tests
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
-            missionBuilder.mount(mapView, mapboxMap, style)
-            mapBoxSearchAreaBuilder.mount(this, mapView, mapboxMap, style)
+            //Create builders
+            missionBuilder = MissionBuilder()
+                    .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
+                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            searchAreaBuilder = QuadrilateralBuilder()
+
+            // Add listeners to builders
+            searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
+            searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
+            missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
+            searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+
+            // Location listener on drone
+            Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
         }
@@ -227,15 +228,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Map clic to current eventListener
      */
     fun onMapClicked(position: LatLng) {
-        mapBoxSearchAreaBuilder.onMapClicked(position)
+        searchAreaBuilder.addVertex(position)
     }
 
     /**
      * Map long clic to current eventListener
      */
-    fun onMapLongClicked(position: LatLng) {
-        mapBoxSearchAreaBuilder.onMapLongClicked(position)
-    }
+    fun onMapLongClicked(position: LatLng) {}
 
     /**
      * Clears the waypoints list and removes all the lines and points related to waypoints
@@ -243,7 +242,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun clearWaypoints() {
         if (!isMapReady) return
 
-        mapBoxSearchAreaBuilder.resetSearchArea()
+        searchAreaBuilder.reset()
     }
 
     /**
