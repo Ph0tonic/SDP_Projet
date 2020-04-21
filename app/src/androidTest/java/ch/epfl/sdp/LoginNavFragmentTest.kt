@@ -106,7 +106,7 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
 
-        onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
+        //onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
         runOnUiThread {
             Auth.logout()
             Auth.loggedIn.postValue(false)
