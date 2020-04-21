@@ -1,15 +1,14 @@
 package ch.epfl.sdp
 
-import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
@@ -19,7 +18,6 @@ import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers
 import org.junit.Before
-import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +25,6 @@ import org.junit.runners.MethodSorters
 
 
 @RunWith(AndroidJUnit4::class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class OfflineManagerActivityTest {
 
     companion object {
@@ -42,10 +39,7 @@ class OfflineManagerActivityTest {
 
 
         @get:Rule
-        var mActivityRule = ActivityTestRule(
-                OfflineManagerActivity::class.java,
-                true,
-                false) // Activity is not launched immediately
+        var mActivityRule = IntentsTestRule(OfflineManagerActivity::class.java)
 
         private fun clickOnDownloadButton() {
             // android.R.id.button2 = negative button
@@ -92,21 +86,22 @@ class OfflineManagerActivityTest {
             onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
             isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
         }
+        
+        private fun moveCameraToPosition(pos: LatLng) {
+            UiThreadStatement.runOnUiThread {
+                mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+                    mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
+                }
+            }
+        }
     }
 
     @Before
     @Throws(Exception::class)
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
     }
-
-    @get:Rule
-    var mActivityRule = ActivityTestRule(
-            OfflineManagerActivity::class.java,
-            true,
-            false) // Activity is not launched immediately
 
     @Test
     fun cannotClickOnListWhenNoDownloadedMap() {
@@ -168,14 +163,6 @@ class OfflineManagerActivityTest {
         clickOnDownloadButton()
         clickOnDownloadButtonInDialog()
         isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.dialog_toast))
-    }
-
-    private fun moveCameraToPosition(pos: LatLng) {
-        UiThreadStatement.runOnUiThread {
-            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
-            }
-        }
     }
 }
 
