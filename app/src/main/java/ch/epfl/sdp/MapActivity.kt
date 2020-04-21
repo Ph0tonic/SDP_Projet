@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
@@ -59,6 +60,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
 
+    private lateinit var droneBatteryLevelImageView: ImageView
+
+    private val droneBatteryLevelDrawables = listOf(
+            Pair(.0, R.drawable.ic_battery1),
+            Pair(.05, R.drawable.ic_battery2),
+            Pair(.23, R.drawable.ic_battery3),
+            Pair(.41, R.drawable.ic_battery4),
+            Pair(.59, R.drawable.ic_battery5),
+            Pair(.77, R.drawable.ic_battery6),
+            Pair(.95, R.drawable.ic_battery7)
+    )
+
     private lateinit var userLatitudeTextView: TextView
     private lateinit var userLongitudeTextView: TextView
 
@@ -69,13 +82,25 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
-        newBatteryLevel?.let { updateTextView(droneBatteryLevelTextView, (it * 100).toDouble(), PERCENTAGE_FORMAT) }
+
+        // Always update the text string
+        updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
+
+        // Only update the icon if the battery level is not null
+        newBatteryLevel?.let {
+            val newBatteryDrawable = droneBatteryLevelDrawables
+                    .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
+                    .maxBy { x -> x.first }!!
+                    .second
+            droneBatteryLevelImageView.setImageResource(newBatteryDrawable)
+            droneBatteryLevelImageView.tag = newBatteryDrawable
+        }
     }
     private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? ->
-        newAltitude?.let { updateTextView(droneAltitudeTextView, it.toDouble(), DISTANCE_FORMAT) }
+        updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT)
     }
     private var droneSpeedObserver = Observer<Float> { newSpeed: Float? ->
-        newSpeed?.let { updateTextView(droneSpeedTextView, it.toDouble(), SPEED_FORMAT) }
+        updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
 
     companion object {
@@ -102,6 +127,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
+
+        droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
 
         findViewById<Button>(R.id.start_mission_button).setOnClickListener {
             DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
@@ -137,7 +164,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
-        MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
+        if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -182,8 +209,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun updateTextView(textView: TextView, value: Double, formatString: String) {
-        textView.text = formatString.format(value)
+    /**
+     * Updates the text of the given textView with the given value and format, or the default string
+     * if the value is null
+     */
+    private fun updateTextView(textView: TextView, value: Double?, formatString: String) {
+        textView.text = value?.let { formatString.format(it) } ?: getString(R.string.no_info)
     }
 
     /** Trajectory Planning **/
@@ -249,7 +280,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         val circleOptions = CircleOptions()
                 .withLatLng(pinpoints)
-                .withDraggable(true)
         waypointCircleManager.create(circleOptions)
     }
 
@@ -289,8 +319,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     private fun updateDronePosition(newLatLng: LatLng) {
         CentralLocationManager.currentUserPosition.value?.let {
-            val distToUser = it.distanceTo(newLatLng)
-            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
+            updateTextView(distanceToUserTextView, it.distanceTo(newLatLng), DISTANCE_FORMAT)
         }
     }
 
@@ -300,8 +329,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Add a vehicle marker and move the camera
         if (!::dronePositionMarker.isInitialized) {
             val circleOptions = CircleOptions()
-            circleOptions.withLatLng(newLatLng)
-            circleOptions.withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
+                    .withLatLng(newLatLng)
+                    .withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
             dronePositionMarker = droneCircleManager.create(circleOptions)
 
             mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
@@ -317,11 +346,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     private fun updateUserPosition(userLatLng: LatLng) {
         updateTextView(userLatitudeTextView, userLatLng.latitude, getString(R.string.lat) + COORDINATE_FORMAT)
-        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lat) + COORDINATE_FORMAT)
+        updateTextView(userLongitudeTextView, userLatLng.longitude, getString(R.string.lon) + COORDINATE_FORMAT)
 
         Drone.currentPositionLiveData.value?.let {
-            val distToUser = it.distanceTo(userLatLng)
-            updateTextView(distanceToUserTextView, distToUser, DISTANCE_FORMAT)
+            updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
         }
     }
 
@@ -331,7 +359,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Add a vehicle marker and move the camera
         if (!::userPositionMarker.isInitialized) {
             val circleOptions = CircleOptions()
-            circleOptions.withLatLng(userLatLng)
+                    .withLatLng(userLatLng)
             userPositionMarker = userCircleManager.create(circleOptions)
         } else {
             userPositionMarker.latLng = userLatLng
