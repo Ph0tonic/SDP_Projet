@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -42,12 +43,10 @@ class OfflineManagerActivityTest {
         var mActivityRule = IntentsTestRule(OfflineManagerActivity::class.java)
 
         private fun clickOnDownloadButton() {
-            // android.R.id.button2 = negative button
             onView(withId(R.id.download_button)).perform(click())
         }
 
         private fun clickOnDownloadButtonInDialog() {
-            // android.R.id.button1 = positive button
             onView(withId(POSITIVE_BUTTON_ID)).perform(click())
         }
 
@@ -100,6 +99,7 @@ class OfflineManagerActivityTest {
     @Throws(Exception::class)
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
     }
 
