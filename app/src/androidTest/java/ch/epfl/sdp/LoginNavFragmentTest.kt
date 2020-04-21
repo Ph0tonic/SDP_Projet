@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
@@ -87,7 +88,7 @@ class LoginNavFragmentTest {
         mUiDevice.pressBack()
     }
 
-    /* I temporally disabled this test that runs fine in local but not with cirrus, to see the codeclimate report.
+
     @Test
     fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
         runOnUiThread {
@@ -107,7 +108,7 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
 
-        onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
+        onView(withText(getContext().getString(R.string.auth_signout))).perform(scrollTo(), click())
         runOnUiThread {
             Auth.logout()
             Auth.loggedIn.postValue(false)
@@ -117,5 +118,5 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
 
         mUiDevice.pressBack()
-    }*/
+    }
 }

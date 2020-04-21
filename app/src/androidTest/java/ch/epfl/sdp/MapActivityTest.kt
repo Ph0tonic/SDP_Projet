@@ -171,6 +171,29 @@ class MapActivityTest {
     }
 
     @Test
+    fun locateButtonIsFunctionning(){
+
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+
+        runOnUiThread {
+            Drone.currentPositionLiveData.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
+        }
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+        onView(withId(R.id.locate_button)).perform(click()) //button is not instantly visible because it is appearing, so we try to click until we success.
+
+        runOnUiThread {
+            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(LATITUDE_TEST, EPSILON))
+                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(LONGITUDE_TEST, EPSILON))
+            }
+        }
+
+
+    }
+
+    @Test
     fun updateDroneBatteryChangesDroneStatus(){
         mActivityRule.launchActivity(Intent())
 
