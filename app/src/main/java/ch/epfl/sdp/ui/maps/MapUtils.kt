@@ -8,9 +8,13 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 
 object MapUtils {
 
@@ -125,5 +129,20 @@ object MapUtils {
             style.addLayerBelow(circles,
                     MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         }
+    }
+
+    fun createLayerForVictimMarker(style: Style) {
+
+        val symbolLayer = SymbolLayer(
+                MainApplication.applicationContext().getString(R.string.victim_marker_layer_id),
+                MainApplication.applicationContext().getString(R.string.victim_marker_source_id)
+        ).withProperties(
+                iconImage(MainApplication.applicationContext().getString(R.string.victim_icon_id)),
+                iconAllowOverlap(true)
+                //TODO possibly add an offset
+        )
+
+        style.addLayerBelow(symbolLayer,
+                MainApplication.applicationContext().getString(R.string.victim_marker_source_id))
     }
 }

@@ -43,6 +43,10 @@
     <string name="below_layer_id">building</string>
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
+    <string name="victim_marker_layer_id">VictimMarkerLayerID</string>
+    <string name="victim_marker_source_id">VictimMarkerSourceID</string>
+    <string name="victim_icon_id">VictimIconId</string>
+
     <string name="lat">LAT :</string>
     <string name="lon">LON :</string>
 

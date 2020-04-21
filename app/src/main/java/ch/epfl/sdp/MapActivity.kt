@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
@@ -47,8 +48,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     var waypoints = arrayListOf<LatLng>()
 
-    private var features = ArrayList<Feature>()
-    private lateinit var geoJsonSource: GeoJsonSource
+    private var heatmapFeatures = ArrayList<Feature>()
+    private var victimLayerFeatures = ArrayList<Feature>()
+    private lateinit var heatmapGeoJsonSource: GeoJsonSource
+    private lateinit var victimMarkerGeoJsonSource: GeoJsonSource
 
     private lateinit var distanceToUserTextView: TextView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -149,17 +152,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
-            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
-            style.addSource(geoJsonSource)
-
-            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-            addPointToHeatMap(8.543434, 47.398979)
-            addPointToHeatMap(8.543934, 47.398279)
-            addPointToHeatMap(8.544867, 47.397426)
-            addPointToHeatMap(8.543067, 47.397026)
-
+            heatmapGeoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
+            heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            style.addSource(heatmapGeoJsonSource)
             MapUtils.createLayersForHeatMap(style)
+
+            victimMarkerGeoJsonSource = GeoJsonSource(getString(R.string.victim_marker_source_id))
+            victimMarkerGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            style.addSource(victimMarkerGeoJsonSource)
+            MapUtils.createLayerForVictimMarker(style)
 
             // Load latest location
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
@@ -168,6 +169,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
             isMapReady = true
+
+            addVictimMarker(8.544618, 47.398164)
         }
     }
 
@@ -255,8 +258,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
         if(!isMapReady) return
-        features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
-        geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
+        heatmapFeatures.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
+        heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
+    }
+
+    fun addVictimMarker(longitude: Double, latitude: Double) {
+        if(!isMapReady) return
+        victimLayerFeatures.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
+        victimMarkerGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(victimLayerFeatures))
+        Log.d("----------------","Added marker")
     }
 
     /**
