@@ -52,9 +52,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     var waypoints = arrayListOf<LatLng>()
 
     private var heatmapFeatures = ArrayList<Feature>()
-    private var victimLayerFeatures = ArrayList<Feature>()
     private lateinit var heatmapGeoJsonSource: GeoJsonSource
-    private lateinit var victimMarkerGeoJsonSource: GeoJsonSource
 
     private lateinit var distanceToUserTextView: TextView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -155,10 +153,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             victimSymbolManager.iconAllowOverlap = true
             victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
 
-            style.addImage(ID_ICON_AIRPORT,
-                    BitmapUtils.getBitmapFromDrawable(getDrawable(R.drawable.ic_person_black_24dp))!!,
-                    true)
-
+            style.addImage(ID_ICON_AIRPORT, getDrawable(R.drawable.ic_person_black_24dp)!!)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -174,11 +169,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
             style.addSource(heatmapGeoJsonSource)
             MapUtils.createLayersForHeatMap(style)
-
-            victimMarkerGeoJsonSource = GeoJsonSource(getString(R.string.victim_marker_source_id))
-            victimMarkerGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
-            style.addSource(victimMarkerGeoJsonSource)
-            MapUtils.createLayerForVictimMarker(style)
 
             // Load latest location
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
@@ -286,7 +276,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun addVictimMarker(latLng: LatLng) {
         if(!isMapReady) return
-        Log.w("----------------","pass")
         val symbolOptions = SymbolOptions()
                 .withLatLng(LatLng(latLng))
                 .withIconImage(ID_ICON_AIRPORT)
