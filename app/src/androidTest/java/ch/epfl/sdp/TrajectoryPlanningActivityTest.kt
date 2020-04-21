@@ -37,14 +37,13 @@ class TrajectoryPlanningActivityTest {
 
     @Test
     fun clickOnMapInteractWithBuilder() {
-        val builder = mActivityRule.activity.searchAreaBuilder
-        assertThat(builder.vertices.size, equalTo(0))
-
         // Wait for the map to load
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
+        val builder = mActivityRule.activity.searchAreaBuilder
+        assertThat(builder.vertices.size, equalTo(0))
+
         // Add a point
-        //onView(withId(R.id.trajectory_planning_mapView)).perform(click())
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
