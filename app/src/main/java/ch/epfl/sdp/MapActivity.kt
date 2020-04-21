@@ -20,8 +20,10 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
+import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
 /**
@@ -39,6 +41,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var waypointCircleManager: CircleManager
     private lateinit var droneCircleManager: CircleManager
     private lateinit var userCircleManager: CircleManager
+    private lateinit var victimSymbolManager: SymbolManager
 
     private lateinit var lineManager: LineManager
     private lateinit var fillManager: FillManager
@@ -80,6 +83,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         const val MAP_READY_DESCRIPTION: String = "MAP READY"
+
+        const val ID_ICON_AIRPORT: String = "airport"
 
         private const val PATH_THICKNESS: Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F
@@ -146,9 +151,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             waypointCircleManager = CircleManager(mapView, mapboxMap, style)
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
             userCircleManager = CircleManager(mapView, mapboxMap, style)
+            victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
+            victimSymbolManager.iconAllowOverlap = true
+            victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
+
+            style.addImage(ID_ICON_AIRPORT,
+                    BitmapUtils.getBitmapFromDrawable(getDrawable(R.drawable.ic_person_black_24dp))!!,
+                    true)
+
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
+                true
+            }
+
+            mapboxMap.addOnMapLongClickListener { position ->
+                onMapLongClicked(position)
                 true
             }
 
@@ -170,7 +188,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
 
-            addVictimMarker(8.544618, 47.398164)
+            addVictimMarker(LatLng(47.398164, 8.544618))
         }
     }
 
@@ -189,6 +207,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
             }
         }
+    }
+
+    private fun onMapLongClicked(position: LatLng) {
+        addVictimMarker(position)
     }
 
     /**
@@ -262,11 +284,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
     }
 
-    fun addVictimMarker(longitude: Double, latitude: Double) {
+    private fun addVictimMarker(latLng: LatLng) {
         if(!isMapReady) return
-        victimLayerFeatures.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
-        victimMarkerGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(victimLayerFeatures))
-        Log.d("----------------","Added marker")
+        Log.w("----------------","pass")
+        val symbolOptions = SymbolOptions()
+                .withLatLng(LatLng(latLng))
+                .withIconImage(ID_ICON_AIRPORT)
+        victimSymbolManager.create(symbolOptions)
     }
 
     /**

@@ -1,5 +1,5 @@
 <resources>
-    <string name="mapbox_access_token">sk.eyJ1IjoibXlocmFlbCIsImEiOiJjazduaGgyOWowMTk1M2xsOHQ5d2N6MW02In0.mOwke6u2usaPmvK9asaXew</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
     <string name="google_signin_key">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
 
     <string name="app_name">Fly2Find</string>
@@ -42,10 +42,6 @@
 
     <string name="below_layer_id">building</string>
     <string name="heatmap_source_ID">HeatMapSourceID</string>
-
-    <string name="victim_marker_layer_id">VictimMarkerLayerID</string>
-    <string name="victim_marker_source_id">VictimMarkerSourceID</string>
-    <string name="victim_icon_id">VictimIconId</string>
 
     <string name="lat">LAT :</string>
     <string name="lon">LON :</string>
