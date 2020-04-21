@@ -3,7 +3,6 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -24,7 +23,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
 /**
@@ -107,7 +105,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         const val MAP_READY_DESCRIPTION: String = "MAP READY"
 
-        const val ID_ICON_AIRPORT: String = "airport"
+        const val ID_ICON_VICTIM: String = "airport"
 
         private const val PATH_THICKNESS: Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F
@@ -178,9 +176,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             userCircleManager = CircleManager(mapView, mapboxMap, style)
             victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
             victimSymbolManager.iconAllowOverlap = true
+            victimSymbolManager.symbolSpacing = 0F
+            victimSymbolManager.iconIgnorePlacement = true
             victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
 
-            style.addImage(ID_ICON_AIRPORT, getDrawable(R.drawable.ic_person_black_24dp)!!)
+            style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -308,7 +308,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if(!isMapReady) return
         val symbolOptions = SymbolOptions()
                 .withLatLng(LatLng(latLng))
-                .withIconImage(ID_ICON_AIRPORT)
+                .withIconImage(ID_ICON_VICTIM)
         victimSymbolManager.create(symbolOptions)
     }
 
