@@ -86,7 +86,7 @@ class OfflineManagerActivityTest {
             onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
             isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
         }
-        
+
         private fun moveCameraToPosition(pos: LatLng) {
             UiThreadStatement.runOnUiThread {
                 mActivityRule.activity.mapView.getMapAsync { mapboxMap ->

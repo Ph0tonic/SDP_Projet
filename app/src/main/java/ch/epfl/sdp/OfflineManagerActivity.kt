@@ -11,10 +11,7 @@ import ch.epfl.sdp.MapActivity.Companion.MAP_NOT_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.ui.maps.OfflineManagerUtils.deleteOfflineRegion
-import ch.epfl.sdp.ui.maps.OfflineManagerUtils.endProgress
-import ch.epfl.sdp.ui.maps.OfflineManagerUtils.getRegionName
-import ch.epfl.sdp.ui.maps.OfflineManagerUtils.startProgress
+import ch.epfl.sdp.ui.maps.OfflineManagerUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -33,7 +30,7 @@ import kotlin.math.roundToInt
  * Be careful, the maximum number of tiles a user can download is 6000
  * TODO : show error when user try to download more than the limit
  */
-class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
+class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var progressBar: ProgressBar
     private lateinit var downloadButton: Button

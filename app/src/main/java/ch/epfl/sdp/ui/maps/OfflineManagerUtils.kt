@@ -13,7 +13,7 @@ import timber.log.Timber
 import java.nio.charset.Charset
 
 
-object OfflineManagerUtils {
+interface OfflineManagerUtils {
 
     // Progress bar methods
     fun startProgress(downloadButton: Button, listButton: Button, progressBar: ProgressBar) { // Disable buttons
