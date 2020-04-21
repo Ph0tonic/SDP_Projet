@@ -38,10 +38,6 @@ class OfflineManagerActivityTest {
         private const val NEGATIVE_BUTTON_ID: Int = android.R.id.button2
         private const val NEUTRAL_BUTTON_ID: Int = android.R.id.button3
 
-
-        @get:Rule
-        var mActivityRule = IntentsTestRule(OfflineManagerActivity::class.java)
-
         private fun clickOnDownloadButton() {
             onView(withId(R.id.download_button)).perform(click())
         }
@@ -86,20 +82,24 @@ class OfflineManagerActivityTest {
             isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
         }
 
-        private fun moveCameraToPosition(pos: LatLng) {
-            UiThreadStatement.runOnUiThread {
-                mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                    mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
-                }
+    }
+
+    private fun moveCameraToPosition(pos: LatLng) {
+        UiThreadStatement.runOnUiThread {
+            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
             }
         }
     }
+
+    @get:Rule
+    var mActivityRule = IntentsTestRule(OfflineManagerActivity::class.java)
 
     @Before
     @Throws(Exception::class)
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        mActivityRule.launchActivity(Intent())
+        moveCameraToPosition(LatLng(0.0,0.0))
         mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
     }
 
