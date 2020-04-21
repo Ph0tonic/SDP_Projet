@@ -10,7 +10,9 @@ import org.hamcrest.TypeSafeMatcher
  * class to test whether or not a Toast Message is displayed
  */
 class ToastMatcher : TypeSafeMatcher<Root>() {
-    private final val TOAST : Int = 2005
+    companion object {
+        private const val TOAST: Int = 2005
+    }
     override fun describeTo(description: Description) {
         description.appendText("is toast")
     }

@@ -35,10 +35,10 @@ class OfflineManagerActivityTest {
         private const val CMA_NAME = "CMA"
         private val CMA: LatLng = LatLng(46.317261, 7.485201)
         private lateinit var mUiDevice: UiDevice
-        const val EPSILON = 1e-3
-        private const val positiveButtonId: Int = android.R.id.button1
-        const val negativeButtonId: Int = android.R.id.button2
-        private const val neutralButtonId: Int = android.R.id.button3
+        private const val EPSILON = 1e-3
+        private const val POSITIVE_BUTTON_ID: Int = android.R.id.button1
+        private const val NEGATIVE_BUTTON_ID: Int = android.R.id.button2
+        private const val NEUTRAL_BUTTON_ID: Int = android.R.id.button3
 
 
         @get:Rule
@@ -54,7 +54,7 @@ class OfflineManagerActivityTest {
 
         private fun clickOnDownloadButtonInDialog() {
             // android.R.id.button1 = positive button
-            onView(withId(positiveButtonId)).perform(click())
+            onView(withId(POSITIVE_BUTTON_ID)).perform(click())
         }
 
         private fun clickOnListButton() {
@@ -77,19 +77,19 @@ class OfflineManagerActivityTest {
 
         private fun navigateToDownloadedMap(name: String) {
             clickOnListButton()
-            onView(withId(positiveButtonId)).perform(click())
+            onView(withId(POSITIVE_BUTTON_ID)).perform(click())
             onView(withText(name)).inRoot(ToastMatcher())
                     .check(matches(isDisplayed()))
         }
 
         private fun clickOnCancelInListDialog() {
             clickOnListButton()
-            onView(withId(negativeButtonId)).perform(click())
+            onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
         }
 
         private fun deleteMap() {
             clickOnListButton()
-            onView(withId(neutralButtonId)).perform(click())
+            onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
             isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
         }
     }
@@ -109,7 +109,7 @@ class OfflineManagerActivityTest {
             false) // Activity is not launched immediately
 
     @Test
-    fun cannotListWhenNoMap() {
+    fun cannotClickOnListWhenNoDownloadedMap() {
         clickOnListButton()
         isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_no_regions_yet))
     }
@@ -157,14 +157,14 @@ class OfflineManagerActivityTest {
     @Test
     fun canClickOnCancelDownloadDialog() {
         clickOnDownloadButton()
-        onView(withId(negativeButtonId)).perform(click())
+        onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
     }
 
 
 
 
     @Test
-    fun cannotEmptyDownloadName() {
+    fun cannotDownloadEmptyMapName() {
         clickOnDownloadButton()
         clickOnDownloadButtonInDialog()
         isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.dialog_toast))
