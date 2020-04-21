@@ -38,13 +38,14 @@ class QuadrilaterAreaBuilderTest {
         assertThat(corners, equalTo(listOf(LatLng(1.0, 0.0), LatLng(1.0, 1.0))))
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test()
     fun cannotAddMoreThanFourAngles() {
         val area = QuadrilateralBuilder()
         for (i in 0..4) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
+        assertThat(area.vertices.size, CoreMatchers.equalTo(4))
     }
 
     @Test
