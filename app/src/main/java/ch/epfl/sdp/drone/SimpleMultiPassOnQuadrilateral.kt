@@ -11,7 +11,7 @@ import kotlin.math.max
 /**
  * Creates a path covering a quadrilateral in several passes
  */
-class SimpleMultiPassOnQuadrilateral(maxDistBetweenLines: Double) : OverflightStrategy {
+class SimpleMultiPassOnQuadrilateral(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINES) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
     companion object {
