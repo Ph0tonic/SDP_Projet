@@ -1,6 +1,7 @@
 package ch.epfl.sdp.drone
 
 import com.mapbox.mapboxsdk.geometry.LatLng
+import net.mastrgamr.mbmapboxutils.SphericalUtil.computeHeading
 import net.mastrgamr.mbmapboxutils.SphericalUtil.computeOffset
 import kotlin.collections.ArrayList
 import kotlin.math.*
@@ -39,7 +40,8 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
 
          */
         val center = pinpoints[0]
-        val radius = center.distanceTo(pinpoints[1])
+        val outter = pinpoints[1]
+        val radius = center.distanceTo(outter)
 
         val path = ArrayList<LatLng>()
 
@@ -51,16 +53,17 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
 
          */
 
-        val realRadius = 6378137
+        val earthRadius = 6378137
 
+        val turns: Double = 4.0
+
+        val maxTheta = radius/earthRadius
+        val phi0 = computeHeading(center,outter)
+        
         for(step in 0 .. steps){
-            val turns: Double = 4.0
-
-            val test = 2.0
-            val maxTheta = PI/test
             val theta = maxTheta*step/steps
-            val distance = theta*realRadius
-            val phi = (test/2) * turns * step
+            val distance = theta*earthRadius
+            val phi = turns * 2* PI * step/steps
 
 
 
@@ -74,7 +77,7 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
 
              */
 
-            path.add(computeOffset(center,distance, phi))
+            path.add(computeOffset(center,distance, phi0 + Math.toDegrees(phi)))
         }
 
         return path
