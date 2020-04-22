@@ -160,8 +160,6 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
-        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
-
         // Add a point
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
@@ -170,6 +168,7 @@ class MapActivityTest {
             mActivityRule.activity.onMapClicked(LatLng(3.0, 3.0))
             mActivityRule.activity.onMapClicked(LatLng(4.0, 4.0))
         }
+        
         onView(withText("Already enough points for a quadrilateral"))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
