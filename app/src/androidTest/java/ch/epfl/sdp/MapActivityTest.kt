@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
@@ -151,6 +152,27 @@ class MapActivityTest {
             searchAreaBuilder.reset()
         }
         assertThat(searchAreaBuilder.vertices.size, equalTo(0))
+    }
+
+
+    @Test
+    fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
+
+        // Add a point
+        runOnUiThread {
+            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClicked(LatLng(1.0, 1.0))
+            mActivityRule.activity.onMapClicked(LatLng(2.0, 2.0))
+            mActivityRule.activity.onMapClicked(LatLng(3.0, 3.0))
+            mActivityRule.activity.onMapClicked(LatLng(4.0, 4.0))
+        }
+        onView(withText("Already enough points for a quadrilateral"))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
     }
 
     @Test
