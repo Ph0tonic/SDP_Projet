@@ -7,7 +7,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle.Constraints.pinPointsAmount
+import ch.epfl.sdp.drone.OverflightStrategy
+import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle
+import ch.epfl.sdp.drone.SpiralStrategy.Constraints.pinPointsAmount
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.geojson.Feature

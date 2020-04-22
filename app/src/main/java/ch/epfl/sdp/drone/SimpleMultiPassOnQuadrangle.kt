@@ -25,13 +25,13 @@ class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStr
     }
 
     @Throws(IllegalArgumentException::class)
-    override fun createFlightPath(waypoints: List<LatLng>): List<LatLng> {
-        require(waypoints.size == 4) {
-            "This strategy requires exactly 4 pinpoints, ${waypoints.size} given."
+    override fun createFlightPath(pinpoints: List<LatLng>): List<LatLng> {
+        require(pinpoints.size == pinPointsAmount) {
+            "This strategy requires exactly $pinPointsAmount pinpoints, ${pinpoints.size} given."
         }
 
         // Make a mutable copy of the waypoints to be able to reorder them
-        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(waypoints) }
+        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(pinpoints) }
 
         val steps = max(2, ceil(max(
                 waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,

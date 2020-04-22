@@ -46,6 +46,6 @@ object Drone {
                     groundSpeed.velocityEastMS.pow(2))
             currentSpeedLiveData.postValue(speed)
         })
-        overflightStrategy = SimpleMultiPassOnQuadrangle(DEFAULT_MAX_DIST_BETWEEN_PASSES)
+        overflightStrategy = SpiralStrategy(DEFAULT_MAX_DIST_BETWEEN_PASSES)//SimpleMultiPassOnQuadrangle(DEFAULT_MAX_DIST_BETWEEN_PASSES)
     }
 }
