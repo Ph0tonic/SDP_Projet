@@ -66,7 +66,7 @@ class QuadrilaterAreaBuilderTest {
     }
 
     @Test
-    fun resetIsPerformed() {
+    fun quadrilateralBuilderResetIsEffective() {
         val area = QuadrilateralBuilder()
 
         area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
