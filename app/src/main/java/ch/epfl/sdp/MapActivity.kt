@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
@@ -59,6 +60,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var searchAreaBuilder: SearchAreaBuilder
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var missionBuilder: MissionBuilder
 
@@ -228,7 +230,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Map clic to current eventListener
      */
     fun onMapClicked(position: LatLng) {
-        searchAreaBuilder.addVertex(position)
+        try {
+            searchAreaBuilder.addVertex(position)
+        } catch (e: IllegalArgumentException) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**

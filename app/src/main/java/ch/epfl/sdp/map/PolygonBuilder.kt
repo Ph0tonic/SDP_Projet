@@ -3,22 +3,22 @@ package ch.epfl.sdp.map
 import ch.epfl.sdp.searchareabuilder.PolygonArea
 import ch.epfl.sdp.searchareabuilder.SearchArea
 import ch.epfl.sdp.searchareabuilder.SearchAreaNotCompleteException
-import ch.epfl.sdp.ui.maps.IntersectionTools
 import com.mapbox.mapboxsdk.geometry.LatLng
-import java.util.*
 
 class PolygonBuilder : SearchAreaBuilder() {
 
-    override fun addVertex(vertex: LatLng) {
+    override fun addVertex(vertex: LatLng): SearchAreaBuilder {
         vertices.add(vertex)
         this.vertices = this.vertices
+        return this
     }
 
-    override fun moveVertex(old: LatLng, new: LatLng) {
+    override fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
         vertices.removeAt(oldIndex!!)
         vertices.add(new)
         this.vertices = this.vertices
+        return this
     }
 
     override fun isComplete(): Boolean {

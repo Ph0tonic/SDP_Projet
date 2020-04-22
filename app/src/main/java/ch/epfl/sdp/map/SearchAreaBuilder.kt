@@ -26,8 +26,8 @@ abstract class SearchAreaBuilder {
         vertices = mutableListOf()
     }
 
-    abstract fun addVertex(vertex: LatLng)
-    abstract fun moveVertex(old: LatLng, new: LatLng)
+    abstract fun addVertex(vertex: LatLng): SearchAreaBuilder
+    abstract fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder
 
     abstract fun isComplete(): Boolean
     abstract fun build(): SearchArea

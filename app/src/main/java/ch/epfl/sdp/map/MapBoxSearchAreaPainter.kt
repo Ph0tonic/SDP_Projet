@@ -6,6 +6,8 @@ abstract class MapBoxSearchAreaPainter {
 
     val onMoveVertex = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
 
-    abstract fun unMount()
+    open fun unMount() {
+        onMoveVertex.clear()
+    }
     abstract fun paint(vertices: List<LatLng>)
 }

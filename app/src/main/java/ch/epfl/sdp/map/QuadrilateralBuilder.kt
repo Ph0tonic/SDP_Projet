@@ -9,19 +9,21 @@ import java.util.*
 
 class QuadrilateralBuilder : SearchAreaBuilder() {
 
-    override fun addVertex(vertex: LatLng) {
-        if (vertices.size >= 4) return
+    override fun addVertex(vertex: LatLng): SearchAreaBuilder {
+        require(vertices.size < 4) { "Already enough points for a quadrilateral" }
         vertices.add(vertex)
         orderVertex()
         this.vertices = this.vertices
+        return this
     }
 
-    override fun moveVertex(old: LatLng, new: LatLng) {
+    override fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
         vertices.removeAt(oldIndex!!)
         vertices.add(new)
         orderVertex()
         this.vertices = this.vertices
+        return this
     }
 
     private fun orderVertex() {
