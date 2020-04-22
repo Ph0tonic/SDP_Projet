@@ -46,7 +46,7 @@ class PolygonAreaBuilderTest {
     }
 
     @Test
-    fun resetIsPerformed() {
+    fun polygonAreaBuilderResetIsEffective() {
         val area = PolygonBuilder()
 
         area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
