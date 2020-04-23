@@ -226,7 +226,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
              /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-             addVirtualPointsToHeatmap()
+             //addVirtualPointsToHeatmap()
         }
     }
 
