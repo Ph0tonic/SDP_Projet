@@ -1,7 +1,7 @@
 package ch.epfl.sdp.drone
 
 import com.mapbox.mapboxsdk.geometry.LatLng
-
+/*
 class GotoStrategy: OverflightStrategy {
     companion object Constraints {
         const val pinPointsAmount = 1
@@ -15,3 +15,5 @@ class GotoStrategy: OverflightStrategy {
         return pinpoints
     }
 }
+
+ */

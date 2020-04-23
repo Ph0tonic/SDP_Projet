@@ -54,7 +54,7 @@ class OfflineManagerActivityTest {
 
     @Test
     fun canOpenDownloadDialog() {
-        mUiDevice.wait(Until.hasObject(By.desc("DOWNLOAD").clickable(true)), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Download").clickable(true)), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
         mUiDevice.wait(Until.hasObject(By.desc("Enter")), TIMEOUT)
@@ -75,7 +75,7 @@ class OfflineManagerActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc("CANCEL")), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Cancel")), TIMEOUT)
         onView(withText(R.string.dialog_negative_button)).perform(click())
     }
 
@@ -84,7 +84,7 @@ class OfflineManagerActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc("List").clickable(true)), TIMEOUT)
         onView(withId(R.id.list_button)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc("CANCEL").clickable(true)), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Cancel").clickable(true)), TIMEOUT)
         onView(withText(R.string.navigate_negative_button_title)).perform(click())
     }
 
@@ -98,7 +98,7 @@ class OfflineManagerActivityTest {
 
         mUiDevice.pressBack()
 
-        mUiDevice.wait(Until.hasObject(By.desc("DOWNLOAD")), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
     }
 
@@ -108,7 +108,7 @@ class OfflineManagerActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc("List")), TIMEOUT)
         onView(withId(R.id.list_button)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc("DELETE")), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Delete")), TIMEOUT)
         onView(withText(R.string.navigate_neutral_button_title)).perform(click())
     }
 
@@ -117,16 +117,16 @@ class OfflineManagerActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc("List")), TIMEOUT)
         onView(withId(R.id.list_button)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc("NAVIGATE")), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Navigate to")), TIMEOUT)
         onView(withText(R.string.navigate_positive_button)).perform(click())
     }
 
     @Test
     fun cannotEmptyDownloadName() {
-        mUiDevice.wait(Until.hasObject(By.desc("DOWNLOAD")), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc("DOWNLOAD")), TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc("Download")), TIMEOUT)
         onView(withText(R.string.dialog_positive_button)).perform(click())
     }
 }

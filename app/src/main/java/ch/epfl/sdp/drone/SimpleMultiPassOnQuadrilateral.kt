@@ -1,37 +1,42 @@
 package ch.epfl.sdp.drone
 
+import ch.epfl.sdp.searchareabuilder.QuadrilateralArea
+import ch.epfl.sdp.searchareabuilder.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.ceil
 import kotlin.math.max
 
-
 /**
  * Creates a path covering a quadrilateral in several passes
  */
-class SimpleMultiPassOnQuadrangle(maxDistBetweenLinesIn: Double) : OverflightStrategy {
+class SimpleMultiPassOnQuadrilateral(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINES) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
-    companion object Constraints {
-        const val pinPointsAmount = 4
+    companion object {
+        const val DEFAULT_DIST_BETWEEN_LINES: Double = 15.0
     }
 
     init {
-        require(maxDistBetweenLinesIn > 0.0) {
+        require(maxDistBetweenLines > 0.0) {
             "The maximum distance between passes must be strictly positive"
         }
-        this.maxDistBetweenLines = maxDistBetweenLinesIn
+        this.maxDistBetweenLines = maxDistBetweenLines
+    }
+
+    override fun acceptArea(searchArea: SearchArea): Boolean {
+        return searchArea is QuadrilateralArea
     }
 
     @Throws(IllegalArgumentException::class)
-    override fun createFlightPath(pinpoints: List<LatLng>): List<LatLng> {
-        require(pinpoints.size == pinPointsAmount) {
-            "This strategy requires exactly $pinPointsAmount pinpoints, ${pinpoints.size} given."
-        }
-
+    override fun createFlightPath(startingPoint: LatLng, searchArea: SearchArea): List<LatLng> {
+        require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
+        val quadrilateralArea = searchArea as QuadrilateralArea
         // Make a mutable copy of the waypoints to be able to reorder them
-        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(pinpoints) }
+        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(quadrilateralArea.vertices) }
+        val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
+        Collections.rotate(waypointsCopied, -startingIndex)
 
         val steps = max(2, ceil(max(
                 waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,

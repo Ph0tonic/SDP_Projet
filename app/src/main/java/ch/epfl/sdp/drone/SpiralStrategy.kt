@@ -10,6 +10,7 @@ import kotlin.math.*
 /**
  * Creates a path covering a quadrilateral in several passes
  */
+/*
 class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
@@ -86,3 +87,5 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         return path
     }
 }
+
+ */
