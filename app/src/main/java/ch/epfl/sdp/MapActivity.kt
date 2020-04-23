@@ -53,6 +53,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     var features = ArrayList<Feature>()
     private lateinit var geoJsonSource: GeoJsonSource
 
+
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
     private lateinit var distanceToUserTextView: TextView
@@ -225,7 +226,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
              /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-             //addVirtualPointsToHeatmap()
+             addVirtualPointsToHeatmap()
         }
     }
 
@@ -268,7 +269,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
         if(!isMapReady) return
         var feature : Feature = Feature.fromGeometry(Point.fromLngLat(longitude,latitude))
-        feature.addNumberProperty("intensity", intensity)
+        //feature.addNumberProperty("intensity", intensity)
+        /* Will be needed when we have the signal of the drone implemented */
+        feature.addNumberProperty("intensity", Drone.getSignalStrength())
         features.add(feature)
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
@@ -337,6 +340,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun addVirtualPointsToHeatmap(){
         val long=8.5445
         val lat=47.3975
+        //Drone.getSignalStrength={10.0}
         //precision should be 0.00003
         for(i in 0..10){
             for(j in 0..10){
