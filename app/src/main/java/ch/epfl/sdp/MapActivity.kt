@@ -159,11 +159,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     )
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
             style.addSource(geoJsonSource)
-
-
             MapUtils.createLayersForHeatMap(style)
-
-
 
             // Load latest location
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
@@ -172,15 +168,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
             isMapReady = true
+
             /**Uncomment this to see a virtual heatmap**/
-            //addVirtualPointsToHeatmap()
-
-
-
+            addVirtualPointsToHeatmap()
 
         }
     }
-
 
     private fun updateTextView(textView: TextView, value: Double, formatString: String) {
         textView.text = formatString.format(value)

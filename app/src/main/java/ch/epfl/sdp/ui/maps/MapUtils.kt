@@ -86,7 +86,7 @@ object MapUtils {
      */
     fun createLayersForHeatMap(style: Style) {
         unclusteredLayerData(style)
-        clusteredLayerData(style)
+        //clusteredLayerData(style)
     }
 
     private fun unclusteredLayerData(style: Style) {
@@ -119,18 +119,6 @@ object MapUtils {
             val circles = CircleLayer("cluster-$i",
                     MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
             circles.setProperties(
-                    /*
-                    PropertyFactory.circleColor(
-
-                            Expression.interpolate(Expression.linear(),Expression.get("intensities"),
-                                    Expression.stop(1.0, Expression.rgb(255,0,0)),
-                                    Expression.stop(2.0, Expression.rgb(0,255,0)),
-                                    Expression.stop(3.0, Expression.rgb(0,0,255))
-                            )
-
-                    ),
-
-                     */
                     PropertyFactory.circleColor(layers[i][1]),
                     PropertyFactory.circleRadius(100f),
                     PropertyFactory.circleBlur(1f)
