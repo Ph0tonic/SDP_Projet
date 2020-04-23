@@ -30,10 +30,6 @@ class HomeFragment : Fragment() {
         root.findViewById<Button>(R.id.display_map).setOnClickListener {
             startActivity(Intent(context, MapActivity::class.java))
         }
-        root.findViewById<Button>(R.id.display_camera).setOnClickListener {
-            startActivity(Intent(context, VlcActivity::class.java))
-        }
-
         return root
     }
 }

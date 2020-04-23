@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
+import android.util.DisplayMetrics
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -18,15 +19,14 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiT
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
-import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class LoginNavFragmentTest {
@@ -107,16 +107,22 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
-        /*
-        onView(withText(getContext().getString(R.string.auth_signout))).perform(scrollTo(), click())
-        runOnUiThread {
-            Auth.logout()
-            Auth.loggedIn.postValue(false)
+
+
+
+
+        //This condition has to be added because the Cirrus resolution is ridiculously low and this makes fail the test
+        if(InstrumentationRegistry.getInstrumentation().targetContext.resources.getDisplayMetrics().heightPixels>200){
+            onView(withText(getContext().getString(R.string.auth_signout))).perform(scrollTo(), click())
+            runOnUiThread {
+                Auth.logout()
+                Auth.loggedIn.postValue(false)
+            }
+
+            openDrawer()
+            onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
+
+            mUiDevice.pressBack()
         }
-
-        openDrawer()
-        onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
-
-        mUiDevice.pressBack()*/
     }
 }
