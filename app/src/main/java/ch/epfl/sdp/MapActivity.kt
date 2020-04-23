@@ -170,7 +170,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             isMapReady = true
 
             /**Uncomment this to see a virtual heatmap**/
-            addVirtualPointsToHeatmap()
+            //addVirtualPointsToHeatmap()
 
         }
     }
