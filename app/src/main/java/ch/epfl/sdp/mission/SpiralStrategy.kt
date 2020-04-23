@@ -1,5 +1,7 @@
-package ch.epfl.sdp.drone
+package ch.epfl.sdp.mission
 
+import ch.epfl.sdp.searcharea.CircleArea
+import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import net.mastrgamr.mbmapboxutils.SphericalUtil.computeHeading
 import net.mastrgamr.mbmapboxutils.SphericalUtil.computeOffset
@@ -10,7 +12,7 @@ import kotlin.math.*
 /**
  * Creates a path covering a quadrilateral in several passes
  */
-/*
+
 class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
@@ -25,34 +27,20 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         this.maxDistBetweenLines = maxDistBetweenLinesIn
     }
 
-    @Throws(IllegalArgumentException::class)
-    override fun createFlightPath(pinpoints: List<LatLng>): List<LatLng> {
-        require(pinpoints.size == pinPointsAmount) {
-            "This strategy requires exactly $pinPointsAmount pinpoints, ${pinpoints.size} given."
-        }
+    override fun acceptArea(searchArea: SearchArea): Boolean {
+        return searchArea is CircleArea
+    }
 
-        // Make a mutable copy of the waypoints to be able to reorder them
-        /*
-        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(pinpoints) }
-
-        val steps = max(2, ceil(max(
-                waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,
-                waypointsCopied[2].distanceTo(waypointsCopied[3]) / maxDistBetweenLines)).toInt())
-
-         */
-        val center = pinpoints[0]
-        val outter = pinpoints[1]
+    override fun createFlightPath(startingPoint: LatLng, searchArea: SearchArea): List<LatLng> {
+        require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
+        val area = searchArea as CircleArea
+        val center = area.center
+        val outter = area.radial
         val radius = center.distanceTo(outter)
 
         val path = ArrayList<LatLng>()
 
         val steps = 200
-        /*
-        for(step in 0 .. steps){
-            path.add(computeOffset(center,radius,360.0 * step/steps))
-        }
-
-         */
 
         val earthRadius = 6378137
 
@@ -60,26 +48,13 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
 
         val maxTheta = radius/earthRadius
         val phi0 = computeHeading(center,outter)
-        
+
         for(step in 0 .. steps){
-            val a = 1.0
             val s = step.toDouble()/steps //between 0 and 1
             val t = sqrt(s)//sqrt(2*s/a)
             val theta = maxTheta*t
             val distance = theta*earthRadius
             val phi = turns * 2 * PI * t
-
-
-
-            /*
-            val aMax = PI*turns/2
-            val a = (step/steps)*aMax
-
-            val theta = (PI/2)*a/aMax //PI*step/steps
-            val distance = theta*realRadius
-            val phi = step.toDouble()//a //(step/steps)*turns*PI/2
-
-             */
 
             path.add(computeOffset(center,distance, phi0 + Math.toDegrees(phi)))
         }
@@ -87,5 +62,3 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         return path
     }
 }
-
- */

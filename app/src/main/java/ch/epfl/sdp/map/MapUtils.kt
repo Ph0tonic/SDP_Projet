@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.maps
+package ch.epfl.sdp.map
 
 import android.graphics.Color
 import androidx.preference.PreferenceManager
@@ -6,7 +6,6 @@ import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer

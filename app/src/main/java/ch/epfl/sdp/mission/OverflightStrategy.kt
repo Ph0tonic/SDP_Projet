@@ -1,6 +1,6 @@
-package ch.epfl.sdp.drone
+package ch.epfl.sdp.mission
 
-import ch.epfl.sdp.searchareabuilder.SearchArea
+import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 interface OverflightStrategy {

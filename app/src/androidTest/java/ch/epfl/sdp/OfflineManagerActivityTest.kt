@@ -12,7 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import ch.epfl.sdp.ui.maps.MapUtils
+import ch.epfl.sdp.map.MapUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.junit.Before
 import org.junit.FixMethodOrder

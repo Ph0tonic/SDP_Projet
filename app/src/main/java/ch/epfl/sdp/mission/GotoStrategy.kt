@@ -1,4 +1,4 @@
-package ch.epfl.sdp.drone
+package ch.epfl.sdp.mission
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 /*

@@ -10,10 +10,15 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.drone.DroneUtils
+import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.map.*
-import ch.epfl.sdp.ui.maps.MapUtils
+import ch.epfl.sdp.searcharea.QuadrilateralBuilder
+import ch.epfl.sdp.searcharea.SearchAreaBuilder
+import ch.epfl.sdp.map.MapUtils
+import ch.epfl.sdp.mission.MissionBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
+import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
@@ -130,7 +135,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
 
         findViewById<Button>(R.id.start_mission_button).setOnClickListener {
-            Drone.startMission(DroneMission.makeDroneMission(
+            Drone.startMission(DroneUtils.makeDroneMission(
                     missionBuilder.build()
             ).getMissionItems())
         }
