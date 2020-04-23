@@ -1,6 +1,5 @@
 package ch.epfl.sdp.ui.maps
 
-import android.graphics.Color
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
@@ -10,7 +9,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
-import com.mapbox.mapboxsdk.style.layers.PropertyValue
 
 object MapUtils {
 
@@ -18,11 +16,11 @@ object MapUtils {
     const val DEFAULT_LONGITUDE: Double = 8.545970150745575
     const val DEFAULT_ZOOM: Double = 9.0
 
-    private val BLUE = Expression.rgb(0,0,255)
-    private val CYAN = Expression.rgb(0,255,255)
-    private val GREEN = Expression.rgb(0,255,0)
-    private val ORANGE = Expression.rgb(255,255,0)
-    private val RED = Expression.rgb(255,0,0)
+    private val BLUE = Expression.rgb(0, 0, 255)
+    private val CYAN = Expression.rgb(0, 255, 255)
+    private val GREEN = Expression.rgb(0, 255, 0)
+    private val ORANGE = Expression.rgb(255, 255, 0)
+    private val RED = Expression.rgb(255, 0, 0)
 
 
     private fun loadLastMapPositionFromPrefs(): LatLng {
@@ -97,7 +95,7 @@ object MapUtils {
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         unclustered.setProperties(
                 PropertyFactory.circleColor(
-                         Expression.interpolate(Expression.linear(),Expression.get("intensity"),
+                        Expression.interpolate(Expression.linear(), Expression.get("intensity"),
                                 Expression.stop(8, BLUE),
                                 Expression.stop(8.5, CYAN),
                                 Expression.stop(9, GREEN),
@@ -111,7 +109,8 @@ object MapUtils {
         style.addLayerBelow(unclustered,
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }
-    private fun clusteredLayerData(style: Style){
+
+    private fun clusteredLayerData(style: Style) {
         val clustered = CircleLayer("clustered-points",
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         clustered.setProperties(
@@ -119,7 +118,7 @@ object MapUtils {
                 PropertyFactory.circleRadius(50f),
                 PropertyFactory.circleBlur(1f)
         )
-        clustered.setFilter(Expression.eq(Expression.get("cluster"),Expression.literal(true)))
+        clustered.setFilter(Expression.eq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(clustered,
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }

@@ -21,16 +21,13 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.plugins.annotation.Circle
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
 import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
+import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Main Activity to display map and create missions.
@@ -195,10 +192,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
                     .withCluster(true)
-                    .withClusterProperty("intensities", Expression.literal("+") ,Expression.get("intensity"))
+                    .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
                     .withClusterMaxZoom(13)
 
-                    )
+            )
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
             style.addSource(geoJsonSource)
             MapUtils.createLayersForHeatMap(style)
@@ -226,8 +223,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
-             /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-             //addVirtualPointsToHeatmap()
+            /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
+            addVirtualPointsToHeatmap()
         }
     }
 
@@ -268,8 +265,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Adds a heat point to the heatmap
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
-        if(!isMapReady) return
-        var feature : Feature = Feature.fromGeometry(Point.fromLngLat(longitude,latitude))
+        if (!isMapReady) return
+        var feature: Feature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
         feature.addNumberProperty("intensity", intensity)
         /* Will be needed when we have the signal of the drone implemented */
         //feature.addNumberProperty("intensity", Drone.getSignalStrength())
@@ -337,21 +334,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
     /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-    /*
-    private fun addVirtualPointsToHeatmap(){
-        val long=8.5445
-        val lat=47.3975
+
+    private fun addVirtualPointsToHeatmap() {
+        val long = 8.5445
+        val lat = 47.3975
         //Drone.getSignalStrength={10.0}
         //precision should be 0.00003
-        for(i in 0..10){
-            for(j in 0..10){
-                val newlong= 8.544 + i/10000.0
-                val newlat=47.397 + j/10000.0
-                val intensity=10-Math.sqrt((long-newlong)*(long-newlong)*10000000 + (lat-newlat)*(lat-newlat)*10000000)
-                addPointToHeatMap(newlong,newlat,intensity)
+        for (i in 0..10) {
+            for (j in 0..10) {
+                val newlong = 8.544 + i / 10000.0
+                val newlat = 47.397 + j / 10000.0
+                val intensity = 10 - Math.sqrt((long - newlong) * (long - newlong) * 10000000 + (lat - newlat) * (lat - newlat) * 10000000)
+                addPointToHeatMap(newlong, newlat, intensity)
             }
         }
     }
-    */
+
 }
