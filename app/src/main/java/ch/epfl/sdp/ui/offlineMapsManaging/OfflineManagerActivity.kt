@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.MapActivity.Companion.MAP_NOT_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
@@ -14,11 +13,10 @@ import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.deleteOfflineRegion
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.getRegionName
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.showToast
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.showErrorToast
 import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.deletingInProgress
 import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.downloadingInProgress
 import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.endProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.getProgressBar
 import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.initProgressBar
 import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.startProgress
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -96,8 +94,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // If the user-provided string is empty, display
                     // a toast message and do not begin download.
                     if (regionName.isEmpty()) {
-
-                        showToast(getString(R.string.dialog_toast))
+                        Toast.makeText(applicationContext, getString(R.string.dialog_toast), Toast.LENGTH_SHORT)
                     } else { // Begin download process
                         downloadRegion(regionName)
                     }
@@ -130,7 +127,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
-                Timber.e("Failed to encode metadata: %s", exception.message)
+                showErrorToast("Failed to encode metadata: " + exception.message)
                 null
             }
             // Create the offline region and launch the download
@@ -140,7 +137,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
 
                 override fun onError(error: String) {
-                    Timber.e("Error: %s", error)
+                    showErrorToast("Error : $error")
                 }
             })
         }
@@ -161,12 +158,11 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             override fun onError(error: OfflineRegionError) {
                 Timber.e("onError reason: %s", error.reason)
-                Timber.e("onError message: %s", error.message)
+                showErrorToast("onError message: " + error.message )
             }
 
             override fun mapboxTileCountLimitExceeded(limit: Long) {
-                Timber.e("Mapbox tile count limit exceeded : %s", limit)
-                showToast(getString(R.string.too_many_regions))
+                showErrorToast("Mapbox tile count limit exceeded : $limit")
             }
         })
         // Change the region state
@@ -181,7 +177,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
                 // downloaded yet, notify user and return
                 if (offlineRegions.isEmpty()) {
-                    showToast(getString(R.string.toast_no_regions_yet))
+                    Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT)
                     return
                 }
                 // Add all of the region names to a list
@@ -193,8 +189,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
 
             override fun onError(error: String) {
-                Timber.e("Error: %s", error)
-                showToast("Error : $error")
+                showErrorToast("Error : $error")
             }
         })
     }

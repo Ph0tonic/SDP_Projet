@@ -3,6 +3,7 @@ package ch.epfl.sdp.ui.offlineMapsManaging
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.Toast
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 
@@ -30,8 +31,7 @@ object ProgressBar {
         progressBar.isIndeterminate = false
         progressBar.visibility = View.GONE
         // Show a toast
-        OfflineManagerUtils.
-                showToast(MainApplication.applicationContext().getString(R.string.end_progress_success))
+        Toast.makeText(MainApplication.applicationContext(),MainApplication.applicationContext().getString(R.string.end_progress_success), Toast.LENGTH_SHORT)
     }
 
     fun downloadingInProgress(percentage : Int){

@@ -1,7 +1,5 @@
 package ch.epfl.sdp.ui.offlineMapsManaging
 
-import android.view.View
-import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
@@ -18,13 +16,12 @@ object OfflineManagerUtils {
             override fun onDelete() { // Once the region is deleted, remove the
                 // progressBar and display a toast
                 hideProgressBar()
-                showToast(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
+                Toast.makeText(MainApplication.applicationContext(), MainApplication.applicationContext().getString(R.string.toast_region_deleted), Toast.LENGTH_LONG).show()
             }
 
             override fun onError(error: String) {
                 hideProgressBar()
-                Timber.e("Error: %s", error)
-                showToast("Error : $error")
+                showErrorToast("Error : $error")
             }
         })
     }
@@ -43,7 +40,8 @@ object OfflineManagerUtils {
         return regionName
     }
 
-    fun showToast(message : String){
+    fun showErrorToast(message : String){
+        Timber.e(message)
         Toast.makeText(MainApplication.applicationContext(), message, Toast.LENGTH_LONG).show()
     }
 }
