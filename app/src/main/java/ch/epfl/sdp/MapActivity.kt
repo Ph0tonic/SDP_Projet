@@ -224,7 +224,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-            addVirtualPointsToHeatmap()
+            //addVirtualPointsToHeatmap()
         }
     }
 
@@ -336,7 +336,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-
+/*
     private fun addVirtualPointsToHeatmap() {
         val long = 8.5445
         val lat = 47.3975
@@ -351,5 +351,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
         }
     }
+ */
 
 }
