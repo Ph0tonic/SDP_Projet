@@ -36,7 +36,6 @@
     <string name="toast_region_deleted">Region Deleted</string>
     <string name="toast_no_regions_yet">No regions yet</string>
     <string name="dialog_toast">Name cannot be empty</string>
-    <string name="too_many_regions">Too many downloaded regions</string>
     <string name="region_name">Region name error</string>
     <string name="switch_video">Switch video</string>
 
