@@ -91,10 +91,8 @@ class OfflineManagerActivityTest {
     }
 
     private fun moveCameraToPosition(pos: LatLng) {
-        UiThreadStatement.runOnUiThread {
-            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
-            }
+        mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+            mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
         }
     }
 
