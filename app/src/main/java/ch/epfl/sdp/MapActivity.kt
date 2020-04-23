@@ -181,6 +181,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             victimSymbolManager.iconIgnorePlacement = true
             victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
 
+
+            victimSymbolManager.addLongClickListener { symbol: Symbol ->
+                onMapLongClicked(symbol.latLng, symbol)
+            }
+
             style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
 
             mapboxMap.addOnMapClickListener { position ->
@@ -231,8 +236,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun onMapLongClicked(position: LatLng) {
-        addVictimMarker(position)
+
+    //TODO problem: gets fired twice when long clicking on a symbol (once with and once without symbol)
+    private fun onMapLongClicked(position: LatLng, symbol: Symbol? = null) {
+        if(symbol != null){
+            victimSymbolManager.delete(symbol)
+        }else{
+            addVictimMarker(position)
+        }
     }
 
     /**
