@@ -50,7 +50,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     var waypoints = arrayListOf<LatLng>()
 
-    private var features = ArrayList<Feature>()
+    var features = ArrayList<Feature>()
     private lateinit var geoJsonSource: GeoJsonSource
 
     private lateinit var distanceToUserTextView: TextView
@@ -172,21 +172,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapView.contentDescription = MAP_READY_DESCRIPTION
 
             isMapReady = true
-            /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-            val long=8.5445
-            val lat=47.3975
-            //precision should be 0.00003
-            for(i in 0..10){
-                for(j in 0..10){
-                     val newlong= 8.544 + i/10000.0
-                    val newlat=47.397 + j/10000.0
-                     val intensity=10-Math.sqrt((long-newlong)*(long-newlong)*10000000 + (lat-newlat)*(lat-newlat)*10000000)
-                    addPointToHeatMap(newlong,newlat,intensity)
-                }
-            }
+            /**Uncomment this to see a virtual heatmap**/
+            //addVirtualPointsToHeatmap()
+
+
+
 
         }
     }
+
 
     private fun updateTextView(textView: TextView, value: Double, formatString: String) {
         textView.text = formatString.format(value)
@@ -339,5 +333,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+    /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
+    private fun addVirtualPointsToHeatmap(){
+        val long=8.5445
+        val lat=47.3975
+        //precision should be 0.00003
+        for(i in 0..10){
+            for(j in 0..10){
+                val newlong= 8.544 + i/10000.0
+                val newlat=47.397 + j/10000.0
+                val intensity=10-Math.sqrt((long-newlong)*(long-newlong)*10000000 + (lat-newlat)*(lat-newlat)*10000000)
+                addPointToHeatMap(newlong,newlat,intensity)
+            }
+        }
     }
 }
