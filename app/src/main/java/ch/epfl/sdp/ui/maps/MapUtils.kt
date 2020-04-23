@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
+import com.mapbox.mapboxsdk.style.layers.PropertyValue
 
 object MapUtils {
 
@@ -88,6 +89,7 @@ object MapUtils {
      */
     fun createLayersForHeatMap(style: Style) {
         unclusteredLayerData(style)
+        clusteredLayerData(style)
     }
 
     private fun unclusteredLayerData(style: Style) {
@@ -106,8 +108,20 @@ object MapUtils {
                 ),
                 PropertyFactory.circleRadius(40f),
                 PropertyFactory.circleBlur(1.5f))
-        //unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
+        unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
+                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
+    }
+    private fun clusteredLayerData(style: Style){
+        val clustered = CircleLayer("clustered-points",
+                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
+        clustered.setProperties(
+                PropertyFactory.circleColor(RED),
+                PropertyFactory.circleRadius(50f),
+                PropertyFactory.circleBlur(1f)
+        )
+        clustered.setFilter(Expression.eq(Expression.get("cluster"),Expression.literal(true)))
+        style.addLayerBelow(clustered,
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }
 }

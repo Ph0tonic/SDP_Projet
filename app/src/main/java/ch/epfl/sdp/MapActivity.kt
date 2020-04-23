@@ -194,7 +194,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
                     .withCluster(true)
                     .withClusterProperty("intensities", Expression.literal("+") ,Expression.get("intensity"))
-                    .withClusterMaxZoom(1)
+                    .withClusterMaxZoom(13)
+
                     )
             geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
             style.addSource(geoJsonSource)
@@ -223,7 +224,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
-             /**Uncomment this to see a virtual heatmap**/
+             /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
              addVirtualPointsToHeatmap()
         }
     }
