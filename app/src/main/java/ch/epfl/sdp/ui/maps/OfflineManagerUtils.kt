@@ -41,14 +41,14 @@ interface OfflineManagerUtils {
                 // progressBar and display a toast
                 progressBar.visibility = View.INVISIBLE
                 progressBar.isIndeterminate = false
-                Toast.makeText(MainApplication.applicationContext(), MainApplication.applicationContext().getString(R.string.toast_region_deleted),
-                        Toast.LENGTH_LONG).show()
+                showToast(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
             }
 
             override fun onError(error: String) {
                 progressBar.visibility = View.INVISIBLE
                 progressBar.isIndeterminate = false
                 Timber.e("Error: %s", error)
+                showToast("Error : $error")
             }
         })
     }

@@ -87,7 +87,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
                     // If the user-provided string is empty, display
                     // a toast message and do not begin download.
                     if (regionName.isEmpty()) {
-                        Toast.makeText(this@OfflineManagerActivity, R.string.dialog_toast, Toast.LENGTH_SHORT).show()
+                        showToast(getString(R.string.dialog_toast))
                     } else { // Begin download process
                         downloadRegion(regionName)
                     }
@@ -157,7 +157,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
 
             override fun mapboxTileCountLimitExceeded(limit: Long) {
                 Timber.e("Mapbox tile count limit exceeded : %s", limit)
-                Toast.makeText(applicationContext, R.string.too_many_regions , Toast.LENGTH_SHORT).show()
+                showToast(getString(R.string.too_many_regions))
             }
         })
         // Change the region state
@@ -172,7 +172,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
                 // downloaded yet, notify user and return
                 if (offlineRegions.isEmpty()) {
-                    Toast.makeText(applicationContext, R.string.toast_no_regions_yet, Toast.LENGTH_SHORT).show()
+                    showToast(getString(R.string.toast_no_regions_yet))
                     return
                 }
                 // Add all of the region names to a list
@@ -185,6 +185,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
 
             override fun onError(error: String) {
                 Timber.e("Error: %s", error)
+                showToast("Error : $error")
             }
         })
     }

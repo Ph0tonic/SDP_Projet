@@ -31,7 +31,6 @@
     <string name="dialog_positive_button">Download</string>
     <string name="dialog_negative_button">Cancel</string>
     <string name="navigate_title">List</string>
-    <string name="navigate_negative_button_title">Cancel</string>
     <string name="navigate_positive_button">Navigate To</string>
     <string name="navigate_neutral_button_title">Delete</string>
     <string name="toast_region_deleted">Region Deleted</string>
@@ -64,6 +63,5 @@
     <string name="camera_button">Camera</string>
     <string name="map_button">Map</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
-    <string name="enter_name">Enter Name</string>
     <string name="sign_out_success">Sign out successful</string>
 </resources>
