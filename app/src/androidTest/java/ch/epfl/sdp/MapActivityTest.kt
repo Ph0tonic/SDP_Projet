@@ -70,6 +70,7 @@ class MapActivityTest {
     fun canStartMission() {
         // Launch activity
         mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
         // Add 4 points to the map for the strategy
         runOnUiThread {
             arrayListOf(
