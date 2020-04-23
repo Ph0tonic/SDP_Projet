@@ -17,6 +17,12 @@ object MapUtils {
     const val DEFAULT_LONGITUDE: Double = 8.545970150745575
     const val DEFAULT_ZOOM: Double = 9.0
 
+    private val BLUE = Expression.rgb(0,0,255)
+    private val CYAN = Expression.rgb(0,255,255)
+    private val GREEN = Expression.rgb(0,255,0)
+    private val ORANGE = Expression.rgb(255,255,0)
+    private val RED = Expression.rgb(255,0,0)
+
 
     private fun loadLastMapPositionFromPrefs(): LatLng {
         val context = MainApplication.applicationContext()
@@ -91,16 +97,16 @@ object MapUtils {
                 PropertyFactory.circleColor(
 
                         Expression.interpolate(Expression.linear(),Expression.get("intensity"),
-                                Expression.stop(8, Expression.rgb(0,0,255)),
-                                Expression.stop(8.5, Expression.rgb(0,255,255)),
-                                Expression.stop(9, Expression.rgb(0,255,0)),
-                                Expression.stop(9.5, Expression.rgb(255,255,0)),
-                                Expression.stop(10.0, Expression.rgb(255,0,0))
+                                Expression.stop(8, BLUE),
+                                Expression.stop(8.5, CYAN),
+                                Expression.stop(9, GREEN),
+                                Expression.stop(9.5, ORANGE),
+                                Expression.stop(10.0, RED)
                         )
                 ),
                 PropertyFactory.circleRadius(40f),
                 PropertyFactory.circleBlur(1.5f))
-        unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
+        //unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }
