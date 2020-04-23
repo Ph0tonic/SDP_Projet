@@ -25,8 +25,8 @@ object Drone {
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
 
     lateinit var getSignalStrength: ()->Double
-    /*Will be usefull later on*/
-    val debugGetSignelStrength: ()->Double={ currentPositionLiveData.value?.distanceTo(LatLng(47.3975,8.5445))?:0.0}
+    /*Will be useful later on*/
+    val debugGetSignalStrength: ()->Double={ currentPositionLiveData.value?.distanceTo(LatLng(47.3975,8.5445))?:0.0}
 
     private val instance: System
 

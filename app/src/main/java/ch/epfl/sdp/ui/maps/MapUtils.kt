@@ -97,8 +97,7 @@ object MapUtils {
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         unclustered.setProperties(
                 PropertyFactory.circleColor(
-
-                        Expression.interpolate(Expression.linear(),Expression.get("intensity"),
+                         Expression.interpolate(Expression.linear(),Expression.get("intensity"),
                                 Expression.stop(8, BLUE),
                                 Expression.stop(8.5, CYAN),
                                 Expression.stop(9, GREEN),

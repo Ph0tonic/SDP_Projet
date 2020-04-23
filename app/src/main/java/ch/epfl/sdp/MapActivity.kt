@@ -50,9 +50,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePositionMarker: Circle
     private lateinit var userPositionMarker: Circle
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var features = ArrayList<Feature>()
-    private lateinit var geoJsonSource: GeoJsonSource
 
+    private lateinit var geoJsonSource: GeoJsonSource
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
