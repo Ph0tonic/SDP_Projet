@@ -39,15 +39,15 @@ object MapUtils {
     /**
      * Saves the camera position and zoom to the shared preferences
      */
-    fun saveCameraPositionAndZoomToPrefs(mapboxMap: MapboxMap?) {
+    fun saveCameraPositionAndZoomToPrefs(cameraPosition: CameraPosition) {
         val context = MainApplication.applicationContext()
         PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext()).edit()
                 .putString(context.getString(R.string.prefs_latitude),
-                        mapboxMap?.cameraPosition?.target?.latitude.toString())
+                        cameraPosition.target?.latitude.toString())
                 .putString(context.getString(R.string.prefs_longitude),
-                        mapboxMap?.cameraPosition?.target?.longitude.toString())
+                        cameraPosition.target?.longitude.toString())
                 .putString(context.getString(R.string.prefs_zoom),
-                        mapboxMap?.cameraPosition?.zoom.toString())
+                        cameraPosition.zoom.toString())
                 .apply()
     }
 

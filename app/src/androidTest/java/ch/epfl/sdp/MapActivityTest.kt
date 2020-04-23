@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
@@ -37,9 +38,10 @@ class MapActivityTest {
         const val ZOOM_TEST = 0.9
         const val MAP_LOADING_TIMEOUT = 1000L
         const val EPSILON = 1e-10
+        const val DEFAULT_ALTITUDE = " 0.0 m"
     }
 
-    lateinit var preferencesEditor: SharedPreferences.Editor
+    private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
 
     @get:Rule
@@ -90,8 +92,7 @@ class MapActivityTest {
 
         // Launch activity after setting preferences
         mActivityRule.launchActivity(Intent())
-
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
@@ -112,11 +113,9 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
         runOnUiThread{
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0, 10.0)
+
         }
-
-        assertThat(mActivityRule.activity.features.size, equalTo(1))
-
-
+         assertThat(mActivityRule.activity.features.size, equalTo(1))
     }
 
     @Test
@@ -137,53 +136,75 @@ class MapActivityTest {
     }
 
     @Test
-    fun droneStatusIsVisible(){
+    fun droneStatusIsVisible() {
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun clickOnMapAddsWaypoint() {
+    fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
         mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
-
-        // Wait for the map to load
-        mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
 
         // Add a point
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
 
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
+        assertThat(searchAreaBuilder.vertices.size, equalTo(1))
+        runOnUiThread {
+            searchAreaBuilder.reset()
+        }
+        assertThat(searchAreaBuilder.vertices.size, equalTo(0))
+    }
+
+
+    @Test
+    fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
+        // Add 5 points
+        runOnUiThread {
+            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClicked(LatLng(1.0, 1.0))
+            mActivityRule.activity.onMapClicked(LatLng(2.0, 2.0))
+            mActivityRule.activity.onMapClicked(LatLng(3.0, 3.0))
+            mActivityRule.activity.onMapClicked(LatLng(4.0, 4.0))
+        }
+
+        onView(withText("Already enough points for a quadrilateral"))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
     }
 
     @Test
-    fun deleteButtonRemovesWaypoints(){
+    fun deleteButtonRemovesWaypoints() {
         mActivityRule.launchActivity(Intent())
-        mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
         }
-
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(1))
+        assertThat(searchAreaBuilder.vertices.size, equalTo(1))
 
         onView(withId(R.id.clear_waypoints)).perform(click())
 
-        assertThat(mActivityRule.activity.waypoints.size, equalTo(0))
-
+        runOnUiThread {
+            assertThat(searchAreaBuilder.vertices.size, equalTo(0))
+        }
     }
 
     @Test
-    fun updateDroneBatteryChangesDroneStatus(){
+    fun updateDroneBatteryChangesDroneStatus() {
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(null)
         }
-
         onView(withId(R.id.battery_level)).check(matches(withText(R.string.no_info)))
 
         runOnUiThread {
@@ -203,7 +224,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun updateDroneAltitudeChangesDroneStatus(){
+    fun updateDroneAltitudeChangesDroneStatus() {
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {
@@ -215,7 +236,7 @@ class MapActivityTest {
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.postValue(0F)
         }
-        onView(withId(R.id.altitude)).check(matches(withText(" 0.0 m")))
+        onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.postValue(1.123F)
@@ -229,16 +250,16 @@ class MapActivityTest {
     }
 
     @Test
-    fun updateDroneSpeedChangesDroneStatus(){
+    fun updateDroneSpeedChangesDroneStatus() {
         mActivityRule.launchActivity(Intent())
 
-        runOnUiThread{
+        runOnUiThread {
             Drone.currentSpeedLiveData.postValue(null)
         }
 
         onView(withId(R.id.speed)).check(matches(withText(R.string.no_info)))
 
-        runOnUiThread{
+        runOnUiThread {
             Drone.currentSpeedLiveData.postValue(0F)
         }
         onView(withId(R.id.speed)).check(matches(withText(" 0.0 m/s")))
@@ -255,32 +276,71 @@ class MapActivityTest {
     }
 
     @Test
-    fun updateDronePositionChangesDistToUser(){
+    fun updateDronePositionChangesDistToUser() {
         mActivityRule.launchActivity(Intent())
         runOnUiThread {
-            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
-            Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
+            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(1.0,0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(1.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
     }
 
     @Test
-    fun updateUserPositionChangesDistToUser(){
+    fun updateUserPositionChangesDistToUser() {
         mActivityRule.launchActivity(Intent())
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(0.0,0.0))
-            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0,0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
+            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(" 0.0 m")))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
-            CentralLocationManager.currentUserPosition.postValue(LatLng(1.0,0.0))
+            CentralLocationManager.currentUserPosition.postValue(LatLng(1.0, 0.0))
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(" 0.0 m"))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
+    }
+
+    @Test
+    fun updateBatteryLevelChangesBatteryLevelIcon() {
+        mActivityRule.launchActivity(Intent())
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.00f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery1))))
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.10f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery2))))
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.30f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery3))))
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.50f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery4))))
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.70f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery5))))
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.90f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery6))))
+
+        runOnUiThread {
+            Drone.currentBatteryLevelLiveData.postValue(.98f)
+        }
+        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
     }
 }
