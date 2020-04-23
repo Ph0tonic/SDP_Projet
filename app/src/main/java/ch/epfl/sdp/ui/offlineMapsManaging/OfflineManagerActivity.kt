@@ -2,7 +2,6 @@ package ch.epfl.sdp.ui.offlineMapsManaging
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -30,6 +29,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
+import android.view.View as View
 
 /**
  * Download, view, navigate to, and delete an offline region.
