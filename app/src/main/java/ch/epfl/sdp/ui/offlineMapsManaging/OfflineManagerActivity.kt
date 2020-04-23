@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.offlineMapsManaging
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -9,9 +9,18 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.MapActivity.Companion.MAP_NOT_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
+import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.ui.maps.OfflineManagerUtils
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.deleteOfflineRegion
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.getRegionName
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.showToast
+import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.deletingInProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.downloadingInProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.endProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.getProgressBar
+import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.initProgressBar
+import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.startProgress
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -30,9 +39,8 @@ import kotlin.math.roundToInt
  * Be careful, the maximum number of tiles a user can download is 6000
  * TODO : show error when user try to download more than the limit
  */
-class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMapReadyCallback {
+class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
-    private lateinit var progressBar: ProgressBar
     private lateinit var downloadButton: Button
     private lateinit var listButton: Button
     private lateinit var offlineManager: OfflineManager
@@ -52,7 +60,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
             // Assign progressBar for later use
-            progressBar = findViewById(R.id.progress_bar)
+            initProgressBar(findViewById(R.id.progress_bar))
+
             // Set up the offlineManager
             offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
         }
@@ -87,6 +96,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
                     // If the user-provided string is empty, display
                     // a toast message and do not begin download.
                     if (regionName.isEmpty()) {
+
                         showToast(getString(R.string.dialog_toast))
                     } else { // Begin download process
                         downloadRegion(regionName)
@@ -102,7 +112,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
      * min/max zoom, and metadata
      */
     private fun downloadRegion(regionName: String) {
-        startProgress(downloadButton, listButton, progressBar)
+        startProgress(downloadButton, listButton)
         // Create offline definition using the current
         // style and boundaries of visible map area
         mapboxMap.getStyle { style ->
@@ -142,11 +152,10 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete) { // Download complete
-                    endProgress(downloadButton, listButton, progressBar)
+                    endProgress(downloadButton, listButton)
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
-                    progressBar.isIndeterminate = false
-                    progressBar.progress = percentage.roundToInt()
+                    downloadingInProgress(percentage.roundToInt())
                 }
             }
 
@@ -205,11 +214,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
                     // Make progressBar indeterminate and
                     // set it to visible to signal that
                     // the deletion process has begun
-                    progressBar.isIndeterminate = true
-                    progressBar.visibility = View.VISIBLE
+                    deletingInProgress()
                     // Begin the deletion process
-
-                    deleteOfflineRegion(offlineRegions[regionSelected], progressBar)
+                    deleteOfflineRegion(offlineRegions[regionSelected])
                 }
                 // When the user cancels, don't do anything.
                 // The dialog will automatically close

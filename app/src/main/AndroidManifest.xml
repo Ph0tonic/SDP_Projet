@@ -21,7 +21,7 @@
             android:name=".MapActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".OfflineManagerActivity"
+            android:name=".ui.offlineMapsManaging.OfflineManagerActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"

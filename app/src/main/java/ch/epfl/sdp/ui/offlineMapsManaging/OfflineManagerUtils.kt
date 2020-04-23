@@ -1,52 +1,28 @@
-package ch.epfl.sdp.ui.maps
+package ch.epfl.sdp.ui.offlineMapsManaging
 
 import android.view.View
-import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.MainApplication
-import ch.epfl.sdp.OfflineManagerActivity
 import ch.epfl.sdp.R
+import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.hideProgressBar
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import org.json.JSONObject
 import timber.log.Timber
 import java.nio.charset.Charset
 
 
-interface OfflineManagerUtils {
-
-    // Progress bar methods
-    fun startProgress(downloadButton: Button, listButton: Button, progressBar: ProgressBar) { // Disable buttons
-        downloadButton.isEnabled = false
-        listButton.isEnabled = false
-        // Start and show the progress bar
-        progressBar.isIndeterminate = true
-        progressBar.visibility = View.VISIBLE
-    }
-
-    fun endProgress(downloadButton: Button, listButton: Button, progressBar: ProgressBar) { // Don't notify more than once
-        // Enable buttons
-        downloadButton.isEnabled = true
-        listButton.isEnabled = true
-        // Stop and hide the progress bar
-        progressBar.isIndeterminate = false
-        progressBar.visibility = View.GONE
-        // Show a toast
-        showToast(MainApplication.applicationContext().getString(R.string.end_progress_success))
-    }
-
-    fun deleteOfflineRegion(offRegion: OfflineRegion, progressBar: ProgressBar) {
+object OfflineManagerUtils {
+    fun deleteOfflineRegion(offRegion: OfflineRegion) {
         offRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
             override fun onDelete() { // Once the region is deleted, remove the
                 // progressBar and display a toast
-                progressBar.visibility = View.INVISIBLE
-                progressBar.isIndeterminate = false
+                hideProgressBar()
                 showToast(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
             }
 
             override fun onError(error: String) {
-                progressBar.visibility = View.INVISIBLE
-                progressBar.isIndeterminate = false
+                hideProgressBar()
                 Timber.e("Error: %s", error)
                 showToast("Error : $error")
             }
@@ -70,5 +46,4 @@ interface OfflineManagerUtils {
     fun showToast(message : String){
         Toast.makeText(MainApplication.applicationContext(), message, Toast.LENGTH_LONG).show()
     }
-
 }

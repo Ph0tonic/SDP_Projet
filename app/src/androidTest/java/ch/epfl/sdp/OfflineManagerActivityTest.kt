@@ -16,6 +16,7 @@ import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivityTest.Companion.MAP_LOADING_TIMEOUT
 import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.not

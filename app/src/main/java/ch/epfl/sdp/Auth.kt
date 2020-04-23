@@ -5,13 +5,13 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ch.epfl.sdp.ui.maps.OfflineManagerUtils
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.showToast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
-object Auth : ViewModel(), OfflineManagerUtils {
+object Auth : ViewModel() {
 
     private const val RC_SIGN_IN = 9001
 
