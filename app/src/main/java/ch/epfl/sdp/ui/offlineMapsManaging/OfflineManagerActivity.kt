@@ -5,20 +5,20 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.MapActivity.Companion.MAP_NOT_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.deleteOfflineRegion
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.getRegionName
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.showErrorAndToast
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.deletingInProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.downloadingInProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.endProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.initProgressBar
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.startProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.showErrorAndToast
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.deletingInProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.downloadingInProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.endProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.startProgress
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -42,6 +42,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var downloadButton: Button
     private lateinit var listButton: Button
     private lateinit var offlineManager: OfflineManager
+    private lateinit var progressBar: ProgressBar
 
     private var regionSelected = 0
 
@@ -58,7 +59,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
             // Assign progressBar for later use
-            initProgressBar(findViewById(R.id.progress_bar))
+            progressBar = findViewById(R.id.progress_bar)
 
             // Set up the offlineManager
             offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
@@ -109,7 +110,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * min/max zoom, and metadata
      */
     private fun downloadRegion(regionName: String) {
-        startProgress(downloadButton, listButton)
+        startProgress(downloadButton, listButton, progressBar)
         // Create offline definition using the current
         // style and boundaries of visible map area
         mapboxMap.getStyle { style ->
@@ -149,10 +150,10 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete) { // Download complete
-                    endProgress(downloadButton, listButton)
+                    endProgress(downloadButton, listButton, progressBar)
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
-                    downloadingInProgress(percentage.roundToInt())
+                    downloadingInProgress(percentage.roundToInt(), progressBar)
                 }
             }
 
@@ -209,9 +210,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // Make progressBar indeterminate and
                     // set it to visible to signal that
                     // the deletion process has begun
-                    deletingInProgress()
+                    deletingInProgress(progressBar)
                     // Begin the deletion process
-                    deleteOfflineRegion(offlineRegions[regionSelected])
+                    deleteOfflineRegion(offlineRegions[regionSelected], progressBar)
                 }
                 // When the user cancels, don't do anything.
                 // The dialog will automatically close

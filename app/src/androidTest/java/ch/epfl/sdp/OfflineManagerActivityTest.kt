@@ -156,9 +156,6 @@ class OfflineManagerActivityTest {
         onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
     }
 
-
-
-
     @Test
     fun cannotDownloadEmptyMapName() {
         clickOnDownloadButton()
