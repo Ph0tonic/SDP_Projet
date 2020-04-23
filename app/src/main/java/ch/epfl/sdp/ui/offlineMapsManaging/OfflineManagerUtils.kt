@@ -3,7 +3,7 @@ package ch.epfl.sdp.ui.offlineMapsManaging
 import android.widget.Toast
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
-import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.hideProgressBar
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.hideProgressBar
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import org.json.JSONObject
 import timber.log.Timber
@@ -21,11 +21,10 @@ object OfflineManagerUtils {
 
             override fun onError(error: String) {
                 hideProgressBar()
-                showErrorToast("Error : $error")
+                showErrorAndToast("Error : $error")
             }
         })
     }
-
 
     // Get the region name from the offline region metadata
     fun getRegionName(offlineRegion: OfflineRegion): String {
@@ -40,7 +39,7 @@ object OfflineManagerUtils {
         return regionName
     }
 
-    fun showErrorToast(message : String){
+    fun showErrorAndToast(message : String){
         Timber.e(message)
         Toast.makeText(MainApplication.applicationContext(), message, Toast.LENGTH_LONG).show()
     }

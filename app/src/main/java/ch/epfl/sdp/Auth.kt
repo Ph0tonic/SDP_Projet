@@ -54,7 +54,7 @@ object Auth : ViewModel() {
                     .addOnSuccessListener {
                         updateLoginStateFromAccount(it)
                     }.addOnFailureListener {
-                        Toast.makeText(context,context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT)
+                        Toast.makeText(context,context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
                     }
         }
     }
@@ -63,7 +63,7 @@ object Auth : ViewModel() {
         createGoogleSignClient().signOut().addOnSuccessListener {
             val context = MainApplication.applicationContext()
             loggedIn.postValue(false)
-            Toast.makeText(context, context.getString(R.string.sign_out_success), Toast.LENGTH_SHORT)
+            Toast.makeText(context, context.getString(R.string.sign_out_success), Toast.LENGTH_SHORT).show()
         }
     }
 

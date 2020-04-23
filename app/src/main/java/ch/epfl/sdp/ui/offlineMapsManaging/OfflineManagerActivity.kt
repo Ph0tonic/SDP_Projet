@@ -13,12 +13,12 @@ import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.deleteOfflineRegion
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.getRegionName
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.showErrorToast
-import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.deletingInProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.downloadingInProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.endProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.initProgressBar
-import ch.epfl.sdp.ui.offlineMapsManaging.ProgressBar.startProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerUtils.showErrorAndToast
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.deletingInProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.downloadingInProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.endProgress
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.initProgressBar
+import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBar.startProgress
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -94,7 +94,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // If the user-provided string is empty, display
                     // a toast message and do not begin download.
                     if (regionName.isEmpty()) {
-                        Toast.makeText(applicationContext, getString(R.string.dialog_toast), Toast.LENGTH_SHORT)
+                        Toast.makeText(applicationContext, getString(R.string.dialog_toast), Toast.LENGTH_SHORT).show()
                     } else { // Begin download process
                         downloadRegion(regionName)
                     }
@@ -127,7 +127,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
-                showErrorToast("Failed to encode metadata: " + exception.message)
+                showErrorAndToast("Failed to encode metadata: " + exception.message)
                 null
             }
             // Create the offline region and launch the download
@@ -137,7 +137,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
 
                 override fun onError(error: String) {
-                    showErrorToast("Error : $error")
+                    showErrorAndToast("Error : $error")
                 }
             })
         }
@@ -158,11 +158,11 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             override fun onError(error: OfflineRegionError) {
                 Timber.e("onError reason: %s", error.reason)
-                showErrorToast("onError message: " + error.message )
+                showErrorAndToast("onError message: " + error.message )
             }
 
             override fun mapboxTileCountLimitExceeded(limit: Long) {
-                showErrorToast("Mapbox tile count limit exceeded : $limit")
+                showErrorAndToast("Mapbox tile count limit exceeded : $limit")
             }
         })
         // Change the region state
@@ -177,7 +177,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
                 // downloaded yet, notify user and return
                 if (offlineRegions.isEmpty()) {
-                    Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT)
+                    Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
                 // Add all of the region names to a list
@@ -189,7 +189,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
 
             override fun onError(error: String) {
-                showErrorToast("Error : $error")
+                showErrorAndToast("Error : $error")
             }
         })
     }

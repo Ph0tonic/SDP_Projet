@@ -7,7 +7,7 @@ import android.widget.Toast
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 
-object ProgressBar {
+object DownloadProgressBar {
     private lateinit var progressBar: ProgressBar
 
     fun initProgressBar(progressBar: ProgressBar){
@@ -31,7 +31,7 @@ object ProgressBar {
         progressBar.isIndeterminate = false
         progressBar.visibility = View.GONE
         // Show a toast
-        Toast.makeText(MainApplication.applicationContext(),MainApplication.applicationContext().getString(R.string.end_progress_success), Toast.LENGTH_SHORT)
+        Toast.makeText(MainApplication.applicationContext(),MainApplication.applicationContext().getString(R.string.end_progress_success), Toast.LENGTH_SHORT).show()
     }
 
     fun downloadingInProgress(percentage : Int){
