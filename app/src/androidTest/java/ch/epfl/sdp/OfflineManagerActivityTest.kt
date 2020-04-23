@@ -65,11 +65,13 @@ class OfflineManagerActivityTest {
     @Throws(Exception::class)
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        moveCameraToPosition(LatLng(0.0,0.0))
-        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        moveCameraToPosition(LatLng(0.0, 0.0))
+        UiThreadStatement.runOnUiThread {
+            mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        }
     }
 
-    private fun checkToastMessageIsDisplayed(message : String) {
+    private fun checkToastMessageIsDisplayed(message: String) {
         onView(withText(message))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
@@ -91,8 +93,11 @@ class OfflineManagerActivityTest {
     }
 
     private fun moveCameraToPosition(pos: LatLng) {
-        mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-            mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
+        UiThreadStatement.runOnUiThread {
+            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
+                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
+            }
         }
     }
 
@@ -138,11 +143,9 @@ class OfflineManagerActivityTest {
 
         navigateToDownloadedMap(CMA_NAME)
 
-        UiThreadStatement.runOnUiThread {
-            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assertThat(mapboxMap.cameraPosition.target.latitude, Matchers.closeTo(CMA.latitude, EPSILON))
-                assertThat(mapboxMap.cameraPosition.target.longitude, Matchers.closeTo(CMA.longitude, EPSILON))
-            }
+        mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+            assertThat(mapboxMap.cameraPosition.target.latitude, Matchers.closeTo(CMA.latitude, EPSILON))
+            assertThat(mapboxMap.cameraPosition.target.longitude, Matchers.closeTo(CMA.longitude, EPSILON))
         }
 
         deleteMap()
