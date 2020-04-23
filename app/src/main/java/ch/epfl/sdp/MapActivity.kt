@@ -269,9 +269,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
         if(!isMapReady) return
         var feature : Feature = Feature.fromGeometry(Point.fromLngLat(longitude,latitude))
-        //feature.addNumberProperty("intensity", intensity)
+        feature.addNumberProperty("intensity", intensity)
         /* Will be needed when we have the signal of the drone implemented */
-        feature.addNumberProperty("intensity", Drone.getSignalStrength())
+        //feature.addNumberProperty("intensity", Drone.getSignalStrength())
         features.add(feature)
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
