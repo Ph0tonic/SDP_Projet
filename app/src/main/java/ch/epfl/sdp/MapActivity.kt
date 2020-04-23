@@ -25,16 +25,16 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
-    private var isMapReady    = false
+    private var isMapReady = false
     private var isDroneFlying = false
 
     private lateinit var waypointCircleManager: CircleManager
-    private lateinit var droneCircleManager:    CircleManager
-    private lateinit var userCircleManager:     CircleManager
-    private lateinit var lineManager:           LineManager
-    private lateinit var fillManager:           FillManager
-    private lateinit var dronePositionMarker:   Circle
-    private lateinit var userPositionMarker:    Circle
+    private lateinit var droneCircleManager: CircleManager
+    private lateinit var userCircleManager: CircleManager
+    private lateinit var lineManager: LineManager
+    private lateinit var fillManager: FillManager
+    private lateinit var dronePositionMarker: Circle
+    private lateinit var userPositionMarker: Circle
 
     var waypoints = arrayListOf<LatLng>()
     private var features = ArrayList<Feature>()
@@ -42,13 +42,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
 
     private lateinit var droneBatteryLevelImageView: ImageView
-    private lateinit var droneBatteryLevelTextView:  TextView
-    private lateinit var droneAltitudeTextView:      TextView
-    private lateinit var droneSpeedTextView:         TextView
-    private lateinit var distanceToUserTextView:     TextView
+    private lateinit var droneBatteryLevelTextView: TextView
+    private lateinit var droneAltitudeTextView: TextView
+    private lateinit var droneSpeedTextView: TextView
+    private lateinit var distanceToUserTextView: TextView
 
     private val droneBatteryLevelDrawables = listOf(
-            Pair(.0,  R.drawable.ic_battery1),
+            Pair(.0, R.drawable.ic_battery1),
             Pair(.05, R.drawable.ic_battery2),
             Pair(.23, R.drawable.ic_battery3),
             Pair(.41, R.drawable.ic_battery4),
@@ -66,7 +66,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newBatteryLevel?.let { // Only update the icon if the battery level is not null
             val newBatteryDrawable = droneBatteryLevelDrawables
                     .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
-                    .maxBy  { x -> x.first }!!
+                    .maxBy { x -> x.first }!!
                     .second
             droneBatteryLevelImageView.setImageResource(newBatteryDrawable)
             droneBatteryLevelImageView.tag = newBatteryDrawable
@@ -308,6 +308,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun updateStartButton(){
-        findViewById<FloatingActionButton>(R.id.start_or_return_button).setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start )
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start )
     }
 }

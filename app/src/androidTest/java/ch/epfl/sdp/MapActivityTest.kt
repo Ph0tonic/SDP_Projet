@@ -189,8 +189,6 @@ class MapActivityTest {
                 assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(LONGITUDE_TEST, EPSILON))
             }
         }
-
-
     }
 
     @Test
