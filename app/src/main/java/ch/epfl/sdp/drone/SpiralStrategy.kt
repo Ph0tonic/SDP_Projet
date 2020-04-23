@@ -55,15 +55,18 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
 
         val earthRadius = 6378137
 
-        val turns: Double = 4.0
+        val turns: Double = ceil(radius/maxDistBetweenLines)
 
         val maxTheta = radius/earthRadius
         val phi0 = computeHeading(center,outter)
         
         for(step in 0 .. steps){
-            val theta = maxTheta*step/steps
+            val a = 1.0
+            val s = step.toDouble()/steps //between 0 and 1
+            val t = sqrt(s)//sqrt(2*s/a)
+            val theta = maxTheta*t
             val distance = theta*earthRadius
-            val phi = turns * 2* PI * step/steps
+            val phi = turns * 2 * PI * t
 
 
 
