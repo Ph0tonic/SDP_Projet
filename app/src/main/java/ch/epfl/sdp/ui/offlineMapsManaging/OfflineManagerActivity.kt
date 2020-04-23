@@ -114,7 +114,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Create offline definition using the current
         // style and boundaries of visible map area
         mapboxMap.getStyle { style ->
-            val maxZoom = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
             val definition = OfflineTilePyramidRegionDefinition(
                     style.uri,
                     mapboxMap.projection.visibleRegion.latLngBounds,
@@ -123,8 +122,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // Build a JSONObject using the user-defined offline region title,
             // convert it into string, and use it to create a metadata variable.
             // The metadata variable will later be passed to createOfflineRegion()
-            val metadata: ByteArray?
-            metadata = try {
+            val metadata = try {
                 val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
@@ -224,5 +222,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // JSON encoding/decoding
         const val JSON_CHARSET = "UTF-8"
         const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
+        const val maxZoom = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
     }
 }
