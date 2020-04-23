@@ -337,6 +337,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
     /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
+    /*
     private fun addVirtualPointsToHeatmap(){
         val long=8.5445
         val lat=47.3975
@@ -351,4 +352,5 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
         }
     }
+    */
 }
