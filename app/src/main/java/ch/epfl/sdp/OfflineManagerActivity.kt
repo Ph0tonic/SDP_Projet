@@ -65,7 +65,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OfflineManagerUtils, OnMap
 
     override fun onPause() {
         super.onPause()
-        MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
+        MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
 
     fun downloadRegionDialog(v: View) { // Set up download interaction. Display a dialog

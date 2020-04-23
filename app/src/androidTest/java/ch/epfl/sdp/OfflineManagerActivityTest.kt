@@ -1,11 +1,11 @@
 package ch.epfl.sdp
 
-import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
@@ -18,11 +18,11 @@ import ch.epfl.sdp.MapActivityTest.Companion.MAP_LOADING_TIMEOUT
 import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.MethodSorters
 
 
 @RunWith(AndroidJUnit4::class)
@@ -50,46 +50,11 @@ class OfflineManagerActivityTest {
             onView(withId(R.id.list_button)).perform(click())
         }
 
-        private fun isToastMessageDisplayed(message : String) {
-            onView(withText(message)).inRoot(ToastMatcher())
-                    .check(matches(isDisplayed()))
-        }
-
-        private fun downloadMap(name: String) {
-            clickOnDownloadButton()
-            onView(withId(R.id.dialog_textfield_id)).perform(typeText(name))
-            mUiDevice.pressBack() //hide the keyboard
-
-            clickOnDownloadButtonInDialog()
-            isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.end_progress_success))
-        }
-
-        private fun navigateToDownloadedMap(name: String) {
-            clickOnListButton()
-            onView(withId(POSITIVE_BUTTON_ID)).perform(click())
-            onView(withText(name)).inRoot(ToastMatcher())
-                    .check(matches(isDisplayed()))
-        }
-
         private fun clickOnCancelInListDialog() {
             clickOnListButton()
             onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
         }
 
-        private fun deleteMap() {
-            clickOnListButton()
-            onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
-            isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
-        }
-
-    }
-
-    private fun moveCameraToPosition(pos: LatLng) {
-        UiThreadStatement.runOnUiThread {
-            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
-            }
-        }
     }
 
     @get:Rule
@@ -101,6 +66,41 @@ class OfflineManagerActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         moveCameraToPosition(LatLng(0.0,0.0))
         mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+    }
+
+    private fun isToastMessageDisplayed(message : String) {
+        onView(withText(message))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
+    }
+
+    private fun deleteMap() {
+        clickOnListButton()
+        onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
+        isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.toast_region_deleted))
+    }
+
+    private fun downloadMap(name: String) {
+        clickOnDownloadButton()
+        onView(withId(R.id.dialog_textfield_id)).perform(typeText(name))
+        mUiDevice.pressBack() //hide the keyboard
+
+        clickOnDownloadButtonInDialog()
+        isToastMessageDisplayed(MainApplication.applicationContext().getString(R.string.end_progress_success))
+    }
+
+    private fun moveCameraToPosition(pos: LatLng) {
+        UiThreadStatement.runOnUiThread {
+            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+                mapboxMap.cameraPosition = getCameraWithParameters(pos, 15.0)
+            }
+        }
+    }
+
+    private fun navigateToDownloadedMap(name: String) {
+        clickOnListButton()
+        onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+        isToastMessageDisplayed(name)
     }
 
     @Test
