@@ -60,6 +60,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { updateDronePosition(it); updateDronePositionOnMap(it) }
     }
+    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
+        newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
+    }
 
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
         updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT) // Always update the text string
@@ -122,11 +125,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
+        CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
 
     }
 
     override fun onPause() {
         super.onPause()
+        CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
         Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
@@ -142,7 +147,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             lineManager = LineManager(mapView, mapboxMap, style)
             waypointCircleManager = CircleManager(mapView, mapboxMap, style)
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
-            userCircleManager  = CircleManager(mapView, mapboxMap, style)
+            userCircleManager = CircleManager(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -298,6 +303,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         } else {
             userPositionMarker.latLng = userLatLng
             userCircleManager.update(userPositionMarker)
+        }
+    }
+
+    private fun updateUserPosition(userLatLng: LatLng) {
+        Drone.currentPositionLiveData.value?.let {
+            updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
         }
     }
 
