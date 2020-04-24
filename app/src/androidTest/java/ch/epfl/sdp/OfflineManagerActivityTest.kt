@@ -35,9 +35,9 @@ class OfflineManagerActivityTest {
         private const val CMA_NAME = "CMA"
         private val CMA: LatLng = LatLng(46.317261, 7.485201)
         private const val EPSILON = 1e-3
-        private const val POSITIVE_BUTTON_ID: Int = R.id.button1
-        private const val NEGATIVE_BUTTON_ID: Int = R.id.button2
-        private const val NEUTRAL_BUTTON_ID: Int = R.id.button3
+        private const val POSITIVE_BUTTON_ID: Int = android.R.id.button1
+        private const val NEGATIVE_BUTTON_ID: Int = android.R.id.button2
+        private const val NEUTRAL_BUTTON_ID: Int = android.R.id.button3
 
         private fun clickOnDownloadButton() {
             onView(withId(R.id.download_button)).perform(click())
@@ -50,12 +50,6 @@ class OfflineManagerActivityTest {
         private fun clickOnListButton() {
             onView(withId(R.id.list_button)).perform(click())
         }
-
-        private fun clickOnCancelInListDialog() {
-            clickOnListButton()
-            onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
-        }
-
     }
 
     @get:Rule
@@ -119,7 +113,8 @@ class OfflineManagerActivityTest {
 
         navigateToDownloadedMap(RANDOM_NAME)
 
-        clickOnCancelInListDialog()
+        clickOnListButton()
+        onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
 
         deleteMap()
     }
