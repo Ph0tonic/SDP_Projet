@@ -25,16 +25,16 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
-    private var isMapReady    = false
+    private var isMapReady = false
     private var isDroneFlying = false
 
     private lateinit var waypointCircleManager: CircleManager
-    private lateinit var droneCircleManager:    CircleManager
-    private lateinit var userCircleManager:     CircleManager
-    private lateinit var lineManager:           LineManager
-    private lateinit var fillManager:           FillManager
-    private lateinit var dronePositionMarker:   Circle
-    private lateinit var userPositionMarker:    Circle
+    private lateinit var droneCircleManager: CircleManager
+    private lateinit var userCircleManager: CircleManager
+    private lateinit var lineManager: LineManager
+    private lateinit var fillManager: FillManager
+    private lateinit var dronePositionMarker: Circle
+    private lateinit var userPositionMarker: Circle
 
     var waypoints = arrayListOf<LatLng>()
     private var features = ArrayList<Feature>()
@@ -42,13 +42,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
 
     private lateinit var droneBatteryLevelImageView: ImageView
-    private lateinit var droneBatteryLevelTextView:  TextView
-    private lateinit var droneAltitudeTextView:      TextView
-    private lateinit var droneSpeedTextView:         TextView
-    private lateinit var distanceToUserTextView:     TextView
+    private lateinit var droneBatteryLevelTextView: TextView
+    private lateinit var droneAltitudeTextView: TextView
+    private lateinit var droneSpeedTextView: TextView
+    private lateinit var distanceToUserTextView: TextView
 
     private val droneBatteryLevelDrawables = listOf(
-            Pair(.0,  R.drawable.ic_battery1),
+            Pair(.0, R.drawable.ic_battery1),
             Pair(.05, R.drawable.ic_battery2),
             Pair(.23, R.drawable.ic_battery3),
             Pair(.41, R.drawable.ic_battery4),
@@ -57,40 +57,34 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Pair(.95, R.drawable.ic_battery7)
     )
 
-    private lateinit var userLatitudeTextView: TextView
-    private lateinit var userLongitudeTextView: TextView
-
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { updateDronePosition(it); updateDronePositionOnMap(it) }
     }
-    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
-    }
+
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
         updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT) // Always update the text string
         newBatteryLevel?.let { // Only update the icon if the battery level is not null
             val newBatteryDrawable = droneBatteryLevelDrawables
                     .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
-                    .maxBy  { x -> x.first }!!
+                    .maxBy { x -> x.first }!!
                     .second
             droneBatteryLevelImageView.setImageResource(newBatteryDrawable)
             droneBatteryLevelImageView.tag = newBatteryDrawable
         }
     }
     private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? -> updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT) }
-    private var droneSpeedObserver = Observer<Float>    { newSpeed:    Float? -> updateTextView(droneSpeedTextView,    newSpeed   ?.toDouble(), SPEED_FORMAT   ) }
+    private var droneSpeedObserver = Observer<Float> { newSpeed: Float? -> updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT) }
 
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
-        const val MAP_READY_DESCRIPTION:     String = "MAP READY"
+        const val MAP_READY_DESCRIPTION: String = "MAP READY"
 
-        private const val PATH_THICKNESS:      Float = 5F
+        private const val PATH_THICKNESS: Float = 5F
         private const val REGION_FILL_OPACITY: Float = 0.5F
 
-        private const val DISTANCE_FORMAT   = " %.1f m"
+        private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
-        private const val SPEED_FORMAT      = " %.1f m/s"
-        private const val COORDINATE_FORMAT = " %.7f"
+        private const val SPEED_FORMAT = " %.1f m/s"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,13 +94,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         initButtons()
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
-        droneBatteryLevelTextView  = findViewById(R.id.battery_level)
-        droneAltitudeTextView      = findViewById(R.id.altitude)
-        distanceToUserTextView     = findViewById(R.id.distance_to_user)
-        droneSpeedTextView         = findViewById(R.id.speed)
-        userLatitudeTextView       = findViewById(R.id.tv_latitude)
-        userLongitudeTextView      = findViewById(R.id.tv_longitude)
-
+        droneBatteryLevelTextView = findViewById(R.id.battery_level)
+        droneAltitudeTextView = findViewById(R.id.altitude)
+        distanceToUserTextView = findViewById(R.id.distance_to_user)
+        droneSpeedTextView = findViewById(R.id.speed)
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
 
         CentralLocationManager.configure(this)
@@ -127,20 +118,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        Drone.currentPositionLiveData             .observe(this, dronePositionObserver)
-        Drone.currentBatteryLevelLiveData         .observe(this, droneBatteryObserver)
-        Drone.currentAbsoluteAltitudeLiveData     .observe(this, droneAltitudeObserver)
-        Drone.currentSpeedLiveData                .observe(this, droneSpeedObserver)
-        CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
+        Drone.currentPositionLiveData.observe(this, dronePositionObserver)
+        Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
+        Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
+        Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
+
     }
 
     override fun onPause() {
         super.onPause()
-        CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
-        Drone.currentPositionLiveData.             removeObserver(dronePositionObserver)
-        Drone.currentBatteryLevelLiveData.         removeObserver(droneSpeedObserver)
-        Drone.currentAbsoluteAltitudeLiveData.     removeObserver(droneAltitudeObserver)
-        Drone.currentSpeedLiveData.                removeObserver(droneSpeedObserver)
+        Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
+        Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
+        Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
+        Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
     }
 
@@ -148,11 +138,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            fillManager           = FillManager  (mapView, mapboxMap, style)
-            lineManager           = LineManager  (mapView, mapboxMap, style)
+            fillManager = FillManager(mapView, mapboxMap, style)
+            lineManager = LineManager(mapView, mapboxMap, style)
             waypointCircleManager = CircleManager(mapView, mapboxMap, style)
-            droneCircleManager    = CircleManager(mapView, mapboxMap, style)
-            userCircleManager     = CircleManager(mapView, mapboxMap, style)
+            droneCircleManager = CircleManager(mapView, mapboxMap, style)
+            userCircleManager  = CircleManager(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener { position ->
                 onMapClicked(position)
@@ -297,18 +287,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    /**
-     * Updates the user position if the drawing managers are ready
-     */
-    private fun updateUserPosition(userLatLng: LatLng) {
-        updateTextView(userLatitudeTextView,  userLatLng.latitude, COORDINATE_FORMAT)
-        updateTextView(userLongitudeTextView, userLatLng.longitude,COORDINATE_FORMAT)
-
-        Drone.currentPositionLiveData.value?.let {
-            updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
-        }
-    }
-
     private fun updateUserPositionOnMap(userLatLng: LatLng) {
         if (!isMapReady) return
 
@@ -330,6 +308,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun updateStartButton(){
-        findViewById<FloatingActionButton>(R.id.start_or_return_button).setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start )
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start )
     }
 }
