@@ -31,7 +31,7 @@ connected_check_task:
     - chmod +x ./cc-test-reporter
     - ./cc-test-reporter before-build
   run_instrumented_tests_script:
-    ./gradlew connectedCheck jacocoTestReport --stacktrace
+    ./gradlew connectedCheck jacocoTestReport --debug
   report_codeclimate_script:
     # Report test coverage to Code Climate
     - export JACOCO_SOURCE_PATH=app/src/main/java/
