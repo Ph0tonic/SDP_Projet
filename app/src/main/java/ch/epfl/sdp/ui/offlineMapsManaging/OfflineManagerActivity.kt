@@ -29,7 +29,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
-import android.view.View as View
+import android.view.View
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -45,6 +45,13 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var progressBar: ProgressBar
 
     private var regionSelected = 0
+
+    companion object {
+        // JSON encoding/decoding
+        const val JSON_CHARSET = "UTF-8"
+        const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
+        const val MAX_ZOOM = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,12 +223,5 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 // The dialog will automatically close
                 .setNegativeButton(getString(R.string.dialog_negative_button)
                 ) { _, _ -> }.create().show()
-    }
-
-    companion object {
-        // JSON encoding/decoding
-        const val JSON_CHARSET = "UTF-8"
-        const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
-        const val MAX_ZOOM = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
     }
 }
