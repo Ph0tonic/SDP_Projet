@@ -139,7 +139,6 @@ class OfflineManagerActivityTest {
         downloadMap(CMA_NAME)
 
         moveCameraToPosition(rdmLatLng)
-        Thread.sleep(2000)
 
         navigateToDownloadedMap(CMA_NAME)
 
