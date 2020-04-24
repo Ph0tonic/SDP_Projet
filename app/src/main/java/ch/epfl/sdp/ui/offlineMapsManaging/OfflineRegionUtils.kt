@@ -30,8 +30,7 @@ object OfflineRegionUtils {
 
     // Get the region name from the offline region metadata
     fun getRegionName(offlineRegion: OfflineRegion): String {
-        val regionName: String
-        regionName = try {
+        val regionName = try {
             JSONObject(String(offlineRegion.metadata, Charset.forName(OfflineManagerActivity.JSON_CHARSET)))
                     .getString(OfflineManagerActivity.JSON_FIELD_REGION_NAME)
         } catch (exception: Exception) {
