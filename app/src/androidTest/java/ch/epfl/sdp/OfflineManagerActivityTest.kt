@@ -83,7 +83,7 @@ class OfflineManagerActivityTest {
     @Test
     fun canDownloadAndThenDeleteMap() {
         //check that the downloaded list map is empty
-        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
@@ -95,17 +95,18 @@ class OfflineManagerActivityTest {
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(RANDOM_NAME))
         mUiDevice.pressBack()
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
-        onView(withText(context.getString(R.string.end_progress_success)))
-                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
-                .check(matches(isDisplayed()))
 
-        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
                 assertThat(RANDOM_NAME, equalTo(getRegionName(offlineRegions[0])))
             }
             override fun onError(error: String) {} //left intentionally empty
         })
+
+        onView(withText(context.getString(R.string.end_progress_success)))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
 
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
@@ -118,7 +119,7 @@ class OfflineManagerActivityTest {
                 .check(matches(isDisplayed()))
 
         //check that the downloaded list map is empty
-        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
@@ -141,7 +142,7 @@ class OfflineManagerActivityTest {
         moveCameraToPosition(SEA)
 
         //check that the downloaded list map is empty
-        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
@@ -153,6 +154,15 @@ class OfflineManagerActivityTest {
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(SEA_NAME))
         mUiDevice.pressBack()
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+            override fun onList(offlineRegions: Array<OfflineRegion>) {
+                //check that the region has been downloaded
+                assertThat(RANDOM_NAME, equalTo(getRegionName(offlineRegions[0])))
+            }
+            override fun onError(error: String) {} //left intentionally empty
+        })
+
         onView(withText(context.getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
@@ -179,7 +189,7 @@ class OfflineManagerActivityTest {
                 .check(matches(isDisplayed()))
 
         //check that the downloaded list map is empty
-        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
