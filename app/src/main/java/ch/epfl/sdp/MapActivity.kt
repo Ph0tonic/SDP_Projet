@@ -107,6 +107,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         const val MAP_READY_DESCRIPTION: String = "MAP READY"
+        const val MAP_DOWNLOADING_DESCRIPTION: String = "MAP DOWNLOADING"
+        const val MAP_DELETING_DESCRIPTION: String = "MAP DELETING"
 
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"

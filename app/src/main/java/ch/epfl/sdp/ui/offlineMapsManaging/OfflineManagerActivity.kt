@@ -30,6 +30,8 @@ import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
 import android.view.View
+import ch.epfl.sdp.MapActivity.Companion.MAP_DOWNLOADING_DESCRIPTION
+import com.mapbox.mapboxsdk.maps.MapView
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -151,11 +153,13 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun launchDownload(offlineRegion: OfflineRegion) { // Set up an observer to handle download progress and
         // notify the user when the region is finished downloading
+        mapView.contentDescription = MAP_DOWNLOADING_DESCRIPTION
         offlineRegion.setObserver(object : OfflineRegionObserver {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete) { // Download complete
                     endProgress(downloadButton, listButton, progressBar)
+                    mapView.contentDescription = MAP_READY_DESCRIPTION
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     downloadingInProgress(percentage.roundToInt(), progressBar)
@@ -217,7 +221,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // the deletion process has begun
                     deletingInProgress(progressBar)
                     // Begin the deletion process
-                    deleteOfflineRegion(offlineRegions[regionSelected], progressBar)
+                    deleteOfflineRegion(offlineRegions[regionSelected], progressBar, mapView)
                 }
                 // When the user cancels, don't do anything.
                 // The dialog will automatically close

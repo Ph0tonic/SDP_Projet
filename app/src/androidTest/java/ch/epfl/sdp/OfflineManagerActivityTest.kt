@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.widget.ProgressBar
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -17,13 +18,14 @@ import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivityTest.Companion.MAP_LOADING_TIMEOUT
 import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +35,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class OfflineManagerActivityTest {
     private lateinit var mUiDevice: UiDevice
-    private lateinit var offlineManager : OfflineManager
+    private lateinit var offlineManager: OfflineManager
 
     companion object {
         private const val RANDOM_NAME = "RandomName"
@@ -54,9 +56,7 @@ class OfflineManagerActivityTest {
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         moveCameraToPosition(LatLng(0.0, 0.0))
-        UiThreadStatement.runOnUiThread {
-            mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
-        }
+        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
         offlineManager = OfflineManager.getInstance(context)
     }
 
@@ -71,6 +71,16 @@ class OfflineManagerActivityTest {
 
     @Test
     fun checkToastWhenNoMapsHaveBeenDownloaded() {
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+            override fun onList(offlineRegions: Array<OfflineRegion>) {
+                if(offlineRegions.isNotEmpty()){
+                    for(or in offlineRegions){
+                        deleteOfflineRegion(or, ProgressBar(context), mActivityRule.activity.mapView)
+                    }
+                }
+            }
+            override fun onError(error: String) {} //left intentionally empty
+        })
         onView(withId(R.id.list_button)).perform(click())
         onView(withText(context.getString(R.string.toast_no_regions_yet)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
@@ -87,6 +97,7 @@ class OfflineManagerActivityTest {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
+
             override fun onError(error: String) {} //left intentionally empty
         })
 
@@ -94,23 +105,24 @@ class OfflineManagerActivityTest {
         onView(withId(R.id.download_button)).perform(click())
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(RANDOM_NAME))
         mUiDevice.pressBack()
+
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+
+        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT * 18)
+        assertThat(mActivityRule.activity.mapView.contentDescription == MAP_READY_DESCRIPTION, `is`(true))
+
+        onView(withText(context.getString(R.string.end_progress_success)))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
 
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
-                println("DEBUG : Expected : $RANDOM_NAME")
-                println("DEBUG : Actually : ${getRegionName(offlineRegions[0])}")
                 assertThat(RANDOM_NAME, equalTo(getRegionName(offlineRegions[0])))
             }
+
             override fun onError(error: String) {} //left intentionally empty
         })
-
-        /*
-        onView(withText(context.getString(R.string.end_progress_success)))
-                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
-                .check(matches(isDisplayed()))
-         */
 
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
@@ -121,12 +133,14 @@ class OfflineManagerActivityTest {
         onView(withText(context.getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
+        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         //check that the downloaded list map is empty
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
+
             override fun onError(error: String) {} //left intentionally empty
         })
     }
@@ -150,6 +164,7 @@ class OfflineManagerActivityTest {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
+
             override fun onError(error: String) {} //left intentionally empty
         })
 
@@ -157,21 +172,24 @@ class OfflineManagerActivityTest {
         onView(withId(R.id.download_button)).perform(click())
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(SEA_NAME))
         mUiDevice.pressBack()
+
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+
+        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT * 12)
+        assertThat(mActivityRule.activity.mapView.contentDescription == MAP_READY_DESCRIPTION, `is`(true))
+
+        onView(withText(context.getString(R.string.end_progress_success)))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
 
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
                 assertThat(SEA_NAME, equalTo(getRegionName(offlineRegions[0])))
             }
+
             override fun onError(error: String) {} //left intentionally empty
         })
-
-        /*
-        onView(withText(context.getString(R.string.end_progress_success)))
-                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
-                .check(matches(isDisplayed()))
-         */
 
         moveCameraToPosition(rdmLatLng)
 
@@ -190,6 +208,8 @@ class OfflineManagerActivityTest {
         //DELETE PART
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
+        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
         onView(withText(context.getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
@@ -199,6 +219,7 @@ class OfflineManagerActivityTest {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
             }
+
             override fun onError(error: String) {} //left intentionally empty
         })
     }
