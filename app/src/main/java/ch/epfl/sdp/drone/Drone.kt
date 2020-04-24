@@ -3,11 +3,13 @@ package ch.epfl.sdp.drone
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
+import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
+
 
 object Drone {
     //must be IP address where the mavsdk_server is running
@@ -31,6 +33,13 @@ object Drone {
     private val instance: System
 
     init {
+        //Require a arm64-v8a simulator to run
+        //TODO: Just uncomment this code when you mavsdk-server to run
+//        Thread(Runnable {
+//            val mavsdkServer = MavsdkServer()
+//            mavsdkServer.run("udp://:14540", 50051)
+//        }).start()
+
         instance = System(BACKEND_IP_ADDRESS, BACKEND_PORT)
 
         disposables.add(instance.telemetry.flightMode.distinct()
