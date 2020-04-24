@@ -194,15 +194,15 @@ class MapActivityTest {
         assertThat(searchAreaBuilder.vertices.size, equalTo(1))
 
         onView(withId(R.id.floating_menu_button)).perform(click())
-        while (mActivityRule.activity.waypoints.size>0) onView(withId(R.id.clear_button)).perform(click()) //button is not instantly visible because it is appearing, so we try to click until we success.
+        while (mActivityRule.activity.searchAreaBuilder.vertices.isNotEmpty()) onView(withId(R.id.clear_button)).perform(click()) //button is not instantly visible because it is appearing, so we try to click until we success.
 
         runOnUiThread {
-            assertThat(searchAreaBuilder.vertices.size, equalTo(0))
+            assertThat(mActivityRule.activity.searchAreaBuilder.vertices.isEmpty(), equalTo(true))
         }
     }
 
     @Test
-    fun locateButtonIsFunctionning(){
+    fun locateButtonIsWorking(){
 
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc("MAP READY")), 1000)
@@ -212,7 +212,7 @@ class MapActivityTest {
         }
 
         onView(withId(R.id.floating_menu_button)).perform(click())
-        onView(withId(R.id.locate_button)).perform(click()) //button is not instantly visible because it is appearing, so we try to click until we success.
+        onView(withId(R.id.locate_button)).perform(click())
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
