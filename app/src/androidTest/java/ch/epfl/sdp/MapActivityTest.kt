@@ -70,6 +70,7 @@ class MapActivityTest {
     fun canStartMission() {
         // Launch activity
         mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
         // Add 4 points to the map for the strategy
         runOnUiThread {
             arrayListOf(
@@ -105,11 +106,16 @@ class MapActivityTest {
 
     @Test
     fun mapBoxCanAddPointToHeatMap() {
+
         mActivityRule.launchActivity(Intent())
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.features.size, equalTo(0))
+
+        // Wait for the map to load and add a heatmap point
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
         runOnUiThread {
-            mActivityRule.activity.addPointToHeatMap(10.0, 10.0)
+            mActivityRule.activity.addPointToHeatMap(10.0, 10.0, 10.0)
         }
+        assertThat(mActivityRule.activity.features.size, equalTo(1))
     }
 
     @Test

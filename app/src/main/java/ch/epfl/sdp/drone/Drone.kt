@@ -16,7 +16,7 @@ object Drone {
     private const val BACKEND_IP_ADDRESS = "10.0.2.2"
     private const val BACKEND_PORT = 50051
 
-    // Maximum distance betwen passes in the strategy
+    // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
 
     private val disposables: MutableList<Disposable> = ArrayList()
@@ -25,6 +25,10 @@ object Drone {
     val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
+
+    lateinit var getSignalStrength: ()->Double
+    /*Will be useful later on*/
+    val debugGetSignalStrength: ()->Double={ currentPositionLiveData.value?.distanceTo(LatLng(47.3975,8.5445))?:0.0}
 
     private val instance: System
 

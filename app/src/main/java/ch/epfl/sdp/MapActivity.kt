@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Circle
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
 import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
+import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
@@ -47,8 +48,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePositionMarker: Circle
     private lateinit var userPositionMarker: Circle
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var features = ArrayList<Feature>()
+
     private lateinit var geoJsonSource: GeoJsonSource
-    private var features = ArrayList<Feature>()
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -188,10 +191,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
-            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
-            style.addSource(geoJsonSource)
+            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
+                    .withCluster(true)
+                    .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
+                    .withClusterMaxZoom(13)
 
+            )
+            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
+            style.addSource(geoJsonSource)
             MapUtils.createLayersForHeatMap(style)
 
             // Load latest location
@@ -206,6 +213,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
             searchAreaBuilder = QuadrilateralBuilder()
 
+
             // Add listeners to builders
             searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
             searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
@@ -216,6 +224,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
+            /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
+            //addVirtualPointsToHeatmap()
         }
     }
 
@@ -255,9 +265,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     /**
      * Adds a heat point to the heatmap
      */
-    fun addPointToHeatMap(longitude: Double, latitude: Double) {
+    fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
         if (!isMapReady) return
-        features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
+        var feature: Feature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
+        feature.addNumberProperty("intensity", intensity)
+        /* Will be needed when we have the signal of the drone implemented */
+        //feature.addNumberProperty("intensity", Drone.getSignalStrength())
+        features.add(feature)
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
 
@@ -321,4 +335,23 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
+    /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
+/*
+    private fun addVirtualPointsToHeatmap() {
+        val long = 8.5445
+        val lat = 47.3975
+        //Drone.getSignalStrength={10.0}
+        //precision should be 0.00003
+        for (i in 0..10) {
+            for (j in 0..10) {
+                val newlong = 8.544 + i / 10000.0
+                val newlat = 47.397 + j / 10000.0
+                val intensity = 10 - Math.sqrt((long - newlong) * (long - newlong) * 10000000 + (lat - newlat) * (lat - newlat) * 10000000)
+                addPointToHeatMap(newlong, newlat, intensity)
+            }
+        }
+    }
+ */
+
 }
