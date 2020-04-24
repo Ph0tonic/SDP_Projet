@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import android.util.Log
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -100,8 +99,8 @@ class OfflineManagerActivityTest {
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
-                Log.d("DEBUG", "Expected : $RANDOM_NAME")
-                Log.d("DEBUG", "Actually : ${getRegionName(offlineRegions[0])}")
+                println("DEBUG : Expected : $RANDOM_NAME")
+                println("DEBUG : Actually : ${getRegionName(offlineRegions[0])}")
                 assertThat(RANDOM_NAME, equalTo(getRegionName(offlineRegions[0])))
             }
             override fun onError(error: String) {} //left intentionally empty
