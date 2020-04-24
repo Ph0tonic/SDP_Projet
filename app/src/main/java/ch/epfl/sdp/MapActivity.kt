@@ -3,18 +3,33 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrangle.Constraints.pinPointsAmount
-import ch.epfl.sdp.ui.maps.*
+import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.map.*
+import ch.epfl.sdp.ui.maps.MapUtils
+import ch.epfl.sdp.ui.maps.MapViewBaseActivity
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import com.getbase.floatingactionbutton.FloatingActionButton
-import com.mapbox.geojson.*
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.*
-import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.sources.*
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.Circle
+import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
+import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
+import com.mapbox.mapboxsdk.plugins.annotation.FillOptions
+import com.mapbox.mapboxsdk.style.expressions.Expression
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
 /**
@@ -28,24 +43,35 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var isMapReady = false
     private var isDroneFlying = false
 
-    private lateinit var waypointCircleManager: CircleManager
     private lateinit var droneCircleManager: CircleManager
     private lateinit var userCircleManager: CircleManager
-    private lateinit var lineManager: LineManager
-    private lateinit var fillManager: FillManager
     private lateinit var dronePositionMarker: Circle
     private lateinit var userPositionMarker: Circle
 
     var waypoints = arrayListOf<LatLng>()
-    private var features = ArrayList<Feature>()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var features = ArrayList<Feature>()
+
     private lateinit var geoJsonSource: GeoJsonSource
     private lateinit var mapboxMap: MapboxMap
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
+    private lateinit var distanceToUserTextView: TextView
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
-    private lateinit var distanceToUserTextView: TextView
+
+    /** Builders */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var searchAreaBuilder: SearchAreaBuilder
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var missionBuilder: MissionBuilder
+
+    /** Painters */
+    private lateinit var searchAreaPainter: MapBoxSearchAreaPainter
+    private lateinit var missionPainter: MapBoxMissionPainter
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -82,12 +108,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         const val MAP_READY_DESCRIPTION: String = "MAP READY"
 
-        private const val PATH_THICKNESS: Float = 5F
-        private const val REGION_FILL_OPACITY: Float = 0.5F
-
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
+        private const val REGION_FILL_OPACITY = 0.5f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,6 +125,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
+
         mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
 
         CentralLocationManager.configure(this)
@@ -110,7 +135,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         findViewById<FloatingActionButton>(R.id.start_or_return_button).setOnClickListener {
             if(!isDroneFlying) { //TODO : return to user else
                 isDroneFlying = true
-                DroneMission.makeDroneMission(Drone.overflightStrategy.createFlightPath(waypoints)).startMission()
+                Drone.startMission(DroneMission.makeDroneMission(
+                        missionBuilder.build()
+                ).getMissionItems())
             }
             updateStartButton()
         }
@@ -136,32 +163,59 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
-        if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap)
+
+        if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            fillManager = FillManager(mapView, mapboxMap, style)
-            lineManager = LineManager(mapView, mapboxMap, style)
-            waypointCircleManager = CircleManager(mapView, mapboxMap, style)
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
             userCircleManager = CircleManager(mapView, mapboxMap, style)
+            missionPainter = MapBoxMissionPainter(mapView, mapboxMap, style)
+            searchAreaPainter = MapBoxQuadrilateralPainter(mapView, mapboxMap, style)
 
-            mapboxMap.addOnMapClickListener { position ->
-                onMapClicked(position)
+            mapboxMap.addOnMapClickListener {
+                onMapClicked(it)
+                true
+            }
+            mapboxMap.addOnMapLongClickListener {
+                onMapLongClicked(it)
                 true
             }
 
-            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions().withCluster(true))
-            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(emptyList<Feature>()))
+            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
+                    .withCluster(true)
+                    .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
+                    .withClusterMaxZoom(13)
+            )
+            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
+
             style.addSource(geoJsonSource)
             MapUtils.createLayersForHeatMap(style)
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()// Load latest location
             mapView.contentDescription = MAP_READY_DESCRIPTION// Used to detect when the map is ready in tests
 
+            //Create builders
+            missionBuilder = MissionBuilder()
+                    .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
+                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            searchAreaBuilder = QuadrilateralBuilder()
+
+
+            // Add listeners to builders
+            searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
+            searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
+            missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
+            searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+
+            // Location listener on drone
+            Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
+
             isMapReady = true
+            /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
+            //addVirtualPointsToHeatmap()
         }
     }
 
@@ -173,65 +227,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         textView.text = value?.let { formatString.format(it) } ?: getString(R.string.no_info)
     }
 
-    /** Trajectory Planning **/
     fun onMapClicked(position: LatLng) {
-        if (waypoints.size < pinPointsAmount) {
-            waypoints.add(position)
-            drawPinpoint(position)
-            drawRegion(waypoints)
-
-            if (waypoints.size == pinPointsAmount) {
-                drawPath(Drone.overflightStrategy.createFlightPath(waypoints))
-            }
+        try {
+            searchAreaBuilder.addVertex(position)
+        } catch (e: IllegalArgumentException) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
     }
 
     /**
-     * Draws the path given by the list of positions
+     * Map long clic to current eventListener
      */
-    private fun drawPath(path: List<LatLng>) {
-        if (!isMapReady) return
-
-        lineManager.create(LineOptions()
-                .withLatLngs(path)
-                .withLineWidth(PATH_THICKNESS))
-    }
-
-    /**
-     * Fills the regions described by the list of positions
-     */
-    private fun drawRegion(corners: List<LatLng>) {
-        if (!isMapReady) return
-
-        val fillOption = FillOptions()
-                .withLatLngs(listOf(waypoints))
-                .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
-                .withFillOpacity(REGION_FILL_OPACITY)
-        fillManager.deleteAll()
-        fillManager.create(fillOption)
-
-        // Make it loop
-        val linePoints = arrayListOf<LatLng>().apply {
-            addAll(corners)
-            add(corners[0])
-        }
-        val lineOptions = LineOptions()
-                .withLatLngs(linePoints)
-                .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
-        lineManager.deleteAll()
-        lineManager.create(lineOptions)
-    }
-
-    /**
-     * Draws a pinpoint on the map at the given position
-     */
-    private fun drawPinpoint(pinpoints: LatLng) {
-        if (!isMapReady) return
-
-        val circleOptions = CircleOptions()
-                .withLatLng(pinpoints)
-        waypointCircleManager.create(circleOptions)
-    }
+    fun onMapLongClicked(position: LatLng) {}
 
     /**
      * Clears the waypoints list and removes all the lines and points related to waypoints
@@ -239,18 +246,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun clearWaypoints() {
         if (!isMapReady) return
 
-        waypoints.clear()
-        waypointCircleManager.deleteAll()
-        lineManager.deleteAll()
-        fillManager.deleteAll()
+        searchAreaBuilder.reset()
     }
 
     /**
      * Adds a heat point to the heatmap
      */
-    fun addPointToHeatMap(longitude: Double, latitude: Double) {
+    fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
         if (!isMapReady) return
-        features.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
+        var feature: Feature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
+        feature.addNumberProperty("intensity", intensity)
+        /* Will be needed when we have the signal of the drone implemented */
+        //feature.addNumberProperty("intensity", Drone.getSignalStrength())
+        features.add(feature)
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
 
@@ -275,8 +283,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     .withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
             dronePositionMarker = droneCircleManager.create(circleOptions)
 
-            mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
+//            mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
+//            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
             dronePositionMarker.latLng = newLatLng
             droneCircleManager.update(dronePositionMarker)

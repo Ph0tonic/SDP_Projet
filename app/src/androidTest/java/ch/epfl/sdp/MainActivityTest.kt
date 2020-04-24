@@ -30,7 +30,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
-    private var mUiDevice: UiDevice? = null
+    private lateinit var mUiDevice: UiDevice
 
     @Rule
     @JvmField
@@ -90,7 +90,7 @@ class MainActivityTest {
 
         // Trigger saving mechanism by opening map and coming back
         onView(withId(R.id.display_map)).perform(click())
-        mUiDevice?.pressBack()
+        mUiDevice.pressBack()
 
         longitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
         latitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
@@ -106,7 +106,7 @@ class MainActivityTest {
             mActivityRule.activity.onSupportNavigateUp()
         }
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
-        mUiDevice?.pressBack()
+        mUiDevice.pressBack()
     }
 
 }
