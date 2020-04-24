@@ -158,7 +158,7 @@ class OfflineManagerActivityTest {
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
-                assertThat(RANDOM_NAME, equalTo(getRegionName(offlineRegions[0])))
+                assertThat(SEA_NAME, equalTo(getRegionName(offlineRegions[0])))
             }
             override fun onError(error: String) {} //left intentionally empty
         })
