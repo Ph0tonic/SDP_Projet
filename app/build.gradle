@@ -7,7 +7,6 @@ jacoco {
     toolVersion = "0.8.4"
 }
 
-
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
