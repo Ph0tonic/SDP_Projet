@@ -26,7 +26,8 @@ object DownloadProgressBarUtils {
         progressBar.isIndeterminate = false
         progressBar.visibility = View.GONE
         // Show a toast
-        Toast.makeText(MainApplication.applicationContext(),MainApplication.applicationContext().getString(R.string.end_progress_success), Toast.LENGTH_SHORT).show()
+        val context = MainApplication.applicationContext()
+        Toast.makeText(context, context.getString(R.string.end_progress_success), Toast.LENGTH_SHORT).show()
     }
 
     fun downloadingInProgress(percentage : Int, progressBar: ProgressBar){

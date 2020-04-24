@@ -54,7 +54,7 @@ object Auth : ViewModel() {
                     .addOnSuccessListener {
                         updateLoginStateFromAccount(it)
                     }.addOnFailureListener {
-                        Toast.makeText(context,context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
                     }
         }
     }

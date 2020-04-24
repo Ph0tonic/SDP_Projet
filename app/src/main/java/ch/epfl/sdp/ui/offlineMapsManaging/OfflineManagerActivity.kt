@@ -117,7 +117,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             val definition = OfflineTilePyramidRegionDefinition(
                     style.uri,
                     mapboxMap.projection.visibleRegion.latLngBounds,
-                    mapboxMap.cameraPosition.zoom, maxZoom,
+                    mapboxMap.cameraPosition.zoom, MAX_ZOOM,
                     this@OfflineManagerActivity.resources.displayMetrics.density)
             // Build a JSONObject using the user-defined offline region title,
             // convert it into string, and use it to create a metadata variable.
@@ -157,7 +157,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             override fun onError(error: OfflineRegionError) {
                 Timber.e("onError reason: %s", error.reason)
-                showErrorAndToast("onError message: " + error.message )
+                showErrorAndToast("onError message: " + error.message)
             }
 
             override fun mapboxTileCountLimitExceeded(limit: Long) {
@@ -222,6 +222,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // JSON encoding/decoding
         const val JSON_CHARSET = "UTF-8"
         const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
-        const val maxZoom = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
+        const val MAX_ZOOM = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
     }
 }

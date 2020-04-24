@@ -17,7 +17,8 @@ object OfflineRegionUtils {
             override fun onDelete() { // Once the region is deleted, remove the
                 // progressBar and display a toast
                 hideProgressBar(progressBar)
-                Toast.makeText(MainApplication.applicationContext(), MainApplication.applicationContext().getString(R.string.toast_region_deleted), Toast.LENGTH_LONG).show()
+                val context = MainApplication.applicationContext()
+                Toast.makeText(context, context.getString(R.string.toast_region_deleted), Toast.LENGTH_LONG).show()
             }
 
             override fun onError(error: String) {
