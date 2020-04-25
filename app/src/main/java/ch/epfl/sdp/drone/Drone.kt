@@ -13,9 +13,9 @@ import kotlin.math.sqrt
 
 
 object Drone {
-    //must be IP address where the mavsdk_server is running
-    private const val BACKEND_IP_ADDRESS = "10.0.2.2"
-    private const val BACKEND_PORT = 50051
+    private const val USE_REMOTE_BACKEND = false // False for running MavsdkServer locally, True to connect to a remote instance
+    private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" // IP of the remote instance
+    private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
 
     // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
@@ -39,14 +39,14 @@ object Drone {
     private val isFlying = false
 
     init {
-        //Require a arm64-v8a simulator to run
-        //TODO: Just uncomment this code when you mavsdk-server to run
-//        Thread(Runnable {
-//            val mavsdkServer = MavsdkServer()
-//            mavsdkServer.run("udp://:14540", 50051)
-//        }).start()
-
-        instance = System(BACKEND_IP_ADDRESS, BACKEND_PORT)
+        if (USE_REMOTE_BACKEND) {
+            instance = System(REMOTE_BACKEND_IP_ADDRESS, REMOTE_BACKEND_PORT)
+        } else {
+            // Works for armeabi-v7a and arm64-v8a (not x86 or x86_64)
+            val mavsdkServer = MavsdkServer()
+            val mavsdkServerPort = mavsdkServer.run()
+            instance = System("localhost", mavsdkServerPort)
+        }
 
         disposables.add(instance.telemetry.flightMode.distinct()
                 .subscribe { flightMode -> Timber.d("flight mode: $flightMode") })
