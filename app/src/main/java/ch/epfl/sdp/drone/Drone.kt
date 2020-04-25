@@ -1,16 +1,21 @@
 package ch.epfl.sdp.drone
 
 import androidx.lifecycle.MutableLiveData
+import ch.epfl.sdp.MainApplication
+import ch.epfl.sdp.R
+import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
 import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
+import io.mavsdk.telemetry.Telemetry
+import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
-import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 object Drone {
@@ -31,6 +36,8 @@ object Drone {
     val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
+    val currentFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val currentHomeLiveData: MutableLiveData<Telemetry.Position> = MutableLiveData()
 
     lateinit var getSignalStrength: () -> Double
 
@@ -81,6 +88,16 @@ object Drone {
                 .subscribe(
                         { vector_speed -> currentSpeedLiveData.postValue(sqrt(vector_speed.velocity.eastMS.pow(2) + vector_speed.velocity.northMS.pow(2))) },
                         { error -> Timber.e("Error GroundSpeedNed : $error") }))
+        disposables.add(instance.telemetry.inAir
+                .subscribe(
+                        { isFlying -> currentFlyingLiveData.postValue(isFlying) },
+                        { error -> Timber.e("Error inAir : $error") }
+                ))
+        disposables.add(instance.telemetry.home
+                .subscribe(
+                        { home -> currentHomeLiveData.postValue(home) },
+                        { error -> Timber.e("Error home : $error") }
+                ))
     }
 
     fun startMission(missionPlan: Mission.MissionPlan) {
@@ -90,12 +107,15 @@ object Drone {
                 .firstOrError()
                 .toCompletable()
 
-        isConnectedCompletable
-                .andThen(instance.mission.setReturnToLaunchAfterMission(true))
-                .andThen(instance.mission.uploadMission(missionPlan))
-                .andThen(instance.action.arm())
-                .andThen(instance.mission.startMission())
-                .subscribe()
+        disposables.add(
+                isConnectedCompletable
+                        .andThen(instance.mission.setReturnToLaunchAfterMission(true))
+                        .andThen(instance.mission.uploadMission(missionPlan))
+                        .andThen(instance.action.arm())
+                        .andThen(instance.mission.startMission())
+                        .subscribe(
+                                { Timber.d("Mission started successfully") },
+                                { error -> Timber.e("Error : %s", error.message) }))
     }
 
     fun isConnected(): Boolean {
@@ -110,11 +130,40 @@ object Drone {
         }
     }
 
-    fun isFlying(): Boolean {
-        return try {
-            !instance.mission.isMissionFinished.blockingGet()
-        } catch (e: RuntimeException) {
-            false
+    private fun getConnectionState(): Completable {
+        return instance.core.connectionState
+                .filter { state -> state.isConnected }
+                .firstOrError().toCompletable()
+    }
+
+    fun returnHome() {
+        disposables.add(
+                getConnectionState()
+                        .andThen(instance.action.returnToLaunch())
+                        .subscribe())
+    }
+
+    fun returnUser() {
+        val returnLocation = CentralLocationManager.currentUserPosition.value
+                ?: currentHomeLiveData.value?.let { LatLng(it.latitudeDeg, it.longitudeDeg) }
+        if (returnLocation != null) {
+            this.currentMissionLiveData.postValue(listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat())))
+            getConnectionState()
+                    .andThen(instance.mission.pauseMission())
+                    .andThen(instance.mission.clearMission())
+                    .andThen(instance.action.gotoLocation(returnLocation.latitude, returnLocation.longitude, 20.0F, 0F))
+                    .subscribe()
+
+            disposables.add(
+                    instance.telemetry.position.subscribe(
+                            { pos ->
+                                val isRightPos = LatLng(pos.latitudeDeg, pos.longitudeDeg).distanceTo(returnLocation).roundToInt() == 0
+                                val isStopped = currentSpeedLiveData.value?.roundToInt() == 0
+                                if (isRightPos.and(isStopped)) instance.action.land().blockingAwait()
+                            },
+                            { e -> Timber.e("ERROR LANDING : $e") }))
+        } else {
+            throw IllegalStateException(MainApplication.applicationContext().getString(R.string.drone_home_error))
         }
     }
 }

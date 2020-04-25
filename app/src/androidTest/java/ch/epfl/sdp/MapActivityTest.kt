@@ -115,6 +115,7 @@ class MapActivityTest {
 
         // TODO: Why click on menu button doesn't work ?
         // Open menu to click on start button
+        onView(withId(R.id.floating_menu_button)).perform(click())
         onView(withId(R.id.start_or_return_button)).perform(click())
 
         runOnUiThread {
