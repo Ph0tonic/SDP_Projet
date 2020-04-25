@@ -26,7 +26,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Circle
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
 import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
-import com.mapbox.mapboxsdk.plugins.annotation.FillOptions
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -47,8 +46,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var userCircleManager: CircleManager
     private lateinit var dronePositionMarker: Circle
     private lateinit var userPositionMarker: Circle
-
-    var waypoints = arrayListOf<LatLng>()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var features = ArrayList<Feature>()
@@ -108,7 +105,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
-        private const val REGION_FILL_OPACITY = 0.5f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
