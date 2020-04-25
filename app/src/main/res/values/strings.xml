@@ -43,7 +43,10 @@
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
     <string name="no_info">No data</string>
-
+    <string name="map_ready">MAP READY</string>
+    <string name="map_not_ready">MAP NOT READY</string>
+    <string name="map_downloading">MAP DOWNLOADING</string>
+    <string name="map_deleting">MAP DELETING</string>
 
     <string name="prefs_latitude">latitude</string>
     <string name="prefs_longitude">longitude</string>

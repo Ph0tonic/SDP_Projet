@@ -6,8 +6,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-import ch.epfl.sdp.MapActivity.Companion.MAP_NOT_READY_DESCRIPTION
-import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -30,8 +28,6 @@ import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
 import android.view.View
-import ch.epfl.sdp.MapActivity.Companion.MAP_DOWNLOADING_DESCRIPTION
-import com.mapbox.mapboxsdk.maps.MapView
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -61,7 +57,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         downloadButton = findViewById(R.id.download_button)
         listButton = findViewById(R.id.list_button)
-        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
+        mapView.contentDescription = getString(R.string.map_not_ready)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -76,7 +72,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapboxMap.cameraPosition = MapUtils.getLastCameraState()
 
         // Used to detect when the map is ready in tests
-        mapView.contentDescription = MAP_READY_DESCRIPTION
+        mapView.contentDescription = getString(R.string.map_ready)
 
     }
 
@@ -153,13 +149,13 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun launchDownload(offlineRegion: OfflineRegion) { // Set up an observer to handle download progress and
         // notify the user when the region is finished downloading
-        mapView.contentDescription = MAP_DOWNLOADING_DESCRIPTION
+        mapView.contentDescription = getString(R.string.map_downloading)
         offlineRegion.setObserver(object : OfflineRegionObserver {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete) { // Download complete
                     endProgress(downloadButton, listButton, progressBar)
-                    mapView.contentDescription = MAP_READY_DESCRIPTION
+                    mapView.contentDescription = getString(R.string.map_ready)
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     downloadingInProgress(percentage.roundToInt(), progressBar)

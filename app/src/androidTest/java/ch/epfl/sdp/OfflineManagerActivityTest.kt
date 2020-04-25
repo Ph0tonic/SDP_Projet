@@ -14,7 +14,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import ch.epfl.sdp.MapActivity.Companion.MAP_READY_DESCRIPTION
 import ch.epfl.sdp.MapActivityTest.Companion.MAP_LOADING_TIMEOUT
 import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
@@ -23,9 +22,7 @@ import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,7 +53,7 @@ class OfflineManagerActivityTest {
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         moveCameraToPosition(LatLng(0.0, 0.0))
-        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         offlineManager = OfflineManager.getInstance(context)
     }
 
@@ -108,8 +105,8 @@ class OfflineManagerActivityTest {
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT * 18)
-        assertThat(mActivityRule.activity.mapView.contentDescription == MAP_READY_DESCRIPTION, `is`(true))
+        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == context.getString(R.string.map_ready), `is`(true))
 
         onView(withText(context.getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
@@ -133,7 +130,7 @@ class OfflineManagerActivityTest {
         onView(withText(context.getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
-        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
 
         //check that the downloaded list map is empty
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
@@ -175,8 +172,8 @@ class OfflineManagerActivityTest {
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT * 12)
-        assertThat(mActivityRule.activity.mapView.contentDescription == MAP_READY_DESCRIPTION, `is`(true))
+        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
+        assertThat(mActivityRule.activity.mapView.contentDescription == context.getString(R.string.map_ready), `is`(true))
 
         onView(withText(context.getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
@@ -201,14 +198,14 @@ class OfflineManagerActivityTest {
                 .check(matches(isDisplayed()))
 
         mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-            assertThat(mapboxMap.cameraPosition.target.latitude, Matchers.closeTo(SEA.latitude, EPSILON))
-            assertThat(mapboxMap.cameraPosition.target.longitude, Matchers.closeTo(SEA.longitude, EPSILON))
+            assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(SEA.latitude, EPSILON))
+            assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(SEA.longitude, EPSILON))
         }
 
         //DELETE PART
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
-        mUiDevice.wait(Until.hasObject(By.desc(MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
 
         onView(withText(context.getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))

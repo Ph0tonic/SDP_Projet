@@ -22,9 +22,6 @@
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1">
 
-
-
-
     </com.mapbox.mapboxsdk.maps.MapView>
 
     <TableLayout
@@ -47,6 +44,7 @@
                 android:id="@+id/battery_level_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
                 android:padding="2dp"
                 android:rotation="90"
                 app:srcCompat="@drawable/ic_battery1" />
@@ -66,6 +64,7 @@
                 android:id="@+id/imageView4"
                 android:layout_width="21dp"
                 android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
                 android:padding="2dp"
                 app:srcCompat="@drawable/ic_altitude" />
 
@@ -84,6 +83,7 @@
                 android:id="@+id/imageView2"
                 android:layout_width="18dp"
                 android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
                 android:padding="2dp"
                 app:srcCompat="@drawable/ic_speed" />
 
@@ -101,6 +101,7 @@
                 android:id="@+id/imageView3"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
                 android:paddingVertical="2dp"
                 app:srcCompat="@drawable/ic_distancetodrone" />
 
@@ -115,12 +116,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-
-
             <ImageView
                 android:id="@+id/imageView5"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
                 android:paddingVertical="2dp"
                 app:srcCompat="@drawable/ic_distancetohome" />
 

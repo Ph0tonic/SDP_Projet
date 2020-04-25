@@ -105,11 +105,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var droneSpeedObserver = Observer<Float> { newSpeed: Float? -> updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT) }
 
     companion object {
-        const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
-        const val MAP_READY_DESCRIPTION: String = "MAP READY"
-        const val MAP_DOWNLOADING_DESCRIPTION: String = "MAP DOWNLOADING"
-        const val MAP_DELETING_DESCRIPTION: String = "MAP DELETING"
-
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
@@ -128,7 +123,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
 
-        mapView.contentDescription = MAP_NOT_READY_DESCRIPTION
+        mapView.contentDescription = getString(R.string.map_not_ready)
 
         CentralLocationManager.configure(this)
     }
@@ -197,7 +192,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             style.addSource(geoJsonSource)
             MapUtils.createLayersForHeatMap(style)
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()// Load latest location
-            mapView.contentDescription = MAP_READY_DESCRIPTION// Used to detect when the map is ready in tests
+            mapView.contentDescription = getString(R.string.map_ready)// Used to detect when the map is ready in tests
 
             //Create builders
             missionBuilder = MissionBuilder()
