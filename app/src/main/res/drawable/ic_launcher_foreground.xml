@@ -5,7 +5,7 @@
     android:viewportWidth="1251.5151"
     android:viewportHeight="1251.5151">
   <group android:translateX="336.55164"
-      android:translateY="307.58136">>
+      android:translateY="307.58136">
   <path android:fillColor="#FF000000" android:fillType="nonZero" android:pathData="M8.787,513.615L8.787,100.868L287.237,100.868L287.237,149.575L63.407,149.575L63.407,277.397L346.205,277.397L277.559,326.105L63.407,326.105L63.407,513.615L8.787,513.615Z " android:strokeLineCap="round" android:strokeLineJoin="round"/>
   <path android:fillColor="#FF000000" android:fillType="nonZero" android:pathData="M577.696,100.868L577.696,513.615L299.247,513.615L299.247,464.907L523.076,464.907L523.076,337.085L240.278,337.085L308.925,288.378L523.076,288.378L523.076,100.868L577.696,100.868Z " android:strokeLineCap="round" android:strokeLineJoin="round"/>
   <group>

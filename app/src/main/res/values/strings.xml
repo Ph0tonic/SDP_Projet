@@ -42,26 +42,12 @@
 
     <string name="heatmap_source_ID">HeatMapSourceID</string>
 
-    <string name="lat">LAT</string>
-    <string name="lon">LON</string>
-
     <string name="no_info">No data</string>
-    <string name="battery_level">Battery level:</string>
-    <string name="altitude">Altitude:</string>
-    <string name="speed">Ground speed:</string>
-    <string name="met_per_sec"><sup>m</sup>⁄<sub>s</sub></string>
-    <string name="distance_to_user">Dist. to user:</string>
-    <string name="distance_to_base">Dist. to base:</string>
 
-    <string name="locate">Locate</string>
-    <string name="start">Start</string>
-    <string name="store">Store</string>
-    <string name="clear">Clear</string>
 
     <string name="prefs_latitude">latitude</string>
     <string name="prefs_longitude">longitude</string>
     <string name="prefs_zoom">zoom</string>
-    <string name="camera_button">Camera</string>
     <string name="map_button">Start new mission</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="sign_out_success">Sign out successful</string>
