@@ -4,7 +4,7 @@ interface DAO {
     /**
      * Connects to the database using the given credentials
      */
-    fun connect(/*Credentials*/)
+    fun connect(/*Credentials*/): DAO
 
     /**
      * Returns a list of all groups

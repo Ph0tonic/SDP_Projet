@@ -1,6 +1,4 @@
-package ch.epfl.sdp.DAO
-
-import ch.epfl.sdp.firebase.DAO
+package ch.epfl.sdp.firebase
 
 /**
  * Empty DAO used to test the app.

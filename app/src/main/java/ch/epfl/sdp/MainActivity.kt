@@ -2,10 +2,8 @@ package ch.epfl.sdp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,9 +13,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.tasks.OnCompleteListener
+import ch.epfl.sdp.firebase.DAOFactory
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
@@ -56,10 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         /* SETUP Firebase */
         // Write a message to the database
-        val database = Firebase.database
-        val myRef = database.getReference("message")
-
-        myRef.setValue("Hello, World!")
+        DAOFactory.instance.connect().getGroups()
     }
 
     override fun onStart() {
