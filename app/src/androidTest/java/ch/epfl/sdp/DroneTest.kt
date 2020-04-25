@@ -30,4 +30,9 @@ class DroneTest {
         print(Drone.debugGetSignalStrength)
     }
 
+    @Test
+    fun missionTestDoesNotCrashes(){
+        Drone.startMission(arrayListOf())
+    }
+
 }
