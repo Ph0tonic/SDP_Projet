@@ -144,7 +144,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         findViewById<Button>(R.id.start_mission_button).setOnClickListener {
             Drone.startMission(DroneMission.makeDroneMission(
                     missionBuilder.build()
-            ).getMissionItems())
+            ).getMissionPlan())
         }
         findViewById<Button>(R.id.stored_offline_map).setOnClickListener {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
