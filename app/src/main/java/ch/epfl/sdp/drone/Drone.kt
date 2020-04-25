@@ -3,6 +3,7 @@ package ch.epfl.sdp.drone
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
+import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
@@ -67,8 +68,8 @@ object Drone {
         })
     }
 
-    fun startMission(mission: List<Mission.MissionItem>) {
-        this.currentMissionLiveData.value = mission
+    fun startMission(missionPlan : Mission.MissionPlan) {
+        this.currentMissionLiveData.postValue(missionPlan.missionItems)
         val isConnectedCompletable = instance.core.connectionState
                 .filter { state -> state.isConnected }
                 .firstOrError()
@@ -76,7 +77,7 @@ object Drone {
 
         isConnectedCompletable
                 .andThen(instance.mission.setReturnToLaunchAfterMission(true))
-                .andThen(instance.mission.uploadMission(mission))
+                .andThen(instance.mission.uploadMission(missionPlan))
                 .andThen(instance.action.arm())
                 .andThen(instance.mission.startMission())
                 .subscribe()
@@ -99,3 +100,4 @@ object Drone {
         return instance.mission.isMissionFinished.blockingGet()
     }
 }
+
