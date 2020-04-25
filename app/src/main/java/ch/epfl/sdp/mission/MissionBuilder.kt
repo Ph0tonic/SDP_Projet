@@ -1,6 +1,5 @@
 package ch.epfl.sdp.mission
 
-import android.util.Log
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlin.properties.Delegates
