@@ -2,19 +2,34 @@ package ch.epfl.sdp.firebase
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import timber.log.Timber
+import com.mapbox.mapboxsdk.geometry.LatLng
 
+@IgnoreExtraProperties
+data class Test(
+    var field1: Int? = 0,
+    var field2: String? = "",
+    var field3: TestNested? = null,
+    var field4: LatLng? = null
+)
+
+data class TestNested(
+    var field1: Int? = 0,
+    var field2: String? = ""
+)
+
+data class SearchGroup(
+    var name: String? = null,
+    var base_location: LatLng? = null,
+    var search_location: LatLng? = null
+)
 
 class FirebaseDAO : DAO {
     private lateinit var database: FirebaseDatabase
-    private var groups : MutableLiveData<List<String>> = MutableLiveData()
+    private var groups: MutableLiveData<List<String>> = MutableLiveData()
 
     override fun connect(): DAO {
         database = Firebase.database
@@ -22,17 +37,24 @@ class FirebaseDAO : DAO {
     }
 
     override fun getGroups() {
-        val myRef = database.getReference("test")
-
-        Log.w("FIREBASE","Listener")
+        val myRef = database.getReference("Test")
+        Log.w("FIREBASE", "Listener")
         // Read from the database
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                groups.postValue(listOf(dataSnapshot.getValue<String>()) as List<String>)
-                val value = dataSnapshot.getValue<String>()
-                Log.w("FIREBASE","Value is: $value")
+
+                val g = mutableListOf<DataSnapshot>()
+//                val res = dataSnapshot.children.toCollection(g)
+                val data = dataSnapshot.getValue<Test>()
+                Log.w("FIREBASE", "${data}")
+
+//                g.forEach {
+//                }
+//                groups.pos/tValue(listOf(dataSnapshot.getValue<String>()) as List<String>)
+                //val value = dataSnapshot.getValue<String>()
+//                Log.w("FIREBASE", "Value is: $value")
             }
 
             override fun onCancelled(error: DatabaseError) {
