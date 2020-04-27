@@ -9,8 +9,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.firebase.BaseViewModelFactory
+import ch.epfl.sdp.firebase.SearchGroupViewModel
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -107,6 +111,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
     private var droneSpeedObserver = Observer<Float> { newSpeed: Float? ->
         updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
+    }
+
+    val searchGroupViewModel: SearchGroupViewModel by lazy {
+        ViewModelProvider(this)[SearchGroupViewModel::class.java]
     }
 
     companion object {

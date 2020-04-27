@@ -8,25 +8,6 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-@IgnoreExtraProperties
-data class Test(
-    var field1: Int? = 0,
-    var field2: String? = "",
-    var field3: TestNested? = null,
-    var field4: LatLng? = null
-)
-
-data class TestNested(
-    var field1: Int? = 0,
-    var field2: String? = ""
-)
-
-data class SearchGroup(
-    var name: String? = null,
-    var base_location: LatLng? = null,
-    var search_location: LatLng? = null
-)
-
 class FirebaseDAO : DAO {
     private lateinit var database: FirebaseDatabase
     private var groups: MutableLiveData<List<String>> = MutableLiveData()
@@ -45,10 +26,10 @@ class FirebaseDAO : DAO {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
 
-                val g = mutableListOf<DataSnapshot>()
+                //val g = mutableListOf<DataSnapshot>()
 //                val res = dataSnapshot.children.toCollection(g)
-                val data = dataSnapshot.getValue<Test>()
-                Log.w("FIREBASE", "${data}")
+                //val data = dataSnapshot.getValue<Test>()
+                //Log.w("FIREBASE", "${data}")
 
 //                g.forEach {
 //                }
