@@ -19,6 +19,7 @@ object Auth : ViewModel() {
     val email: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val profileImageURL: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val name: MutableLiveData<String> by lazy { MutableLiveData<String>() }
+    val accountId: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     init {
         GoogleSignIn.getLastSignedInAccount(MainApplication.applicationContext())
@@ -72,5 +73,6 @@ object Auth : ViewModel() {
         name.postValue(account.displayName)
         profileImageURL.postValue(account.photoUrl.toString())
         loggedIn.postValue(true)
+        accountId.postValue(account.id)
     }
 }
