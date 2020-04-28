@@ -73,6 +73,7 @@ class OfflineManagerActivityTest {
                 if(offlineRegions.isNotEmpty()){
                     for(or in offlineRegions){
                         deleteOfflineRegion(or, ProgressBar(context), mActivityRule.activity.mapView)
+
                     }
                 }
             }

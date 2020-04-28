@@ -3,7 +3,6 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -222,37 +221,30 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     /**
      * Clears the waypoints list and removes all the lines and points related to waypoints
      */
-    fun clearWaypoints(v : View) {
-        Log.d("DEBUG", "----------------------------------------_____>  CLEAR_WAYPOINTS_GOAL")
+    fun clearWaypoints(v: View) {
         if (!isMapReady) return
-        Log.d("DEBUG", "----------------------------------------      > RESET CLEARWAYPOINTS()")
         searchAreaBuilder.reset()
     }
 
-    fun startMissionOrReturnHome(v : View){
-        Log.d("DEBUG", "--------------------------> startMissionOrReturnHomeCall")
-        findViewById<FloatingActionButton>(R.id.start_or_return_button).setOnClickListener {
-            if(!isDroneFlying) { //TODO : return to user else
-                isDroneFlying = true
-                Drone.startMission(DroneMission.makeDroneMission(
-                        missionBuilder.build()
-                ).getMissionItems())
-            }
-            updateStartButton()
+    fun startMissionOrReturnHome(v: View) {
+        if (!isDroneFlying) { //TODO : return to user else
+            isDroneFlying = true
+            Drone.startMission(DroneMission.makeDroneMission(
+                    missionBuilder.build()
+            ).getMissionItems())
         }
+        updateStartButton()
     }
 
-    fun storeMap(v : View){
-        Log.d("DEBUG", "--------------------------> storeMapCall")
+    fun storeMap(v: View) {
         startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
     }
 
     /**
      * Centers the camera on the drone
      */
-    fun centerCameraOnDrone(v : View){
-        Log.d("DEBUG", "--------------------------> centerCameraOnDroneCall")
-        if(::dronePositionMarker.isInitialized){
+    fun centerCameraOnDrone(v: View) {
+        if (::dronePositionMarker.isInitialized) {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, 14.0))
         }
     }
@@ -325,8 +317,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    private fun updateStartButton(){
+    private fun updateStartButton() {
         findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start )
+                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
     }
 }

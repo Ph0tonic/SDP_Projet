@@ -1,13 +1,10 @@
 package ch.epfl.sdp
 
 import android.Manifest.permission
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.preference.PreferenceManager
-import androidx.test.InstrumentationRegistry.getTargetContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -19,7 +16,6 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.By
@@ -75,7 +71,6 @@ class MapActivityTest {
 
     @Test
     fun canStartMission() {
-        Log.d("DEBUG", "--------------------------------> canStartMission")
         // Launch activity
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -204,7 +199,6 @@ class MapActivityTest {
 
     @Test
     fun deleteButtonRemovesWaypoints() {
-        Log.d("DEBUG", "------------------------------------> deleteButtonRemovesWaypoints")
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
@@ -225,7 +219,6 @@ class MapActivityTest {
 
     @Test
     fun storeMapButtonIsWorking(){
-        Log.d("DEBUG", "--------------------------------> storeMapButtonIsWorking")
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
@@ -236,10 +229,9 @@ class MapActivityTest {
 
         intended(hasComponent(OfflineManagerActivity::class.java.name))
     }
-    
+
     @Test
     fun locateButtonIsWorking(){
-        Log.d("DEBUG", "--------------------------------> locateButtonIsWorking")
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
