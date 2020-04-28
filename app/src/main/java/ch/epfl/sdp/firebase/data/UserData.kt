@@ -2,7 +2,7 @@ package ch.epfl.sdp.firebase.data
 
 import com.google.firebase.database.PropertyName
 
-data class User(
+data class UserData(
         @get:PropertyName("google_id")
         @set:PropertyName("google_id")
         var googleId: String = ""

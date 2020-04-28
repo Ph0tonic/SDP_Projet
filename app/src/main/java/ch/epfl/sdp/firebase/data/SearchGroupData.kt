@@ -3,7 +3,7 @@ package ch.epfl.sdp.firebase.data
 import com.google.firebase.database.PropertyName
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-data class MapMarker(
+data class SearchGroupData(
         var uuid: String? = null,
 
         @get:PropertyName("base_location")
@@ -14,5 +14,5 @@ data class MapMarker(
 
         @get:PropertyName("search_location")
         @set:PropertyName("search_location")
-        var search_location: LatLng? = null){
+        var search_location:LatLng? = null){
 }
