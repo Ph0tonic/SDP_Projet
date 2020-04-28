@@ -7,11 +7,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.firebase.SearchGroupViewModel
+import ch.epfl.sdp.firebase.data.HeatmapData
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -166,7 +168,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
-        this.heatmap = Heatmap()
+
+        //TODO change this to create heatmap via repo
+        this.heatmap = Heatmap(MutableLiveData(HeatmapData()))
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
@@ -216,7 +220,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-            addVirtualPointsToHeatmap()
+            //addVirtualPointsToHeatmap()
         }
     }
 
@@ -293,16 +297,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-    private fun addVirtualPointsToHeatmap() {
-        val center = LatLng(47.3975, 8.5445)
-        //Drone.getSignalStrength={10.0}
-        //precision should be 0.00003
-        for (i in 0..10) {
-            for (j in 0..10) {
-                val point = LatLng(47.397 + j / 10000.0, 8.544 + i / 10000.0)
-                val intensity = 10 - 1 * (center.distanceTo(point) / 10.0 - 1.0)
-                addPointToHeatMap(point, intensity)
-            }
-        }
-    }
+//    private fun addVirtualPointsToHeatmap() {
+//        val center = LatLng(47.3975, 8.5445)
+//        //Drone.getSignalStrength={10.0}
+//        //precision should be 0.00003
+//        for (i in 0..10) {
+//            for (j in 0..10) {
+//                val point = LatLng(47.397 + j / 10000.0, 8.544 + i / 10000.0)
+//                val intensity = 10 - 1 * (center.distanceTo(point) / 10.0 - 1.0)
+//                addPointToHeatMap(point, intensity)
+//            }
+//        }
+//    }
 }

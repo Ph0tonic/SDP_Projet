@@ -17,9 +17,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.epfl.sdp.firebase.dao.FirebaseGroupDao
-import ch.epfl.sdp.firebase.dao.FirebaseMarkersDao
-import ch.epfl.sdp.firebase.dao.MarkersDao
-import ch.epfl.sdp.firebase.repository.GroupMarkersDataRepository
 import ch.epfl.sdp.firebase.repository.SearchGroupDataRepository
 import com.google.android.material.navigation.NavigationView
 

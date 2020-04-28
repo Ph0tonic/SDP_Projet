@@ -3,7 +3,6 @@ package ch.epfl.sdp.drone
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
-import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
