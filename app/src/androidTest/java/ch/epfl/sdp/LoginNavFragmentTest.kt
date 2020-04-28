@@ -8,6 +8,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
+import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -106,7 +107,8 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
 
-        onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_signout_button))
+
         runOnUiThread {
             Auth.logout()
             Auth.loggedIn.postValue(false)
@@ -114,7 +116,5 @@ class LoginNavFragmentTest {
 
         openDrawer()
         onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
-
-        mUiDevice.pressBack()
     }
 }
