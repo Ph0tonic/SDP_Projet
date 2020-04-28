@@ -33,13 +33,8 @@ object OfflineRegionUtils {
 
     // Get the region name from the offline region metadata
     fun getRegionName(offlineRegion: OfflineRegion): String {
-        return try {
-            JSONObject(String(offlineRegion.metadata, Charset.forName(OfflineManagerActivity.JSON_CHARSET)))
-                    .getString(OfflineManagerActivity.JSON_FIELD_REGION_NAME)
-        } catch (exception: Exception) {
-            Timber.e("Failed to decode metadata: %s", exception.message)
-            String.format(MainApplication.applicationContext().getString(R.string.region_name), offlineRegion.id)
-        }
+        return JSONObject(String(offlineRegion.metadata, Charset.forName(OfflineManagerActivity.JSON_CHARSET)))
+                .getString(OfflineManagerActivity.JSON_FIELD_REGION_NAME)
     }
 
     fun showErrorAndToast(message : String){

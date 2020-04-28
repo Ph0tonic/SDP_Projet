@@ -28,6 +28,7 @@ import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
 import android.view.View
+import ch.epfl.sdp.MainApplication
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -188,7 +189,14 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
                 // Add all of the region names to a list
                 val items = offlineRegions
-                        .map { region -> getRegionName(region) }
+                        .map {
+                            region -> try {
+                                getRegionName(region)
+                            } catch(e : Exception){
+                                Timber.e("Failed to decode metadata: %s", e.message)
+                                String.format(MainApplication.applicationContext().getString(R.string.region_name), region.id)
+                            }
+                        }
                         .toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
                 showDialog(items, offlineRegions)
