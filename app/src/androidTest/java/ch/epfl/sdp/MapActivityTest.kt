@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.collection.arraySetOf
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -23,9 +24,11 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.drone.Drone.currentMissionLiveData
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -76,20 +79,29 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
         onView(withId(R.id.floating_menu_button)).perform(click())
-
+        val expectedLatLng = arrayListOf(
+                LatLng( 47.398979, 8.543434),
+                LatLng( 47.398279, 8.543934),
+                LatLng( 47.397426, 8.544867),
+                LatLng( 47.397026, 8.543067))
         // Add 4 points to the map for the strategy
         runOnUiThread {
             mActivityRule.activity.searchAreaBuilder.reset()
-
-            arrayListOf(
-                    LatLng( 47.398979, 8.543434),
-                    LatLng( 47.398279, 8.543934),
-                    LatLng( 47.397426, 8.544867),
-                    LatLng( 47.397026, 8.543067)
-            ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
+            expectedLatLng.forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
         }
+
         onView(withId(R.id.start_or_return_button)).perform(click())
         onView(withId(R.id.start_or_return_button)).perform(click())
+
+        val uploadedMission = currentMissionLiveData.value
+
+        if (uploadedMission != null) {
+            for (missionItem in uploadedMission){
+                assert(expectedLatLng.contains(LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)))
+            }
+        } else {
+            Assert.fail("No MissionItem")
+        }
     }
 
     @Test

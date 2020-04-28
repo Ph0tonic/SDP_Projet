@@ -26,7 +26,7 @@ object OfflineRegionUtils {
 
             override fun onError(error: String) {
                 hideProgressBar(progressBar)
-                showErrorAndToast("Error : $error")
+                throw Exception("Error : $error")
             }
         })
     }
