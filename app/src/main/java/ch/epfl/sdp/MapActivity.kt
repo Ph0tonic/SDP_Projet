@@ -17,20 +17,14 @@ import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.Circle
-import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
-import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
 /**
@@ -63,6 +57,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var userLatitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
+
+    private var victimSymbolLongClickConsumed = false
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -191,20 +187,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             victimSymbolManager.iconIgnorePlacement = true
             victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
 
-            /*victimSymbolManager.addLongClickListener {
+            victimSymbolManager.addLongClickListener {
+                victimSymbolManager.delete(it)
+                victimSymbolLongClickConsumed = true
+            }
+
+            /*victimSymbolManager.addClickListener {
                 victimSymbolManager.delete(it)
                 true
             }*/
 
-            victimSymbolManager.addClickListener {
-                victimSymbolManager.delete(it)
-                true
-            }
-
-            mapboxMap.setOnMarkerClickListener {
+            /*mapboxMap.setOnMarkerClickListener {
                 mapboxMap.removeMarker(it)
                 true
-            }
+            }*/
 
             style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
             missionPainter = MapBoxMissionPainter(mapView, mapboxMap, style)
@@ -274,7 +270,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Map long click to current eventListener
      */
     private fun onMapLongClicked(position: LatLng) {
-        addVictimMarker(position)
+        if (!victimSymbolLongClickConsumed) {
+            addVictimMarker(position)
+        }
+        victimSymbolLongClickConsumed = false
     }
 
     /**
@@ -290,27 +289,27 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Adds a heat point to the heatmap
      */
     fun addPointToHeatMap(longitude: Double, latitude: Double) {
-        if(!isMapReady) return
+        if (!isMapReady) return
         heatmapFeatures.add(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))
         heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
     }
 
     private fun addVictimMarker(latLng: LatLng) {
-        if(!isMapReady) return
-        /*val symbolOptions = SymbolOptions()
+        if (!isMapReady) return
+        val symbolOptions = SymbolOptions()
                 .withLatLng(LatLng(latLng))
                 .withIconImage(ID_ICON_VICTIM)
-        victimSymbolManager.create(symbolOptions)*/
+        victimSymbolManager.create(symbolOptions)
 
         // I know this code is deprecated but it is not currently possible to achieve the same with
         // the mapbox annotation plugin. I wrote an email to them and will update the code if the
         // offer a better alternative
-        val iconFactory = IconFactory.getInstance(this)
+        /*val iconFactory = IconFactory.getInstance(this)
         val iconImage = BitmapUtils.getBitmapFromDrawable(getDrawable(R.drawable.ic_victim))
         mapboxMap.addMarker(MarkerOptions()
                 .position(latLng)
                 .icon(iconFactory.fromBitmap(iconImage!!))
-        )
+        )*/
     }
 
     /**
