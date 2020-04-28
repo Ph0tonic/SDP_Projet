@@ -108,14 +108,14 @@ class MapActivityTest {
     fun mapBoxCanAddPointToHeatMap() {
 
         mActivityRule.launchActivity(Intent())
-        assertThat(mActivityRule.activity.features.size, equalTo(0))
+        assertThat(mActivityRule.activity.heatmapFeatures.size, equalTo(0))
 
         // Wait for the map to load and add a heatmap point
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT);
         runOnUiThread {
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0, 10.0)
         }
-        assertThat(mActivityRule.activity.features.size, equalTo(1))
+        assertThat(mActivityRule.activity.heatmapFeatures.size, equalTo(1))
     }
 
     @Test

@@ -52,7 +52,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var userPositionMarker: Circle
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    private var heatmapFeatures = ArrayList<Feature>()
+    var heatmapFeatures = ArrayList<Feature>()
     private lateinit var heatmapGeoJsonSource: GeoJsonSource
 
     private lateinit var droneBatteryLevelImageView: ImageView
