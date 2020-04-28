@@ -13,7 +13,7 @@ import kotlin.math.sqrt
 
 object Drone {
     //must be IP address where the mavsdk_server is running
-    private const val BACKEND_IP_ADDRESS = "10.0.2.2"
+    private const val BACKEND_IP_ADDRESS =  "10.0.2.2"
     private const val BACKEND_PORT = 50051
 
     // Maximum distance between passes in the strategy
@@ -30,7 +30,7 @@ object Drone {
     /*Will be useful later on*/
     val debugGetSignalStrength: ()->Double={ currentPositionLiveData.value?.distanceTo(LatLng(47.3975,8.5445))?:0.0}
 
-    private val instance: System
+    val instance: System
 
     init {
         //Require a arm64-v8a simulator to run

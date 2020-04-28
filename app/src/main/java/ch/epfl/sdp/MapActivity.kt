@@ -3,6 +3,8 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -111,7 +113,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
-        initButtons()
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
         droneBatteryLevelTextView = findViewById(R.id.battery_level)
@@ -122,21 +123,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapView.contentDescription = getString(R.string.map_not_ready)
 
         CentralLocationManager.configure(this)
-    }
-
-    private fun initButtons(){
-        findViewById<FloatingActionButton>(R.id.start_or_return_button).setOnClickListener {
-            if(!isDroneFlying) { //TODO : return to user else
-                isDroneFlying = true
-                Drone.startMission(DroneMission.makeDroneMission(
-                        missionBuilder.build()
-                ).getMissionItems())
-            }
-            updateStartButton()
-        }
-        findViewById<FloatingActionButton>(R.id.clear_button ).setOnClickListener { clearWaypoints() }
-        findViewById<FloatingActionButton>(R.id.locate_button).setOnClickListener { centerCameraOnDrone() }
-        findViewById<FloatingActionButton>(R.id.store_button ).setOnClickListener { startActivity(Intent(applicationContext, OfflineManagerActivity::class.java)) }
     }
 
     override fun onResume() {
@@ -236,9 +222,39 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     /**
      * Clears the waypoints list and removes all the lines and points related to waypoints
      */
-    private fun clearWaypoints() {
+    fun clearWaypoints(v : View) {
+        Log.d("DEBUG", "----------------------------------------_____>  CLEAR_WAYPOINTS_GOAL")
         if (!isMapReady) return
+        Log.d("DEBUG", "----------------------------------------      > RESET CLEARWAYPOINTS()")
         searchAreaBuilder.reset()
+    }
+
+    fun startMissionOrReturnHome(v : View){
+        Log.d("DEBUG", "--------------------------> startMissionOrReturnHomeCall")
+        findViewById<FloatingActionButton>(R.id.start_or_return_button).setOnClickListener {
+            if(!isDroneFlying) { //TODO : return to user else
+                isDroneFlying = true
+                Drone.startMission(DroneMission.makeDroneMission(
+                        missionBuilder.build()
+                ).getMissionItems())
+            }
+            updateStartButton()
+        }
+    }
+
+    fun storeMap(v : View){
+        Log.d("DEBUG", "--------------------------> storeMapCall")
+        startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
+    }
+
+    /**
+     * Centers the camera on the drone
+     */
+    fun centerCameraOnDrone(v : View){
+        Log.d("DEBUG", "--------------------------> centerCameraOnDroneCall")
+        if(::dronePositionMarker.isInitialized){
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, 14.0))
+        }
     }
 
     /**
@@ -280,15 +296,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         } else {
             dronePositionMarker.latLng = newLatLng
             droneCircleManager.update(dronePositionMarker)
-        }
-    }
-
-    /**
-     * Centers the camera on the drone
-     */
-    private fun centerCameraOnDrone(){
-        if(::dronePositionMarker.isInitialized){
-        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, 14.0))
         }
     }
 

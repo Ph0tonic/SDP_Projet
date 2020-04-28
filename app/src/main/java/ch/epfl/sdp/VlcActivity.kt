@@ -2,7 +2,9 @@ package ch.epfl.sdp
 
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
@@ -15,7 +17,7 @@ class VlcActivity : AppCompatActivity() {
     companion object {
         private const val USE_TEXTURE_VIEW = false
         private const val ENABLE_SUBTITLES = false
-        private const val ASSET_FILENAME = "rtsp://192.168.1.120:8554/live"
+        private const val ASSET_FILENAME = "rtsp://192.168.1.131:8554/live" //must be your IP
         private val ARGS = arrayListOf("-vvv")//, "--live-caching=200")
     }
 
@@ -39,6 +41,10 @@ class VlcActivity : AppCompatActivity() {
     }
 
     fun switchVideo(view: View) {
+        val toast = Toast.makeText(applicationContext, "Video is " + if(started) "on" else "off" ,  Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL,0,0)
+        toast.show()
+
         started = if (started) stopVideo()
         else startVideo()
     }

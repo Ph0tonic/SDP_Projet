@@ -1,13 +1,19 @@
 package ch.epfl.sdp
 
 import android.Manifest.permission
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.preference.PreferenceManager
+import androidx.test.InstrumentationRegistry.getTargetContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -21,6 +27,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
 import org.junit.Before
@@ -45,7 +52,7 @@ class MapActivityTest {
     private lateinit var mUiDevice: UiDevice
 
     @get:Rule
-    var mActivityRule = ActivityTestRule(
+    var mActivityRule = IntentsTestRule(
             MapActivity::class.java,
             true,
             false) // Activity is not launched immediately
@@ -68,21 +75,25 @@ class MapActivityTest {
 
     @Test
     fun canStartMission() {
+        Log.d("DEBUG", "--------------------------------> canStartMission")
         // Launch activity
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        onView(withId(R.id.floating_menu_button)).perform(click())
 
         // Add 4 points to the map for the strategy
         runOnUiThread {
+            mActivityRule.activity.searchAreaBuilder.reset()
+
             arrayListOf(
-                    LatLng(8.543434, 47.398979),
-                    LatLng(8.543934, 47.398279),
-                    LatLng(8.544867, 47.397426),
-                    LatLng(8.543067, 47.397026)
+                    LatLng( 47.398979, 8.543434),
+                    LatLng( 47.398279, 8.543934),
+                    LatLng( 47.397426, 8.544867),
+                    LatLng( 47.397026, 8.543067)
             ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
         }
-        onView(withId(R.id.floating_menu_button)).perform(click())
+        onView(withId(R.id.start_or_return_button)).perform(click())
         onView(withId(R.id.start_or_return_button)).perform(click())
     }
 
@@ -187,11 +198,13 @@ class MapActivityTest {
         onView(withText("Already enough points for a quadrilateral"))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
+
     }
 
 
     @Test
     fun deleteButtonRemovesWaypoints() {
+        Log.d("DEBUG", "------------------------------------> deleteButtonRemovesWaypoints")
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
@@ -211,8 +224,22 @@ class MapActivityTest {
     }
 
     @Test
-    fun locateButtonIsWorking(){
+    fun storeMapButtonIsWorking(){
+        Log.d("DEBUG", "--------------------------------> storeMapButtonIsWorking")
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
+        onView(withId(R.id.floating_menu_button)).perform(click())
+        onView(withId(R.id.store_button)).perform(click())
+        onView(withId(R.id.store_button)).perform(click())
+
+        intended(hasComponent(OfflineManagerActivity::class.java.name))
+    }
+    
+    @Test
+    fun locateButtonIsWorking(){
+        Log.d("DEBUG", "--------------------------------> locateButtonIsWorking")
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
@@ -222,6 +249,7 @@ class MapActivityTest {
         }
 
         onView(withId(R.id.floating_menu_button)).perform(click())
+        onView(withId(R.id.locate_button)).perform(click())
         onView(withId(R.id.locate_button)).perform(click())
 
         runOnUiThread {
