@@ -59,6 +59,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneSpeedTextView: TextView
 
     private var victimSymbolLongClickConsumed = false
+    private val victimMarkers = mutableListOf<Symbol>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -189,18 +190,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             victimSymbolManager.addLongClickListener {
                 victimSymbolManager.delete(it)
+                victimMarkers.remove(it)
                 victimSymbolLongClickConsumed = true
             }
-
-            /*victimSymbolManager.addClickListener {
-                victimSymbolManager.delete(it)
-                true
-            }*/
-
-            /*mapboxMap.setOnMarkerClickListener {
-                mapboxMap.removeMarker(it)
-                true
-            }*/
 
             style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
             missionPainter = MapBoxMissionPainter(mapView, mapboxMap, style)
@@ -299,17 +291,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val symbolOptions = SymbolOptions()
                 .withLatLng(LatLng(latLng))
                 .withIconImage(ID_ICON_VICTIM)
-        victimSymbolManager.create(symbolOptions)
-
-        // I know this code is deprecated but it is not currently possible to achieve the same with
-        // the mapbox annotation plugin. I wrote an email to them and will update the code if the
-        // offer a better alternative
-        /*val iconFactory = IconFactory.getInstance(this)
-        val iconImage = BitmapUtils.getBitmapFromDrawable(getDrawable(R.drawable.ic_victim))
-        mapboxMap.addMarker(MarkerOptions()
-                .position(latLng)
-                .icon(iconFactory.fromBitmap(iconImage!!))
-        )*/
+        victimMarkers.add(victimSymbolManager.create(symbolOptions))
     }
 
     /**
