@@ -1,10 +1,12 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,6 +17,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.epfl.sdp.firebase.dao.FirebaseGroupDao
+import ch.epfl.sdp.firebase.dao.FirebaseMarkersDao
+import ch.epfl.sdp.firebase.dao.MarkersDao
+import ch.epfl.sdp.firebase.repository.GroupMarkersDataRepository
 import ch.epfl.sdp.firebase.repository.SearchGroupDataRepository
 import com.google.android.material.navigation.NavigationView
 
@@ -22,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
@@ -53,9 +59,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         /* SETUP Firebase */
-        // Write a message to the database
-        val groups = SearchGroupDataRepository(FirebaseGroupDao()).getGroups()
-        groups.observe(this, Observer{Log.w("FIREBASE","observer: $it")})
+        val repo = SearchGroupDataRepository(FirebaseGroupDao())
+        repo.getGroupById("g1").observe(this, Observer { Log.w("FIREBASE", "Group 1 got updated") })
     }
 
     override fun onStart() {

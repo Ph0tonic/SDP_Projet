@@ -11,12 +11,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.mapbox.mapboxsdk.geometry.LatLng
 
 class FirebaseGroupDao : GroupDao {
     private var database: FirebaseDatabase = Firebase.database
 
     private val groups: MutableLiveData<List<SearchGroup>> = MutableLiveData(mutableListOf())
-    private val groupEventListeners: MutableMap<String,MutableList<ValueEventListener>> = mutableMapOf()
+    private val groupsById: MutableMap<String, MutableLiveData<SearchGroup>> = mutableMapOf()
 
     init {
         val myRef = database.getReference("search_groups")
@@ -42,26 +43,21 @@ class FirebaseGroupDao : GroupDao {
         return groups
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    override fun addOnGroupChangedListener(OnGroupChangedListener: OnGroupChangedListener, groupId: String){
-        val myRef = database.getReference("search_groups/$groupId")
-        val listener = object: ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                OnGroupChangedListener.onGroupChanged()
-            }
+    override fun getGroupById(groupId: String): MutableLiveData<SearchGroup> {
+        if (!groupsById.containsKey(groupId)) {
+            val myRef = database.getReference("search_groups/$groupId")
+            groupsById[groupId] = MutableLiveData()
+            myRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    groupsById[groupId]!!.value = dataSnapshot.getValue(SearchGroup::class.java)
+                }
 
-            override fun onCancelled(error: DatabaseError) {
-                // Failed to read value
-                Log.w("FIREBASE", "Failed to read value.", error.toException())
-            }
+                override fun onCancelled(error: DatabaseError) {
+                    // Failed to read value
+                    Log.w("FIREBASE", "Failed to read value.", error.toException())
+                }
+            })
         }
-        groupEventListeners.putIfAbsent(groupId, mutableListOf())!!.add(listener)
-        myRef.addValueEventListener(listener)
-    }
-
-    override fun removeGroupListeners(groupId: String){
-        groupEventListeners.remove(groupId)
-        val myRef = database.getReference("search_groups/$groupId")
-        groupEventListeners[groupId]?.forEach{myRef.removeEventListener(it)}
+        return groupsById[groupId]!!
     }
 }
