@@ -1,8 +1,6 @@
 package ch.epfl.sdp.firebase.dao
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.firebase.data.SearchGroup
 import com.google.firebase.database.DataSnapshot
@@ -11,13 +9,12 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.mapbox.mapboxsdk.geometry.LatLng
 
 class FirebaseGroupDao : GroupDao {
     private var database: FirebaseDatabase = Firebase.database
 
     private val groups: MutableLiveData<List<SearchGroup>> = MutableLiveData(mutableListOf())
-    private val groupsById: MutableMap<String, MutableLiveData<SearchGroup>> = mutableMapOf()
+    private val watchedGroupsById: MutableMap<String, MutableLiveData<SearchGroup>> = mutableMapOf()
 
     init {
         val myRef = database.getReference("search_groups")
@@ -44,12 +41,12 @@ class FirebaseGroupDao : GroupDao {
     }
 
     override fun getGroupById(groupId: String): MutableLiveData<SearchGroup> {
-        if (!groupsById.containsKey(groupId)) {
+        if (!watchedGroupsById.containsKey(groupId)) {
             val myRef = database.getReference("search_groups/$groupId")
-            groupsById[groupId] = MutableLiveData()
+            watchedGroupsById[groupId] = MutableLiveData()
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    groupsById[groupId]!!.value = dataSnapshot.getValue(SearchGroup::class.java)
+                    watchedGroupsById[groupId]!!.value = dataSnapshot.getValue(SearchGroup::class.java)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -58,6 +55,6 @@ class FirebaseGroupDao : GroupDao {
                 }
             })
         }
-        return groupsById[groupId]!!
+        return watchedGroupsById[groupId]!!
     }
 }
