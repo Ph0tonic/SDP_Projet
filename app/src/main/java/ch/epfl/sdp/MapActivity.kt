@@ -254,7 +254,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     private fun clearWaypoints() {
         if (!isMapReady) return
-
         searchAreaBuilder.reset()
     }
 
