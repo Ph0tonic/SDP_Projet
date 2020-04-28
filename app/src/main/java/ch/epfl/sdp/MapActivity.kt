@@ -15,9 +15,6 @@ import ch.epfl.sdp.firebase.SearchGroupViewModel
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -35,11 +32,9 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
+    private lateinit var heatmap: Heatmap
 
     private var isMapReady = false
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var features = ArrayList<Feature>()
 
     private lateinit var geoJsonSource: GeoJsonSource
 
@@ -171,6 +166,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
+        this.heatmap = Heatmap()
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
@@ -191,9 +187,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     .withCluster(true)
                     .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
                     .withClusterMaxZoom(13)
-
             )
-            geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
+            geoJsonSource.setGeoJson(heatmap.getFeatures())
             style.addSource(geoJsonSource)
             MapUtils.createLayersForHeatMap(style)
 
@@ -221,7 +216,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-            //addVirtualPointsToHeatmap()
+            addVirtualPointsToHeatmap()
         }
     }
 
@@ -260,14 +255,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     /**
      * Adds a heat point to the heatmap
      */
-    fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
+    fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (!isMapReady) return
-        var feature: Feature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
-        feature.addNumberProperty("intensity", intensity)
         /* Will be needed when we have the signal of the drone implemented */
         //feature.addNumberProperty("intensity", Drone.getSignalStrength())
-        features.add(feature)
-        geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
+        heatmap.addPoint(location, intensity)
+        geoJsonSource.setGeoJson(heatmap.getFeatures())
     }
 
     /**
@@ -300,21 +293,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-/*
     private fun addVirtualPointsToHeatmap() {
-        val long = 8.5445
-        val lat = 47.3975
+        val center = LatLng(47.3975, 8.5445)
         //Drone.getSignalStrength={10.0}
         //precision should be 0.00003
         for (i in 0..10) {
             for (j in 0..10) {
-                val newlong = 8.544 + i / 10000.0
-                val newlat = 47.397 + j / 10000.0
-                val intensity = 10 - Math.sqrt((long - newlong) * (long - newlong) * 10000000 + (lat - newlat) * (lat - newlat) * 10000000)
-                addPointToHeatMap(newlong, newlat, intensity)
+                val point = LatLng(47.397 + j / 10000.0, 8.544 + i / 10000.0)
+                val intensity = 10 - 1 * (center.distanceTo(point) / 10.0 - 1.0)
+                addPointToHeatMap(point, intensity)
             }
         }
     }
- */
-
 }
