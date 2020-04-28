@@ -16,7 +16,7 @@ class FirebaseGroupDao : GroupDao {
     private var database: FirebaseDatabase = Firebase.database
 
     private val groups: MutableLiveData<List<SearchGroup>> = MutableLiveData(mutableListOf())
-    private val onGroupChangedListeners: MutableMap<String,MutableList<OnGroupChangedListener>> = mutableMapOf()
+    private val groupEventListeners: MutableMap<String,MutableList<ValueEventListener>> = mutableMapOf()
 
     init {
         val myRef = database.getReference("search_groups")
@@ -45,8 +45,7 @@ class FirebaseGroupDao : GroupDao {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun addOnGroupChangedListener(OnGroupChangedListener: OnGroupChangedListener, groupId: String){
         val myRef = database.getReference("search_groups/$groupId")
-        onGroupChangedListeners.putIfAbsent(groupId, mutableListOf())!!.add(OnGroupChangedListener)
-        myRef.addValueEventListener(object : ValueEventListener {
+        val listener = object: ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 OnGroupChangedListener.onGroupChanged()
             }
@@ -55,10 +54,14 @@ class FirebaseGroupDao : GroupDao {
                 // Failed to read value
                 Log.w("FIREBASE", "Failed to read value.", error.toException())
             }
-        })
+        }
+        groupEventListeners.putIfAbsent(groupId, mutableListOf())!!.add(listener)
+        myRef.addValueEventListener(listener)
     }
 
     override fun removeGroupListeners(groupId: String){
-        onGroupChangedListeners.remove(groupId)
+        groupEventListeners.remove(groupId)
+        val myRef = database.getReference("search_groups/$groupId")
+        groupEventListeners[groupId]?.forEach{myRef.removeEventListener(it)}
     }
 }
