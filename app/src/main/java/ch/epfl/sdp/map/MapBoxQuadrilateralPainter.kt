@@ -8,8 +8,8 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-class MapBoxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
-        MapBoxSearchAreaPainter() {
+class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
+        MapboxSearchAreaPainter() {
 
     companion object {
         private const val PATH_THICKNESS: Float = 2F

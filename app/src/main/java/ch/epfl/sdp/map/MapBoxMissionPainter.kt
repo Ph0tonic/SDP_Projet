@@ -10,7 +10,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.LineManager
 import com.mapbox.mapboxsdk.plugins.annotation.LineOptions
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-class MapBoxMissionPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) {
+class MapboxMissionPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) {
     companion object {
         private const val PATH_THICKNESS: Float = 2F
     }

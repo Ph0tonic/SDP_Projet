@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -10,10 +9,8 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.firebase.BaseViewModelFactory
 import ch.epfl.sdp.firebase.SearchGroupViewModel
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
@@ -25,13 +22,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.Circle
-import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
-import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.utils.ColorUtils
 
 /**
  * Main Activity to display map and create missions.
@@ -44,12 +37,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
 
     private var isMapReady = false
-
-    private lateinit var droneCircleManager: CircleManager
-    private lateinit var userCircleManager: CircleManager
-
-    private lateinit var dronePositionMarker: Circle
-    private lateinit var userPositionMarker: Circle
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var features = ArrayList<Feature>()
@@ -72,8 +59,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     lateinit var missionBuilder: MissionBuilder
 
     /** Painters */
-    private lateinit var searchAreaPainter: MapBoxSearchAreaPainter
-    private lateinit var missionPainter: MapBoxMissionPainter
+    private lateinit var searchAreaPainter: MapboxSearchAreaPainter
+    private lateinit var missionPainter: MapboxMissionPainter
+    private lateinit var dronePainter: MapboxDronePainter
+    private lateinit var userPainter: MapboxUserPainter
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -86,10 +75,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     )
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateDronePosition(it); updateDronePositionOnMap(it) }
+        newLatLng?.let { updateDronePosition(it); if (::dronePainter.isInitialized) dronePainter.paint(it) }
     }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
+        newLatLng?.let { updateUserPosition(it); if (::userPainter.isInitialized) userPainter.paint(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
 
@@ -184,10 +173,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            droneCircleManager = CircleManager(mapView, mapboxMap, style)
-            userCircleManager = CircleManager(mapView, mapboxMap, style)
-            missionPainter = MapBoxMissionPainter(mapView, mapboxMap, style)
-            searchAreaPainter = MapBoxQuadrilateralPainter(mapView, mapboxMap, style)
+            userPainter = MapboxUserPainter(mapView, mapboxMap, style)
+            dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
+            missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener {
                 onMapClicked(it)
@@ -293,24 +282,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun updateDronePositionOnMap(newLatLng: LatLng) {
-        if (!isMapReady) return
-
-        // Add a vehicle marker and move the camera
-        if (!::dronePositionMarker.isInitialized) {
-            val circleOptions = CircleOptions()
-                    .withLatLng(newLatLng)
-                    .withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
-            dronePositionMarker = droneCircleManager.create(circleOptions)
-
-//            mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
-//            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
-        } else {
-            dronePositionMarker.latLng = newLatLng
-            droneCircleManager.update(dronePositionMarker)
-        }
-    }
-
     /**
      * Updates the user position if the drawing managers are ready
      */
@@ -320,20 +291,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         Drone.currentPositionLiveData.value?.let {
             updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
-        }
-    }
-
-    private fun updateUserPositionOnMap(userLatLng: LatLng) {
-        if (!isMapReady) return
-
-        // Add a vehicle marker and move the camera
-        if (!::userPositionMarker.isInitialized) {
-            val circleOptions = CircleOptions()
-                    .withLatLng(userLatLng)
-            userPositionMarker = userCircleManager.create(circleOptions)
-        } else {
-            userPositionMarker.latLng = userLatLng
-            userCircleManager.update(userPositionMarker)
         }
     }
 
