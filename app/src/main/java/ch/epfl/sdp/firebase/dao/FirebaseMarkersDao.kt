@@ -1,4 +1,4 @@
-package ch.epfl.sdp.firebase
+package ch.epfl.sdp.firebase.dao
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +17,7 @@ class FirebaseMarkersDao : MarkersDao {
 
     override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<MutableMap<String, LatLng>> {
         if (!markersGroups.containsKey(groupId)) {
-            val myRef = database.getReference("makers/$groupId")
+            val myRef = database.getReference("markers/$groupId")
             markersGroups[groupId] = MutableLiveData<MutableMap<String, LatLng>>(mutableMapOf())
 
             myRef.addValueEventListener(object : ValueEventListener {
