@@ -50,8 +50,7 @@ class FirebaseGroupDao : GroupDao {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    // Failed to read value
-                    Log.w("FIREBASE", "Failed to read value.", error.toException())
+                    Log.w("FIREBASE", "Failed to read group from firebase.", error.toException())
                 }
             })
         }

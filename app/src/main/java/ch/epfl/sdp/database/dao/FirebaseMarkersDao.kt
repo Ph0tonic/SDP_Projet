@@ -31,8 +31,7 @@ class FirebaseMarkersDao : MarkersDao {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    // Failed to read value
-                    Log.w("FIREBASE", "Failed to read value.", error.toException())
+                    Log.w("FIREBASE", "Failed to read markers of search group from firebase.", error.toException())
                 }
             })
         }
