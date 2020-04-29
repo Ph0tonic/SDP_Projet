@@ -8,6 +8,7 @@ import androidx.collection.arraySetOf
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
@@ -131,7 +132,7 @@ class MapActivityTest {
     fun mapBoxCanAddPointToHeatMap() {
 
         mActivityRule.launchActivity(Intent())
-        assertThat(mActivityRule.activity.features.size, equalTo(0))
+        assertThat(mActivityRule.activity.heatmapFeatures.size, equalTo(0))
 
         // Wait for the map to load and add a heatmap point
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT);
@@ -140,7 +141,7 @@ class MapActivityTest {
         runOnUiThread {
             mActivityRule.activity.addPointToHeatMap(10.0, 10.0, 10.0)
         }
-        assertThat(mActivityRule.activity.features.size, equalTo(1))
+        assertThat(mActivityRule.activity.heatmapFeatures.size, equalTo(1))
     }
 
     @Test
@@ -164,6 +165,21 @@ class MapActivityTest {
     fun droneStatusIsVisible() {
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun longClickOnMapAddAMarker() {
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
+        onView(withId(R.id.mapView)).perform(longClick())
+        runOnUiThread {
+            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
+        }
+        onView(withId(R.id.mapView)).perform(longClick())
+        runOnUiThread {
+            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
+        }
     }
 
     @Test
