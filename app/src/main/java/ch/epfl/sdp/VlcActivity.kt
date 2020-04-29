@@ -2,9 +2,7 @@ package ch.epfl.sdp
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
@@ -41,10 +39,6 @@ class VlcActivity : AppCompatActivity() {
     }
 
     fun switchVideo(view: View) {
-        val toast = Toast.makeText(applicationContext, "Video is " + if(started) "on" else "off" ,  Toast.LENGTH_SHORT)
-        toast.setGravity(Gravity.CENTER_HORIZONTAL,0,0)
-        toast.show()
-
         started = if (started) stopVideo()
         else startVideo()
     }

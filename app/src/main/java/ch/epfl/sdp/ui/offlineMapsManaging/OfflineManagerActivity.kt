@@ -2,6 +2,7 @@ package ch.epfl.sdp.ui.offlineMapsManaging
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -9,14 +10,13 @@ import android.widget.Toast
 import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.showErrorAndToast
 import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.deletingInProgress
 import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.downloadingInProgress
 import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.endProgress
 import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.startProgress
-import com.mapbox.mapboxsdk.geometry.LatLng
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
+import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.showErrorAndToast
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -27,8 +27,6 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
-import android.view.View
-import ch.epfl.sdp.MainApplication
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -135,6 +133,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 showErrorAndToast("Failed to encode metadata: " + exception.message)
                 null
             }
+
             // Create the offline region and launch the download
             offlineManager.createOfflineRegion(definition, metadata!!, object : CreateOfflineRegionCallback {
                 override fun onCreate(offlineRegion: OfflineRegion) {
@@ -189,12 +188,11 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 }
                 // Add all of the region names to a list
                 val items = offlineRegions
-                        .map {
-                            region -> try {
+                        .map { region ->
+                            try{
                                 getRegionName(region)
-                            } catch(e : Exception){
-                                showErrorAndToast("Failed to decode metadata: $e.message")
-                                String.format(MainApplication.applicationContext().getString(R.string.region_name), region.id)
+                            }catch(exception : java.lang.Exception){
+                                String.format(getString(R.string.region_name_error), region.id)
                             }
                         }
                         .toTypedArray<CharSequence>()

@@ -13,7 +13,7 @@ import java.nio.charset.Charset
 
 
 object OfflineRegionUtils {
-    fun deleteOfflineRegion(offRegion: OfflineRegion,progressBar : ProgressBar, mapView: MapView) {
+    fun deleteOfflineRegion(offRegion: OfflineRegion, progressBar: ProgressBar, mapView: MapView) {
         mapView.contentDescription = MainApplication.applicationContext().getString(R.string.map_deleting)
         offRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
             override fun onDelete() { // Once the region is deleted, remove the
@@ -37,7 +37,7 @@ object OfflineRegionUtils {
                 .getString(OfflineManagerActivity.JSON_FIELD_REGION_NAME)
     }
 
-    fun showErrorAndToast(message : String){
+    fun showErrorAndToast(message: String) {
         Timber.e(message)
         Toast.makeText(MainApplication.applicationContext(), message, Toast.LENGTH_LONG).show()
     }

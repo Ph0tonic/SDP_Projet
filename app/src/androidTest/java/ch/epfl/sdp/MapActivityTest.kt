@@ -79,8 +79,8 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
         onView(withId(R.id.start_or_return_button)).perform(click())
-        val expectedLatLng =  LatLng(47.397026, 8.543067)
-        
+        val expectedLatLng = LatLng(47.397026, 8.543067)
+
         // Add 4 points to the map for the strategy
         runOnUiThread {
             mActivityRule.activity.searchAreaBuilder.reset()
@@ -89,7 +89,7 @@ class MapActivityTest {
                     LatLng(47.398279, 8.543934),
                     LatLng(47.397426, 8.544867),
                     expectedLatLng //we consider the closest point to the drone
-                   ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
+            ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
         }
 
         onView(withId(R.id.start_or_return_button)).perform(click())
@@ -169,7 +169,7 @@ class MapActivityTest {
     @Test
     fun longClickOnMapAddAMarker() {
         mActivityRule.launchActivity(Intent())
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
 
         onView(withId(R.id.mapView)).perform(longClick())
         runOnUiThread {
@@ -278,7 +278,6 @@ class MapActivityTest {
 
     @Test
     fun updateDroneBatteryChangesDroneStatus() {
-
         mActivityRule.launchActivity(Intent())
 
         runOnUiThread {

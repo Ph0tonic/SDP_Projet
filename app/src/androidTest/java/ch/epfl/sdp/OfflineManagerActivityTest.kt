@@ -35,7 +35,7 @@ class OfflineManagerActivityTest {
     private lateinit var offlineManager: OfflineManager
 
     companion object {
-        private const val RANDOM_NAME = "RandomName"
+        private const val RANDOM_MAP_NAME = "RandomName"
         private const val SEA_NAME = "SEA"
         private val SEA: LatLng = LatLng(39.317261, 6.485201)
         private const val EPSILON = 1e-3
@@ -70,13 +70,14 @@ class OfflineManagerActivityTest {
     fun checkToastWhenNoMapsHaveBeenDownloaded() {
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
-                if(offlineRegions.isNotEmpty()){
-                    for(or in offlineRegions){
+                if (offlineRegions.isNotEmpty()) {
+                    for (or in offlineRegions) {
                         deleteOfflineRegion(or, ProgressBar(context), mActivityRule.activity.mapView)
 
                     }
                 }
             }
+
             override fun onError(error: String) {} //left intentionally empty
         })
         onView(withId(R.id.list_button)).perform(click())
@@ -101,7 +102,7 @@ class OfflineManagerActivityTest {
 
         //DOWNLOAD part
         onView(withId(R.id.download_button)).perform(click())
-        onView(withId(R.id.dialog_textfield_id)).perform(typeText(RANDOM_NAME))
+        onView(withId(R.id.dialog_textfield_id)).perform(typeText(RANDOM_MAP_NAME))
         mUiDevice.pressBack()
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
@@ -116,7 +117,7 @@ class OfflineManagerActivityTest {
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
-                assertThat(RANDOM_NAME, equalTo(getRegionName(offlineRegions[0])))
+                assertThat(RANDOM_MAP_NAME, equalTo(getRegionName(offlineRegions[0])))
             }
 
             override fun onError(error: String) {} //left intentionally empty

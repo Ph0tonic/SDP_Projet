@@ -13,6 +13,7 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
+import ch.epfl.sdp.ui.maps.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -25,11 +26,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
-import com.mapbox.mapboxsdk.plugins.annotation.Circle
-import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
-import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
 import com.mapbox.mapboxsdk.style.expressions.Expression
+import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
@@ -50,7 +48,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var userCircleManager: CircleManager
     private lateinit var victimSymbolManager: SymbolManager
 
-
     private lateinit var dronePositionMarker: Circle
     var waypoints = arrayListOf<LatLng>()
     private lateinit var userPositionMarker: Circle
@@ -59,7 +56,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     var heatmapFeatures = ArrayList<Feature>()
     private lateinit var heatmapGeoJsonSource: GeoJsonSource
 
-
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
     private lateinit var distanceToUserTextView: TextView
@@ -67,6 +63,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneSpeedTextView: TextView
 
     private var victimSymbolLongClickConsumed = false
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val victimMarkers = mutableListOf<Symbol>()
 
@@ -113,9 +110,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var droneSpeedObserver = Observer<Float> { newSpeed: Float? -> updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT) }
 
     companion object {
-
-        const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
-        const val MAP_READY_DESCRIPTION: String = "MAP READY"
         const val ID_ICON_VICTIM: String = "airport"
 
         private const val DISTANCE_FORMAT = " %.1f m"
@@ -280,7 +274,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     fun centerCameraOnDrone(v: View) {
         if (::dronePositionMarker.isInitialized) {
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, 14.0))
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, DEFAULT_ZOOM))
         }
     }
 
