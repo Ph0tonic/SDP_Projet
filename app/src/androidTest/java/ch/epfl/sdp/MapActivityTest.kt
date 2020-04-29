@@ -186,7 +186,6 @@ class MapActivityTest {
         assertThat(searchAreaBuilder.vertices.size, equalTo(0))
     }
 
-
     @Test
     fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
         mActivityRule.launchActivity(Intent())
@@ -205,9 +204,7 @@ class MapActivityTest {
         onView(withText("Already enough points for a quadrilateral"))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
-
     }
-
 
     @Test
     fun deleteButtonRemovesWaypoints() {

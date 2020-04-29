@@ -131,7 +131,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
-
     }
 
     override fun onPause() {
@@ -233,7 +232,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     missionBuilder.build()
             ).getMissionItems())
         }
-        updateStartButton()
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
     }
 
     fun storeMap(v: View) {
@@ -315,10 +315,5 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    private fun updateStartButton() {
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
     }
 }

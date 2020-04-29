@@ -153,7 +153,7 @@ class OfflineManagerActivityTest {
      */
     @Test
     fun canNavigateToDownloadedMap() {
-        val rdmLatLng = LatLng((-90..90).random().toDouble(), (-180..180).random().toDouble())
+        val randomLocation = LatLng((-90..90).random().toDouble(), (-180..180).random().toDouble())
 
         moveCameraToPosition(SEA)
 
@@ -189,7 +189,7 @@ class OfflineManagerActivityTest {
             override fun onError(error: String) {} //left intentionally empty
         })
 
-        moveCameraToPosition(rdmLatLng)
+        moveCameraToPosition(randomLocation)
 
         //NAVIGATE Part
         onView(withId(R.id.list_button)).perform(click())

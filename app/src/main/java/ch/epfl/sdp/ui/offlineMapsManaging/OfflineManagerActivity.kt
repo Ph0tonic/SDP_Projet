@@ -193,7 +193,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                             region -> try {
                                 getRegionName(region)
                             } catch(e : Exception){
-                                Timber.e("Failed to decode metadata: %s", e.message)
+                                showErrorAndToast("Failed to decode metadata: $e.message")
                                 String.format(MainApplication.applicationContext().getString(R.string.region_name), region.id)
                             }
                         }
@@ -216,7 +216,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     // Create new camera position
                     val definition = offlineRegions[regionSelected].definition
                     mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(
-                            LatLng(definition.bounds.center.latitude, definition.bounds.center.longitude),
+                            definition.bounds.center,
                             definition.minZoom)
                 }
                 .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
