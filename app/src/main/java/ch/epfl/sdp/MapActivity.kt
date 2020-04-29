@@ -64,7 +64,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneSpeedTextView: TextView
 
     private var victimSymbolLongClickConsumed = false
-    private val victimMarkers = mutableListOf<Symbol>()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val victimMarkers = mutableListOf<Symbol>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

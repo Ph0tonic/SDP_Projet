@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -139,6 +140,21 @@ class MapActivityTest {
     fun droneStatusIsVisible() {
         mActivityRule.launchActivity(Intent())
         onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun longClickOnMapAddAMarker() {
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
+        onView(withId(R.id.mapView)).perform(longClick())
+        runOnUiThread {
+            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
+        }
+        onView(withId(R.id.mapView)).perform(longClick())
+        runOnUiThread {
+            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
+        }
     }
 
     @Test
