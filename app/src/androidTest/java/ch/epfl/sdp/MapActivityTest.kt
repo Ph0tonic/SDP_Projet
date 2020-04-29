@@ -97,7 +97,7 @@ class MapActivityTest {
 
         if (uploadedMission != null) {
             for (missionItem in uploadedMission){
-                assert(expectedLatLng.contains(LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)))
+                assertThat(expectedLatLng.contains(LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)), `is`(true))
             }
         } else {
             Assert.fail("No MissionItem")
