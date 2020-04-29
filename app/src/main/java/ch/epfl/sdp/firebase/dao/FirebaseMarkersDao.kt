@@ -21,6 +21,7 @@ class FirebaseMarkersDao : MarkersDao {
             groupMarkers[groupId]= MutableLiveData(mutableMapOf())
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    Log.w("FIREBASE: ",dataSnapshot.toString())
                     val markers = dataSnapshot.children.associate { Pair(it.key!!, it.getValue(LatLng::class.java)!!)}.toMutableMap()
                     groupMarkers[groupId]!!.value = markers
                 }

@@ -27,7 +27,7 @@ class Heatmap (val heatmapData: MutableLiveData<HeatmapData>) {
         // Notify eventual observers
         heatmapData.value = heatmapData.value
         //TODO clean up
-        val repo = HeatmapDataRepository(FirebaseHeatmapDao())
+        val repo = HeatmapDataRepository()
         repo.updateHeatmap("g2", heatmapData.value!!)
     }
 
@@ -36,7 +36,7 @@ class Heatmap (val heatmapData: MutableLiveData<HeatmapData>) {
         // Notify eventual observers
         heatmapData.value = heatmapData.value
         //TODO clean up
-        val repo = HeatmapDataRepository(FirebaseHeatmapDao())
+        val repo = HeatmapDataRepository()
         repo.updateHeatmap("g2", heatmapData.value!!)
     }
 }

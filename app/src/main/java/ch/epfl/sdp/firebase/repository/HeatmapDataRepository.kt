@@ -1,14 +1,26 @@
 package ch.epfl.sdp.firebase.repository
 
 import androidx.lifecycle.MutableLiveData
+import ch.epfl.sdp.firebase.dao.FirebaseHeatmapDao
 import ch.epfl.sdp.firebase.dao.HeatmapDao
 import ch.epfl.sdp.firebase.data.HeatmapData
 
-class HeatmapDataRepository(private val heatmapDao: HeatmapDao) {
-    fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
-        heatmapDao.updateHeatmap(groupId, heatmapData)
+class HeatmapDataRepository {
+
+    companion object {
+        val DEFAULT_DAO = { FirebaseHeatmapDao() }
+
+        // Change this for dependency injection
+        var daoProvider: () -> HeatmapDao = DEFAULT_DAO
     }
+
+    val dao: HeatmapDao = daoProvider()
+
+    fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
+        dao.updateHeatmap(groupId, heatmapData)
+    }
+
     fun getGroupHeatmaps(groupId: String): MutableLiveData<MutableMap<String, HeatmapData>> {
-        return heatmapDao.getHeatmapsOfSearchGroup(groupId)
+        return dao.getHeatmapsOfSearchGroup(groupId)
     }
 }

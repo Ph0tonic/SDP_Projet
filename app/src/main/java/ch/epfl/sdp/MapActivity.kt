@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,14 +10,17 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.firebase.SearchGroupViewModel
 import ch.epfl.sdp.firebase.data.HeatmapData
+import ch.epfl.sdp.firebase.repository.GroupMarkersDataRepository
+import ch.epfl.sdp.firebase.repository.HeatmapDataRepository
+import ch.epfl.sdp.firebase.repository.SearchGroupDataRepository
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -56,7 +60,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var victimSymbolLongClickConsumed = false
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val victimMarkers = mutableListOf<Symbol>()
+    val victimMarkers = mutableMapOf<String,Symbol>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -109,9 +113,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
 
-    val searchGroupViewModel: SearchGroupViewModel by lazy {
-        ViewModelProvider(this)[SearchGroupViewModel::class.java]
-    }
+    val groupMarkersDataRepository = GroupMarkersDataRepository()
+    val heatmapDataRepository = HeatmapDataRepository()
 
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
@@ -123,6 +126,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
         private const val COORDINATE_FORMAT = " %.7f"
+
+        private const val DEFAULT_NEW_MARKER_ID = "new_marker_id"
+        private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -198,7 +204,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             victimSymbolManager.addLongClickListener {
                 victimSymbolManager.delete(it)
-                victimMarkers.remove(it)
+                victimMarkers.remove(it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString)
                 victimSymbolLongClickConsumed = true
             }
 
@@ -247,10 +253,28 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
-
-            /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-            //addVirtualPointsToHeatmap()
+            onceMapReady()
         }
+    }
+
+    /**
+     * Called once the map and the style are completely initialized
+     */
+    private fun onceMapReady(){
+        groupMarkersDataRepository.getMarkersOfSearchGroup("g1").observe(this, Observer {markers ->
+            Log.w("FIREBASE", markers.toString())
+            val removedMarkers = victimMarkers.keys - markers.keys
+            val newMarkers = markers.keys - victimMarkers.keys
+            removedMarkers.forEach {
+                victimSymbolManager.delete(victimMarkers[it])
+            }
+            newMarkers.forEach {
+                addVictimMarker(markers[it]!!, it)
+            }
+        })
+
+        /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
+        //addVirtualPointsToHeatmap()
     }
 
     /**
@@ -301,12 +325,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
     }
 
-    private fun addVictimMarker(latLng: LatLng) {
+    private fun addVictimMarker(latLng: LatLng, markerId: String = DEFAULT_NEW_MARKER_ID) {
         if (!isMapReady) return
+        val markerProperties = JsonObject()
+        markerProperties.addProperty(VICTIM_MARKER_ID_PROPERTY_NAME,markerId)
         val symbolOptions = SymbolOptions()
                 .withLatLng(LatLng(latLng))
                 .withIconImage(ID_ICON_VICTIM)
-        victimMarkers.add(victimSymbolManager.create(symbolOptions))
+                .withData(markerProperties)
+        victimMarkers[markerId] = victimSymbolManager.create(symbolOptions)
     }
 
     /**

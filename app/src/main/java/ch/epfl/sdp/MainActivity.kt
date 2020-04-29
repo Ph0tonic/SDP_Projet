@@ -54,10 +54,6 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-
-        /* SETUP Firebase */
-        val repo = SearchGroupDataRepository(FirebaseGroupDao())
-        repo.getGroupById("g1").observe(this, Observer { Log.w("FIREBASE", "Group 1 got updated") })
     }
 
     override fun onStart() {
