@@ -25,7 +25,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
 /**
  * Main Activity to display map and create missions.
@@ -36,12 +35,10 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
-
     private var isMapReady = false
 
     private lateinit var groupId: String
 
-    private lateinit var heatmapGeoJsonSource: GeoJsonSource
     private lateinit var victimSymbolManager: SymbolManager
 
     private lateinit var droneBatteryLevelImageView: ImageView
@@ -123,11 +120,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val SPEED_FORMAT = " %.1f m/s"
         private const val COORDINATE_FORMAT = " %.7f"
 
-        //private const val DEFAULT_NEW_MARKER_ID = "new_marker_id"
         private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        require(intent.getStringExtra("groupId") != null) { "MapActivity should be provided with a searchGroupId" }
+
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
@@ -186,9 +184,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
 
-        //TODO change this to create heatmap via repo
-        //this.heatmap = Heatmap(MutableLiveData(HeatmapData()))
-
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
@@ -218,13 +213,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            //MapUtils.createLayersForHeatMap(style)
-
             // Load latest location
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
-
-            // Used to detect when the map is ready in tests
-            mapView.contentDescription = MAP_READY_DESCRIPTION
 
             //Create builders
             missionBuilder = MissionBuilder()
@@ -243,6 +233,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             onceMapReady(style)
+
+            // Used to detect when the map is ready in tests
+            mapView.contentDescription = MAP_READY_DESCRIPTION
         }
     }
 
@@ -258,7 +251,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun setupMarkerObserver() {
         markerRepository.getMarkersOfSearchGroup(groupId).observe(this, Observer { markers ->
-
             Log.w("FIREBASE", markers.toString())
             val removedMarkers = victimMarkers.keys - markers.map { it.uuid }
             removedMarkers.forEach {
@@ -322,10 +314,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (!isMapReady) return
+
         /* Will be needed when we have the signal of the drone implemented */
-        //feature.addNumberProperty("intensity", Drone.getSignalStrength())
-        //heatmap.addPoint(location, intensity)
-        //heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
+        heatmapRepository.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
     }
 
     private fun addVictimMarker(latLng: LatLng, markerId: String) {

@@ -20,7 +20,6 @@ class FirebaseHeatmapDao : HeatmapDao {
     val groupHeatmaps: MutableMap<String, MutableLiveData<MutableMap<String, MutableLiveData<HeatmapData>>>> = mutableMapOf()
 
     override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
-        TODO("Rework")
         database.getReference("heatmaps/$groupId/${Auth.accountId.value!!}")
                 .setValue(heatmapData)
     }

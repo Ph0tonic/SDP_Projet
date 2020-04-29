@@ -48,7 +48,7 @@ class MapboxHeatmapPainter(style: Style,
             val clustered = CircleLayer("clustered-points-$heatmapId", heatmapId)
             clustered.setProperties(
                     PropertyFactory.circleColor(RED),
-                    PropertyFactory.circleRadius(50f),
+                    PropertyFactory.circleRadius(40f),
                     PropertyFactory.circleBlur(1f)
             )
             clustered.setFilter(Expression.eq(Expression.get("cluster"), Expression.literal(true)))
@@ -89,27 +89,4 @@ class MapboxHeatmapPainter(style: Style,
         )
         geoJsonSource.setGeoJson(features)
     }
-
-    fun addPoint(latLng: LatLng, intensity: Double) {
-        TODO("Implement me")
-//        val feature: Feature = Feature.fromGeometry(Point.fromLngLat(latLng.longitude, latLng.latitude))
-//        feature.addNumberProperty("intensity", intensity)
-//        features.add(feature)
-//
-//        heatmapData.value!!.dataPoints.add(HeatmapPointData(latLng, intensity))
-//        // Notify eventual observers
-//        heatmapData.value = heatmapData.value
-//        //TODO clean up
-//        val repo = HeatmapRepository()
-//        repo.updateHeatmap("g2", heatmapData.value!!)
-    }
-
-//    fun clear() {
-//        heatmapData.value!!.dataPoints.clear()
-//        // Notify eventual observers
-//        heatmapData.value = heatmapData.value
-//        //TODO clean up
-//        val repo = HeatmapRepository()
-//        repo.updateHeatmap("g2", heatmapData.value!!)
-//    }
 }
