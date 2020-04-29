@@ -21,7 +21,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.expressions.Expression
+import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
@@ -38,7 +42,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private var isMapReady = false
 
-    private lateinit var geoJsonSource: GeoJsonSource
+    private lateinit var heatmapGeoJsonSource: GeoJsonSource
+    private lateinit var victimSymbolManager: SymbolManager
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -47,6 +52,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var userLatitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
+
+    private var victimSymbolLongClickConsumed = false
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val victimMarkers = mutableListOf<Symbol>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -106,6 +116,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         const val MAP_READY_DESCRIPTION: String = "MAP READY"
+
+        const val ID_ICON_VICTIM: String = "airport"
 
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
@@ -178,6 +190,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, style)
 
+            victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
+            victimSymbolManager.iconAllowOverlap = true
+            victimSymbolManager.symbolSpacing = 0F
+            victimSymbolManager.iconIgnorePlacement = true
+            victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
+
+            victimSymbolManager.addLongClickListener {
+                victimSymbolManager.delete(it)
+                victimMarkers.remove(it)
+                victimSymbolLongClickConsumed = true
+            }
+
+            style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
+
             mapboxMap.addOnMapClickListener {
                 onMapClicked(it)
                 true
@@ -187,13 +213,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            geoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
+            heatmapGeoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
                     .withCluster(true)
                     .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
                     .withClusterMaxZoom(13)
             )
-            geoJsonSource.setGeoJson(heatmap.getFeatures())
-            style.addSource(geoJsonSource)
+
+            heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
+            style.addSource(heatmapGeoJsonSource)
+
             MapUtils.createLayersForHeatMap(style)
 
             // Load latest location
@@ -219,6 +247,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
+
             /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
             //addVirtualPointsToHeatmap()
         }
@@ -244,9 +273,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /**
-     * Map long clic to current eventListener
+     * Map long click to current eventListener
      */
-    fun onMapLongClicked(position: LatLng) {}
+    private fun onMapLongClicked(position: LatLng) {
+        if (!victimSymbolLongClickConsumed) {
+            addVictimMarker(position)
+        }
+        victimSymbolLongClickConsumed = false
+    }
 
     /**
      * Clears the waypoints list and removes all the lines and points related to waypoints
@@ -264,7 +298,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         /* Will be needed when we have the signal of the drone implemented */
         //feature.addNumberProperty("intensity", Drone.getSignalStrength())
         heatmap.addPoint(location, intensity)
-        geoJsonSource.setGeoJson(heatmap.getFeatures())
+        heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
+    }
+
+    private fun addVictimMarker(latLng: LatLng) {
+        if (!isMapReady) return
+        val symbolOptions = SymbolOptions()
+                .withLatLng(LatLng(latLng))
+                .withIconImage(ID_ICON_VICTIM)
+        victimMarkers.add(victimSymbolManager.create(symbolOptions))
     }
 
     /**
