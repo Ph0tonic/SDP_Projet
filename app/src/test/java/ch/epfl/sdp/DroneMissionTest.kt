@@ -40,11 +40,11 @@ class DroneMissionTest {
             DroneMission.generateMissionItem(pos.latitude, pos.longitude)
         }
 
-        val missionsItems = DroneMission
+        val missionPlan = DroneMission
                 .makeDroneMission(positions)
-                .getMissionItems()
+                .getMissionPlan()
 
-        expectedMissionItems.zip(missionsItems).forEach { (expected, observed) ->
+        expectedMissionItems.zip(missionPlan.missionItems).forEach { (expected, observed) ->
             Assert.assertTrue(missionEquality(expected, observed))
         }
     }
