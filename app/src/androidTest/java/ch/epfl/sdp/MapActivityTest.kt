@@ -4,7 +4,6 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.collection.arraySetOf
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -79,27 +78,27 @@ class MapActivityTest {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
-        onView(withId(R.id.floating_menu_button)).perform(click())
-        val expectedLatLng = arrayListOf(
-                LatLng( 47.398979, 8.543434),
-                LatLng( 47.398279, 8.543934),
-                LatLng( 47.397426, 8.544867),
-                LatLng( 47.397026, 8.543067))
+        onView(withId(R.id.start_or_return_button)).perform(click())
+        val expectedLatLng =  LatLng(47.397026, 8.543067)
+        
         // Add 4 points to the map for the strategy
         runOnUiThread {
             mActivityRule.activity.searchAreaBuilder.reset()
-            expectedLatLng.forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
+            arrayListOf(
+                    LatLng(47.398979, 8.543434),
+                    LatLng(47.398279, 8.543934),
+                    LatLng(47.397426, 8.544867),
+                    expectedLatLng //we consider the closest point to the drone
+                   ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
         }
 
-        onView(withId(R.id.start_or_return_button)).perform(click())
         onView(withId(R.id.start_or_return_button)).perform(click())
 
         val uploadedMission = currentMissionLiveData.value
 
         if (uploadedMission != null) {
-            for (missionItem in uploadedMission){
-                assertThat(expectedLatLng.contains(LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)), `is`(true))
-            }
+            assertThat(expectedLatLng.latitude, closeTo(uploadedMission[0].latitudeDeg, 0.1))
+            assertThat(expectedLatLng.longitude, closeTo(uploadedMission[0].longitudeDeg, 0.1))
         } else {
             Assert.fail("No MissionItem")
         }
@@ -135,7 +134,7 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.heatmapFeatures.size, equalTo(0))
 
         // Wait for the map to load and add a heatmap point
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT);
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         runOnUiThread {
@@ -243,7 +242,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun storeMapButtonIsWorking(){
+    fun storeMapButtonIsWorking() {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
@@ -256,7 +255,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun locateButtonIsWorking(){
+    fun locateButtonIsWorking() {
         mActivityRule.launchActivity(Intent())
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
@@ -278,7 +277,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun updateDroneBatteryChangesDroneStatus(){
+    fun updateDroneBatteryChangesDroneStatus() {
 
         mActivityRule.launchActivity(Intent())
 

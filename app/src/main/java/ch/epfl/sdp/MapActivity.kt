@@ -45,6 +45,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var isMapReady = false
     private var isDroneFlying = false
 
+    private lateinit var mapboxMap: MapboxMap
     private lateinit var droneCircleManager: CircleManager
     private lateinit var userCircleManager: CircleManager
     private lateinit var victimSymbolManager: SymbolManager
@@ -195,7 +196,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
                     .withClusterMaxZoom(13)
             )
-e.addSource(geoJsonSource)
             heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
             style.addSource(heatmapGeoJsonSource)
 
