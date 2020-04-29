@@ -34,7 +34,7 @@ class QuadrilaterAreaBuilderTest {
         area.moveVertex(LatLng(0.0, 0.0), LatLng(1.0, 1.0))
 
         val corners = area.vertices
-        assertThat(corners, equalTo(listOf(LatLng(1.0, 0.0), LatLng(1.0, 1.0))))
+        assertThat(corners, equalTo(listOf(LatLng(1.0, 1.0), LatLng(1.0, 0.0))))
     }
 
     @Test(expected = IllegalArgumentException::class)

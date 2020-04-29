@@ -12,8 +12,7 @@ class PolygonBuilder : SearchAreaBuilder() {
 
     override fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
-        vertices.removeAt(oldIndex!!)
-        vertices.add(new)
+        vertices[oldIndex!!] = new
         this.vertices = this.vertices
         return this
     }

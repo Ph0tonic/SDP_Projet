@@ -1,13 +1,10 @@
 package ch.epfl.sdp.mission
 
-import android.widget.Toast
 import ch.epfl.sdp.searcharea.CircleArea
 import ch.epfl.sdp.searcharea.SearchArea
-import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import net.mastrgamr.mbmapboxutils.SphericalUtil.computeHeading
 import net.mastrgamr.mbmapboxutils.SphericalUtil.computeOffset
-import timber.log.Timber
 import kotlin.collections.ArrayList
 import kotlin.math.*
 
@@ -38,8 +35,8 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
         val area = searchArea as CircleArea
         val center = area.center
-        val outter = area.radial
-        val radius = center.distanceTo(outter)
+        val outer = area.outer
+        val radius = center.distanceTo(outer)
 
         val path = ArrayList<LatLng>()
 
@@ -51,7 +48,7 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val turns: Double = ceil(radius/maxDistBetweenLines)
 
         val maxTheta = radius/earthRadius
-        val phi0 = computeHeading(center,outter)
+        val phi0 = computeHeading(center,outer)
 
         //steps is the solution of {thDist = radius * turns * 2 * PI * (1.0 - sqrt((steps-1.0)/steps))} for thDist = maxDistBetweenLines
         val c = 1.0 - maxDistBetweenLines/(radius*turns*2*PI)
