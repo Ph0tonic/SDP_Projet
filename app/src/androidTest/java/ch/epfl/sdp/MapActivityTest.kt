@@ -44,6 +44,7 @@ class MapActivityTest {
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
+    private val intentWithGroup = Intent().putExtra("groupId","DummyGroupId")
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -70,7 +71,7 @@ class MapActivityTest {
     @Test
     fun canStartMission() {
         // Launch activity
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
         // Add 4 points to the map for the strategy
         runOnUiThread {
@@ -93,7 +94,7 @@ class MapActivityTest {
                 .apply()
 
         // Launch activity after setting preferences
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         runOnUiThread {
@@ -107,16 +108,18 @@ class MapActivityTest {
 
     @Test
     fun mapBoxCanAddPointToHeatMap() {
-        mActivityRule.launchActivity(Intent())
-
-        // Wait for the map to load and add a heatmap point
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(0))
-
-        runOnUiThread {
-            mActivityRule.activity.addPointToHeatMap(LatLng(10.0,10.0),10.0)
-        }
-        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(1))
+        assertThat(1, equalTo(2))
+        //TODO reimplement this test to work with the new heatmap data management
+//        mActivityRule.launchActivity(intentWithGroup)
+//
+//        // Wait for the map to load and add a heatmap point
+//        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+//        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(0))
+//
+//        runOnUiThread {
+//            mActivityRule.activity.addPointToHeatMap(LatLng(10.0,10.0),10.0)
+//        }
+//        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(1))
     }
 
     @Test
@@ -132,19 +135,19 @@ class MapActivityTest {
 
     @Test
     fun canOnRequestPermissionResult() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 
     @Test
     fun droneStatusIsVisible() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
     }
 
     @Test
     fun longClickOnMapAddAMarker() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         onView(withId(R.id.mapView)).perform(longClick())
@@ -159,7 +162,7 @@ class MapActivityTest {
 
     @Test
     fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
@@ -179,7 +182,7 @@ class MapActivityTest {
 
     @Test
     fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         // Add 5 points
@@ -198,7 +201,7 @@ class MapActivityTest {
 
     @Test
     fun deleteButtonRemovesWaypoints() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
 
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
@@ -216,7 +219,7 @@ class MapActivityTest {
 
     @Test
     fun updateDroneBatteryChangesDroneStatus() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
 
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(null)
@@ -241,7 +244,7 @@ class MapActivityTest {
 
     @Test
     fun updateDroneAltitudeChangesDroneStatus() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
 
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.postValue(null)
@@ -267,7 +270,7 @@ class MapActivityTest {
 
     @Test
     fun updateDroneSpeedChangesDroneStatus() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
 
         runOnUiThread {
             Drone.currentSpeedLiveData.postValue(null)
@@ -293,7 +296,7 @@ class MapActivityTest {
 
     @Test
     fun updateDronePositionChangesDistToUser() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         runOnUiThread {
             CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
             Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
@@ -308,7 +311,7 @@ class MapActivityTest {
 
     @Test
     fun updateUserPositionChangesDistToUser() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         runOnUiThread {
             Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
             CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
@@ -323,7 +326,7 @@ class MapActivityTest {
 
     @Test
     fun updateBatteryLevelChangesBatteryLevelIcon() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.00f)
         }

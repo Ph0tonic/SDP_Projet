@@ -32,7 +32,9 @@ class HomeFragment : Fragment() {
         })
 
         root.findViewById<Button>(R.id.display_map).setOnClickListener {
-            startActivity(Intent(context, MapActivity::class.java))
+            val intent = Intent(context, MapActivity::class.java)
+                    .putExtra("groupId","g2") //TODO adapt group ID via group choosing activity or something
+            startActivity(intent)
         }
         root.findViewById<Button>(R.id.display_camera).setOnClickListener {
             startActivity(Intent(context, VlcActivity::class.java))
