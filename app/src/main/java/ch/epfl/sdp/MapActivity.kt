@@ -209,7 +209,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
                     .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
-            searchAreaBuilder = CircleBuilder()
+            searchAreaBuilder = QuadrilateralBuilder()
 
             // Add listeners to builders
             searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
