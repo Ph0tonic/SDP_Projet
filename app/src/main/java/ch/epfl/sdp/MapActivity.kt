@@ -10,11 +10,11 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import ch.epfl.sdp.database.data.HeatmapData
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.database.data.HeatmapData
-import ch.epfl.sdp.database.repository.MarkerRepository
-import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -42,7 +42,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    lateinit var heatmap: Heatmap
+    //lateinit var heatmap: Heatmap
 
     private var isMapReady = false
 
@@ -61,6 +61,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val victimMarkers = mutableMapOf<String, Symbol>()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val heatmaps = mutableMapOf<String, Heatmap>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -127,7 +130,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val SPEED_FORMAT = " %.1f m/s"
         private const val COORDINATE_FORMAT = " %.7f"
 
-        private const val DEFAULT_NEW_MARKER_ID = "new_marker_id"
+        //private const val DEFAULT_NEW_MARKER_ID = "new_marker_id"
         private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
     }
 
@@ -188,7 +191,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
 
         //TODO change this to create heatmap via repo
-        this.heatmap = Heatmap(MutableLiveData(HeatmapData()))
+        //this.heatmap = Heatmap(MutableLiveData(HeatmapData()))
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
@@ -203,9 +206,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
 
             victimSymbolManager.addLongClickListener {
-                victimSymbolManager.delete(it)
                 val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
-                victimMarkers.remove(markerId)
                 //TODO replace g1 constant
                 markerRepository.removeMarkerForSearchGroup("g1", markerId)
                 victimSymbolLongClickConsumed = true
@@ -228,7 +229,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     .withClusterMaxZoom(13)
             )
 
-            heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
+            //heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
             style.addSource(heatmapGeoJsonSource)
 
             MapUtils.createLayersForHeatMap(style)
@@ -276,8 +277,43 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
         })
 
+        val heatmapRedrawObserver = Observer<HeatmapData> {
+            drawHeatMap(it.uuid!!)
+        }
+
+        // observers that get triggered when a new heatmap is created or removed
+        //TODO replace g1 g2 constant
+        heatmapRepository.getGroupHeatmaps("g2").observe(this, Observer { repoHeatmaps ->
+            // Observers for heatmap creation
+            Log.w("FIREBASE/HEATMAP","created observer for heatmap collection")
+            repoHeatmaps.filter { !heatmaps.containsKey(it.key) }
+                    .forEach { (key, value) ->
+                        heatmaps[key] = Heatmap(value)
+                        value.observe(this, heatmapRedrawObserver)
+                        // first call is not triggered by observer
+                        drawHeatMap(key)
+                        Log.w("FIREBASE/HEATMAP","created observer for specific heatmap")
+                    }
+
+            // Observers for heatmap deletion
+            val removedHeatmapIds = heatmaps.keys - repoHeatmaps.keys
+            removedHeatmapIds.forEach{
+                heatmaps[it]!!.heatmapData.removeObserver(heatmapRedrawObserver)
+                heatmaps.remove(it)
+            }
+        })
+
         /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
         //addVirtualPointsToHeatmap()
+    }
+
+    private fun drawHeatMap(heatmapId: String) {
+
+        heatmapGeoJsonSource.setGeoJson(heatmaps[heatmapId]!!.getFeatures())
+        
+        Log.w("MAPACTIVITY", "draw heatmap: $heatmapId")
+
+        //TODO Not yet implemented
     }
 
     /**
@@ -304,7 +340,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     private fun onMapLongClicked(position: LatLng) {
         if (!victimSymbolLongClickConsumed) {
-            addVictimMarker(position)
             //TODO replace g1 constant
             markerRepository.addMarkerForSearchGroup("g1", position)
         }
@@ -326,11 +361,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (!isMapReady) return
         /* Will be needed when we have the signal of the drone implemented */
         //feature.addNumberProperty("intensity", Drone.getSignalStrength())
-        heatmap.addPoint(location, intensity)
-        heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
+        //heatmap.addPoint(location, intensity)
+        //heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
     }
 
-    private fun addVictimMarker(latLng: LatLng, markerId: String = DEFAULT_NEW_MARKER_ID) {
+    private fun addVictimMarker(latLng: LatLng, markerId: String) {
         if (!isMapReady) return
         val markerProperties = JsonObject()
         markerProperties.addProperty(VICTIM_MARKER_ID_PROPERTY_NAME, markerId)

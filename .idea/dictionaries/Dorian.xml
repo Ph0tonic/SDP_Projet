@@ -2,6 +2,7 @@
   <dictionary name="Dorian">
     <words>
       <w>heatmap</w>
+      <w>heatmaps</w>
       <w>mapbox</w>
       <w>mapview</w>
       <w>waypoints</w>

@@ -21,7 +21,7 @@ class FirebaseMarkersDao : MarkersDao {
             groupMarkers[groupId] = MutableLiveData(setOf())
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    Log.w("FIREBASE", dataSnapshot.toString())
+                    Log.w("FIREBASE/MARKERS", dataSnapshot.toString())
                     val markers = dataSnapshot.children.map {
                         val marker = it.getValue(MarkerData::class.java)!!
                         marker.uuid = it.key
@@ -31,7 +31,7 @@ class FirebaseMarkersDao : MarkersDao {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.w("FIREBASE", "Failed to read markers of search group from firebase.", error.toException())
+                    Log.w("FIREBASE/MARKERS", "Failed to read markers of search group from firebase.", error.toException())
                 }
             })
         }

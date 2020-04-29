@@ -9,12 +9,19 @@ import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-class Heatmap (val heatmapData: MutableLiveData<HeatmapData>) {
+class Heatmap(val heatmapData: MutableLiveData<HeatmapData>) {
 
     var features = ArrayList<Feature>()
 
     fun getFeatures(): FeatureCollection {
-        return FeatureCollection.fromFeatures(features)
+
+        return FeatureCollection.fromFeatures(
+                heatmapData.value!!.dataPoints.map {
+                    val feature = Feature.fromGeometry(Point.fromLngLat(it.position!!.longitude, it.position!!.latitude))
+                    feature.addNumberProperty("intensity", it.intensity)
+                    feature
+                }.toMutableList()
+        )
     }
 
     fun addPoint(latLng: LatLng, intensity: Double) {
@@ -30,7 +37,7 @@ class Heatmap (val heatmapData: MutableLiveData<HeatmapData>) {
         repo.updateHeatmap("g2", heatmapData.value!!)
     }
 
-    fun clear(){
+    fun clear() {
         heatmapData.value!!.dataPoints.clear()
         // Notify eventual observers
         heatmapData.value = heatmapData.value

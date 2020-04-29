@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.repository
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseHeatmapDao
 import ch.epfl.sdp.database.dao.HeatmapDao
@@ -20,7 +21,7 @@ class HeatmapRepository {
         dao.updateHeatmap(groupId, heatmapData)
     }
 
-    fun getGroupHeatmaps(groupId: String): MutableLiveData<MutableMap<String, HeatmapData>> {
+    fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
         return dao.getHeatmapsOfSearchGroup(groupId)
     }
 }

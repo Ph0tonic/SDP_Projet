@@ -14,5 +14,5 @@ data class SearchGroupData(
 
         @get:PropertyName("search_location")
         @set:PropertyName("search_location")
-        var search_location:LatLng? = null){
+        var searchLocation:LatLng? = null){
 }
