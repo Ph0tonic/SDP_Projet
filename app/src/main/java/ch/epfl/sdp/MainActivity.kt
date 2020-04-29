@@ -3,7 +3,6 @@ package ch.epfl.sdp
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
@@ -16,8 +15,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import ch.epfl.sdp.firebase.dao.FirebaseGroupDao
-import ch.epfl.sdp.firebase.repository.SearchGroupDataRepository
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {

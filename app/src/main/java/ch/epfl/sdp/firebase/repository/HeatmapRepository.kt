@@ -5,7 +5,7 @@ import ch.epfl.sdp.firebase.dao.FirebaseHeatmapDao
 import ch.epfl.sdp.firebase.dao.HeatmapDao
 import ch.epfl.sdp.firebase.data.HeatmapData
 
-class HeatmapDataRepository {
+class HeatmapRepository {
 
     companion object {
         val DEFAULT_DAO = { FirebaseHeatmapDao() }
@@ -14,7 +14,7 @@ class HeatmapDataRepository {
         var daoProvider: () -> HeatmapDao = DEFAULT_DAO
     }
 
-    val dao: HeatmapDao = daoProvider()
+    private val dao: HeatmapDao = daoProvider()
 
     fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
         dao.updateHeatmap(groupId, heatmapData)

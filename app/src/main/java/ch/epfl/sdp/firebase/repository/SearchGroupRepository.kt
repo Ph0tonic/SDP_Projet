@@ -5,7 +5,7 @@ import ch.epfl.sdp.firebase.dao.FirebaseGroupDao
 import ch.epfl.sdp.firebase.dao.GroupDao
 import ch.epfl.sdp.firebase.data.SearchGroupData
 
-class SearchGroupDataRepository {
+class SearchGroupRepository {
     companion object {
         val DEFAULT_DAO = { FirebaseGroupDao() }
         // Change this for dependency injection

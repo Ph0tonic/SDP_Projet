@@ -1,10 +1,9 @@
 package ch.epfl.sdp.map
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.firebase.dao.FirebaseHeatmapDao
 import ch.epfl.sdp.firebase.data.HeatmapData
 import ch.epfl.sdp.firebase.data.HeatmapPointData
-import ch.epfl.sdp.firebase.repository.HeatmapDataRepository
+import ch.epfl.sdp.firebase.repository.HeatmapRepository
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
@@ -27,7 +26,7 @@ class Heatmap (val heatmapData: MutableLiveData<HeatmapData>) {
         // Notify eventual observers
         heatmapData.value = heatmapData.value
         //TODO clean up
-        val repo = HeatmapDataRepository()
+        val repo = HeatmapRepository()
         repo.updateHeatmap("g2", heatmapData.value!!)
     }
 
@@ -36,7 +35,7 @@ class Heatmap (val heatmapData: MutableLiveData<HeatmapData>) {
         // Notify eventual observers
         heatmapData.value = heatmapData.value
         //TODO clean up
-        val repo = HeatmapDataRepository()
+        val repo = HeatmapRepository()
         repo.updateHeatmap("g2", heatmapData.value!!)
     }
 }

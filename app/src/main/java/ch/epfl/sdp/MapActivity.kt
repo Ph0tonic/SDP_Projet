@@ -13,13 +13,11 @@ import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.firebase.data.HeatmapData
-import ch.epfl.sdp.firebase.repository.GroupMarkersDataRepository
-import ch.epfl.sdp.firebase.repository.HeatmapDataRepository
-import ch.epfl.sdp.firebase.repository.SearchGroupDataRepository
+import ch.epfl.sdp.firebase.repository.MarkerRepository
+import ch.epfl.sdp.firebase.repository.HeatmapRepository
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -60,7 +58,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var victimSymbolLongClickConsumed = false
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val victimMarkers = mutableMapOf<String,Symbol>()
+    val victimMarkers = mutableMapOf<String, Symbol>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -113,8 +111,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
 
-    val groupMarkersDataRepository = GroupMarkersDataRepository()
-    val heatmapDataRepository = HeatmapDataRepository()
+    val markerRepository = MarkerRepository()
+    val heatmapRepository = HeatmapRepository()
 
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
@@ -204,7 +202,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             victimSymbolManager.addLongClickListener {
                 victimSymbolManager.delete(it)
-                victimMarkers.remove(it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString)
+                val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
+                victimMarkers.remove(markerId)
+                //TODO replace g1 constant
+                markerRepository.removeMarkerForSearchGroup("g1", markerId)
                 victimSymbolLongClickConsumed = true
             }
 
@@ -260,16 +261,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     /**
      * Called once the map and the style are completely initialized
      */
-    private fun onceMapReady(){
-        groupMarkersDataRepository.getMarkersOfSearchGroup("g1").observe(this, Observer {markers ->
+    private fun onceMapReady() {
+        //TODO replace g1 constant
+        markerRepository.getMarkersOfSearchGroup("g1").observe(this, Observer { markers ->
             Log.w("FIREBASE", markers.toString())
-            val removedMarkers = victimMarkers.keys - markers.keys
-            val newMarkers = markers.keys - victimMarkers.keys
+            val removedMarkers = victimMarkers.keys - markers.map { it.uuid }
             removedMarkers.forEach {
                 victimSymbolManager.delete(victimMarkers[it])
             }
-            newMarkers.forEach {
-                addVictimMarker(markers[it]!!, it)
+            markers.filter { !victimMarkers.containsKey(it.uuid) }.forEach {
+                addVictimMarker(it.location!!, it.uuid!!)
             }
         })
 
@@ -302,6 +303,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun onMapLongClicked(position: LatLng) {
         if (!victimSymbolLongClickConsumed) {
             addVictimMarker(position)
+            //TODO replace g1 constant
+            markerRepository.addMarkerForSearchGroup("g1", position)
         }
         victimSymbolLongClickConsumed = false
     }
@@ -328,7 +331,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun addVictimMarker(latLng: LatLng, markerId: String = DEFAULT_NEW_MARKER_ID) {
         if (!isMapReady) return
         val markerProperties = JsonObject()
-        markerProperties.addProperty(VICTIM_MARKER_ID_PROPERTY_NAME,markerId)
+        markerProperties.addProperty(VICTIM_MARKER_ID_PROPERTY_NAME, markerId)
         val symbolOptions = SymbolOptions()
                 .withLatLng(LatLng(latLng))
                 .withIconImage(ID_ICON_VICTIM)
