@@ -1,9 +1,9 @@
-package ch.epfl.sdp.firebase.repository
+package ch.epfl.sdp.database.repository
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.firebase.dao.FirebaseGroupDao
-import ch.epfl.sdp.firebase.dao.GroupDao
-import ch.epfl.sdp.firebase.data.SearchGroupData
+import ch.epfl.sdp.database.dao.FirebaseGroupDao
+import ch.epfl.sdp.database.dao.GroupDao
+import ch.epfl.sdp.database.data.SearchGroupData
 
 class SearchGroupRepository {
     companion object {

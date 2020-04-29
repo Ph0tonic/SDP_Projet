@@ -1,10 +1,9 @@
-package ch.epfl.sdp.firebase.repository
+package ch.epfl.sdp.database.repository
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.firebase.dao.FirebaseMarkersDao
-import ch.epfl.sdp.firebase.dao.MarkersDao
-import ch.epfl.sdp.firebase.data.MarkerData
-import com.mapbox.mapboxsdk.annotations.Marker
+import ch.epfl.sdp.database.dao.FirebaseMarkersDao
+import ch.epfl.sdp.database.dao.MarkersDao
+import ch.epfl.sdp.database.data.MarkerData
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 class MarkerRepository {

@@ -1,7 +1,7 @@
-package ch.epfl.sdp.firebase.dao
+package ch.epfl.sdp.database.dao
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.firebase.data.HeatmapData
+import ch.epfl.sdp.database.data.HeatmapData
 
 interface HeatmapDao {
 

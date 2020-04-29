@@ -1,9 +1,9 @@
-package ch.epfl.sdp.firebase.repository
+package ch.epfl.sdp.database.repository
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.firebase.dao.FirebaseHeatmapDao
-import ch.epfl.sdp.firebase.dao.HeatmapDao
-import ch.epfl.sdp.firebase.data.HeatmapData
+import ch.epfl.sdp.database.dao.FirebaseHeatmapDao
+import ch.epfl.sdp.database.dao.HeatmapDao
+import ch.epfl.sdp.database.data.HeatmapData
 
 class HeatmapRepository {
 

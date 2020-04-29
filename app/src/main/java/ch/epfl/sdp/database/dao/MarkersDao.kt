@@ -1,8 +1,7 @@
-package ch.epfl.sdp.firebase.dao
+package ch.epfl.sdp.database.dao
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.firebase.data.MarkerData
-import com.mapbox.mapboxsdk.geometry.LatLng
+import ch.epfl.sdp.database.data.MarkerData
 
 interface MarkersDao {
     fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>>

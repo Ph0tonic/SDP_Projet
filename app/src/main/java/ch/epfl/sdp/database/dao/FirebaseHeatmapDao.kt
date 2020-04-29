@@ -1,9 +1,9 @@
-package ch.epfl.sdp.firebase.dao
+package ch.epfl.sdp.database.dao
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.Auth
-import ch.epfl.sdp.firebase.data.HeatmapData
+import ch.epfl.sdp.database.data.HeatmapData
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase

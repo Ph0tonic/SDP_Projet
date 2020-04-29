@@ -12,9 +12,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.firebase.data.HeatmapData
-import ch.epfl.sdp.firebase.repository.MarkerRepository
-import ch.epfl.sdp.firebase.repository.HeatmapRepository
+import ch.epfl.sdp.database.data.HeatmapData
+import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -40,7 +40,9 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
-    private lateinit var heatmap: Heatmap
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var heatmap: Heatmap
 
     private var isMapReady = false
 

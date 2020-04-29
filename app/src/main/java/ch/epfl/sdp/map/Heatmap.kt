@@ -1,9 +1,9 @@
 package ch.epfl.sdp.map
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.firebase.data.HeatmapData
-import ch.epfl.sdp.firebase.data.HeatmapPointData
-import ch.epfl.sdp.firebase.repository.HeatmapRepository
+import ch.epfl.sdp.database.data.HeatmapData
+import ch.epfl.sdp.database.data.HeatmapPointData
+import ch.epfl.sdp.database.repository.HeatmapRepository
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point

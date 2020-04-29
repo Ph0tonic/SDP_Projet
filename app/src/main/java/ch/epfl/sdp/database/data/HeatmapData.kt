@@ -1,4 +1,4 @@
-package ch.epfl.sdp.firebase.data
+package ch.epfl.sdp.database.data
 
 import com.google.firebase.database.PropertyName
 
