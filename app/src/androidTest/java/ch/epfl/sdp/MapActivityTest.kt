@@ -34,6 +34,7 @@ import org.junit.runner.RunWith
 class MapActivityTest {
 
     companion object {
+        const val FAKE_ACCOUNT_ID = "fake_account_id"
         const val LATITUDE_TEST = 42.125
         const val LONGITUDE_TEST = -30.229
         const val ZOOM_TEST = 0.9
@@ -110,7 +111,8 @@ class MapActivityTest {
     fun mapBoxCanAddPointToHeatMap() {
         assertThat(1, equalTo(2))
         //TODO reimplement this test to work with the new heatmap data management
-//        mActivityRule.launchActivity(intentWithGroup)
+//        mActivityRule.launchActivity(Intent())
+//        runOnUiThread { Auth.accountId.value = FAKE_ACCOUNT_ID }
 //
 //        // Wait for the map to load and add a heatmap point
 //        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
