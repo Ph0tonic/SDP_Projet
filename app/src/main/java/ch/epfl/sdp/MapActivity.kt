@@ -17,7 +17,6 @@ import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.mission.MissionBuilder
-import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -209,7 +208,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             //Create builders
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-                    .withStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
             searchAreaBuilder = CircleBuilder()
 
             // Add listeners to builders
