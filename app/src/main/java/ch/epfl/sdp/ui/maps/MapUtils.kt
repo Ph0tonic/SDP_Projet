@@ -16,13 +16,6 @@ object MapUtils {
     const val DEFAULT_LONGITUDE: Double = 8.545970150745575
     const val DEFAULT_ZOOM: Double = 9.0
 
-    private val BLUE = rgb(0, 0, 255)
-    private val CYAN = rgb(0, 255, 255)
-    private val GREEN = rgb(0, 255, 0)
-    private val ORANGE = rgb(255, 255, 0)
-    private val RED = rgb(255, 0, 0)
-
-
     private fun loadLastMapPositionFromPrefs(): LatLng {
         val context = MainApplication.applicationContext()
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -80,46 +73,5 @@ object MapUtils {
                 .target(latLng)
                 .zoom(zoom)
                 .build()
-    }
-
-    /**
-     * Creates and adds the layers necessary to display the heatmap information of the signal
-     */
-    fun createLayersForHeatMap(style: Style) {
-        unclusteredLayerData(style)
-        clusteredLayerData(style)
-    }
-
-    private fun unclusteredLayerData(style: Style) {
-        val unclustered = CircleLayer("unclustered-points",
-                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
-        unclustered.setProperties(
-                PropertyFactory.circleColor(
-                        interpolate(linear(), get("intensity"),
-                                stop(8, BLUE),
-                                stop(8.5, CYAN),
-                                stop(9, GREEN),
-                                stop(9.5, ORANGE),
-                                stop(10.0, RED)
-                        )
-                ),
-                PropertyFactory.circleRadius(40f),
-                PropertyFactory.circleBlur(1.5f))
-        unclustered.setFilter(neq(get("cluster"), literal(true)))
-        style.addLayerBelow(unclustered,
-                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
-    }
-
-    private fun clusteredLayerData(style: Style) {
-        val clustered = CircleLayer("clustered-points",
-                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
-        clustered.setProperties(
-                PropertyFactory.circleColor(RED),
-                PropertyFactory.circleRadius(50f),
-                PropertyFactory.circleBlur(1f)
-        )
-        clustered.setFilter(eq(get("cluster"), literal(true)))
-        style.addLayerBelow(clustered,
-                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }
 }

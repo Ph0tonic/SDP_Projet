@@ -37,9 +37,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    //lateinit var heatmap: Heatmap
-
     private var isMapReady = false
 
     private lateinit var groupId: String
@@ -112,8 +109,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
 
-    val markerRepository = MarkerRepository()
-    val heatmapRepository = HeatmapRepository()
+    private val markerRepository = MarkerRepository()
+    private val heatmapRepository: HeatmapRepository = HeatmapRepository()
 
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
@@ -221,7 +218,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            MapUtils.createLayersForHeatMap(style)
+            //MapUtils.createLayersForHeatMap(style)
 
             // Load latest location
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
@@ -235,7 +232,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
             searchAreaBuilder = QuadrilateralBuilder()
 
-
             // Add listeners to builders
             searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
             searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
@@ -246,16 +242,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
-            onceMapReady()
+            onceMapReady(style)
         }
     }
 
     /**
      * Called once the map and the style are completely initialized
      */
-    private fun onceMapReady() {
+    private fun onceMapReady(style: Style) {
         setupMarkerObserver()
-        setupHeatmapsObservers()
+        setupHeatmapsObservers(style)
         /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
         //addVirtualPointsToHeatmap()
     }
@@ -279,13 +275,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      *  - An observer for the collection of heatmaps
      *  - An observer for each heatmap for new points
      */
-    private fun setupHeatmapsObservers() {
+    private fun setupHeatmapsObservers(style: Style) {
         heatmapRepository.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
             // Observers for heatmap creation
             Log.w("FIREBASE/HEATMAP", "created observer for heatmap collection")
             repoHeatmaps.filter { !heatmapPainters.containsKey(it.key) }
                     .forEach { (key, value) ->
-                        heatmapPainters[key] = MapboxHeatmapPainter(mapboxMap.style!!, this, value)
+                        heatmapPainters[key] = MapboxHeatmapPainter(style, this, value)
                         Log.w("FIREBASE/HEATMAP", "created observer for specific heatmap")
                     }
 
