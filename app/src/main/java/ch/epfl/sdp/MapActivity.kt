@@ -156,7 +156,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
         }
         findViewById<Button>(R.id.clear_waypoints).setOnClickListener {
-            clearWaypoints()
+            if (isMapReady) searchAreaBuilder.reset()
         }
 
         userLatitudeTextView = findViewById(R.id.tv_latitude)
@@ -265,6 +265,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Called once the map and the style are completely initialized
      */
     private fun onceMapReady() {
+        setupMarkerObserver()
+        setupHeatmapsObservers()
+        /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
+        //addVirtualPointsToHeatmap()
+    }
+
+    private fun setupMarkerObserver(){
         //TODO replace g1 constant
         markerRepository.getMarkersOfSearchGroup("g1").observe(this, Observer { markers ->
             Log.w("FIREBASE", markers.toString())
@@ -276,12 +283,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 addVictimMarker(it.location!!, it.uuid!!)
             }
         })
+    }
 
+    /**
+     * Instantiates the heatmaps observers:
+     *  - An observer for the collection of heatmaps
+     *  - An observer for each heatmap for new points
+     */
+    private fun setupHeatmapsObservers(){
         val heatmapRedrawObserver = Observer<HeatmapData> {
             drawHeatMap(it.uuid!!)
         }
 
-        // observers that get triggered when a new heatmap is created or removed
         //TODO replace g1 g2 constant
         heatmapRepository.getGroupHeatmaps("g2").observe(this, Observer { repoHeatmaps ->
             // Observers for heatmap creation
@@ -295,24 +308,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                         Log.w("FIREBASE/HEATMAP","created observer for specific heatmap")
                     }
 
-            // Observers for heatmap deletion
+            // Remove observers on heatmap deletion
             val removedHeatmapIds = heatmaps.keys - repoHeatmaps.keys
             removedHeatmapIds.forEach{
                 heatmaps[it]!!.heatmapData.removeObserver(heatmapRedrawObserver)
                 heatmaps.remove(it)
             }
         })
-
-        /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-        //addVirtualPointsToHeatmap()
     }
 
     private fun drawHeatMap(heatmapId: String) {
-
         heatmapGeoJsonSource.setGeoJson(heatmaps[heatmapId]!!.getFeatures())
-        
         Log.w("MAPACTIVITY", "draw heatmap: $heatmapId")
-
         //TODO Not yet implemented
     }
 
@@ -324,9 +331,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         textView.text = value?.let { formatString.format(it) } ?: getString(R.string.no_info)
     }
 
-    /**
-     * Map clic to current eventListener
-     */
     fun onMapClicked(position: LatLng) {
         try {
             searchAreaBuilder.addVertex(position)
@@ -335,23 +339,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    /**
-     * Map long click to current eventListener
-     */
     private fun onMapLongClicked(position: LatLng) {
         if (!victimSymbolLongClickConsumed) {
             //TODO replace g1 constant
             markerRepository.addMarkerForSearchGroup("g1", position)
         }
         victimSymbolLongClickConsumed = false
-    }
-
-    /**
-     * Clears the waypoints list and removes all the lines and points related to waypoints
-     */
-    private fun clearWaypoints() {
-        if (!isMapReady) return
-        searchAreaBuilder.reset()
     }
 
     /**
