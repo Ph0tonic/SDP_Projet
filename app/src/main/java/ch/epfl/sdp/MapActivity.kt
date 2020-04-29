@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
-import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
@@ -25,9 +24,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
-import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
 /**
@@ -63,9 +60,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val victimMarkers = mutableMapOf<String, Symbol>()
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val heatmaps = mutableMapOf<String, Heatmap>()
-
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var searchAreaBuilder: SearchAreaBuilder
@@ -74,6 +68,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     lateinit var missionBuilder: MissionBuilder
 
     /** Painters */
+    private val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
     private lateinit var searchAreaPainter: MapboxSearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
@@ -141,7 +136,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         groupId = intent.getStringExtra("groupId")!!
-        Log.w("MAPACTIVITY","group id for map activity: $groupId")
+        Log.w("MAPACTIVITY", "group id for map activity: $groupId")
 
         droneBatteryLevelTextView = findViewById(R.id.battery_level)
         droneAltitudeTextView = findViewById(R.id.altitude)
@@ -226,15 +221,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            heatmapGeoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
-                    .withCluster(true)
-                    .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
-                    .withClusterMaxZoom(13)
-            )
-
-            //heatmapGeoJsonSource.setGeoJson(heatmap.getFeatures())
-            style.addSource(heatmapGeoJsonSource)
-
             MapUtils.createLayersForHeatMap(style)
 
             // Load latest location
@@ -274,8 +260,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         //addVirtualPointsToHeatmap()
     }
 
-    private fun setupMarkerObserver(){
+    private fun setupMarkerObserver() {
         markerRepository.getMarkersOfSearchGroup(groupId).observe(this, Observer { markers ->
+
             Log.w("FIREBASE", markers.toString())
             val removedMarkers = victimMarkers.keys - markers.map { it.uuid }
             removedMarkers.forEach {
@@ -292,36 +279,23 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      *  - An observer for the collection of heatmaps
      *  - An observer for each heatmap for new points
      */
-    private fun setupHeatmapsObservers(){
-        val heatmapRedrawObserver = Observer<HeatmapData> {
-            drawHeatMap(it.uuid!!)
-        }
-
+    private fun setupHeatmapsObservers() {
         heatmapRepository.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
             // Observers for heatmap creation
-            Log.w("FIREBASE/HEATMAP","created observer for heatmap collection")
-            repoHeatmaps.filter { !heatmaps.containsKey(it.key) }
+            Log.w("FIREBASE/HEATMAP", "created observer for heatmap collection")
+            repoHeatmaps.filter { !heatmapPainters.containsKey(it.key) }
                     .forEach { (key, value) ->
-                        heatmaps[key] = Heatmap(value)
-                        value.observe(this, heatmapRedrawObserver)
-                        // first call is not triggered by observer
-                        drawHeatMap(key)
-                        Log.w("FIREBASE/HEATMAP","created observer for specific heatmap")
+                        heatmapPainters[key] = MapboxHeatmapPainter(mapboxMap.style!!, this, value)
+                        Log.w("FIREBASE/HEATMAP", "created observer for specific heatmap")
                     }
 
             // Remove observers on heatmap deletion
-            val removedHeatmapIds = heatmaps.keys - repoHeatmaps.keys
-            removedHeatmapIds.forEach{
-                heatmaps[it]!!.heatmapData.removeObserver(heatmapRedrawObserver)
-                heatmaps.remove(it)
+            val removedHeatmapIds = heatmapPainters.keys - repoHeatmaps.keys
+            removedHeatmapIds.forEach {
+                heatmapPainters[it]!!.destroy(mapboxMap.style!!)
+                heatmapPainters.remove(it)
             }
         })
-    }
-
-    private fun drawHeatMap(heatmapId: String) {
-        heatmapGeoJsonSource.setGeoJson(heatmaps[heatmapId]!!.getFeatures())
-        Log.w("MAPACTIVITY", "draw heatmap: $heatmapId")
-        //TODO Not yet implemented
     }
 
     /**
