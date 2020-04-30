@@ -55,6 +55,9 @@ class OfflineManagerActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         moveCameraToPosition(LatLng(0.0, 0.0))
         offlineManager = OfflineManager.getInstance(applicationContext())
@@ -108,9 +111,6 @@ class OfflineManagerActivityTest {
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
-
         onView(withText(applicationContext().getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
@@ -133,8 +133,6 @@ class OfflineManagerActivityTest {
         onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         //check that the downloaded list map is empty
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {

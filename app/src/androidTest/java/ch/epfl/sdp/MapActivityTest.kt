@@ -281,11 +281,10 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(FAKE_LOCATION_TEST)
+            Drone.currentPositionLiveData.value = FAKE_LOCATION_TEST
         }
 
         onView(withId(R.id.floating_menu_button)).perform(click())
-        onView(withId(R.id.locate_button)).perform(click())
         onView(withId(R.id.locate_button)).perform(click())
 
         runOnUiThread {

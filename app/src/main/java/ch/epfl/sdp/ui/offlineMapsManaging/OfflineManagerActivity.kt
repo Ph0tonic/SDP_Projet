@@ -54,25 +54,26 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
         mapView.getMapAsync(this)
+
+        mapView.contentDescription = getString(R.string.map_not_ready)
+
+        // Assign progressBar for later use
+        progressBar = findViewById(R.id.progress_bar)
         downloadButton = findViewById(R.id.download_button)
         listButton = findViewById(R.id.list_button)
-        mapView.contentDescription = getString(R.string.map_not_ready)
+
+        // Set up the offlineManager
+        offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
-            // Assign progressBar for later use
-            progressBar = findViewById(R.id.progress_bar)
+            mapboxMap.cameraPosition = MapUtils.getLastCameraState()
 
-            // Set up the offlineManager
-            offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
+            // Used to detect when the map is ready in tests
+            mapView.contentDescription = getString(R.string.map_ready)
         }
-        mapboxMap.cameraPosition = MapUtils.getLastCameraState()
-
-        // Used to detect when the map is ready in tests
-        mapView.contentDescription = getString(R.string.map_ready)
-
     }
 
     override fun onPause() {
@@ -189,9 +190,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 // Add all of the region names to a list
                 val items = offlineRegions
                         .map { region ->
-                            try{
+                            try {
                                 getRegionName(region)
-                            }catch(exception : java.lang.Exception){
+                            } catch (exception: java.lang.Exception) {
                                 String.format(getString(R.string.region_name_error), region.id)
                             }
                         }
