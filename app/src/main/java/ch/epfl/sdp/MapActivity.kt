@@ -264,18 +264,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         if (!Drone.isDroneConnected()) {
             snackbar.show()
-        } else {
-            if (!isDroneFlying) { //TODO : return to user else
-                isDroneFlying = true
-                Drone.startMission(DroneMission.makeDroneMission(
-                        missionBuilder.build()
-                ).getMissionItems())
-            }
-            findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                    .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
-
         }
+        if (!isDroneFlying) { //TODO : return to user else
+            isDroneFlying = true
+            Drone.startMission(DroneMission.makeDroneMission(
+                    missionBuilder.build()
+            ).getMissionItems())
+        }
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
     }
+
     fun storeMap(v: View) {
         startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
     }
