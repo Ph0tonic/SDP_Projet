@@ -8,6 +8,7 @@ import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
@@ -30,8 +31,9 @@ class LocationWithPermissionTest {
     private var mUiDevice: UiDevice? = null
 
     companion object {
-        const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupdId"
-        const val DUMMY_GROUP_ID = "DummyGroupId"
+        private const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
+        private const val DUMMY_GROUP_ID = "DummyGroupId"
+        private const val FAKE_ACCOUNT_ID = "fake_account_id"
     }
 
     @Rule
@@ -46,6 +48,12 @@ class LocationWithPermissionTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        //Fake logged in
+        UiThreadStatement.runOnUiThread {
+            Auth.accountId.value = FAKE_ACCOUNT_ID
+            Auth.loggedIn.value = true
+        }
+
         HeatmapRepository.daoProvider = { MockHeatmapDao() }
         MarkerRepository.daoProvider = { MockMarkerDao() }
         mActivityRule.launchActivity(intentWithGroup)

@@ -30,8 +30,7 @@ class OfflineManagerActivityTest {
         private const val ZOOM = 10.0
         private const val NAME = "Crans-Montana"
 
-        private const val OCEAN_LATITUDE = 46.399111
-        private const val OCEAN_LONGITUDE = -31.697953
+        private val DUMMY_LOCATION = LatLng(46.399111, -31.697953)
         private const val TIMEOUT: Long = 2000
     }
 
@@ -44,7 +43,7 @@ class OfflineManagerActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(LatLng(OCEAN_LATITUDE, OCEAN_LONGITUDE), ZOOM)
+                mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(DUMMY_LOCATION, ZOOM)
             }
         }
     }

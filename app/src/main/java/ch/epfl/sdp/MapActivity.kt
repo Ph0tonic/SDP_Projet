@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
+import timber.log.Timber
 
 /**
  * Main Activity to display map and create missions.
@@ -128,7 +129,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.w("FIREBASE", Thread.currentThread().stackTrace.toString())
         require(intent.getStringExtra("groupId") != null) { "MapActivity should be provided with a searchGroupId\n" }
         require(Auth.loggedIn.value == true) { "You need to be logged in to access this part of the app" }
 

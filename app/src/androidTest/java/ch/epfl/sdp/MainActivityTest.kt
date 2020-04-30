@@ -2,7 +2,6 @@ package ch.epfl.sdp
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
-import android.content.Intent
 import android.view.Gravity
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
@@ -32,11 +31,9 @@ import org.junit.runner.RunWith
 class MainActivityTest {
 
     private lateinit var mUiDevice: UiDevice
-    private val intentWithGroup = Intent().putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
 
     companion object {
-        const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
-        const val DUMMY_GROUP_ID = "DummyGroupId"
+        private const val FAKE_ACCOUNT_ID = "fake_account_id"
     }
 
     @Rule
@@ -44,12 +41,11 @@ class MainActivityTest {
     val grantPermissionRule: GrantPermissionRule = grant(ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION)
 
     @get:Rule
-    val mActivityRule = IntentsTestRule(MainActivity::class.java, true, false)
+    val mActivityRule = IntentsTestRule(MainActivity::class.java)
 
     @Before
     @Throws(Exception::class)
     fun before() {
-        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 
@@ -98,7 +94,7 @@ class MainActivityTest {
 
         //Fake logged in
         runOnUiThread {
-            Auth.accountId.value = MapActivityTest.FAKE_ACCOUNT_ID
+            Auth.accountId.value = FAKE_ACCOUNT_ID
             Auth.loggedIn.value = true
         }
 

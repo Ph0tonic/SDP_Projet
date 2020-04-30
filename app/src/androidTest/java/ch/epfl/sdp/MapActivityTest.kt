@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -39,17 +40,15 @@ class MapActivityTest {
 
     companion object {
         // TODO change to latLng for simplicity
-        const val LATITUDE_TEST = 42.125
-        const val LONGITUDE_TEST = -30.229
-        const val FAKE_HEATMAP_POINT_INTENSITY = 8.12
-
-        const val ZOOM_TEST = 0.9
-        const val MAP_LOADING_TIMEOUT = 1000L
-        const val EPSILON = 1e-10
-        const val DEFAULT_ALTITUDE = " 0.0 m"
-        const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
-        const val FAKE_ACCOUNT_ID = "fake_account_id"
-        const val DUMMY_GROUP_ID = "DummyGroupId"
+        private val FAKE_LOCATION_TEST = LatLng(42.125, -30.229)
+        private const val FAKE_HEATMAP_POINT_INTENSITY = 8.12
+        private const val ZOOM_TEST = 0.9
+        private const val MAP_LOADING_TIMEOUT = 1000L
+        private const val EPSILON = 1e-9
+        private const val DEFAULT_ALTITUDE = " 0.0 m"
+        private const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
+        private const val FAKE_ACCOUNT_ID = "fake_account_id"
+        private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
@@ -106,8 +105,8 @@ class MapActivityTest {
     @Test
     fun mapboxUsesOurPreferences() {
         preferencesEditor
-                .putString(applicationContext().getString(R.string.prefs_latitude), LATITUDE_TEST.toString())
-                .putString(applicationContext().getString(R.string.prefs_longitude), LONGITUDE_TEST.toString())
+                .putString(applicationContext().getString(R.string.prefs_latitude), FAKE_LOCATION_TEST.latitude.toString())
+                .putString(applicationContext().getString(R.string.prefs_longitude), FAKE_LOCATION_TEST.longitude.toString())
                 .putString(applicationContext().getString(R.string.prefs_zoom), ZOOM_TEST.toString())
                 .apply()
 
@@ -117,8 +116,8 @@ class MapActivityTest {
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(LATITUDE_TEST, EPSILON))
-                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(LONGITUDE_TEST, EPSILON))
+                Log.w("TESTS", mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST).toString())
+                assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST), closeTo(0.0, EPSILON))
                 assertThat(mapboxMap.cameraPosition.zoom, closeTo(ZOOM_TEST, EPSILON))
             }
         }
@@ -132,7 +131,7 @@ class MapActivityTest {
 
         assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
         runOnUiThread {
-            mActivityRule.activity.addPointToHeatMap(LatLng(LATITUDE_TEST, LONGITUDE_TEST), FAKE_HEATMAP_POINT_INTENSITY)
+            mActivityRule.activity.addPointToHeatMap(FAKE_LOCATION_TEST, FAKE_HEATMAP_POINT_INTENSITY)
         }
         val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]?.value?.dataPoints?.size, equalTo(1))
@@ -140,13 +139,13 @@ class MapActivityTest {
 
     @Test
     fun canUpdateUserLocation() {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
     }
 
     @Test
     fun canUpdateUserLocationTwice() {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
-        CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST, -LONGITUDE_TEST))
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
     }
 
     @Test
