@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import timber.log.Timber
 
 class FirebaseHeatmapDao : HeatmapDao {
 
@@ -31,20 +32,18 @@ class FirebaseHeatmapDao : HeatmapDao {
 
             myRef.addChildEventListener(object : ChildEventListener {
                 override fun onCancelled(error: DatabaseError) {
-                    Log.w("FIREBASE/HEATMAP", "Failed to read heatmaps of search group from firebase.", error.toException())
+                    Timber.w("Failed to read heatmaps of search group from firebase.")
                 }
 
                 override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {}
 
                 override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                    Log.w("FIREBASE/HEATMAP", "Updating heatmap")
                     val newHeatmapData = dataSnapshot.getValue(HeatmapData::class.java)!!
                     newHeatmapData.uuid = dataSnapshot.key
                     groupHeatmaps[groupId]!!.value!![dataSnapshot.key!!]!!.value = newHeatmapData
                 }
 
                 override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                    Log.w("FIREBASE/HEATMAP", "Adding new heatmap groupId: $groupId")
                     val newHeatmapData = dataSnapshot.getValue(HeatmapData::class.java)!!
                     newHeatmapData.uuid = dataSnapshot.key
                     groupHeatmaps[groupId]!!.value!![dataSnapshot.key!!] = MutableLiveData(newHeatmapData)

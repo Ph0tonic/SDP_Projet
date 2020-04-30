@@ -26,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
 @RunWith(AndroidJUnit4::class)
 class LoginNavFragmentTest {
 
@@ -81,6 +82,7 @@ class LoginNavFragmentTest {
         Intents.intended(IntentMatchers.filterEquals(mGoogleSignInClient.signInIntent))
         mUiDevice.pressBack()
     }
+
 
     @Test
     fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {

@@ -9,6 +9,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import timber.log.Timber
 
 class FirebaseMarkersDao : MarkerDao {
     private var database: FirebaseDatabase = Firebase.database
@@ -21,7 +22,6 @@ class FirebaseMarkersDao : MarkerDao {
             groupMarkers[groupId] = MutableLiveData(setOf())
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    Log.w("FIREBASE/MARKERS", dataSnapshot.toString())
                     val markers = dataSnapshot.children.map {
                         val marker = it.getValue(MarkerData::class.java)!!
                         marker.uuid = it.key
@@ -31,7 +31,7 @@ class FirebaseMarkersDao : MarkerDao {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.w("FIREBASE/MARKERS", "Failed to read markers of search group from firebase.", error.toException())
+                    Timber.w("Failed to read markers of search group from firebase.")
                 }
             })
         }
