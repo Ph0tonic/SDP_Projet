@@ -1,7 +1,9 @@
 package ch.epfl.sdp.database.dao
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.MarkerData
+import java.util.*
 
 /**
  * Working local DAO
@@ -21,7 +23,9 @@ class MockMarkerDao : MarkerDao {
         if (!data.containsKey(groupId)) {
             data[groupId] = MutableLiveData<Set<MarkerData>>(setOf())
         }
-        data[groupId]!!.value = data[groupId]!!.value!! + setOf(markerData)
+        val newMarker = markerData.copy()
+        newMarker.uuid = UUID.randomUUID().toString()
+        data[groupId]!!.value = data[groupId]!!.value!! + setOf(newMarker)
     }
 
     override fun removeMarker(groupId: String, markerId: String) {

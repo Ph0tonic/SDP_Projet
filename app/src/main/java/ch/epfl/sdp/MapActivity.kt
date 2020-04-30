@@ -257,10 +257,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun setupMarkerObserver() {
         markerRepository.getMarkersOfSearchGroup(groupId).observe(this, Observer { markers ->
-            Log.w("FIREBASE", markers.toString())
             val removedMarkers = victimMarkers.keys - markers.map { it.uuid }
             removedMarkers.forEach {
-                victimSymbolManager.delete(victimMarkers[it])
+                victimSymbolManager.delete(victimMarkers.remove(it))
             }
             markers.filter { !victimMarkers.containsKey(it.uuid) }.forEach {
                 addVictimMarker(it.location!!, it.uuid!!)
