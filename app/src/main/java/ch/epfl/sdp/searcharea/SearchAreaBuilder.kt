@@ -46,7 +46,7 @@ abstract class SearchAreaBuilder {
         return this
     }
 
-    protected open fun order(){}
+    protected open fun order() {}
 
     private fun isUnderUpperBound() = sizeUpperBound?.let { vertices.size <= it } ?: true
     private fun isAboveLowerBound() = sizeLowerBound?.let { it <= vertices.size } ?: true

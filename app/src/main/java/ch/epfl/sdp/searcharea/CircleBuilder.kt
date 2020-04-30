@@ -1,7 +1,5 @@
 package ch.epfl.sdp.searcharea
 
-import com.mapbox.mapboxsdk.geometry.LatLng
-
 class CircleBuilder : SearchAreaBuilder() {
     override val sizeLowerBound: Int? = 2
     override val sizeUpperBound: Int? = 2
