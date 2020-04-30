@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -23,15 +24,19 @@ class TrajectoryPlanningActivityTest {
     private lateinit var mUiDevice: UiDevice
 
     companion object {
+        const val DUMMY_GROUP_ID = "DummyGroupId"
         const val MAP_LOADING_TIMEOUT = 1000L
     }
 
     @get:Rule
-    val mActivityRule = IntentsTestRule(MapActivity::class.java)
+    val mActivityRule = IntentsTestRule(MapActivity::class.java, true, false)
+
+    private val intentWithGroup = Intent().putExtra("groupId", MapActivityTest.DUMMY_GROUP_ID)
 
     @Before
     @Throws(Exception::class)
     fun before() {
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
