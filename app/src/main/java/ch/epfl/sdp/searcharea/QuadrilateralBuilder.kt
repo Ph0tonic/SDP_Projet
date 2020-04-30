@@ -7,6 +7,7 @@ import java.util.*
 class QuadrilateralBuilder : SearchAreaBuilder() {
     override val sizeLowerBound: Int? = 4
     override val sizeUpperBound: Int? = 4
+    override val shapeName: String = "Quadrilateral"
 
     protected override fun order() {
         if (isComplete()) {
@@ -24,10 +25,5 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
         }
     }
 
-    override fun build(): SearchArea {
-        if (!isComplete()) {
-            throw SearchAreaNotCompleteException("Quarilateral not complete")
-        }
-        return QuadrilateralArea(vertices)
-    }
+    override fun buildIfComplete(): QuadrilateralArea = QuadrilateralArea(vertices)
 }

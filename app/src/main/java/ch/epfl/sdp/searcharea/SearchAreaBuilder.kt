@@ -8,6 +8,7 @@ abstract class SearchAreaBuilder {
 
     abstract val sizeLowerBound: Int?
     abstract val sizeUpperBound: Int?
+    abstract val shapeName: String
 
 
     val searchAreaChanged = mutableListOf<(SearchArea?) -> Unit>()
@@ -54,5 +55,12 @@ abstract class SearchAreaBuilder {
         return isAboveLowerBound() && isUnderUpperBound()
     }
 
-    abstract fun build(): SearchArea
+    abstract fun buildIfComplete(): SearchArea
+
+    fun build(): SearchArea {
+        if (!isComplete()) {
+            throw SearchAreaNotCompleteException("$shapeName not complete")
+        }
+        return buildIfComplete()
+    }
 }

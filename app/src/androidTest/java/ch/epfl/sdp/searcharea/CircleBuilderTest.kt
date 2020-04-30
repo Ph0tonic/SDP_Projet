@@ -1,7 +1,6 @@
 package ch.epfl.sdp.searcharea
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import ch.epfl.sdp.utils.IntersectionUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert.assertThat

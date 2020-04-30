@@ -5,11 +5,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 class CircleBuilder : SearchAreaBuilder() {
     override val sizeLowerBound: Int? = 2
     override val sizeUpperBound: Int? = 2
-
-    override fun build(): SearchArea {
-        if (!isComplete()) {
-            throw SearchAreaNotCompleteException("Circle not complete: Needs 2 points")
-        }
-        return CircleArea(vertices[0], vertices[1])
-    }
+    override val shapeName: String = "Circle"
+    override fun buildIfComplete(): CircleArea = CircleArea(vertices[0], vertices[1])
 }
