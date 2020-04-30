@@ -5,6 +5,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
 import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import kotlin.math.pow
@@ -74,5 +75,15 @@ object Drone {
                 .andThen(instance.action.arm())
                 .andThen(instance.mission.startMission())
                 .subscribe()
+    }
+    fun isDroneConnected(): Boolean {
+        val isConnected = instance.core.connectionState
+                .filter { state -> state.isConnected }
+                .firstOrError()
+                .toCompletable()
+                .toSingleDefault(true)
+                .onErrorReturnItem(false)
+
+        return isConnected.equals(true)
     }
 }
