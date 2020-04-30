@@ -85,13 +85,11 @@ object Drone {
                     .filter { state -> state.isConnected }
                     .firstOrError()
                     .toFuture()
-                    //.isCancelled
                     .get(WAIT_TIME, TimeUnit.MILLISECONDS).isConnected
 
         }
         catch(e: TimeoutException){
             return false
         }
-       // return false
     }
 }
