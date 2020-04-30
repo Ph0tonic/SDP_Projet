@@ -27,6 +27,8 @@ import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
 import org.junit.Before
@@ -74,8 +76,9 @@ class MapActivityTest {
             Auth.loggedIn.value = true
         }
 
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        Firebase.database.goOffline()
+        //HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        //MarkerRepository.daoProvider = { MockMarkerDao() }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 
