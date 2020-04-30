@@ -14,6 +14,7 @@ import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.ui.maps.MapUtils
 import ch.epfl.sdp.ui.maps.MapUtils.DEFAULT_ZOOM
+import ch.epfl.sdp.ui.maps.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -273,8 +274,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Centers the camera on the drone
      */
     fun centerCameraOnDrone(v: View) {
+        val currentZoom = mapboxMap.cameraPosition.zoom
         if (::dronePositionMarker.isInitialized) {
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng, DEFAULT_ZOOM))
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng,
+                    if (currentZoom > DEFAULT_ZOOM/ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM*ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
         }
     }
 
