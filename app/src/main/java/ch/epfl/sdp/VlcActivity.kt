@@ -15,7 +15,7 @@ class VlcActivity : AppCompatActivity() {
     companion object {
         private const val USE_TEXTURE_VIEW = false
         private const val ENABLE_SUBTITLES = false
-        private const val ASSET_FILENAME = "rtsp://192.168.1.120:8554/live"
+        private const val ASSET_FILENAME = "rtsp://192.168.1.131:8554/live" //must be your IP
         private val ARGS = arrayListOf("-vvv")//, "--live-caching=200")
     }
 

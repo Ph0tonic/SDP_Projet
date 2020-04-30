@@ -2,210 +2,217 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:id="@+id/latLonDisplay"
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1">
-
-        <TextView
-            android:id="@+id/tv_latitude"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:clickable="false"
-            android:gravity="center"
-            android:textColor="@android:color/white" />
-
-        <TextView
-            android:id="@+id/tv_longitude"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:clickable="false"
-            android:gravity="center"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal"
-        android:weightSum="4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1">
-
-        <Button
-            android:id="@+id/locate_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/locate"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/start_mission_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="31dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/start"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/stored_offline_map"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/store"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/clear_waypoints"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/clear"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
+    android:layout_height="match_parent"
+    >
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/latLonDisplay"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintLeft_toLeftOf="parent"
 
-        <TableLayout
-            android:id="@+id/drone_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#CCFFFFFF"
-            android:foregroundTint="#000000">
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/battery_level_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    app:srcCompat="@drawable/ic_battery1"
-                    android:contentDescription="@string/battery_level" />
-
-                <TextView
-                    android:id="@+id/battery_level"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_info" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="21dp"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/altitude"
-                    app:srcCompat="@drawable/ic_altitude" />
-
-                <TextView
-                    android:id="@+id/altitude"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_info" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="18dp"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/speed"
-                    app:srcCompat="@drawable/ic_speed" />
-
-                <TextView
-                    android:id="@+id/speed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_info" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/distance_to_user"
-                    app:srcCompat="@drawable/ic_distancetodrone" />
-
-                <TextView
-                    android:id="@+id/distance_to_user"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_info" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/distance_to_base"
-                    app:srcCompat="@drawable/ic_distancetohome" />
-
-                <TextView
-                    android:id="@+id/distance_to_base"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_info" />
-            </TableRow>
-        </TableLayout>
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1">
 
     </com.mapbox.mapboxsdk.maps.MapView>
+
+    <TableLayout
+        android:id="@+id/drone_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryTransparent"
+        android:layout_margin="@dimen/tiny_margin"
+        android:padding="@dimen/tiny_padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintLeft_creator="1">
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/battery_level_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
+                android:padding="@dimen/tiny_padding"
+                android:rotation="90"
+                app:srcCompat="@drawable/ic_battery1" />
+
+            <TextView
+                android:id="@+id/battery_level"
+                android:theme="@style/InformationDisplayTheme"
+                android:text="@string/no_info"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="21dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
+                android:padding="@dimen/tiny_padding"
+                app:srcCompat="@drawable/ic_altitude" />
+
+            <TextView
+                android:id="@+id/altitude"
+                android:theme="@style/InformationDisplayTheme"
+                android:text="@string/no_info"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="18dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
+                android:padding="@dimen/tiny_padding"
+                app:srcCompat="@drawable/ic_speed" />
+
+            <TextView
+                android:id="@+id/speed"
+                android:theme="@style/InformationDisplayTheme"
+                android:text="@string/no_info"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
+                android:paddingVertical="@dimen/tiny_padding"
+                app:srcCompat="@drawable/ic_distancetodrone" />
+
+            <TextView
+                android:id="@+id/distance_to_user"
+                android:theme="@style/InformationDisplayTheme"
+                android:text="@string/no_info"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/map_not_ready"
+                android:paddingVertical="@dimen/tiny_padding"
+                app:srcCompat="@drawable/ic_distancetohome" />
+
+            <TextView
+                android:id="@+id/distance_to_base"
+                android:theme="@style/InformationDisplayTheme"
+                android:text="@string/no_info"/>
+
+        </TableRow>
+
+
+    </TableLayout>
+    <LinearLayout
+        android:id="@+id/switch_button"
+        android:layout_width="@dimen/widget_width"
+        android:layout_height="@dimen/widget_height"
+        android:layout_margin="@dimen/tiny_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1">
+
+        <org.videolan.libvlc.util.VLCVideoLayout
+            android:id="@+id/video_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+        </org.videolan.libvlc.util.VLCVideoLayout>
+
+    </LinearLayout>
+
+
+
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/floating_menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        app:fab_addButtonColorNormal="@color/colorPrimaryDark"
+        app:fab_addButtonColorPressed="@color/colorPrimary"
+        app:fab_addButtonPlusIconColor="@color/colorWhite"
+        app:fab_expandDirection="left"
+        tools:context="ch.epfl.sdp.MapActivity"
+        >
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/start_or_return_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startMissionOrReturnHome"
+            app:fab_colorNormal="@color/colorPrimary"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_start"
+            app:fab_size="normal" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/clear_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="clearWaypoints"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_clear"
+            app:fab_size="normal"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/locate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="centerCameraOnDrone"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_locate"
+            app:fab_size="normal"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/store_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="storeMap"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_store"
+            app:fab_size="normal"/>
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

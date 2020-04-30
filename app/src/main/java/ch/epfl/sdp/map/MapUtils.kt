@@ -1,6 +1,5 @@
 package ch.epfl.sdp.map
 
-import android.graphics.Color
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
@@ -15,11 +14,15 @@ object MapUtils {
 
     const val DEFAULT_LATITUDE: Double = 47.39778846550371
     const val DEFAULT_LONGITUDE: Double = 8.545970150745575
-    const val DEFAULT_ZOOM: Double = 9.0
+    const val DEFAULT_ZOOM: Double = 9.0 
+    const val ZOOM_TOLERANCE: Double = 2.0
 
-    private val DARK_RED = Color.parseColor("#E55E5E")
-    private val LIGHT_RED = Color.parseColor("#F9886C")
-    private val ORANGE = Color.parseColor("#FBB03B")
+    private val BLUE = Expression.rgb(0, 0, 255)
+    private val CYAN = Expression.rgb(0, 255, 255)
+    private val GREEN = Expression.rgb(0, 255, 0)
+    private val ORANGE = Expression.rgb(255, 255, 0)
+    private val RED = Expression.rgb(255, 0, 0)
+
 
     private fun loadLastMapPositionFromPrefs(): LatLng {
         val context = MainApplication.applicationContext()
@@ -68,8 +71,7 @@ object MapUtils {
     }
 
     /**
-     * Loads and applies the camera settings passed in parameters to the camera of the given map
-     * @param mapboxMap
+     * Loads the camera settings passed in parameters to the camera
      * @param latLng
      * @param zoom
      */
@@ -92,37 +94,32 @@ object MapUtils {
         val unclustered = CircleLayer("unclustered-points",
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
         unclustered.setProperties(
-                PropertyFactory.circleColor(ORANGE),
-                PropertyFactory.circleRadius(20f),
-                PropertyFactory.circleBlur(1f))
+                PropertyFactory.circleColor(
+                        Expression.interpolate(Expression.linear(), Expression.get("intensity"),
+                                Expression.stop(8, BLUE),
+                                Expression.stop(8.5, CYAN),
+                                Expression.stop(9, GREEN),
+                                Expression.stop(9.5, ORANGE),
+                                Expression.stop(10.0, RED)
+                        )
+                ),
+                PropertyFactory.circleRadius(40f),
+                PropertyFactory.circleBlur(1.5f))
         unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
         style.addLayerBelow(unclustered,
                 MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }
 
     private fun clusteredLayerData(style: Style) {
-        val layers = arrayOf(
-                intArrayOf(4, DARK_RED),
-                intArrayOf(2, LIGHT_RED),
-                intArrayOf(0, ORANGE))
-        layers.indices.forEach { i ->
-            val circles = CircleLayer("cluster-$i",
-                    MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
-            circles.setProperties(
-                    PropertyFactory.circleColor(layers[i][1]),
-                    PropertyFactory.circleRadius(60f),
-                    PropertyFactory.circleBlur(1f)
-            )
-            val pointCount: Expression = Expression.toNumber(Expression.get("point_count"))
-            circles.setFilter(
-                    if (i == 0) Expression.gte(pointCount, Expression.literal(layers[i][0]))
-                    else Expression.all(
-                            Expression.gte(pointCount, Expression.literal(layers[i][0])),
-                            Expression.lt(pointCount, Expression.literal(layers[i - 1][0]))
-                    )
-            )
-            style.addLayerBelow(circles,
-                    MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
-        }
+        val clustered = CircleLayer("clustered-points",
+                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
+        clustered.setProperties(
+                PropertyFactory.circleColor(RED),
+                PropertyFactory.circleRadius(50f),
+                PropertyFactory.circleBlur(1f)
+        )
+        clustered.setFilter(Expression.eq(Expression.get("cluster"), Expression.literal(true)))
+        style.addLayerBelow(clustered,
+                MainApplication.applicationContext().getString(R.string.heatmap_source_ID))
     }
 }

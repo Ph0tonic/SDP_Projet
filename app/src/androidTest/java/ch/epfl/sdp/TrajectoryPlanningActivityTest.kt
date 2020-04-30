@@ -12,6 +12,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +39,8 @@ class TrajectoryPlanningActivityTest {
     @Test
     fun clickOnMapInteractWithBuilder() {
         // Wait for the map to load
-        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == MainApplication.applicationContext().getString(R.string.map_ready), Matchers.`is`(true))
 
         val builder = mActivityRule.activity.searchAreaBuilder
         assertThat(builder.vertices.size, equalTo(0))
