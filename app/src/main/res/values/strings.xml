@@ -65,4 +65,6 @@
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="enter_name">Enter Name</string>
     <string name="sign_out_success">Sign out successful</string>
+
+    <string name="overflight_strategy_header">Overflight Strategy</string>
 </resources>

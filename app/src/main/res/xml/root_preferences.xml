@@ -26,4 +26,12 @@
         android:title="@string/gps_refresh_rate_header"
         app:useSimpleSummaryProvider="true" />
 
+    <ListPreference
+        android:defaultValue="zigzag"
+        android:entries="@array/overflight_strategy_entries"
+        android:entryValues="@array/overflight_strategy_values"
+        android:key="overflight_strategy"
+        android:title="@string/overflight_strategy_header"
+        app:useSimpleSummaryProvider="true" />
+
 </PreferenceScreen>

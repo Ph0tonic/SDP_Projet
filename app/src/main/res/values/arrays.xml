@@ -37,4 +37,14 @@
         <item>1</item>
         <item>10</item>
     </string-array>
+
+    <string-array name="overflight_strategy_entries">
+        <item>Zig Zag</item>
+        <item>Spiral</item>
+    </string-array>
+
+    <string-array name="overflight_strategy_values">
+        <item>zigzag</item>
+        <item>spiral</item>
+    </string-array>
 </resources>
