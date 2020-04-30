@@ -29,7 +29,7 @@ abstract class SearchAreaBuilder {
     }
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
-        val isStrictlyUnderBound = sizeUpperBound?.let { vertices.size <= it } ?: true
+        val isStrictlyUnderBound = sizeUpperBound?.let { vertices.size < it } ?: true
         require(isStrictlyUnderBound) { "Already enough points" }
         vertices.add(vertex)
         order()
