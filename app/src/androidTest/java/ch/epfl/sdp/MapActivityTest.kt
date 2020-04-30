@@ -21,6 +21,10 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.dao.MockHeatmapDao
+import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
@@ -34,19 +38,23 @@ import org.junit.runner.RunWith
 class MapActivityTest {
 
     companion object {
-        const val FAKE_ACCOUNT_ID = "fake_account_id"
+        // TODO change to latLng for simplicity
         const val LATITUDE_TEST = 42.125
         const val LONGITUDE_TEST = -30.229
+        const val FAKE_HEATMAP_POINT_INTENSITY = 8.12
+
         const val ZOOM_TEST = 0.9
         const val MAP_LOADING_TIMEOUT = 1000L
         const val EPSILON = 1e-10
         const val DEFAULT_ALTITUDE = " 0.0 m"
+        const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
+        const val FAKE_ACCOUNT_ID = "fake_account_id"
         const val DUMMY_GROUP_ID = "DummyGroupId"
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
-    private val intentWithGroup = Intent().putExtra("groupId", DUMMY_GROUP_ID)
+    private val intentWithGroup = Intent().putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -61,6 +69,14 @@ class MapActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        //Fake logged in
+        runOnUiThread {
+            Auth.accountId.value = FAKE_ACCOUNT_ID
+            Auth.loggedIn.value = true
+        }
+
+        HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        MarkerRepository.daoProvider = { MockMarkerDao() }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 
@@ -109,19 +125,17 @@ class MapActivityTest {
     }
 
     @Test
-    fun mapBoxCanAddPointToHeatMap() {
-        //TODO reimplement this test to work with the new heatmap data management
-//        mActivityRule.launchActivity(IntentWithGroup)
-//        runOnUiThread { Auth.accountId.value = FAKE_ACCOUNT_ID }
-//
-//        // Wait for the map to load and add a heatmap point
-//        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
-//        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(0))
-//
-//        runOnUiThread {
-//            mActivityRule.activity.addPointToHeatMap(LatLng(10.0,10.0),10.0)
-//        }
-//        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(1))
+    fun addPointToHeatmapAddsPointToHeatmap() {
+        // Launch activity after setting preferences
+        mActivityRule.launchActivity(intentWithGroup)
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
+        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
+        runOnUiThread {
+            mActivityRule.activity.addPointToHeatMap(LatLng(LATITUDE_TEST, LONGITUDE_TEST), FAKE_HEATMAP_POINT_INTENSITY)
+        }
+        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]?.value?.dataPoints?.size, equalTo(1))
     }
 
     @Test
@@ -149,18 +163,17 @@ class MapActivityTest {
 
     @Test
     fun longClickOnMapAddAMarker() {
-        //TODO: Fix this test
-//        mActivityRule.launchActivity(intentWithGroup)
-//        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
-//
-//        onView(withId(R.id.mapView)).perform(longClick())
-//        runOnUiThread {
-//            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
-//        }
-//        onView(withId(R.id.mapView)).perform(longClick())
-//        runOnUiThread {
-//            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
-//        }
+        mActivityRule.launchActivity(intentWithGroup)
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
+        onView(withId(R.id.mapView)).perform(longClick())
+        runOnUiThread {
+            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
+        }
+        onView(withId(R.id.mapView)).perform(longClick())
+        runOnUiThread {
+            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
+        }
     }
 
     @Test
@@ -299,18 +312,17 @@ class MapActivityTest {
 
     @Test
     fun updateDronePositionChangesDistToUser() {
-        //TODO Fix this test
-//        mActivityRule.launchActivity(intentWithGroup)
-//        runOnUiThread {
-//            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
-//            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
-//        }
-//        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
-//
-//        runOnUiThread {
-//            Drone.currentPositionLiveData.postValue(LatLng(1.0, 0.0))
-//        }
-//        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
+        mActivityRule.launchActivity(intentWithGroup)
+        runOnUiThread {
+            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
+            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
+        }
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
+
+        runOnUiThread {
+            Drone.currentPositionLiveData.postValue(LatLng(1.0, 0.0))
+        }
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
     }
 
     @Test

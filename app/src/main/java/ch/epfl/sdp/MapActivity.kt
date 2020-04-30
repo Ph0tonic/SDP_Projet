@@ -54,19 +54,26 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val victimMarkers = mutableMapOf<String, Symbol>()
 
-    /** Builders */
+    /* Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var searchAreaBuilder: SearchAreaBuilder
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var missionBuilder: MissionBuilder
 
-    /** Painters */
+    /* Painters */
     private val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
     private lateinit var searchAreaPainter: MapboxSearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var userPainter: MapboxUserPainter
+
+    /* Repositories */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val heatmapRepository = HeatmapRepository()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val markerRepository = MarkerRepository()
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -106,9 +113,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
 
-    private val markerRepository = MarkerRepository()
-    private val heatmapRepository: HeatmapRepository = HeatmapRepository()
-
     companion object {
         const val MAP_NOT_READY_DESCRIPTION: String = "MAP NOT READY"
         const val MAP_READY_DESCRIPTION: String = "MAP READY"
@@ -124,7 +128,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        require(intent.getStringExtra("groupId") != null) { "MapActivity should be provided with a searchGroupId" }
+        Log.w("FIREBASE", Thread.currentThread().stackTrace.toString())
+        require(intent.getStringExtra("groupId") != null) { "MapActivity should be provided with a searchGroupId\n" }
+        require(Auth.loggedIn.value == true) { "You need to be logged in to access this part of the app" }
 
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)

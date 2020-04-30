@@ -10,13 +10,4 @@ data class HeatmapData(
 
         @get:Exclude
         var uuid: String? = null
-) {
-//    override fun equals(other: Any?): Boolean {
-//        if (other !is HeatmapData) return false
-//        return uuid == other.uuid && dataPoints == other.dataPoints
-//    }
-//
-//    override fun hashCode(): Int {
-//        return dataPoints.hashCode()
-//    }
-}
+)

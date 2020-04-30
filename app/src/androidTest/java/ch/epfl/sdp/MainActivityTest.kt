@@ -32,9 +32,10 @@ import org.junit.runner.RunWith
 class MainActivityTest {
 
     private lateinit var mUiDevice: UiDevice
-    private val intentWithGroup = Intent().putExtra("groupId", LocationWithPermissionTest.DUMMY_GROUP_ID)
+    private val intentWithGroup = Intent().putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
 
     companion object {
+        const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
         const val DUMMY_GROUP_ID = "DummyGroupId"
     }
 
@@ -95,6 +96,12 @@ class MainActivityTest {
 
         sharedPreferences.edit().clear().apply()
 
+        //Fake logged in
+        runOnUiThread {
+            Auth.accountId.value = MapActivityTest.FAKE_ACCOUNT_ID
+            Auth.loggedIn.value = true
+        }
+
         var longitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
         var latitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
         var zoom: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
@@ -122,5 +129,4 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
         mUiDevice.pressBack()
     }
-
 }

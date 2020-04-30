@@ -58,21 +58,6 @@ class FirebaseHeatmapDao : HeatmapDao {
                 }
 
             })
-
-//            myRef.addValueEventListener(object : ValueEventListener {
-//                override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                    val heatmaps = dataSnapshot.children.map {
-//                        val heatmapData = it.getValue(HeatmapData::class.java)!!
-//                        heatmapData.uuid = it.key!!
-//                        heatmapData
-//                    }
-//                    groupHeatmaps[groupId]!!.value = heatmaps
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.w("FIREBASE", "Failed to read heatmap from firebase.", error.toException())
-//                }
-//            })
         }
         return groupHeatmaps[groupId]!!
     }

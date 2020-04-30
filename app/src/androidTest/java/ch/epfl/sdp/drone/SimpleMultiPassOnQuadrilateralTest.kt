@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.drone
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
