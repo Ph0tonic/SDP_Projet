@@ -170,7 +170,7 @@ class MapActivityTest {
             mActivityRule.activity.onMapClicked(LatLng(4.0, 4.0))
         }
 
-        onView(withText("Already enough points for a quadrilateral"))
+        onView(withText("Already enough points"))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
     }
