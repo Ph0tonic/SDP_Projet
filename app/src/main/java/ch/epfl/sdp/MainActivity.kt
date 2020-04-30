@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -33,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         val navView = findViewById<NavigationView>(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         snackbar = Snackbar.make(navView,R.string.not_connected_message,Snackbar.LENGTH_LONG )
+                .setBackgroundTint(Color.BLACK)
+                .setTextColor(Color.WHITE)
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
