@@ -6,6 +6,10 @@ import kotlin.properties.Delegates
 
 abstract class SearchAreaBuilder {
 
+    abstract val sizeLowerBound: Int?
+    abstract val sizeUpperBound: Int?
+
+
     val searchAreaChanged = mutableListOf<(SearchArea?) -> Unit>()
     val verticesChanged = mutableListOf<(MutableList<LatLng>) -> Unit>()
 
@@ -24,9 +28,31 @@ abstract class SearchAreaBuilder {
         vertices = mutableListOf()
     }
 
-    abstract fun addVertex(vertex: LatLng): SearchAreaBuilder
-    abstract fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder
+    fun addVertex(vertex: LatLng): SearchAreaBuilder {
+        val isStrictlyUnderBound = sizeUpperBound?.let { vertices.size <= it } ?: true
+        require(isStrictlyUnderBound) { "Already enough points" }
+        vertices.add(vertex)
+        order()
+        this.vertices = this.vertices
+        return this
+    }
 
-    abstract fun isComplete(): Boolean
+    fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
+        val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
+        vertices[oldIndex!!] = new
+        order()
+        this.vertices = this.vertices
+        return this
+    }
+
+    protected open fun order(){}
+
+    private fun isUnderUpperBound() = sizeUpperBound?.let { vertices.size <= it } ?: true
+    private fun isAboveLowerBound() = sizeLowerBound?.let { it <= vertices.size } ?: true
+
+    fun isComplete(): Boolean {
+        return isAboveLowerBound() && isUnderUpperBound()
+    }
+
     abstract fun build(): SearchArea
 }

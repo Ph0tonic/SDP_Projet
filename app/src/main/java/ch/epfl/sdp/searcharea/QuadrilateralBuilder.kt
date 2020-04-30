@@ -5,25 +5,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 
 class QuadrilateralBuilder : SearchAreaBuilder() {
+    override val sizeLowerBound: Int? = 4
+    override val sizeUpperBound: Int? = 4
 
-    override fun addVertex(vertex: LatLng): SearchAreaBuilder {
-        require(vertices.size < 4) { "Already enough points for a quadrilateral" }
-        vertices.add(vertex)
-        orderVertex()
-        this.vertices = this.vertices
-        return this
-    }
-
-    override fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
-        val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
-        vertices[oldIndex!!] = new
-        orderVertex()
-        this.vertices = this.vertices
-        return this
-    }
-
-    private fun orderVertex() {
-        if (vertices.size == 4) {
+    protected override fun order() {
+        if (isComplete()) {
             val data = vertices
 
             // Diagonals should intersect
@@ -35,10 +21,6 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
                 }
             }
         }
-    }
-
-    override fun isComplete(): Boolean {
-        return vertices.size == 4
     }
 
     override fun build(): SearchArea {
