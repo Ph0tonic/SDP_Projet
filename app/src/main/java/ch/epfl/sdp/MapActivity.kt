@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -266,16 +265,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (!Drone.isDroneConnected()) {
             snackbar.show()
         }
-        else {
-            if (!isDroneFlying) { //TODO : return to user else
-                isDroneFlying = true
-                Drone.startMission(DroneMission.makeDroneMission(
-                        missionBuilder.build()
-                ).getMissionItems())
-            }
-            findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                    .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
+
+        if (!isDroneFlying) { //TODO : return to user else
+            isDroneFlying = true
+            Drone.startMission(DroneMission.makeDroneMission(
+                    missionBuilder.build()
+            ).getMissionItems())
         }
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
+
     }
 
     fun storeMap(v: View) {
