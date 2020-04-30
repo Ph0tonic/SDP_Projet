@@ -80,8 +80,8 @@ object Drone {
     }
     fun isDroneConnected(): Boolean {
 
-        try {
-            return instance.core.connectionState
+        return try {
+            instance.core.connectionState
                     .filter { state -> state.isConnected }
                     .firstOrError()
                     .toFuture()
@@ -89,7 +89,7 @@ object Drone {
 
         }
         catch(e: TimeoutException){
-            return false
+            false
         }
     }
 }
