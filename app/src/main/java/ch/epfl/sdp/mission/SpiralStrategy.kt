@@ -5,8 +5,9 @@ import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import net.mastrgamr.mbmapboxutils.SphericalUtil.computeHeading
 import net.mastrgamr.mbmapboxutils.SphericalUtil.computeOffset
-import kotlin.collections.ArrayList
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.ceil
+import kotlin.math.sqrt
 
 
 /**
@@ -41,30 +42,28 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val path = ArrayList<LatLng>()
 
 
-
-
         val earthRadius = 6378137
 
-        val turns: Double = ceil(radius/maxDistBetweenLines)
+        val turns: Double = ceil(radius / maxDistBetweenLines)
 
-        val maxTheta = radius/earthRadius
-        val phi0 = computeHeading(center,outer)
+        val maxTheta = radius / earthRadius
+        val phi0 = computeHeading(center, outer)
 
         //steps is the solution of {thDist = radius * turns * 2 * PI * (1.0 - sqrt((steps-1.0)/steps))} for thDist = maxDistBetweenLines
-        val c = 1.0 - maxDistBetweenLines/(radius*turns*2*PI)
-        val steps = ceil(1.0/(1-c*c)).toInt()
+        val c = 1.0 - maxDistBetweenLines / (radius * turns * 2 * PI)
+        val steps = ceil(1.0 / (1 - c * c)).toInt()
 
-        for(step in 0 .. steps){
-            val s = step.toDouble()/steps //between 0 and 1
+        for (step in 0..steps) {
+            val s = step.toDouble() / steps //between 0 and 1
             val t = sqrt(s)
-            val theta = maxTheta*t
-            val distance = theta*earthRadius
+            val theta = maxTheta * t
+            val distance = theta * earthRadius
             val phi = turns * 2 * PI * t
 
-            path.add(computeOffset(center,distance, phi0 + Math.toDegrees(phi)))
+            path.add(computeOffset(center, distance, phi0 + Math.toDegrees(phi)))
         }
 
-        val thDist = radius * turns * 2 * PI * (1.0 - sqrt((steps-1.0)/steps))
+        val thDist = radius * turns * 2 * PI * (1.0 - sqrt((steps - 1.0) / steps))
 
         return path
     }

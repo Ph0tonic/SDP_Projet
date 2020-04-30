@@ -2,7 +2,7 @@ package ch.epfl.sdp.searcharea
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-class CircleBuilder: SearchAreaBuilder() {
+class CircleBuilder : SearchAreaBuilder() {
 
 
     override fun addVertex(vertex: LatLng): SearchAreaBuilder {
@@ -27,6 +27,6 @@ class CircleBuilder: SearchAreaBuilder() {
         if (!isComplete()) {
             throw SearchAreaNotCompleteException("Circle not complete: Needs 2 points")
         }
-        return CircleArea(vertices[0],vertices[1])
+        return CircleArea(vertices[0], vertices[1])
     }
 }
