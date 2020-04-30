@@ -20,6 +20,8 @@ object Drone {
     // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
 
+    private const val WAIT_TIME : Long= 200
+
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
     val currentBatteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
@@ -84,7 +86,7 @@ object Drone {
                     .firstOrError()
                     .toFuture()
                     //.isCancelled
-                    .get(200, TimeUnit.MILLISECONDS).isConnected
+                    .get(WAIT_TIME, TimeUnit.MILLISECONDS).isConnected
 
         }
         catch(e: TimeoutException){
