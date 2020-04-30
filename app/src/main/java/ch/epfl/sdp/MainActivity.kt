@@ -21,7 +21,7 @@ import com.google.android.material.snackbar.Snackbar
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var snackbar : Snackbar
+    private lateinit var snackbar: Snackbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
-        snackbar = Snackbar.make(navView,R.string.not_connected_message,Snackbar.LENGTH_LONG )
+        snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK)
                 .setTextColor(Color.WHITE)
 
@@ -84,8 +84,9 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-    fun showSnackbar(){
-        if(!Drone.isDroneConnected())
-        snackbar.show()
+
+    fun showSnackbar() {
+        if (!Drone.isDroneConnected())
+            snackbar.show()
     }
 }

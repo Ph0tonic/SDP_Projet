@@ -20,7 +20,7 @@ object Drone {
     // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
 
-    private const val WAIT_TIME : Long= 200
+    private const val WAIT_TIME: Long = 200
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -29,9 +29,11 @@ object Drone {
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
 
-    lateinit var getSignalStrength: ()->Double
+    lateinit var getSignalStrength: () -> Double
     /*Will be useful later on*/
-    val debugGetSignalStrength: ()->Double={ currentPositionLiveData.value?.distanceTo(LatLng(47.3975,8.5445))?:0.0}
+    val debugGetSignalStrength: () -> Double = {
+        currentPositionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
+    }
 
     private val instance: System
 
@@ -78,8 +80,8 @@ object Drone {
                 .andThen(instance.mission.startMission())
                 .subscribe()
     }
-    fun isDroneConnected(): Boolean {
 
+    fun isDroneConnected(): Boolean {
         return try {
             instance.core.connectionState
                     .filter { state -> state.isConnected }
@@ -87,8 +89,7 @@ object Drone {
                     .toFuture()
                     .get(WAIT_TIME, TimeUnit.MILLISECONDS).isConnected
 
-        }
-        catch(e: TimeoutException){
+        } catch (e: TimeoutException) {
             false
         }
     }
