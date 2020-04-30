@@ -14,6 +14,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
@@ -46,7 +47,6 @@ class OfflineManagerActivityTest {
         private const val POSITIVE_BUTTON_ID: Int = android.R.id.button1
         private const val NEGATIVE_BUTTON_ID: Int = android.R.id.button2
         private const val NEUTRAL_BUTTON_ID: Int = android.R.id.button3
-        val context = MainApplication.applicationContext()
     }
 
     @get:Rule
@@ -57,7 +57,7 @@ class OfflineManagerActivityTest {
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         moveCameraToPosition(LatLng(0.0, 0.0))
-        offlineManager = OfflineManager.getInstance(context)
+        offlineManager = OfflineManager.getInstance(applicationContext())
     }
 
     private fun moveCameraToPosition(pos: LatLng) {
@@ -74,8 +74,7 @@ class OfflineManagerActivityTest {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 if (offlineRegions.isNotEmpty()) {
                     for (or in offlineRegions) {
-                        deleteOfflineRegion(or, ProgressBar(context), mActivityRule.activity.mapView)
-
+                        deleteOfflineRegion(or, ProgressBar(applicationContext()), mActivityRule.activity.mapView)
                     }
                 }
             }
@@ -83,7 +82,7 @@ class OfflineManagerActivityTest {
             override fun onError(error: String) {} //left intentionally empty
         })
         onView(withId(R.id.list_button)).perform(click())
-        onView(withText(context.getString(R.string.toast_no_regions_yet)))
+        onView(withText(applicationContext().getString(R.string.toast_no_regions_yet)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
     }
@@ -109,10 +108,10 @@ class OfflineManagerActivityTest {
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription, equalTo(context.getString(R.string.map_ready)))
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
-        onView(withText(context.getString(R.string.end_progress_success)))
+        onView(withText(applicationContext().getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
 
@@ -131,10 +130,11 @@ class OfflineManagerActivityTest {
         //DELETE PART
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
-        onView(withText(context.getString(R.string.toast_region_deleted)))
+        onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
-        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         //check that the downloaded list map is empty
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
@@ -176,10 +176,10 @@ class OfflineManagerActivityTest {
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
-        assertThat(mActivityRule.activity.mapView.contentDescription, equalTo(context.getString(R.string.map_ready)))
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
-        onView(withText(context.getString(R.string.end_progress_success)))
+        onView(withText(applicationContext().getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
 
@@ -209,9 +209,10 @@ class OfflineManagerActivityTest {
         //DELETE PART
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
-        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
-        onView(withText(context.getString(R.string.toast_region_deleted)))
+        onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
 
@@ -235,7 +236,7 @@ class OfflineManagerActivityTest {
     fun checkToastWhenMapHasEmptyName() {
         onView(withId(R.id.download_button)).perform(click())
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
-        onView(withText(context.getString(R.string.dialog_toast)))
+        onView(withText(applicationContext().getString(R.string.dialog_toast)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
     }
