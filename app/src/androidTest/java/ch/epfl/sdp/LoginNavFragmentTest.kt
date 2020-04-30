@@ -18,15 +18,14 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiT
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
-import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class LoginNavFragmentTest {
@@ -62,11 +61,7 @@ class LoginNavFragmentTest {
                 .requestEmail()
                 .build()
     }
-
-    private fun getContext(): Context {
-        return InstrumentationRegistry.getInstrumentation().targetContext
-    }
-
+    
     private fun openDrawer() {
         onView(withId(R.id.drawer_layout))
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
@@ -87,6 +82,7 @@ class LoginNavFragmentTest {
         Intents.intended(IntentMatchers.filterEquals(mGoogleSignInClient.signInIntent))
         mUiDevice.pressBack()
     }
+
 
     @Test
     fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {

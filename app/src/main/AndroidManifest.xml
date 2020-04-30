@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.screen.landscape"/>
+
 
     <application
         android:name="ch.epfl.sdp.MainApplication"
@@ -14,19 +16,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".VlcActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".MapActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".OfflineManagerActivity"
-            android:parentActivityName=".MainActivity" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:screenOrientation="landscape">
             <!-- The theme set here is launcher, but it gets set to no_actionBar in MainActivity.kt
              when the activity is launched -->
             <intent-filter>
@@ -34,9 +29,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".VlcActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape"/>
+
+        <activity
+            android:name=".MapActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape"/>
+
+        <activity
+            android:name=".ui.offlineMapsManaging.OfflineManagerActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape"/>
+
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape"/>
     </application>
 </manifest>

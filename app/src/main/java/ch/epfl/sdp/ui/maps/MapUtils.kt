@@ -6,19 +6,16 @@ import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage
-import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 
 object MapUtils {
 
     const val DEFAULT_LATITUDE: Double = 47.39778846550371
     const val DEFAULT_LONGITUDE: Double = 8.545970150745575
-    const val DEFAULT_ZOOM: Double = 9.0
+    const val DEFAULT_ZOOM: Double = 9.0 
+    const val ZOOM_TOLERANCE: Double = 2.0
 
     private val BLUE = Expression.rgb(0, 0, 255)
     private val CYAN = Expression.rgb(0, 255, 255)
@@ -74,8 +71,7 @@ object MapUtils {
     }
 
     /**
-     * Loads and applies the camera settings passed in parameters to the camera of the given map
-     * @param mapboxMap
+     * Loads the camera settings passed in parameters to the camera
      * @param latLng
      * @param zoom
      */
