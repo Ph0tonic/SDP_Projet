@@ -27,14 +27,13 @@ class SpiralStrategyTest {
     }
 
     @Test
-    fun simpleMultiPassCreatesGoodNumberOfPointsForSmallArea() {
+    fun createsGoodNumberOfPointsForSmallArea() {
         val searchArea = CircleArea(
                 LatLng(0.0, 0.0),
                 LatLng(1.0, 0.0)
         )
-        val strategy = SpiralStrategy(1000.0)
+        val strategy = SpiralStrategy(1000000000000.0)
         val path = strategy.createFlightPath(LatLng(0.0, 0.0), searchArea)
-        val pathSize = path.size
-        assertThat(pathSize, equalTo(2))
+        assertThat(path.size, equalTo(2))
     }
 }
