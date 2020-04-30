@@ -2,11 +2,9 @@ package ch.epfl.sdp
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
-import android.util.DisplayMetrics
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
@@ -63,11 +61,7 @@ class LoginNavFragmentTest {
                 .requestEmail()
                 .build()
     }
-
-    private fun getContext(): Context {
-        return InstrumentationRegistry.getInstrumentation().targetContext
-    }
-
+    
     private fun openDrawer() {
         onView(withId(R.id.drawer_layout))
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with

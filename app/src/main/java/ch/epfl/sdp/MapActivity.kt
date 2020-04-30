@@ -277,7 +277,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val currentZoom = mapboxMap.cameraPosition.zoom
         if (::dronePositionMarker.isInitialized) {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng,
-                    if (currentZoom > DEFAULT_ZOOM/ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM*ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
+                    if (currentZoom > DEFAULT_ZOOM-ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM+ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
         }
     }
 
