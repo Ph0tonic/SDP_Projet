@@ -134,7 +134,7 @@ class MapActivityTest {
         // Launch activity after setting preferences
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription, equalTo(applicationContext().getString(R.string.map_ready)))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
