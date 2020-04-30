@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
@@ -23,24 +24,29 @@ import org.mockito.Mockito.mock
 @RunWith(AndroidJUnit4::class)
 class LocationWithPermissionTest {
     private var mUiDevice: UiDevice? = null
-    //private var locationTestActivity: Activity? = null
+
+    companion object {
+        const val DUMMY_GROUP_ID = "DummyGroupId"
+    }
 
     @Rule
     @JvmField
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
+    private val intentWithGroup = Intent().putExtra("groupId", DUMMY_GROUP_ID)
+
     @get:Rule
-    val mActivityRule = IntentsTestRule(MapActivity::class.java)
+    val mActivityRule = IntentsTestRule(MapActivity::class.java, true, false)
 
     @Before
     @Throws(Exception::class)
     fun before() {
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
     @Test
     fun centralLocationManagerRequestsLocationUpdatesIfItHasPermission() {
-
         val activity = mock(AppCompatActivity::class.java)
         val context = mock(Context::class.java)
         val manager = mock(LocationManager::class.java)

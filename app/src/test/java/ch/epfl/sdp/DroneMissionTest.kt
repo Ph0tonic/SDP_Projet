@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert
 import org.junit.Test
 import kotlin.random.Random.Default.nextDouble
