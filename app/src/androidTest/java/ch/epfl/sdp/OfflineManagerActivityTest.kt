@@ -57,7 +57,6 @@ class OfflineManagerActivityTest {
     fun before() {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         moveCameraToPosition(LatLng(0.0, 0.0))
-        mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         offlineManager = OfflineManager.getInstance(context)
     }
 
@@ -111,7 +110,7 @@ class OfflineManagerActivityTest {
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
         mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == context.getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription, equalTo(context.getString(R.string.map_ready)))
 
         onView(withText(context.getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
@@ -178,7 +177,7 @@ class OfflineManagerActivityTest {
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
         mUiDevice.wait(Until.hasObject(By.desc(context.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
-        assertThat(mActivityRule.activity.mapView.contentDescription == context.getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription, equalTo(context.getString(R.string.map_ready)))
 
         onView(withText(context.getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
