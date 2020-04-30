@@ -24,7 +24,7 @@ class HeatmapRepository {
         val heatmapData = if (heatmaps != null && heatmaps.containsKey(heatmapId)) {
             heatmaps[heatmapId]?.value?.copy()!!
         } else {
-            HeatmapData(mutableListOf(HeatmapPointData(location, intensity)), heatmapId)
+            HeatmapData(mutableListOf(), heatmapId)
         }
         heatmapData.dataPoints.add(HeatmapPointData(location, intensity))
         dao.updateHeatmap(groupId, heatmapData)

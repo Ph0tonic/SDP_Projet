@@ -10,7 +10,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-class FirebaseMarkersDao : MarkersDao {
+class FirebaseMarkersDao : MarkerDao {
     private var database: FirebaseDatabase = Firebase.database
 
     private val groupMarkers: MutableMap<String, MutableLiveData<Set<MarkerData>>> = mutableMapOf()

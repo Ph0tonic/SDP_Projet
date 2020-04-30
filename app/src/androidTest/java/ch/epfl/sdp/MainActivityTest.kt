@@ -32,6 +32,10 @@ class MainActivityTest {
 
     private lateinit var mUiDevice: UiDevice
 
+    companion object {
+        private const val FAKE_ACCOUNT_ID = "fake_account_id"
+    }
+
     @Rule
     @JvmField
     val grantPermissionRule: GrantPermissionRule = grant(ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION)
@@ -88,6 +92,12 @@ class MainActivityTest {
 
         sharedPreferences.edit().clear().apply()
 
+        //Fake logged in
+        runOnUiThread {
+            Auth.accountId.value = FAKE_ACCOUNT_ID
+            Auth.loggedIn.value = true
+        }
+
         var longitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
         var latitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
         var zoom: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
@@ -115,5 +125,4 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
         mUiDevice.pressBack()
     }
-
 }

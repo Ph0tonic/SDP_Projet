@@ -61,10 +61,6 @@ class LoginNavFragmentTest {
                 .build()
     }
 
-    private fun getContext(): Context {
-        return InstrumentationRegistry.getInstrumentation().targetContext
-    }
-
     private fun openDrawer() {
         onView(withId(R.id.drawer_layout))
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with

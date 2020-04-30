@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -21,6 +22,10 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.dao.MockHeatmapDao
+import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
@@ -34,18 +39,21 @@ import org.junit.runner.RunWith
 class MapActivityTest {
 
     companion object {
-        const val FAKE_ACCOUNT_ID = "fake_account_id"
-        const val LATITUDE_TEST = 42.125
-        const val LONGITUDE_TEST = -30.229
-        const val ZOOM_TEST = 0.9
-        const val MAP_LOADING_TIMEOUT = 1000L
-        const val EPSILON = 1e-10
-        const val DEFAULT_ALTITUDE = " 0.0 m"
+        // TODO change to latLng for simplicity
+        private val FAKE_LOCATION_TEST = LatLng(42.125, -30.229)
+        private const val FAKE_HEATMAP_POINT_INTENSITY = 8.12
+        private const val ZOOM_TEST = 0.9
+        private const val MAP_LOADING_TIMEOUT = 1000L
+        private const val EPSILON = 1e-9
+        private const val DEFAULT_ALTITUDE = " 0.0 m"
+        private const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
+        private const val FAKE_ACCOUNT_ID = "fake_account_id"
+        private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
-    private val intentWithGroup = Intent().putExtra("groupId","DummyGroupId")
+    private val intentWithGroup = Intent().putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
@@ -60,6 +68,14 @@ class MapActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        //Fake logged in
+        runOnUiThread {
+            Auth.accountId.value = FAKE_ACCOUNT_ID
+            Auth.loggedIn.value = true
+        }
+
+        HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        MarkerRepository.daoProvider = { MockMarkerDao() }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 
@@ -89,8 +105,8 @@ class MapActivityTest {
     @Test
     fun mapboxUsesOurPreferences() {
         preferencesEditor
-                .putString(applicationContext().getString(R.string.prefs_latitude), LATITUDE_TEST.toString())
-                .putString(applicationContext().getString(R.string.prefs_longitude), LONGITUDE_TEST.toString())
+                .putString(applicationContext().getString(R.string.prefs_latitude), FAKE_LOCATION_TEST.latitude.toString())
+                .putString(applicationContext().getString(R.string.prefs_longitude), FAKE_LOCATION_TEST.longitude.toString())
                 .putString(applicationContext().getString(R.string.prefs_zoom), ZOOM_TEST.toString())
                 .apply()
 
@@ -100,39 +116,36 @@ class MapActivityTest {
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(LATITUDE_TEST, EPSILON))
-                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(LONGITUDE_TEST, EPSILON))
+                Log.w("TESTS", mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST).toString())
+                assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST), closeTo(0.0, EPSILON))
                 assertThat(mapboxMap.cameraPosition.zoom, closeTo(ZOOM_TEST, EPSILON))
             }
         }
     }
 
     @Test
-    fun mapBoxCanAddPointToHeatMap() {
-        assertThat(1, equalTo(2))
-        //TODO reimplement this test to work with the new heatmap data management
-//        mActivityRule.launchActivity(Intent())
-//        runOnUiThread { Auth.accountId.value = FAKE_ACCOUNT_ID }
-//
-//        // Wait for the map to load and add a heatmap point
-//        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
-//        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(0))
-//
-//        runOnUiThread {
-//            mActivityRule.activity.addPointToHeatMap(LatLng(10.0,10.0),10.0)
-//        }
-//        assertThat(mActivityRule.activity.heatmap.features.size, equalTo(1))
+    fun addPointToHeatmapAddsPointToHeatmap() {
+        // Launch activity after setting preferences
+        mActivityRule.launchActivity(intentWithGroup)
+        mUiDevice.wait(Until.hasObject(By.desc(MapActivity.MAP_READY_DESCRIPTION)), MAP_LOADING_TIMEOUT)
+
+        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
+        runOnUiThread {
+            mActivityRule.activity.addPointToHeatMap(FAKE_LOCATION_TEST, FAKE_HEATMAP_POINT_INTENSITY)
+        }
+        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]?.value?.dataPoints?.size, equalTo(1))
     }
 
     @Test
     fun canUpdateUserLocation() {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
     }
 
     @Test
     fun canUpdateUserLocationTwice() {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
-        CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST, -LONGITUDE_TEST))
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
     }
 
     @Test
@@ -157,6 +170,7 @@ class MapActivityTest {
             assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
         }
         onView(withId(R.id.mapView)).perform(longClick())
+        Thread.sleep(2000)
         runOnUiThread {
             assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
         }
