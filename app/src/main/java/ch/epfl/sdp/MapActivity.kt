@@ -260,7 +260,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         searchAreaBuilder.reset()
     }
 
-    fun startMissionOrReturnHome() {
+    fun startMissionOrReturnHome(v: View) {
 
         if (!Drone.isDroneConnected()) {
             snackbar.show()
