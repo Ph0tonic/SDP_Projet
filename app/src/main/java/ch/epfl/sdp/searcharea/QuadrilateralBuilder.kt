@@ -11,11 +11,12 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
     protected override fun order() {
         if (isComplete()) {
             val data = vertices
+            fun intersect() = IntersectionUtils.doIntersect(data[0], data[2], data[1], data[3])
 
             // Diagonals should intersect
-            if (!IntersectionUtils.doIntersect(data[0], data[2], data[1], data[3])) {
+            if (!intersect()) {
                 Collections.swap(data, 1, 2)
-                if (!IntersectionUtils.doIntersect(data[0], data[2], data[1], data[3])) {
+                if (!intersect()) {
                     Collections.swap(data, 1, 2)
                     Collections.swap(data, 2, 3)
                 }
