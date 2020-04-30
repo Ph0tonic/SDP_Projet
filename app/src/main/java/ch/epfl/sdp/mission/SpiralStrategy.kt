@@ -47,9 +47,9 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val phi0 = angleToOuter - 2 * PI * turns
 
         //steps is chosen so that the approximate arc length between the two last points is equal to maxDistBetweenLines
-        //=> steps is the solution of maxDistBetweenLines = radius * turns * 2 * PI * (1.0 - sqrt((steps-1.0)/steps))
+        //=> steps is the solution of maxDistBetweenLines = 2 * PI * radius * turns * (1.0 - sqrt((steps-1.0)/steps))
         val protoC = 1.0 - 1 / (turns * turns * 2 * PI)
-        val c = max(protoC,0.0) //if distance is short, behaves as a straight line
+        val c = max(protoC, 0.0) //if distance is short, behaves as a straight line
         val steps = ceil(1.0 / (1 - c * c)).toInt()
 
         for (step in 0..steps) {
@@ -61,8 +61,6 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
 
             path.add(computeOffset(center, distance, Math.toDegrees(phi0 + phi)))
         }
-
-        val thDist = radius * turns * 2 * PI * (1.0 - sqrt((steps - 1.0) / steps))
 
         return path
     }
