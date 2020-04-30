@@ -3,11 +3,11 @@ package ch.epfl.sdp.drone
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
-import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
-import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -77,13 +77,19 @@ object Drone {
                 .subscribe()
     }
     fun isDroneConnected(): Boolean {
-        val isConnected = instance.core.connectionState
-                .filter { state -> state.isConnected }
-                .firstOrError()
-                .toCompletable()
-                .toSingleDefault(true)
-                .onErrorReturnItem(false)
 
-        return isConnected.equals(true)
+        try {
+            return instance.core.connectionState
+                    .filter { state -> state.isConnected }
+                    .firstOrError()
+                    .toFuture()
+                    //.isCancelled
+                    .get(200, TimeUnit.MILLISECONDS).isConnected
+
+        }
+        catch(e: TimeoutException){
+            return false
+        }
+       // return false
     }
 }

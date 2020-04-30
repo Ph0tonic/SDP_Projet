@@ -260,6 +260,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun startMissionOrReturnHome(v: View) {
+
         if(!Drone.isDroneConnected()){
             snackbar.show()
         }
