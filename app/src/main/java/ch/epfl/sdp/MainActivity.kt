@@ -55,12 +55,12 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-        showSnackbar()
     }
 
     override fun onStart() {
         super.onStart()
         CentralLocationManager.configure(this)
+        showSnackbar()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
