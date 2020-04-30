@@ -24,15 +24,11 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
-import ch.epfl.sdp.database.dao.MockHeatmapDao
-import ch.epfl.sdp.database.dao.MockMarkerDao
-import ch.epfl.sdp.database.repository.HeatmapRepository
-import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import ch.epfl.sdp.drone.Drone.currentMissionLiveData
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
 import org.junit.Assert
@@ -97,7 +93,7 @@ class MapActivityTest {
     @Test
     fun canStartMission() {
         // Launch activity
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
@@ -136,7 +132,7 @@ class MapActivityTest {
                 .apply()
 
         // Launch activity after setting preferences
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
@@ -194,7 +190,7 @@ class MapActivityTest {
 
     @Test
     fun longClickOnMapAddAMarker() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
@@ -211,7 +207,7 @@ class MapActivityTest {
 
     @Test
     fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
@@ -231,7 +227,7 @@ class MapActivityTest {
 
     @Test
     fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
@@ -251,7 +247,7 @@ class MapActivityTest {
 
     @Test
     fun deleteButtonRemovesWaypoints() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
@@ -271,7 +267,7 @@ class MapActivityTest {
 
     @Test
     fun storeMapButtonIsWorking() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
@@ -284,7 +280,7 @@ class MapActivityTest {
 
     @Test
     fun locateButtonIsWorking() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 

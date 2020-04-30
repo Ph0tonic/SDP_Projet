@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.Context
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
