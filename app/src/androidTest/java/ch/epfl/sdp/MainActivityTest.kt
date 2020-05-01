@@ -79,13 +79,6 @@ class MainActivityTest {
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
     }
-
-    @Test
-    fun canDisplayTheVideo() {
-        onView(withId(R.id.display_camera)).perform(click())
-        onView(withId(R.id.video_layout)).check(matches(isDisplayed()))
-    }
-
     @Test
     fun canDisplayAMapAndReloadLocation() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext())
