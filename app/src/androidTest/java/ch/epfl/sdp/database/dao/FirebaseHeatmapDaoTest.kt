@@ -85,7 +85,7 @@ class FirebaseHeatmapDaoTest {
 
         //Testing
         val ref = Firebase.database.getReference("heatmaps/$DUMMY_GROUP_ID/$DUMMY_HEATMAP_ID")
-        ref.addValueEventListener(object : ValueEventListener {
+        val listener = object : ValueEventListener {
             override fun onCancelled(dataSnapshot: DatabaseError) {}
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (!initialData) {
@@ -99,12 +99,14 @@ class FirebaseHeatmapDaoTest {
                     initialData = false
                 }
             }
-        })
+        }
+        ref.addValueEventListener(listener)
 
         //Update value
         dao.updateHeatmap(DUMMY_GROUP_ID, expectedHeatmap)
 
         tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         MatcherAssert.assertThat(tested.count, CoreMatchers.equalTo(0L))
+        ref.removeEventListener(listener)
     }
 }

@@ -1,6 +1,5 @@
 package ch.epfl.sdp.database.dao
 
-import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.data.MarkerData
@@ -71,7 +70,7 @@ class FirebaseMarkerDaoTest {
 
         val ref = Firebase.database.getReference("markers/$DUMMY_GROUP_ID")
 
-        ref.addChildEventListener(object : ChildEventListener {
+        val listener = object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
@@ -84,12 +83,14 @@ class FirebaseMarkerDaoTest {
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
-        })
+        }
+        ref.addChildEventListener(listener)
 
         dao.addMarker(DUMMY_GROUP_ID, expectedMarker)
 
         tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(tested.count, equalTo(0L))
+        ref.removeEventListener(listener)
     }
 
     @Test
@@ -102,7 +103,7 @@ class FirebaseMarkerDaoTest {
 
         var actualRemovedMarker: MarkerData? = null
 
-        ref.addChildEventListener(object : ChildEventListener {
+        val listener = object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
@@ -111,12 +112,14 @@ class FirebaseMarkerDaoTest {
                 expectedRemovedMarker.uuid = dataSnapshot.key!!
                 added.countDown()
             }
+
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 actualRemovedMarker = dataSnapshot.getValue(MarkerData::class.java)!!
                 actualRemovedMarker!!.uuid = dataSnapshot.key!!
                 tested.countDown()
             }
-        })
+        }
+        ref.addChildEventListener(listener)
 
         ref.push().setValue(expectedRemovedMarker)
         added.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
@@ -125,5 +128,6 @@ class FirebaseMarkerDaoTest {
         tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
         assertThat(actualRemovedMarker, equalTo(expectedRemovedMarker))
+        ref.removeEventListener(listener)
     }
 }
