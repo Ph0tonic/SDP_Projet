@@ -2,7 +2,6 @@ package ch.epfl.sdp.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.database.data.HeatmapData
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -51,8 +50,10 @@ class FirebaseHeatmapDao : HeatmapDao {
                     groupHeatmaps[groupId]!!.value = groupHeatmaps[groupId]!!.value
                 }
 
-                override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
-
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                    groupHeatmaps[groupId]!!.value!!.remove(dataSnapshot.key)
+                    groupHeatmaps[groupId]!!.value = groupHeatmaps[groupId]!!.value
+                }
             })
         }
         return groupHeatmaps[groupId]!!
