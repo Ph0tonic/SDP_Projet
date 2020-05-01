@@ -37,7 +37,6 @@ import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPO
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import com.getbase.floatingactionbutton.FloatingActionButton
 
 /**
  * Main Activity to display map and create missions.
