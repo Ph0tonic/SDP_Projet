@@ -2,7 +2,6 @@ package ch.epfl.sdp.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.database.data.HeatmapData
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -20,7 +19,7 @@ class FirebaseHeatmapDao : HeatmapDao {
     val groupHeatmaps: MutableMap<String, MutableLiveData<MutableMap<String, MutableLiveData<HeatmapData>>>> = mutableMapOf()
 
     override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
-        database.getReference("heatmaps/$groupId/${Auth.accountId.value!!}")
+        database.getReference("heatmaps/$groupId/${heatmapData.uuid}")
                 .setValue(heatmapData)
     }
 
@@ -52,9 +51,9 @@ class FirebaseHeatmapDao : HeatmapDao {
                 }
 
                 override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                    TODO("Not yet implemented")
+                    groupHeatmaps[groupId]!!.value!!.remove(dataSnapshot.key)
+                    groupHeatmaps[groupId]!!.value = groupHeatmaps[groupId]!!.value
                 }
-
             })
         }
         return groupHeatmaps[groupId]!!
