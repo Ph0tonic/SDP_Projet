@@ -18,6 +18,10 @@ import kotlin.math.sqrt
 class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
+    companion object{
+        const val earthRadius = 6378137
+    }
+
     init {
         require(maxDistBetweenLinesIn > 0.0) {
             "The maximum distance between passes must be strictly positive"
@@ -36,13 +40,12 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val outer = area.outer
         val radius = center.distanceTo(outer)
 
-        val path = ArrayList<LatLng>()
-
-        val earthRadius = 6378137
-
         val turns: Double = radius / maxDistBetweenLines
 
+        //Portion of the earth we should cover, defines the radius of the spiral
         val maxTheta = radius / earthRadius
+
+        //offsets the beginning of the spiral so that the end meets the point <outer>
         val angleToOuter = Math.toRadians(computeHeading(center, outer))
         val phi0 = angleToOuter - 2 * PI * turns
 
@@ -51,6 +54,13 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val protoC = 1.0 - 1 / (turns * turns * 2 * PI)
         val c = max(protoC, 0.0) //if distance is short, behaves as a straight line
         val steps = ceil(1.0 / (1 - c * c)).toInt()
+
+        return generatePointsAlongSpiral(center, phi0, maxTheta, turns, steps)
+    }
+
+    private fun generatePointsAlongSpiral(center: LatLng, phi0: Double, maxTheta: Double, turns: Double, steps: Int): List<LatLng> {
+
+        val path = ArrayList<LatLng>()
 
         for (step in 0..steps) {
             val s = step.toDouble() / steps
