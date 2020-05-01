@@ -18,6 +18,7 @@ import ch.epfl.sdp.ui.maps.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import com.getbase.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
@@ -52,6 +53,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePositionMarker: Circle
     var waypoints = arrayListOf<LatLng>()
     private lateinit var userPositionMarker: Circle
+
+    private lateinit var snackbar: Snackbar
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var heatmapFeatures = ArrayList<Feature>()
@@ -98,7 +101,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
         updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT) // Always update the text string
-        newBatteryLevel?.let { // Only update the icon if the battery level is not null
+        newBatteryLevel?.let {
+            // Only update the icon if the battery level is not null
             val newBatteryDrawable = droneBatteryLevelDrawables
                     .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
                     .maxBy { x -> x.first }!!
@@ -128,6 +132,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
+        snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
         mapView.contentDescription = getString(R.string.map_not_ready)
 
@@ -256,6 +261,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun startMissionOrReturnHome(v: View) {
+
+        if (!Drone.isDroneConnected()) {
+            snackbar.show()
+        }
         if (!isDroneFlying) { //TODO : return to user else
             isDroneFlying = true
             Drone.startMission(DroneMission.makeDroneMission(
@@ -277,7 +286,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val currentZoom = mapboxMap.cameraPosition.zoom
         if (::dronePositionMarker.isInitialized) {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng,
-                    if (currentZoom > DEFAULT_ZOOM-ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM+ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
+                    if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
         }
     }
 
