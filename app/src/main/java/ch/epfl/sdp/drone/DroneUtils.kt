@@ -1,12 +1,12 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.drone
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
 
-object DroneMission {
+object DroneUtils {
     private val missionItems = arrayListOf<Mission.MissionItem>()
 
-    fun makeDroneMission(path: List<LatLng>): DroneMission {
+    fun makeDroneMission(path: List<LatLng>): DroneUtils {
         path.forEach { point ->
             missionItems.add(generateMissionItem(point.latitude, point.longitude))
         }

@@ -12,14 +12,20 @@ import androidx.lifecycle.Observer
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
-import ch.epfl.sdp.ui.maps.MapUtils
-import ch.epfl.sdp.ui.maps.MapUtils.DEFAULT_ZOOM
-import ch.epfl.sdp.ui.maps.MapUtils.ZOOM_TOLERANCE
+import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
+import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
+import ch.epfl.sdp.mission.MissionBuilder
+import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.searcharea.QuadrilateralBuilder
+import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.utils.Auth
+import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -45,6 +51,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
+
+    private lateinit var snackbar: Snackbar
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -145,6 +153,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
+        snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
         //TODO: Give user location if current drone position is not available
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
@@ -323,9 +332,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun startMissionOrReturnHome(v: View) {
+        if (!Drone.isDroneConnected()) {
+            snackbar.show()
+        }
         if (!isDroneFlying) { //TODO : return to user else
             isDroneFlying = true
-            Drone.startMission(DroneMission.makeDroneMission(
+            Drone.startMission(DroneUtils.makeDroneMission(
                     missionBuilder.build()
             ).getMissionItems())
         }
@@ -362,8 +374,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateDronePosition(newLatLng: LatLng) {
-        CentralLocationManager.currentUserPosition.value?.let {
-            updateTextView(distanceToUserTextView, it.distanceTo(newLatLng), DISTANCE_FORMAT)
+        CentralLocationManager.currentUserPosition.value.let {
+            updateTextView(distanceToUserTextView, it?.distanceTo(newLatLng), DISTANCE_FORMAT)
         }
     }
 

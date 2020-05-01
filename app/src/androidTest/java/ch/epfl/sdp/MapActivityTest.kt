@@ -25,8 +25,10 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.utils.CentralLocationManager
 import ch.epfl.sdp.drone.Drone.currentMissionLiveData
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.utils.Auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -236,7 +238,7 @@ class MapActivityTest {
             mActivityRule.activity.onMapClicked(LatLng(4.0, 4.0))
         }
 
-        onView(withText("Already enough points for a quadrilateral"))
+        onView(withText("Already enough points"))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
     }

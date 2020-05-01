@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -15,11 +16,16 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.utils.Auth
+import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var snackbar: Snackbar
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
+        snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -56,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         CentralLocationManager.configure(this)
+        showSnackbar()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -78,5 +87,10 @@ class MainActivity : AppCompatActivity() {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    fun showSnackbar() {
+        if (!Drone.isDroneConnected())
+            snackbar.show()
     }
 }
