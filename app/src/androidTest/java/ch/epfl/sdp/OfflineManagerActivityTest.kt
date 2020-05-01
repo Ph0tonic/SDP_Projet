@@ -37,9 +37,9 @@ class OfflineManagerActivityTest {
     companion object {
         private const val ZOOM = 10.0
 
-        private val FAKE_MAP_LOCATION_1 = LatLng(46.399111, -31.697953)
+        private val FAKE_MAP_LOCATION_1 = LatLng(47.3975, 8.5445)
         private const val FAKE_MAP_NAME_1 = "RandomName"
-        private val FAKE_MAP_LOCATION_2: LatLng = LatLng(42.125, -30.229)
+        private val FAKE_MAP_LOCATION_2 = LatLng(47.3975, 8.5445)
         private const val FAKE_MAP_NAME_2 = "SEA"
 
         private const val MAP_LOADING_TIMEOUT: Long = 2000
@@ -60,7 +60,7 @@ class OfflineManagerActivityTest {
 
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
-        moveCameraToPosition(LatLng(0.0, 0.0))
+        moveCameraToPosition(FAKE_MAP_LOCATION_2)
     }
 
     private fun moveCameraToPosition(pos: LatLng) {
@@ -110,6 +110,9 @@ class OfflineManagerActivityTest {
         mUiDevice.pressBack()
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 30)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         onView(withText(applicationContext().getString(R.string.end_progress_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
@@ -176,7 +179,7 @@ class OfflineManagerActivityTest {
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 30)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         onView(withText(applicationContext().getString(R.string.end_progress_success)))
@@ -216,6 +219,9 @@ class OfflineManagerActivityTest {
         //DELETE PART
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
+
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
