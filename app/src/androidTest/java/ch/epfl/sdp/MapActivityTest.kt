@@ -94,7 +94,7 @@ class MapActivityTest {
         // Launch activity
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         onView(withId(R.id.start_or_return_button)).perform(click())
         val expectedLatLng = LatLng(47.397026, 8.543067)
@@ -133,7 +133,7 @@ class MapActivityTest {
         // Launch activity after setting preferences
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
@@ -149,7 +149,7 @@ class MapActivityTest {
         // Launch activity after setting preferences
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
 
@@ -187,7 +187,7 @@ class MapActivityTest {
     fun longClickOnMapAddAMarker() {
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         onView(withId(R.id.mapView)).perform(longClick())
         runOnUiThread {
@@ -204,7 +204,7 @@ class MapActivityTest {
     fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
 
@@ -224,7 +224,7 @@ class MapActivityTest {
     fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         // Add 5 points
         runOnUiThread {
@@ -244,7 +244,7 @@ class MapActivityTest {
     fun deleteButtonRemovesWaypoints() {
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
         runOnUiThread {
@@ -264,7 +264,7 @@ class MapActivityTest {
     fun storeMapButtonIsWorking() {
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         onView(withId(R.id.floating_menu_button)).perform(click())
         onView(withId(R.id.store_button)).perform(click())
@@ -277,7 +277,7 @@ class MapActivityTest {
     fun locateButtonIsWorking() {
         mActivityRule.launchActivity(intentWithGroup)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.currentPositionLiveData.value = FAKE_LOCATION_TEST
