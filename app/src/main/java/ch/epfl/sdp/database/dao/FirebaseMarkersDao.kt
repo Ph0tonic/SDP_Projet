@@ -52,6 +52,6 @@ class FirebaseMarkersDao : MarkerDao {
     }
 
     override fun removeMarker(groupId: String, markerId: String) {
-        database.getReference("markers/$groupId/$markerId").removeValue()
+        database.getReference("markers/$groupId").child(markerId).removeValue()
     }
 }
