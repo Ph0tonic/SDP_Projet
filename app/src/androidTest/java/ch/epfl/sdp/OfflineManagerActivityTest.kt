@@ -9,7 +9,6 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
@@ -35,14 +34,13 @@ class OfflineManagerActivityTest {
     private lateinit var offlineManager: OfflineManager
 
     companion object {
-        private const val ZOOM = 10.0
+        private const val ZOOM_VALUE = 15.0
 
-        private val FAKE_MAP_LOCATION_1 = LatLng(47.3975, 8.5445)
         private const val FAKE_MAP_NAME_1 = "RandomName"
-        private val FAKE_MAP_LOCATION_2 = LatLng(47.3975, 8.5445)
         private const val FAKE_MAP_NAME_2 = "SEA"
+        private val FAKE_MAP_LOCATION = LatLng(14.0, 12.0)
 
-        private const val MAP_LOADING_TIMEOUT: Long = 2000
+        private const val MAP_LOADING_TIMEOUT = 30000L
         private const val EPSILON = 1e-3
         private const val POSITIVE_BUTTON_ID: Int = android.R.id.button1
         private const val NEGATIVE_BUTTON_ID: Int = android.R.id.button2
@@ -60,13 +58,13 @@ class OfflineManagerActivityTest {
 
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
-        moveCameraToPosition(FAKE_MAP_LOCATION_2)
+        moveCameraToPosition(FAKE_MAP_LOCATION)
     }
 
     private fun moveCameraToPosition(pos: LatLng) {
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                mapboxMap.cameraPosition = getCameraWithParameters(pos, ZOOM)
+                mapboxMap.cameraPosition = getCameraWithParameters(pos, ZOOM_VALUE)
             }
         }
     }
@@ -159,9 +157,85 @@ class OfflineManagerActivityTest {
      */
     @Test
     fun canNavigateToDownloadedMap() {
+//        val randomLocation = LatLng((-90..90).random().toDouble(), (-180..180).random().toDouble())
+//
+//        moveCameraToPosition(FAKE_MAP_LOCATION_2)
+//
+//        //check that the downloaded list map is empty
+//        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+//            override fun onList(offlineRegions: Array<OfflineRegion>) {
+//                assert(offlineRegions.isEmpty())
+//            }
+//
+//            override fun onError(error: String) {} //left intentionally empty
+//        })
+//
+//        //DOWNLOAD Part
+//        onView(withId(R.id.download_button)).perform(click())
+//        onView(withId(R.id.dialog_textfield_id)).perform(typeText(FAKE_MAP_NAME_2))
+//        mUiDevice.pressBack()
+//
+//        onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+//
+//        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
+//        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+//
+//        onView(withText(applicationContext().getString(R.string.end_progress_success)))
+//                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+//                .check(matches(isDisplayed()))
+//
+//        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+//            override fun onList(offlineRegions: Array<OfflineRegion>) {
+//                //check that the region has been downloaded
+//                assertThat(getRegionName(offlineRegions[0]), equalTo(FAKE_MAP_NAME_2))
+//            }
+//
+//            override fun onError(error: String) {} //left intentionally empty
+//        })
+//
+//        runOnUiThread {
+//            moveCameraToPosition(randomLocation)
+//        }
+//
+//        //NAVIGATE Part
+//        onView(withId(R.id.list_button)).perform(click())
+//        onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+//        onView(withText(FAKE_MAP_NAME_2))
+//                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+//                .check(matches(isDisplayed()))
+//
+//        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+//        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+//
+//        runOnUiThread {
+//            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+//                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(FAKE_MAP_LOCATION_2.latitude, EPSILON))
+//                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(FAKE_MAP_LOCATION_2.longitude, EPSILON))
+//            }
+//        }
+//
+//        //DELETE PART
+//        onView(withId(R.id.list_button)).perform(click())
+//        onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
+//
+//        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+//        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+//
+//        onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
+//                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+//                .check(matches(isDisplayed()))
+//
+//        //check that the downloaded list map is empty
+//        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+//            override fun onList(offlineRegions: Array<OfflineRegion>) {
+//                assert(offlineRegions.isEmpty())
+//            }
+//
+//            override fun onError(error: String) {} //left intentionally empty
+//        })
         val randomLocation = LatLng((-90..90).random().toDouble(), (-180..180).random().toDouble())
 
-        moveCameraToPosition(FAKE_MAP_LOCATION_2)
+        moveCameraToPosition(FAKE_MAP_LOCATION)
 
         //check that the downloaded list map is empty
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
@@ -179,7 +253,7 @@ class OfflineManagerActivityTest {
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
 
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 30)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         onView(withText(applicationContext().getString(R.string.end_progress_success)))
@@ -189,15 +263,13 @@ class OfflineManagerActivityTest {
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
-                assertThat(getRegionName(offlineRegions[0]), equalTo(FAKE_MAP_NAME_2))
+                assertThat(FAKE_MAP_NAME_2, equalTo(getRegionName(offlineRegions[0])))
             }
 
             override fun onError(error: String) {} //left intentionally empty
         })
 
-        runOnUiThread {
-            moveCameraToPosition(randomLocation)
-        }
+        moveCameraToPosition(randomLocation)
 
         //NAVIGATE Part
         onView(withId(R.id.list_button)).perform(click())
@@ -206,22 +278,15 @@ class OfflineManagerActivityTest {
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
 
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
-
-        runOnUiThread {
-            mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(FAKE_MAP_LOCATION_2.latitude, EPSILON))
-                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(FAKE_MAP_LOCATION_2.longitude, EPSILON))
-            }
+        mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
+            assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(FAKE_MAP_LOCATION.latitude, EPSILON))
+            assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(FAKE_MAP_LOCATION.longitude, EPSILON))
         }
 
         //DELETE PART
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEUTRAL_BUTTON_ID)).perform(click())
-
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
 
         onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
