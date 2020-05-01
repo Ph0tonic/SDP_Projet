@@ -21,6 +21,7 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_maps_managing">Maps managing</string>
+    <string name="not_connected_message">You are currently not connected to the drone</string>
 
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
 
