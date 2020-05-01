@@ -32,9 +32,9 @@ class FirebaseMarkerDaoTest {
     }
 
     @Before
-    @Throws(Exception::class)
     fun beforeAll() {
         Firebase.database.goOffline()
+        Firebase.database.reference.removeValue()
     }
 
     @Test
