@@ -18,8 +18,8 @@ import kotlin.math.sqrt
 class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
-    companion object {
-        const val earthRadius = 6378137
+    private companion object {
+        private const val earthRadius = 6378137
     }
 
     init {
