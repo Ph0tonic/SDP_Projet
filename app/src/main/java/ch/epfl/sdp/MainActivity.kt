@@ -34,8 +34,7 @@ class MainActivity : AppCompatActivity() {
         val navView = findViewById<NavigationView>(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
-                .setBackgroundTint(Color.BLACK)
-                .setTextColor(Color.WHITE)
+                .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
