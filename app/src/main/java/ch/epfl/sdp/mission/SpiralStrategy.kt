@@ -19,7 +19,7 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
     private companion object {
-        private const val earthRadius = 6378137
+        private const val EARTH_RADIUS = 6378137
     }
 
     init {
@@ -49,7 +49,7 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val turns: Double = radius / maxDistBetweenLines
 
         //Portion of the earth we should cover, defines the radius of the spiral
-        val maxTheta = radius / earthRadius
+        val maxTheta = radius / EARTH_RADIUS
 
         //offsets the beginning of the spiral so that the end meets the point <outer>
         val phi0 = angleToOuter - 2 * PI * turns
@@ -66,7 +66,7 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
             val s = step.toDouble() / steps
             val t = sqrt(s)
             val theta = maxTheta * t
-            val distance = theta * earthRadius
+            val distance = theta * EARTH_RADIUS
             val phi = 2 * PI * turns * t
 
             path.add(computeOffset(center, distance, Math.toDegrees(phi0 + phi)))
