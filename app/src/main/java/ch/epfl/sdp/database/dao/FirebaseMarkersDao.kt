@@ -1,12 +1,11 @@
 package ch.epfl.sdp.database.dao
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.MarkerData
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import timber.log.Timber
@@ -18,20 +17,30 @@ class FirebaseMarkersDao : MarkerDao {
 
     override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
         if (!groupMarkers.containsKey(groupId)) {
+            //Initialise data
             val myRef = database.getReference("markers/$groupId")
             groupMarkers[groupId] = MutableLiveData(setOf())
-            myRef.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val markers = dataSnapshot.children.map {
-                        val marker = it.getValue(MarkerData::class.java)!!
-                        marker.uuid = it.key
-                        marker
-                    }.toSet()
-                    groupMarkers[groupId]!!.value = markers
+
+            myRef.addChildEventListener(object : ChildEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    Timber.w("Failed to read value.")
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Timber.w("Failed to read markers of search group from firebase.")
+                override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
+                override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+                    throw IllegalAccessException("A marker has changed and this shouldn't happen !!!")
+                }
+
+                override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+                    val marker = dataSnapshot.getValue(MarkerData::class.java)!!
+                    marker.uuid = dataSnapshot.key
+                    groupMarkers[groupId]!!.value = groupMarkers[groupId]!!.value!!.plus(marker)
+                }
+
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                    val marker = dataSnapshot.getValue(MarkerData::class.java)!!
+                    marker.uuid = dataSnapshot.key
+                    groupMarkers[groupId]!!.value = groupMarkers[groupId]!!.value!!.minus(marker)
                 }
             })
         }
