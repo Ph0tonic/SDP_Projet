@@ -25,18 +25,15 @@ class FirebaseMarkersDao : MarkerDao {
                 override fun onCancelled(p0: DatabaseError) {
                     Timber.w("Failed to read value.")
                 }
-
                 override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
                 override fun onChildChanged(p0: DataSnapshot, p1: String?) {
                     throw IllegalAccessException("A marker has changed and this shouldn't happen !!!")
                 }
-
                 override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
                     val marker = dataSnapshot.getValue(MarkerData::class.java)!!
                     marker.uuid = dataSnapshot.key
                     groupMarkers[groupId]!!.value = groupMarkers[groupId]!!.value!!.plus(marker)
                 }
-
                 override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                     val marker = dataSnapshot.getValue(MarkerData::class.java)!!
                     marker.uuid = dataSnapshot.key
