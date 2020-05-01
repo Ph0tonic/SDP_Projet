@@ -1,6 +1,5 @@
 package ch.epfl.sdp.database.dao
 
-import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.data.MarkerData
@@ -32,7 +31,6 @@ class FirebaseMarkerDaoTest {
     }
 
     @Before
-    @Throws(Exception::class)
     fun beforeAll() {
         Firebase.database.goOffline()
     }

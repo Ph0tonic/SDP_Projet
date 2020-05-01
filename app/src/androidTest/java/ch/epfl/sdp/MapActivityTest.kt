@@ -84,10 +84,7 @@ class MapActivityTest {
         //HeatmapRepository.daoProvider = { MockHeatmapDao() }
         //MarkerRepository.daoProvider = { MockMarkerDao() }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
-    }
 
-    @Before
-    fun setUp() {
         val targetContext: Context = getInstrumentation().targetContext
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
     }
