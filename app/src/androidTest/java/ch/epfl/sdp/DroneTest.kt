@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.drone.DroneUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -41,7 +42,7 @@ class DroneTest {
                 LatLng(47.397426, 8.544867),
                 LatLng(47.397026, 8.543067)
         )
-        Drone.startMission(DroneMission.makeDroneMission(someLocationsList).getMissionItems())
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList).getMissionItems())
         assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
     }
 
