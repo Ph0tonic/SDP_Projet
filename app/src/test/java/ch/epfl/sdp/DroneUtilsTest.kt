@@ -1,12 +1,13 @@
 package ch.epfl.sdp
 
+import ch.epfl.sdp.drone.DroneUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
 import org.junit.Assert
 import org.junit.Test
 import kotlin.random.Random.Default.nextDouble
 
-class DroneMissionTest {
+class DroneUtilsTest {
 
     @Test
     fun generateMissionItemTest() {
@@ -22,7 +23,7 @@ class DroneMissionTest {
                     true, Float.NaN, Float.NaN,
                     Mission.MissionItem.CameraAction.NONE, Float.NaN,
                     1.0)
-            val expectedMission = DroneMission.generateMissionItem(randomLatitude, randomLongitude)
+            val expectedMission = DroneUtils.generateMissionItem(randomLatitude, randomLongitude)
             Assert.assertTrue(missionEquality(expectedMission, mission))
         }
     }
@@ -37,10 +38,10 @@ class DroneMissionTest {
         )
 
         val expectedMissionItems = positions.map { pos ->
-            DroneMission.generateMissionItem(pos.latitude, pos.longitude)
+            DroneUtils.generateMissionItem(pos.latitude, pos.longitude)
         }
 
-        val missionsItems = DroneMission
+        val missionsItems = DroneUtils
                 .makeDroneMission(positions)
                 .getMissionItems()
 

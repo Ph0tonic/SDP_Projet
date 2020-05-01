@@ -14,6 +14,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import ch.epfl.sdp.utils.Auth
+import ch.epfl.sdp.utils.CentralLocationManager
 import ch.epfl.sdp.drone.Drone
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar

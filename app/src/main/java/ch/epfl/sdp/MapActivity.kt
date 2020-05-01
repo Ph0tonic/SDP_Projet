@@ -10,13 +10,17 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
-import ch.epfl.sdp.ui.maps.MapUtils
-import ch.epfl.sdp.ui.maps.MapUtils.DEFAULT_ZOOM
-import ch.epfl.sdp.ui.maps.MapUtils.ZOOM_TOLERANCE
+import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
+import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
+import ch.epfl.sdp.mission.MissionBuilder
+import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.searcharea.QuadrilateralBuilder
+import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.mapbox.geojson.Feature
@@ -267,7 +271,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
         if (!isDroneFlying) { //TODO : return to user else
             isDroneFlying = true
-            Drone.startMission(DroneMission.makeDroneMission(
+            Drone.startMission(DroneUtils.makeDroneMission(
                     missionBuilder.build()
             ).getMissionItems())
         }

@@ -1,9 +1,8 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.mission
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfl.sdp.drone.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.searchareabuilder.QuadrilateralArea
+import ch.epfl.sdp.searcharea.QuadrilateralArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -30,7 +29,7 @@ class SimpleMultiPassOnQuadrilateralTest {
     @Test(expected = java.lang.IllegalArgumentException::class)
     fun simpleMultiPassOnQuadrangleDoesNotAcceptIncompleteSearchArea() {
         val searchArea = QuadrilateralArea(listOf(LatLng(0.0, 0.0)))
-        SimpleMultiPassOnQuadrilateral(-10.0)
+        SimpleMultiPassOnQuadrilateral(10.0)
                 .createFlightPath(LatLng(0.0, 0.0), searchArea)
     }
 

@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import ch.epfl.sdp.Auth
+import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.R
 import com.bumptech.glide.Glide
 

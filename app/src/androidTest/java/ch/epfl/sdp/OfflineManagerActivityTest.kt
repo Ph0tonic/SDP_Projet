@@ -14,8 +14,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.MapActivityTest.Companion.MAP_LOADING_TIMEOUT
-import ch.epfl.sdp.ui.maps.MapUtils.getCameraWithParameters
+import ch.epfl.sdp.map.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName

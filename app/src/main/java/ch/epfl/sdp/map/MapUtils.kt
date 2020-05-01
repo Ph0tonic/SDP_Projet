@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.maps
+package ch.epfl.sdp.map
 
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
