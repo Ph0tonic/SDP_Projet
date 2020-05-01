@@ -18,7 +18,7 @@ import kotlin.math.sqrt
 class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
-    companion object{
+    companion object {
         const val earthRadius = 6378137
     }
 
@@ -39,6 +39,12 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val center = area.center
         val outer = area.outer
         val radius = center.distanceTo(outer)
+        val angleToOuter = Math.toRadians(computeHeading(center, outer))
+
+        return generatePointsAlongSpiral(center, radius, angleToOuter)
+    }
+
+    private fun generatePointsAlongSpiral(center: LatLng, radius: Double, angleToOuter: Double): List<LatLng> {
 
         val turns: Double = radius / maxDistBetweenLines
 
@@ -46,7 +52,6 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val maxTheta = radius / earthRadius
 
         //offsets the beginning of the spiral so that the end meets the point <outer>
-        val angleToOuter = Math.toRadians(computeHeading(center, outer))
         val phi0 = angleToOuter - 2 * PI * turns
 
         //steps is chosen so that the approximate arc length between the two last points is equal to maxDistBetweenLines
@@ -54,11 +59,6 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val protoC = 1.0 - 1 / (turns * turns * 2 * PI)
         val c = max(protoC, 0.0) //if distance is short, behaves as a straight line
         val steps = ceil(1.0 / (1 - c * c)).toInt()
-
-        return generatePointsAlongSpiral(center, phi0, maxTheta, turns, steps)
-    }
-
-    private fun generatePointsAlongSpiral(center: LatLng, phi0: Double, maxTheta: Double, turns: Double, steps: Int): List<LatLng> {
 
         val path = ArrayList<LatLng>()
 
