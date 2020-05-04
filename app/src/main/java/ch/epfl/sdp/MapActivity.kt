@@ -190,9 +190,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
             searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, style)
 
-            victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
             victimSymbolManager.iconAllowOverlap = true
             victimSymbolManager.symbolSpacing = 0F
             victimSymbolManager.iconIgnorePlacement = true
@@ -269,13 +269,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      *  - An observer for each heatmap for new points
      */
     private fun setupHeatmapsObservers(style: Style) {
+        val upperLayerId = victimSymbolManager.layerId
         heatmapRepository.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
             // Observers for heatmap creation
-            Log.w("FIREBASE/HEATMAP", "created observer for heatmap collection")
             repoHeatmaps.filter { !heatmapPainters.containsKey(it.key) }
                     .forEach { (key, value) ->
-                        heatmapPainters[key] = MapboxHeatmapPainter(style, this, value)
-                        Log.w("FIREBASE/HEATMAP", "created observer for specific heatmap")
+                        heatmapPainters[key] = MapboxHeatmapPainter(style, this, value, upperLayerId)
                     }
 
             // Remove observers on heatmap deletion

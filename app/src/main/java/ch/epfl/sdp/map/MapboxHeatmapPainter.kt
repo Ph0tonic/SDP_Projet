@@ -7,7 +7,6 @@ import ch.epfl.sdp.database.data.HeatmapData
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
@@ -17,7 +16,8 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
 class MapboxHeatmapPainter(style: Style,
                            lifecycleOwner: LifecycleOwner,
-                           val heatmapData: MutableLiveData<HeatmapData>) {
+                           val heatmapData: MutableLiveData<HeatmapData>,
+                           belowLayerId: String) {
 
     companion object {
         private val BLUE = Expression.rgb(0, 0, 255)
@@ -26,7 +26,7 @@ class MapboxHeatmapPainter(style: Style,
         private val ORANGE = Expression.rgb(255, 255, 0)
         private val RED = Expression.rgb(255, 0, 0)
 
-        private fun unclusteredLayerData(heatmapId: String, style: Style) {
+        private fun unclusteredLayerData(heatmapId: String, style: Style, belowLayerId: String) {
             val unclustered = CircleLayer("unclustered-points$heatmapId", heatmapId)
             unclustered.setProperties(
                     PropertyFactory.circleColor(
@@ -41,10 +41,10 @@ class MapboxHeatmapPainter(style: Style,
                     PropertyFactory.circleRadius(40f),
                     PropertyFactory.circleBlur(1.5f))
             unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
-            style.addLayerBelow(unclustered, heatmapId)
+            style.addLayerBelow(unclustered, belowLayerId)
         }
 
-        private fun clusteredLayerData(heatmapId: String, style: Style) {
+        private fun clusteredLayerData(heatmapId: String, style: Style, belowLayerId: String) {
             val clustered = CircleLayer("clustered-points-$heatmapId", heatmapId)
             clustered.setProperties(
                     PropertyFactory.circleColor(RED),
@@ -52,7 +52,7 @@ class MapboxHeatmapPainter(style: Style,
                     PropertyFactory.circleBlur(1f)
             )
             clustered.setFilter(Expression.eq(Expression.get("cluster"), Expression.literal(true)))
-            style.addLayerBelow(clustered, heatmapId)
+            style.addLayerBelow(clustered, belowLayerId)
         }
     }
 
@@ -67,8 +67,8 @@ class MapboxHeatmapPainter(style: Style,
         val heatmapId = heatmapData.value!!.uuid!!
         style.addSource(geoJsonSource)
         heatmapData.observe(lifecycleOwner, heatmapRedrawObserver)
-        unclusteredLayerData(heatmapId, style)
-        clusteredLayerData(heatmapId, style)
+        unclusteredLayerData(heatmapId, style, belowLayerId)
+        clusteredLayerData(heatmapId, style, belowLayerId)
 
         // first call is not triggered by observer
         paint()
