@@ -1,9 +1,12 @@
 package ch.epfl.sdp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.ui.searchgroupselection.SearchGroupRecyclerAdapter
 
 class SearchGroupSelectionActivity : AppCompatActivity() {
 
@@ -22,5 +25,8 @@ class SearchGroupSelectionActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
         recyclerView.layoutManager = linearLayoutManager
 
+        SearchGroupRepository().getGroups().observe(this, Observer {
+            recyclerView.adapter = SearchGroupRecyclerAdapter(it)
+        })
     }
 }

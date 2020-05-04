@@ -58,13 +58,13 @@ object Auth : ViewModel() {
             val context = MainApplication.applicationContext()
             GoogleSignIn.getSignedInAccountFromIntent(data)
                     .addOnSuccessListener {
+                        updateLoginStateFromAccount(it)
                         onLoginCallback.forEach { it(true) }
                         onLoginCallback.clear()
-                        updateLoginStateFromAccount(it)
                     }.addOnFailureListener {
+                        Toast.makeText(context, context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
                         onLoginCallback.forEach { it(false) }
                         onLoginCallback.clear()
-                        Toast.makeText(context, context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
                     }
         }
     }
@@ -78,10 +78,10 @@ object Auth : ViewModel() {
     }
 
     private fun updateLoginStateFromAccount(account: GoogleSignInAccount) {
-        email.postValue(account.email)
-        name.postValue(account.displayName)
-        profileImageURL.postValue(account.photoUrl.toString())
-        loggedIn.postValue(true)
-        accountId.postValue(account.id)
+        email.value = account.email
+        name.value = account.displayName
+        profileImageURL.value = account.photoUrl.toString()
+        loggedIn.value = true
+        accountId.value = account.id
     }
 }
