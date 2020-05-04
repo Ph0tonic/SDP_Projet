@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -26,6 +27,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var snackbar: Snackbar
+
+    private var selectSearchGroupAction = false
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,5 +95,33 @@ class MainActivity : AppCompatActivity() {
     fun showSnackbar() {
         if (!Drone.isDroneConnected())
             snackbar.show()
+    }
+
+    fun selectSearchGroup(view: View) {
+        if (Auth.loggedIn.value == false) {
+            selectSearchGroupAction = true
+            Auth.login(this) { success ->
+                if (success) {
+                    selectSearchGroup(view)
+                }
+            }
+        } else {
+            //TODO: open to select search group ...
+        }
+    }
+
+    fun startMission(view: View) {
+        val intent = Intent(this, MapActivity::class.java)
+                .putExtra("groupId", "g2") //TODO adapt group ID via group choosing activity or something
+        startActivity(intent)
+    }
+
+    fun workOffline(view: View) {
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Auth.onActivityResult(requestCode, resultCode, data)
     }
 }

@@ -55,4 +55,7 @@
     <string name="map_button">Start new mission</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="sign_out_success">Sign out successful</string>
+    <string name="select_search_group">Select search group</string>
+    <string name="start_mission">Start mission</string>
+    <string name="work_offline">Work offline</string>
 </resources>

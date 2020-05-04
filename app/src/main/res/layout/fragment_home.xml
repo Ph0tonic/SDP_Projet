@@ -6,31 +6,60 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/display_map"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/map_button"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@color/colorBlack"
-            android:textSize="48sp"
-            android:layout_weight="7"
-            app:layout_constraintLeft_toRightOf="@+id/panelFragment"
-            app:layout_constraintEnd_toEndOf="parent"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="253dp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <Button
+                android:id="@+id/search_group_selection"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="7"
+                android:background="@color/colorPrimaryDark"
+                android:text="@string/select_search_group"
+                android:textColor="@color/colorBlack"
+                android:textSize="48sp"
+                android:onClick="selectSearchGroup"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/panelFragment"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/work_offline"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="7"
+                android:background="@color/colorPrimaryDark"
+                android:text="@string/start_mission"
+                android:textColor="@color/colorBlack"
+                android:textSize="48sp"
+                android:onClick="startMission"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/panelFragment"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/start_mission"
+                android:layout_width="match_parent"
+                android:text="@string/work_offline"
+                android:background="@color/colorPrimaryDark"
+                android:textColor="@color/colorBlack"
+                android:textSize="48sp"
+                android:layout_weight="7"
+                android:onClick="workOffline"
+                app:layout_constraintLeft_toRightOf="@+id/panelFragment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

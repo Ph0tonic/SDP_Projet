@@ -16,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 object Auth : ViewModel() {
 
     private const val RC_SIGN_IN = 9001
+    private var onLoginCallback: MutableList<(Boolean) -> Unit> = mutableListOf()
 
     val loggedIn: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val email: MutableLiveData<String> by lazy { MutableLiveData<String>() }
@@ -42,11 +43,13 @@ object Auth : ViewModel() {
      *  Allow to launch the connect from a Fragment or anActivity
      *  Need to override onActivityResult and call Auth.onActivityResult
      */
-    fun login(fragment: Fragment) {
+    fun login(fragment: Fragment, callback: ((success: Boolean) -> Unit)? = null) {
+        callback?.let { onLoginCallback.add(it) }
         fragment.startActivityForResult(createGoogleSignClient().signInIntent, RC_SIGN_IN)
     }
 
-    fun login(activity: Activity) {
+    fun login(activity: Activity, callback: ((success: Boolean) -> Unit)? = null) {
+        callback?.let { onLoginCallback.add(it) }
         activity.startActivityForResult(createGoogleSignClient().signInIntent, RC_SIGN_IN)
     }
 
@@ -55,8 +58,12 @@ object Auth : ViewModel() {
             val context = MainApplication.applicationContext()
             GoogleSignIn.getSignedInAccountFromIntent(data)
                     .addOnSuccessListener {
+                        onLoginCallback.forEach { it(true) }
+                        onLoginCallback.clear()
                         updateLoginStateFromAccount(it)
                     }.addOnFailureListener {
+                        onLoginCallback.forEach { it(false) }
+                        onLoginCallback.clear()
                         Toast.makeText(context, context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
                     }
         }
