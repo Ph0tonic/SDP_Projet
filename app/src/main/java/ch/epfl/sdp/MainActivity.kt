@@ -17,6 +17,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
+import ch.epfl.sdp.SearchGroupSelectionActivity.Companion.CANCELLED_RESULT_TAG
+import ch.epfl.sdp.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -27,6 +30,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var snackbar: Snackbar
+
+    companion object {
+        private val SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE = 7865
+    }
 
     private var selectSearchGroupAction = false
 
@@ -106,7 +113,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } else {
-            //TODO: open to select search group ...
+            val intent = Intent(this, SearchGroupSelectionActivity::class.java)
+            startActivityForResult(intent, SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE)
         }
     }
 
@@ -122,6 +130,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
+            val cancelled = data!!.getBooleanExtra(CANCELLED_RESULT_TAG, true)
+            if (!cancelled) {
+                val groupId = data.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
+                PreferenceManager.getDefaultSharedPreferences(this)
+                        .edit()
+                        .putString("CURRENT_SEARCHGROUP_ID", groupId)
+                        .apply()
+            }
+        }
         Auth.onActivityResult(requestCode, resultCode, data)
     }
 }
