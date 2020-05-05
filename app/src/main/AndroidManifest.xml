@@ -11,7 +11,7 @@
         android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Launcher">
-        <activity android:name=".SearchGroupSelectionActivity"></activity>
+        <activity android:name=".ui.searchgroupselection.SearchGroupSelectionActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"

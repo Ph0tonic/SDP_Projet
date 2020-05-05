@@ -24,7 +24,7 @@
                 android:text="@string/select_search_group"
                 android:textColor="@color/colorBlack"
                 android:textSize="48sp"
-                android:onClick="selectSearchGroup"
+                android:onClick="goToSearchGroupSelect"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toRightOf="@+id/panelFragment"

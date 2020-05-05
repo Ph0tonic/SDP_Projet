@@ -1,9 +1,11 @@
 package ch.epfl.sdp
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,9 +20,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import ch.epfl.sdp.SearchGroupSelectionActivity.Companion.CANCELLED_RESULT_TAG
-import ch.epfl.sdp.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
+import ch.epfl.sdp.ui.searchgroupselection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.searchgroupselection.SearchGroupSelectionActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView
@@ -104,12 +106,12 @@ class MainActivity : AppCompatActivity() {
             snackbar.show()
     }
 
-    fun selectSearchGroup(view: View) {
+    fun goToSearchGroupSelect(view: View) {
         if (Auth.loggedIn.value == false) {
             selectSearchGroupAction = true
             Auth.login(this) { success ->
                 if (success) {
-                    selectSearchGroup(view)
+                    goToSearchGroupSelect(view)
                 }
             }
         } else {
@@ -130,10 +132,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
-            val cancelled = data!!.getBooleanExtra(CANCELLED_RESULT_TAG, true)
-            if (!cancelled) {
-                val groupId = data.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
+        if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                val groupId = data!!.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
                 PreferenceManager.getDefaultSharedPreferences(this)
                         .edit()
                         .putString("CURRENT_SEARCHGROUP_ID", groupId)
