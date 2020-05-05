@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.epfl.sdp">
+    package="ch.epfl.sdp" >
 
     <uses-feature android:name="android.hardware.screen.landscape" />
 
@@ -16,13 +16,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="landscape"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Launcher">
-        <activity android:name=".searchgroupEditionActivity"></activity>
+        android:theme="@style/AppTheme.Launcher" >
+        <activity android:name=".searchgroupEditionActivity" >
+        </activity>
         <activity android:name=".ui.searchgroupselection.SearchGroupSelectionActivity" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher" >
 
             <!--
              The theme set here is launcher, but it gets set to no_actionBar in MainActivity.kt

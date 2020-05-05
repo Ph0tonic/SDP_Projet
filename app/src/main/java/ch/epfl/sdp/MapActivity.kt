@@ -17,7 +17,10 @@ import ch.epfl.sdp.map.*
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
+import ch.epfl.sdp.mission.OverflightStrategy
 import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SpiralStrategy
+import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -65,6 +68,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var clearButton: FloatingActionButton
 
     private lateinit var role: Role
+    private var currentStrategy: OverflightStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
 
     private var victimSymbolLongClickConsumed = false
 
@@ -310,10 +314,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun onMapClicked(position: LatLng) {
-        try {
-            searchAreaBuilder.addVertex(position)
-        } catch (e: IllegalArgumentException) {
-            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        if (role == Role.OPERATOR){
+            try {
+                searchAreaBuilder.addVertex(position)
+            } catch (e: IllegalArgumentException) {
+                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -406,6 +412,27 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    fun pickStrategy(view: View) {
+        searchAreaBuilder.reset()
+        searchAreaPainter.unMount()
+
+        if(currentStrategy is SimpleMultiPassOnQuadrilateral){
+            currentStrategy = SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
+            searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
+            searchAreaBuilder = CircleBuilder()
+        }else{
+            currentStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+            searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
+            searchAreaBuilder = QuadrilateralBuilder()
+        }
+
+        missionBuilder.withStrategy(currentStrategy)
+
+        searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
+        searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
+        searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
 
     /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/

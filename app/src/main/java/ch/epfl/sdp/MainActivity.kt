@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     fun startMission(view: View) {
         val intent = Intent(this, MapActivity::class.java)
                 .putExtra("groupId", currentGroupId.value)
-                .putExtra("Role", Role.RESCUER)
+                .putExtra("Role", Role.OPERATOR)
         startActivity(intent)
     }
 

@@ -15,7 +15,6 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
         private const val REGION_FILL_OPACITY: Float = 0.5F
     }
 
-    private var lineManager: LineManager = LineManager(mapView, mapboxMap, style)
     private var fillManager: FillManager = FillManager(mapView, mapboxMap, style)
     private var circleManager: CircleManager = CircleManager(mapView, mapboxMap, style)
 
@@ -48,7 +47,6 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
     override fun unMount() {
         super.unMount()
         nbVertices = 0
-        lineManager.deleteAll()
         fillManager.deleteAll()
         circleManager.deleteAll()
     }
