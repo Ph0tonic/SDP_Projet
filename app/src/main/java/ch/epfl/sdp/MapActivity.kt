@@ -61,6 +61,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var userLatitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
+    private lateinit var startOrReturnButton: FloatingActionButton
+    private lateinit var clearButton: FloatingActionButton
+
+    private lateinit var role: Role
 
     private var victimSymbolLongClickConsumed = false
 
@@ -146,7 +150,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         groupId = intent.getStringExtra("groupId")!!
-        Log.w("MAPACTIVITY", "group id for map activity: $groupId")
+        role = intent.getSerializableExtra("Role") as Role
+        Log.w("MAPACTIVITY", "Role for map activity: ${role.name}")
+
+
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
         droneBatteryLevelTextView = findViewById(R.id.battery_level)
@@ -154,6 +161,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+
+        startOrReturnButton = findViewById(R.id.start_or_return_button)!!
+        clearButton = findViewById(R.id.clear_button)!!
+
+        if(role == Role.RESCUER){
+            startOrReturnButton.visibility = View.GONE
+            clearButton.visibility = View.GONE
+        }
 
         //TODO: Give user location if current drone position is not available
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)

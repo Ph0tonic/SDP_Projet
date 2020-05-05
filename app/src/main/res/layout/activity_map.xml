@@ -131,18 +131,20 @@
             app:layout_constraintRight_toRightOf="parent">
         </org.videolan.libvlc.util.VLCVideoLayout>
     </LinearLayout>
+
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/floating_menu_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        mapbox:layout_constraintBottom_toBottomOf="parent"
-        mapbox:layout_constraintEnd_toEndOf="parent"
         app:fab_addButtonColorNormal="@color/colorPrimaryDark"
         app:fab_addButtonColorPressed="@color/colorPrimary"
         app:fab_addButtonPlusIconColor="@color/colorWhite"
         app:fab_expandDirection="left"
-        tools:context="ch.epfl.sdp.MapActivity"
-        >
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        tools:context="ch.epfl.sdp.MapActivity">
+
+
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/start_or_return_button"
             android:layout_width="wrap_content"
@@ -152,6 +154,8 @@
             app:fab_colorPressed="@color/colorLightGray"
             app:fab_icon="@drawable/ic_start"
             app:fab_size="normal" />
+
+
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/clear_button"
             android:layout_width="wrap_content"
@@ -160,7 +164,8 @@
             app:fab_colorNormal="@color/colorWhite"
             app:fab_colorPressed="@color/colorLightGray"
             app:fab_icon="@drawable/ic_clear"
-            app:fab_size="normal"/>
+            app:fab_size="normal" />
+
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/locate_button"
             android:layout_width="wrap_content"
@@ -169,7 +174,8 @@
             app:fab_colorNormal="@color/colorWhite"
             app:fab_colorPressed="@color/colorLightGray"
             app:fab_icon="@drawable/ic_locate"
-            app:fab_size="normal"/>
+            app:fab_size="normal" />
+
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/store_button"
             android:layout_width="wrap_content"
@@ -178,6 +184,6 @@
             app:fab_colorNormal="@color/colorWhite"
             app:fab_colorPressed="@color/colorLightGray"
             app:fab_icon="@drawable/ic_store"
-            app:fab_size="normal"/>
+            app:fab_size="normal" />
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 </androidx.constraintlayout.widget.ConstraintLayout>

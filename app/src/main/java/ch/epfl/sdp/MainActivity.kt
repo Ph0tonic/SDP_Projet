@@ -136,7 +136,8 @@ class MainActivity : AppCompatActivity() {
 
     fun startMission(view: View) {
         val intent = Intent(this, MapActivity::class.java)
-                .putExtra("groupId", currentGroupId.value) //TODO adapt group ID via group choosing activity or something
+                .putExtra("groupId", currentGroupId.value)
+                .putExtra("Role", Role.RESCUER)
         startActivity(intent)
     }
 
