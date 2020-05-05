@@ -76,24 +76,6 @@ class MapBoxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
             fillArea.latLngs = listOf(vertices)
             fillManager.update(fillArea)
         }
-
-//        //Draw the borders
-//        val linePoints = arrayListOf<LatLng>().apply {
-//            addAll(vertices)
-//            add(vertices.first())
-//        }
-//        if (!::lineArea.isInitialized || reseted) {
-//            lineManager.deleteAll()
-//            val lineOptions = LineOptions()
-//                    .withLatLngs(linePoints)
-//                    .withLineWidth(PATH_THICKNESS)
-//                    .withLineColor(ColorUtils.colorToRgbaString(Color.LTGRAY))
-//            lineArea = lineManager.create(lineOptions)
-//            reseted = false
-//        } else {
-//            lineArea.latLngs = linePoints
-//            lineManager.update(lineArea)
-//        }
     }
 
     /**

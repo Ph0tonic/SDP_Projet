@@ -7,7 +7,7 @@ import kotlin.math.min
 
 //Adapted from : https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 object IntersectionUtils {
-    // Given three colinear points p, q, r, the function checks if
+    // Given three collinear points p, q, r, the function checks if
     // point q lies on line segment 'pr'
     private fun onSegment(p: LatLng, q: LatLng, r: LatLng): Boolean {
         return q.latitude <= max(p.latitude, r.latitude) && q.latitude >= min(p.latitude, r.latitude) && q.longitude <= max(p.longitude, r.longitude) && q.longitude >= min(p.longitude, r.longitude)
@@ -15,7 +15,7 @@ object IntersectionUtils {
 
     // To find orientation of ordered triplet (p, q, r).
     // The function returns following values
-    // 0 --> p, q and r are colinear
+    // 0 --> p, q and r are collinear
     // 1 --> Clockwise
     // 2 --> Counterclockwise
     private fun orientation(p: LatLng, q: LatLng, r: LatLng): Int {
@@ -41,16 +41,16 @@ object IntersectionUtils {
         return if (o1 != o2 && o3 != o4) true
 
         // Special Cases
-        // p1, q1 and p2 are colinear and p2 lies on segment p1q1
+        // p1, q1 and p2 are collinear and p2 lies on segment p1q1
         else if (o1 == 0 && onSegment(p1, p2, q1)) true
 
-        // p1, q1 and q2 are colinear and q2 lies on segment p1q1
+        // p1, q1 and q2 are collinear and q2 lies on segment p1q1
         else if (o2 == 0 && onSegment(p1, q2, q1)) true
 
-        // p2, q2 and p1 are colinear and p1 lies on segment p2q2
+        // p2, q2 and p1 are collinear and p1 lies on segment p2q2
         else if (o3 == 0 && onSegment(p2, p1, q2)) true
 
-        // p2, q2 and q1 are colinear and q1 lies on segment p2q2
+        // p2, q2 and q1 are collinear and q1 lies on segment p2q2
         else o4 == 0 && onSegment(p2, q1, q2)
         // Doesn't fall in any of the above cases
     }

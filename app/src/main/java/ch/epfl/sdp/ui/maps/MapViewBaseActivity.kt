@@ -1,12 +1,10 @@
 package ch.epfl.sdp.ui.maps
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.maps.MapView
-import timber.log.Timber
 
 open class MapViewBaseActivity : AppCompatActivity() {
     lateinit var mapView: MapView
