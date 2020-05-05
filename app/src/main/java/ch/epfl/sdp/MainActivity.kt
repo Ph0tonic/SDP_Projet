@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -13,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,9 +20,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import ch.epfl.sdp.ui.searchgroupselection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.searchgroupselection.SearchGroupSelectionActivity
+import ch.epfl.sdp.ui.searchgroupselection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView
@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
     private var selectSearchGroupAction = false
 
+    private val currentGroupId: MutableLiveData<String?> = MutableLiveData(null)
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
@@ -49,10 +51,10 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
-        val navController = findNavController(R.id.nav_host_fragment)
         snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
 
+        val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
@@ -71,6 +73,18 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
+
+        currentGroupId.value = PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getString(getString(R.string.prefs_current_group_id), null)
+        currentGroupId.observe(this, Observer {
+            PreferenceManager
+                    .getDefaultSharedPreferences(this)
+                    .edit()
+                    .putString(getString(R.string.prefs_current_group_id), it)
+                    .apply()
+            Log.w("MAIN_ACTIVITY","Observer called $it")
+        })
     }
 
     override fun onStart() {
@@ -122,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
     fun startMission(view: View) {
         val intent = Intent(this, MapActivity::class.java)
-                .putExtra("groupId", "g2") //TODO adapt group ID via group choosing activity or something
+                .putExtra("groupId", currentGroupId.value) //TODO adapt group ID via group choosing activity or something
         startActivity(intent)
     }
 
@@ -134,11 +148,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                val groupId = data!!.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
-                PreferenceManager.getDefaultSharedPreferences(this)
-                        .edit()
-                        .putString("CURRENT_SEARCHGROUP_ID", groupId)
-                        .apply()
+                currentGroupId.value = data!!.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)

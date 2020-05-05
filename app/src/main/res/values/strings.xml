@@ -52,6 +52,7 @@
     <string name="prefs_latitude">latitude</string>
     <string name="prefs_longitude">longitude</string>
     <string name="prefs_zoom">zoom</string>
+    <string name="prefs_current_group_id">current_group_id</string>
     <string name="map_button">Start new mission</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="sign_out_success">Sign out successful</string>

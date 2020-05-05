@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ch.epfl.sdp">
 
+    <uses-feature android:name="android.hardware.screen.landscape" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -11,7 +17,8 @@
         android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Launcher">
-        <activity android:name=".ui.searchgroupselection.SearchGroupSelectionActivity"></activity>
+        <activity android:name=".searchgroupEditionActivity"></activity>
+        <activity android:name=".ui.searchgroupselection.SearchGroupSelectionActivity" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
@@ -49,11 +56,5 @@
             android:parentActivityName=".MainActivity"
             android:screenOrientation="landscape" />
     </application>
-    <uses-feature android:name="android.hardware.screen.landscape" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>
