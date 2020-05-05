@@ -18,6 +18,10 @@ import kotlin.math.sqrt
 class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
+    private companion object {
+        private const val EARTH_RADIUS = 6378137
+    }
+
     init {
         require(maxDistBetweenLinesIn > 0.0) {
             "The maximum distance between passes must be strictly positive"
@@ -35,15 +39,19 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val center = area.center
         val outer = area.outer
         val radius = center.distanceTo(outer)
+        val angleToOuter = Math.toRadians(computeHeading(center, outer))
 
-        val path = ArrayList<LatLng>()
+        return generatePointsAlongSpiral(center, radius, angleToOuter)
+    }
 
-        val earthRadius = 6378137
+    private fun generatePointsAlongSpiral(center: LatLng, radius: Double, angleToOuter: Double): List<LatLng> {
 
         val turns: Double = radius / maxDistBetweenLines
 
-        val maxTheta = radius / earthRadius
-        val angleToOuter = Math.toRadians(computeHeading(center, outer))
+        //Portion of the earth we should cover, defines the radius of the spiral
+        val maxTheta = radius / EARTH_RADIUS
+
+        //offsets the beginning of the spiral so that the end meets the point <outer>
         val phi0 = angleToOuter - 2 * PI * turns
 
         //steps is chosen so that the approximate arc length between the two last points is equal to maxDistBetweenLines
@@ -52,11 +60,13 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val c = max(protoC, 0.0) //if distance is short, behaves as a straight line
         val steps = ceil(1.0 / (1 - c * c)).toInt()
 
+        val path = ArrayList<LatLng>()
+
         for (step in 0..steps) {
             val s = step.toDouble() / steps
             val t = sqrt(s)
             val theta = maxTheta * t
-            val distance = theta * earthRadius
+            val distance = theta * EARTH_RADIUS
             val phi = 2 * PI * turns * t
 
             path.add(computeOffset(center, distance, Math.toDegrees(phi0 + phi)))

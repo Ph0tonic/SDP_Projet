@@ -8,6 +8,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
+import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -25,6 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class LoginNavFragmentTest {
@@ -60,11 +62,7 @@ class LoginNavFragmentTest {
                 .requestEmail()
                 .build()
     }
-
-    private fun getContext(): Context {
-        return InstrumentationRegistry.getInstrumentation().targetContext
-    }
-
+    
     private fun openDrawer() {
         onView(withId(R.id.drawer_layout))
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
@@ -86,6 +84,7 @@ class LoginNavFragmentTest {
         mUiDevice.pressBack()
     }
 
+
     @Test
     fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
         runOnUiThread {
@@ -105,7 +104,8 @@ class LoginNavFragmentTest {
         onView(withId(R.id.nav_user_email)).check(matches(withText(FAKE_EMAIL)))
         onView(withId(R.id.nav_user_image)).check(matches(isDisplayed()))
 
-        onView(withText(getContext().getString(R.string.auth_signout))).perform(click())
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_signout_button))
+
         runOnUiThread {
             Auth.logout()
             Auth.loggedIn.postValue(false)
@@ -113,7 +113,5 @@ class LoginNavFragmentTest {
 
         openDrawer()
         onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
-
-        mUiDevice.pressBack()
     }
 }
