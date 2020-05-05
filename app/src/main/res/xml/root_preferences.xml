@@ -2,23 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ListPreference
-        android:id="@+id/languageSelector"
-        android:defaultValue="false"
-        android:entries="@array/language_entries"
-        android:entryValues="@array/language_values"
-        android:key="lang"
-        android:title="Language"
-        app:useSimpleSummaryProvider="true" />
-
-    <PreferenceCategory app:title="@string/maps_header">
-        <MultiSelectListPreference
-            android:defaultValue="@array/maps_entries"
-            android:entries="@array/maps_entries"
-            android:entryValues="@array/maps_values"
-            android:key="maps"
-            android:title="Selected Maps" />
-    </PreferenceCategory>
-    <ListPreference
         android:defaultValue="500"
         android:entries="@array/gps_refresh_rate_entries"
         android:entryValues="@array/gps_refresh_rate_values"

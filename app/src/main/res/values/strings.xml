@@ -12,7 +12,6 @@
     <string name="sign_in_error">Could not sign in</string>
 
     <!-- Preference Titles -->
-    <string name="maps_header">Maps</string>
 
     <string name="title_activity_main">Fly2Find</string>
     <string name="nav_header_title">Android Studio</string>
