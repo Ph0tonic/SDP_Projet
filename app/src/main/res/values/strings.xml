@@ -56,5 +56,10 @@
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="sign_out_success">Sign out successful</string>
 
-    <string name="overflight_strategy_header">Overflight Strategy</string>
+    <string name="prefs_gps_refresh">gps_refresh</string>
+
+    <string name="prefs_overflight_strategy">overflight_strategy</string>
+    <string name="overflight_strategy_header">Default Overflight Strategy</string>
+    <string name="zigzag_strategy">zigzag</string>
+    <string name="spiral_strategy">spiral</string>
 </resources>

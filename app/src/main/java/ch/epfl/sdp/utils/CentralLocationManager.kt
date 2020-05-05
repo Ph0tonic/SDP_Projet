@@ -2,6 +2,7 @@ package ch.epfl.sdp.utils
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -17,6 +18,8 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
+import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 object CentralLocationManager {
@@ -33,8 +36,7 @@ object CentralLocationManager {
         locationManager = CentralLocationManager.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (checkAndRequestPermission()) {
-            locationManager.requestLocationUpdates(
-                    GPS_PROVIDER, 500, 10f, CentralLocationListener)
+            requestLocationUpdates(activity)
         }
     }
 
@@ -43,6 +45,21 @@ object CentralLocationManager {
             showLocationDisabledAlert()
         }
         return isLocationEnabled()
+    }
+
+    private fun minTime(context: Context): Long {
+        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        return defaultSharedPrefs
+                .getString(context.getString(R.string.prefs_gps_refresh), null)
+                ?.toLongOrNull()
+                ?: 500
+    }
+
+    // ALWAYS TEST PERMISSION BEFORE LAUNCHING THIS FUNCTION !
+    @SuppressLint("MissingPermission")
+    private fun requestLocationUpdates(context: Context){
+        locationManager.requestLocationUpdates(
+                GPS_PROVIDER, minTime(context), 10f, CentralLocationListener)
     }
 
     private fun showLocationDisabledAlert() {
@@ -78,8 +95,7 @@ object CentralLocationManager {
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == CentralLocationManager.requestCode && checkPermission()) {
-            locationManager.requestLocationUpdates(
-                    GPS_PROVIDER, 500, 10f, CentralLocationListener)
+            requestLocationUpdates(activity)
         }
     }
 

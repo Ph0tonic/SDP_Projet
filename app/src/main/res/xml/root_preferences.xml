@@ -19,18 +19,18 @@
             android:title="Selected Maps" />
     </PreferenceCategory>
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="500"
         android:entries="@array/gps_refresh_rate_entries"
         android:entryValues="@array/gps_refresh_rate_values"
-        android:key="gps_refresh_rate"
+        android:key="@string/prefs_gps_refresh"
         android:title="@string/gps_refresh_rate_header"
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
-        android:defaultValue="zigzag"
+        android:defaultValue="@string/zigzag_strategy"
         android:entries="@array/overflight_strategy_entries"
         android:entryValues="@array/overflight_strategy_values"
-        android:key="overflight_strategy"
+        android:key="@string/prefs_overflight_strategy"
         android:title="@string/overflight_strategy_header"
         app:useSimpleSummaryProvider="true" />
 

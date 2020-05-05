@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -9,13 +10,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.map.*
+import ch.epfl.sdp.map.MapBoxMissionPainter
+import ch.epfl.sdp.map.MapBoxQuadrilateralPainter
+import ch.epfl.sdp.map.MapBoxSearchAreaPainter
+import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
+import ch.epfl.sdp.mission.OverflightStrategy
 import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SpiralStrategy
+import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -207,11 +215,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()// Load latest location
             mapView.contentDescription = getString(R.string.map_ready)// Used to detect when the map is ready in tests
 
+            val (strategy, searchAreaBuilderResult) =
+                    loadStrategyPreference(this, Drone.GROUND_SENSOR_SCOPE) ?: throw Error()
+
+
             //Create builders
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
-            searchAreaBuilder = QuadrilateralBuilder()
+                    .withStrategy(strategy)
+            searchAreaBuilder = searchAreaBuilderResult
 
 
             // Add listeners to builders
@@ -229,6 +241,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             //addVirtualPointsToHeatmap()
         }
     }
+
+    private fun loadStrategyPreference(context: Context, groundSensorScope: Double): Pair<OverflightStrategy, SearchAreaBuilder>? {
+        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val strategyString = defaultSharedPrefs
+                .getString(context.getString(R.string.prefs_overflight_strategy), null)
+        return when (strategyString) {
+            getString(R.string.zigzag_strategy) -> Pair(
+                    SimpleMultiPassOnQuadrilateral(groundSensorScope),
+                    QuadrilateralBuilder())
+            getString(R.string.spiral_strategy) -> Pair(
+                    SpiralStrategy(groundSensorScope),
+                    CircleBuilder())
+            else -> null
+        }
+    }
+
 
     /**
      * Updates the text of the given textView with the given value and format, or the default string
