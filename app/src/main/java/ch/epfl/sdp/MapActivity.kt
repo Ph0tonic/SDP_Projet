@@ -4,9 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.database.repository.HeatmapRepository
@@ -60,12 +58,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
     private lateinit var distanceToUserTextView: TextView
-    private lateinit var userLongitudeTextView: TextView
     private lateinit var droneAltitudeTextView: TextView
-    private lateinit var userLatitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
-    private lateinit var startOrReturnButton: FloatingActionButton
-    private lateinit var clearButton: FloatingActionButton
 
     private lateinit var role: Role
     private var currentStrategy: OverflightStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
@@ -146,6 +140,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //TODO move "groupId" to Strings
         require(intent.getStringExtra("groupId") != null) { "MapActivity should be provided with a searchGroupId\n" }
         require(Auth.loggedIn.value == true) { "You need to be logged in to access this part of the app" }
 
@@ -153,11 +148,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
+        //TODO move "groupId" to Strings
         groupId = intent.getStringExtra("groupId")!!
+        //TODO move "role" to Strings
         role = intent.getSerializableExtra("Role") as Role
-        Log.w("MAPACTIVITY", "Role for map activity: ${role.name}")
-
-
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
         droneBatteryLevelTextView = findViewById(R.id.battery_level)
@@ -166,12 +160,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneSpeedTextView = findViewById(R.id.speed)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
-        startOrReturnButton = findViewById(R.id.start_or_return_button)!!
-        clearButton = findViewById(R.id.clear_button)!!
-
         if(role == Role.RESCUER){
-            startOrReturnButton.visibility = View.GONE
-            clearButton.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
+            findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
+            findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
 
         //TODO: Give user location if current drone position is not available
