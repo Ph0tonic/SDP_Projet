@@ -45,6 +45,8 @@ object Drone {
 
     lateinit var getSignalStrength: () -> Double
 
+    val currentPitchLiveData: MutableLiveData<Float> = MutableLiveData()
+    val currentYawLiveData: MutableLiveData<Float> = MutableLiveData()
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
         currentPositionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
@@ -126,7 +128,6 @@ object Drone {
     fun isConnected(): Boolean {
         return try {
             getConnectionState()
-                    .toFuture()
                     .get(WAIT_TIME, TimeUnit.MILLISECONDS).isConnected
         } catch (e: TimeoutException) {
             false
@@ -182,5 +183,41 @@ object Drone {
                             if (isRightPos.and(isStopped)) instance.action.land().blockingAwait()
                         },
                         { e -> Timber.e("ERROR LANDING : $e") }))
+    }
+    /*    If the plane is flying due east, its yaw is 0.
+        If the plane is flying due north, its yaw is 90 degrees.
+        If the plane is flying due south, its yaw is -90 degrees.
+        If the plane is flying due west, its yaw is 180 degrees (which is the
+        same as a yaw of -180 degrees).
+        If the plane is flying level, its pitch is 0.
+        If the plane is flying upwards, its pitch is positive.
+        If the plane is flying downwards, its pitch is negative.
+
+     */
+    fun gimbalStuff() {
+        if (isConnected()) {
+            Log.d("DEBUG", "------------------------Drone is connected-------------------")
+            val eulerAngle = instance.telemetry.attitudeEuler
+                    .firstOrError()
+                    .blockingGet()
+            Log.d("DEBUG", "PITCH DEG : " + eulerAngle.pitchDeg)
+            Log.d("DEBUG", "YAW DEG  : " + eulerAngle.yawDeg)
+
+            instance.gimbal
+                    .setPitchAndYaw(eulerAngle.pitchDeg - 10 , eulerAngle.yawDeg - 10)
+                    .subscribe(object : CompletableObserver {
+                        override fun onComplete() {
+                            Log.d("DEBUG", "onCompleteCall")
+                        }
+
+                        override fun onSubscribe(d: Disposable) {
+                            Log.d("DEBUG", "onSubscribeCall")
+                        }
+
+                        override fun onError(e: Throwable) {
+                            Log.d("DEBUG", "onErrorCall, msg : " + e.message + " localize msg : " + e.localizedMessage)
+                        }
+                    })
+        }
     }
 }

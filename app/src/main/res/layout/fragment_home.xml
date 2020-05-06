@@ -39,6 +39,19 @@
             android:textSize="48sp" />
 
         <Button
+            android:id="@+id/display_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/vlc_button"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@color/colorBlack"
+            android:onClick="displayVideo"
+            android:textSize="48sp"
+            android:layout_weight="7"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <Button
             android:id="@+id/work_offline_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

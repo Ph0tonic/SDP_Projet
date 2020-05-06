@@ -180,6 +180,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun displayVideo(view: View) {
+        startActivity(Intent(this, VlcActivity::class.java))
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {

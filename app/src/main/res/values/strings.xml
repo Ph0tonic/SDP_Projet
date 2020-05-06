@@ -96,6 +96,7 @@
     <string name="switch_video">Switch video</string>
 
     <string name="no_info">No data</string>
+<<<<<<< HEAD
 
     <string name="drone_altitude_header">Default drone altitude</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
@@ -108,4 +109,24 @@
     <string name="ReturnDroneDialogHome">Home</string>
     <string name="ReturnDroneDialogUser">User</string>
 
+=======
+    <string name="map_ready">MAP READY</string>
+    <string name="map_not_ready">MAP NOT READY</string>
+    <string name="map_downloading">MAP DOWNLOADING</string>
+    <string name="map_deleting">MAP DELETING</string>
+
+    <string name="prefs_latitude">latitude</string>
+    <string name="prefs_longitude">longitude</string>
+    <string name="prefs_zoom">zoom</string>
+    <string name="prefs_current_group_id">current_group_id</string>
+    <string name="map_button">Start new mission</string>
+    <string name="vlc_button">Start Video</string>
+    <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
+    <string name="sign_out_success">Sign out successful</string>
+    <string name="select_search_group">Select search group</string>
+    <string name="start_mission">Start mission</string>
+    <string name="work_offline">Work offline</string>
+    <string name="INTENT_KEY_GROUP_ID">groupId</string>
+    <string name="INTENT_KEY_ROLE">Role</string>
+>>>>>>> 91c313b... setPitchAndYawAngle use
 </resources>
