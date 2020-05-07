@@ -11,7 +11,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.map.*
+import ch.epfl.sdp.map.MapBoxMissionPainter
+import ch.epfl.sdp.map.MapBoxQuadrilateralPainter
+import ch.epfl.sdp.map.MapBoxSearchAreaPainter
+import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
@@ -170,19 +173,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             droneCircleManager = CircleManager(mapView, mapboxMap, style)
             userCircleManager = CircleManager(mapView, mapboxMap, style)
 
-            victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
-            victimSymbolManager.iconAllowOverlap = true
-            victimSymbolManager.symbolSpacing = 0F
-            victimSymbolManager.iconIgnorePlacement = true
-            victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
+            setupVictimSymbolManager(style)
 
-            victimSymbolManager.addLongClickListener {
-                victimSymbolManager.delete(it)
-                victimMarkers.remove(it)
-                victimSymbolLongClickConsumed = true
-            }
-
-            style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
             missionPainter = MapBoxMissionPainter(mapView, mapboxMap, style)
             searchAreaPainter = MapBoxQuadrilateralPainter(mapView, mapboxMap, style)
 
@@ -207,27 +199,47 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()// Load latest location
             mapView.contentDescription = getString(R.string.map_ready)// Used to detect when the map is ready in tests
 
-            //Create builders
-            missionBuilder = MissionBuilder()
-                    .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
-            searchAreaBuilder = QuadrilateralBuilder()
-
-
-            // Add listeners to builders
-            searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
-            searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
-            missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
-            searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
-
-            // Location listener on drone
-            Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
+            setupStrategy(style)
 
             isMapReady = true
 
             /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
             //addVirtualPointsToHeatmap()
         }
+    }
+
+    private fun setupVictimSymbolManager(style: Style) {
+        victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
+        victimSymbolManager.iconAllowOverlap = true
+        victimSymbolManager.symbolSpacing = 0F
+        victimSymbolManager.iconIgnorePlacement = true
+        victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
+
+        victimSymbolManager.addLongClickListener {
+            victimSymbolManager.delete(it)
+            victimMarkers.remove(it)
+            victimSymbolLongClickConsumed = true
+        }
+
+        style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
+    }
+
+    private fun setupStrategy(style: Style) {
+        //Create builders
+        missionBuilder = MissionBuilder()
+                .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
+                .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+        searchAreaBuilder = QuadrilateralBuilder()
+
+
+        // Add listeners to builders
+        searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
+        searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
+        missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
+        searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+
+        // Location listener on drone
+        Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
     }
 
     /**
@@ -335,9 +347,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     .withLatLng(newLatLng)
                     .withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
             dronePositionMarker = droneCircleManager.create(circleOptions)
-
-//            mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(0.0))
-//            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14.0))
         } else {
             dronePositionMarker.latLng = newLatLng
             droneCircleManager.update(dronePositionMarker)

@@ -7,8 +7,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.R
+import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.deletingInProgress
 import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.downloadingInProgress
@@ -189,9 +189,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 // Add all of the region names to a list
                 val items = offlineRegions
                         .map { region ->
-                            try{
+                            try {
                                 getRegionName(region)
-                            }catch(exception : java.lang.Exception){
+                            } catch (exception: java.lang.Exception) {
                                 String.format(getString(R.string.region_name_error), region.id)
                             }
                         }

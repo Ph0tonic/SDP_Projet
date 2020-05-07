@@ -30,17 +30,17 @@ object DownloadProgressBarUtils {
         Toast.makeText(context, context.getString(R.string.end_progress_success), Toast.LENGTH_SHORT).show()
     }
 
-    fun downloadingInProgress(percentage : Int, progressBar: ProgressBar){
+    fun downloadingInProgress(percentage: Int, progressBar: ProgressBar) {
         progressBar.isIndeterminate = false
         progressBar.progress = percentage
     }
 
-    fun deletingInProgress(progressBar: ProgressBar){
+    fun deletingInProgress(progressBar: ProgressBar) {
         progressBar.isIndeterminate = true
         progressBar.visibility = View.VISIBLE
     }
 
-    fun hideProgressBar(progressBar: ProgressBar){
+    fun hideProgressBar(progressBar: ProgressBar) {
         progressBar.visibility = View.INVISIBLE
         progressBar.isIndeterminate = false
     }
