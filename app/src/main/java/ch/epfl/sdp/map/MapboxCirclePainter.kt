@@ -7,6 +7,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
+import kotlin.math.*
 
 class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
         MapboxSearchAreaPainter() {
@@ -68,9 +69,9 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
             if (!::fillArea.isInitialized || reset) {
                 fillManager.deleteAll()
                 val fillOption = FillOptions()
-                    .withLatLngs(listOf(polygonCircle))
-                    .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
-                    .withFillOpacity(REGION_FILL_OPACITY)
+                        .withLatLngs(listOf(polygonCircle))
+                        .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
+                        .withFillOpacity(REGION_FILL_OPACITY)
                 fillArea = fillManager.create(fillOption)
                 reset = false
             } else {
@@ -96,7 +97,7 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
 
     private fun polygonCircleForCoordinate(location: LatLng, radius: Double): ArrayList<LatLng> {
         val degreesBetweenPoints = 8 //45 sides
-        val numberOfPoints = Math.floor((360 / degreesBetweenPoints).toDouble()).toInt()
+        val numberOfPoints = floor((360 / degreesBetweenPoints).toDouble()).toInt()
         val distRadians = radius / 6371000.0 // earth radius in meters
         val centerLatRadians = location.latitude * Math.PI / 180
         val centerLonRadians = location.longitude * Math.PI / 180
@@ -104,9 +105,9 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
         for (index in 0 until numberOfPoints) {
             val degrees = (index * degreesBetweenPoints).toDouble()
             val degreeRadians = degrees * Math.PI / 180
-            val pointLatRadians = Math.asin(Math.sin(centerLatRadians) * Math.cos(distRadians) + Math.cos(centerLatRadians) * Math.sin(distRadians) * Math.cos(degreeRadians))
-            val pointLonRadians = centerLonRadians + Math.atan2(Math.sin(degreeRadians) * Math.sin(distRadians) * Math.cos(centerLatRadians),
-                    Math.cos(distRadians) - Math.sin(centerLatRadians) * Math.sin(pointLatRadians))
+            val pointLatRadians = asin(sin(centerLatRadians) * cos(distRadians) + cos(centerLatRadians) * sin(distRadians) * cos(degreeRadians))
+            val pointLonRadians = centerLonRadians + atan2(sin(degreeRadians) * sin(distRadians) * cos(centerLatRadians),
+                    cos(distRadians) - sin(centerLatRadians) * sin(pointLatRadians))
             val pointLat = pointLatRadians * 180 / Math.PI
             val pointLon = pointLonRadians * 180 / Math.PI
             val point = LatLng(pointLat, pointLon)

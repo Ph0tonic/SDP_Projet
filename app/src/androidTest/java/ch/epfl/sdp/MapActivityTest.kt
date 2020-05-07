@@ -30,6 +30,7 @@ import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
@@ -217,19 +218,47 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
+    fun clickOnMapInteractWithQuadrilateralSearchArea() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
+        runOnUiThread {
+            mActivityRule.activity.setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+        }
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
 
         // Add a point
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClicked(LatLng(1.0, 0.0))
         }
 
-        assertThat(searchAreaBuilder.vertices.size, equalTo(1))
+        assertThat(searchAreaBuilder.vertices.size, equalTo(2))
+        runOnUiThread {
+            searchAreaBuilder.reset()
+        }
+        assertThat(searchAreaBuilder.vertices.size, equalTo(0))
+    }
+
+    @Test
+    fun clickOnMapInteractWithCircleSearchArea() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            mActivityRule.activity.setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+        }
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
+
+        // Add a point
+        runOnUiThread {
+            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClicked(LatLng(1.0, 0.0))
+        }
+
+        assertThat(searchAreaBuilder.vertices.size, equalTo(2))
         runOnUiThread {
             searchAreaBuilder.reset()
         }

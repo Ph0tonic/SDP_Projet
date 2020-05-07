@@ -207,7 +207,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
-            searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, style)
 
             victimSymbolManager.iconAllowOverlap = true
             victimSymbolManager.symbolSpacing = 0F
@@ -237,14 +236,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             //Create builders
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
-            searchAreaBuilder = QuadrilateralBuilder()
+
+            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
 
             // Add listeners to builders
-            searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
-            searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
-            searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
 
             // Location listener on drone
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
@@ -410,19 +406,31 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun pickStrategy(view: View) {
-        searchAreaBuilder.reset()
-        searchAreaPainter.unMount()
-
         if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
-            currentStrategy = SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
-            searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
-            searchAreaBuilder = CircleBuilder()
-            strategyPickerButton.setIcon(R.drawable.ic_spiralstrat)
+            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
         } else {
-            currentStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
-            searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
-            searchAreaBuilder = QuadrilateralBuilder()
-            strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
+            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+        }
+    }
+
+    fun setStrategy(strategy: OverflightStrategy) {
+        if (isMapReady) {
+            searchAreaBuilder.reset()
+            searchAreaPainter.unMount()
+        }
+
+        currentStrategy = strategy
+        when (strategy) {
+            is SimpleMultiPassOnQuadrilateral -> {
+                searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaBuilder = QuadrilateralBuilder()
+                strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
+            }
+            is SpiralStrategy -> {
+                searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaBuilder = CircleBuilder()
+                strategyPickerButton.setIcon(R.drawable.ic_spiralstrat)
+            }
         }
 
         missionBuilder.withStrategy(currentStrategy)
