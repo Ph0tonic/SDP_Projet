@@ -48,7 +48,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var groupId: String
     private var isMapReady = false
-    private var isDroneFlying = false
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
@@ -143,8 +142,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         //TODO move "groupId" to Strings
         requireNotNull(intent.getStringExtra("groupId")) { "MapActivity should be provided with a searchGroupId\n" }
         require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
-        requireNotNull(Auth.accountId.value){"You need to have an account ID set to access MapActivity"}
-        requireNotNull(intent.getSerializableExtra("Role")) {"MapActivity should be provided with a role"}
+        requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
+        requireNotNull(intent.getSerializableExtra("Role")) { "MapActivity should be provided with a role" }
 
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
@@ -162,7 +161,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneSpeedTextView = findViewById(R.id.speed)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
-        if(role == Role.RESCUER){
+        if (role == Role.RESCUER) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
@@ -311,7 +310,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun onMapClicked(position: LatLng) {
-        if (role == Role.OPERATOR){
+        if (role == Role.OPERATOR) {
             try {
                 searchAreaBuilder.addVertex(position)
             } catch (e: IllegalArgumentException) {
@@ -349,17 +348,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun startMissionOrReturnHome(v: View) {
-        if (!Drone.isDroneConnected()) {
-            snackbar.show()
+        if (!Drone.isConnected()) {
+            //snackbar.show()
         }
-        if (!isDroneFlying) { //TODO : return to user else
-            isDroneFlying = true
+        Log.w("MAP_ACTIVITY", "${Drone.isFlying()}")
+        if (!Drone.isFlying()) { //TODO : return to user else
+            try {
+                Log.w("MAP_ACTIVITY", "${missionBuilder.build()}")
+            }catch(e: Exception){
+                Log.w("MAP_ACTIVITY","$e")
+            }
             Drone.startMission(DroneUtils.makeDroneMission(
                     missionBuilder.build()
             ).getMissionItems())
         }
         findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
+                .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
     }
 
     fun storeMap(v: View) {
@@ -415,11 +419,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         searchAreaBuilder.reset()
         searchAreaPainter.unMount()
 
-        if(currentStrategy is SimpleMultiPassOnQuadrilateral){
+        if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
             currentStrategy = SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
             searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
             searchAreaBuilder = CircleBuilder()
-        }else{
+        } else {
             currentStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
             searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
             searchAreaBuilder = QuadrilateralBuilder()

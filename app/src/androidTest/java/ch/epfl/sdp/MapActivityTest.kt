@@ -29,17 +29,13 @@ import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.utils.CentralLocationManager
-import ch.epfl.sdp.drone.Drone.currentMissionLiveData
 import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -105,8 +101,11 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-        onView(withId(R.id.start_or_return_button)).perform(click())
         val expectedLatLng = LatLng(47.397026, 8.543067)
+
+        // TODO: Why click on menu button doesn't work ?
+        // Open menu to click on start button
+        onView(withId(R.id.start_or_return_button)).perform(click())
 
         runOnUiThread {
             val searchArea = QuadrilateralArea(arrayListOf(
@@ -114,23 +113,22 @@ class MapActivityTest {
                     LatLng(47.398979, 8.543434),
                     LatLng(47.398279, 8.543934),
                     LatLng(47.397426, 8.544867)
-            ));
+            ))
             mActivityRule.activity.missionBuilder
                     .withSearchArea(searchArea)
                     .withStartingLocation(expectedLatLng)
                     .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
         }
 
+        // Then start mission officially
         onView(withId(R.id.start_or_return_button)).perform(click())
 
-        val uploadedMission = currentMissionLiveData.value
+        val uploadedMission = Drone.currentMissionLiveData.value
 
-        if (uploadedMission != null) {
-            assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
-            assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
-        } else {
-            Assert.fail("No MissionItem")
-        }
+        assertThat(uploadedMission, `is`(notNullValue()))
+        assertThat(uploadedMission!!.size, not(equalTo(0)))
+        assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
+        assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
     }
 
     @Test
@@ -168,7 +166,7 @@ class MapActivityTest {
         }
         val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
-        Log.w("MAP_ACTIVITY_TEST",heatmaps.value.toString())
+        Log.w("MAP_ACTIVITY_TEST", heatmaps.value.toString())
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))

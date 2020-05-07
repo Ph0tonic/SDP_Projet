@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showSnackbar() {
-        if (!Drone.isDroneConnected())
+        if (!Drone.isConnected())
             snackbar.show()
     }
 
