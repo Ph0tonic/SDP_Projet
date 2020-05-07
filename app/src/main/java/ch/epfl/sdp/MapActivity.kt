@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -222,6 +223,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             // Location listener on drone
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
+
+            //Change Button Color if Drone is not connected
+            if(!Drone.isDroneConnected())
+            findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY;
+
 
             isMapReady = true
 
