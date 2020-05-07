@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
@@ -278,9 +279,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
         else {
             if (!isDroneFlying) { //TODO : return to user else
+                val altitude = getUserPrefAltitude()
                 isDroneFlying = true
                 Drone.startMission(DroneUtils.makeDroneMission(
-                        missionBuilder.build()
+                        missionBuilder.build(), altitude
                 ).getMissionItems())
             }
             missionButton.setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
@@ -372,6 +374,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentPositionLiveData.value?.let {
             updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
         }
+    }
+    private fun getUserPrefAltitude() : Float{
+        val defaultSharedPrefs= PreferenceManager.getDefaultSharedPreferences(this)
+        return defaultSharedPrefs.getString(this.getString(R.string.prefs_drone_altitude),"").toString().toFloat()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
