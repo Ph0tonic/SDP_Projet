@@ -44,7 +44,7 @@ class FirebaseGroupDao : SearchGroupDao {
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val group = dataSnapshot.getValue(SearchGroupData::class.java)
-                    group!!.uuid = dataSnapshot.key
+                    group?.uuid = dataSnapshot.key
                     watchedGroupsById[groupId]!!.value = group
                 }
 

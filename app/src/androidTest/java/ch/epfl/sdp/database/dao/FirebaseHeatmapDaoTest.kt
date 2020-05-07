@@ -10,7 +10,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert
 import org.junit.Before
@@ -58,13 +57,13 @@ class FirebaseHeatmapDaoTest {
             if (it.containsKey(DUMMY_HEATMAP_ID) && it[DUMMY_HEATMAP_ID]!!.value != null) {
                 val actualHeatmap = it[DUMMY_HEATMAP_ID]!!.value!!
 
-                MatcherAssert.assertThat(actualHeatmap, CoreMatchers.equalTo(heatmap))
+                MatcherAssert.assertThat(actualHeatmap, equalTo(heatmap))
                 tested.countDown()
             }
         }
 
         tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, CoreMatchers.equalTo(0L))
+        MatcherAssert.assertThat(tested.count, equalTo(0L))
     }
 
     @Test
@@ -106,7 +105,7 @@ class FirebaseHeatmapDaoTest {
         dao.updateHeatmap(DUMMY_GROUP_ID, expectedHeatmap)
 
         tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, CoreMatchers.equalTo(0L))
+        MatcherAssert.assertThat(tested.count, equalTo(0L))
         ref.removeEventListener(listener)
     }
 }

@@ -43,7 +43,6 @@ class FirebaseHeatmapDao : HeatmapDao {
                 }
 
                 override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                    Log.w("HEATMAP_DAO/CHILD_ADDED","Datasnapshot: ${dataSnapshot.toString()}")
                     val newHeatmapData = dataSnapshot.getValue(HeatmapData::class.java)!!
                     newHeatmapData.uuid = dataSnapshot.key
                     groupHeatmaps[groupId]!!.value!![dataSnapshot.key!!] = MutableLiveData(newHeatmapData)
