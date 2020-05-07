@@ -42,7 +42,7 @@ class DroneTest {
                 LatLng(47.397426, 8.544867),
                 LatLng(47.397026, 8.543067)
         )
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList).getMissionItems())
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, 10f).getMissionItems())
         assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
     }
 
