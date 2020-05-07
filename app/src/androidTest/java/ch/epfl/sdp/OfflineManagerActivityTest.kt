@@ -206,9 +206,9 @@ class OfflineManagerActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 15)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-//        onView(withText(applicationContext().getString(R.string.end_progress_success)))
-//                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
-//                .check(matches(isDisplayed()))
+        onView(withText(applicationContext().getString(R.string.end_progress_success)))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
 
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
@@ -224,9 +224,9 @@ class OfflineManagerActivityTest {
         //NAVIGATE Part
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
-//        onView(withText(FAKE_MAP_NAME_2))
-//                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
-//                .check(matches(isDisplayed()))
+        onView(withText(FAKE_MAP_NAME_2))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
 
         mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
             assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_MAP_LOCATION), closeTo(0.0, EPSILON))
@@ -238,9 +238,9 @@ class OfflineManagerActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-//        onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
-//                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
-//                .check(matches(isDisplayed()))
+        onView(withText(applicationContext().getString(R.string.toast_region_deleted)))
+                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
 
         //check that the downloaded list map is empty
         val tested = CountDownLatch(1)
