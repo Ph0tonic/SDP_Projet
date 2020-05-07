@@ -17,7 +17,7 @@
         android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Launcher" >
-        <activity android:name=".searchgroupEditionActivity" >
+        <activity android:name=".SearchGroupEditionActivity" >
         </activity>
         <activity android:name=".ui.searchgroupselection.SearchGroupSelectionActivity" />
         <activity

@@ -3,7 +3,7 @@ package ch.epfl.sdp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
-class searchgroupEditionActivity : AppCompatActivity() {
+class SearchGroupEditionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
