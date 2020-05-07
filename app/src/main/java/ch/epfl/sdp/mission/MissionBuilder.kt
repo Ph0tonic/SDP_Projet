@@ -10,10 +10,8 @@ class MissionBuilder {
 
     private val eventChanged: (Any?, Any?, Any?) -> Unit = { _, _, _ ->
         val res = try {
-            Log.w("MISSION_BUILDER","Event changed try")
             build()
         } catch (e: IllegalArgumentException) {
-            Log.w("MISSION_BUILDER","Event changed catch $e")
             null
         }
         generatedMissionChanged.forEach { it(res) }
