@@ -83,7 +83,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     val markerRepository = MarkerRepository()
 
     /* Painters */
-    private val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
     private lateinit var searchAreaPainter: MapboxSearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
@@ -327,10 +328,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Adds a heat point to the heatmap
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
-        if (!isMapReady) return
-
-        /* Will be needed when we have the signal of the drone implemented */
-        heatmapRepository.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
+        if (isMapReady) {
+            heatmapRepository.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
+        }
     }
 
     /**

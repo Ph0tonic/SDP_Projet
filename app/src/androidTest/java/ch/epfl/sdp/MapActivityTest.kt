@@ -26,6 +26,8 @@ import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.data.HeatmapData
+import ch.epfl.sdp.database.data.HeatmapPointData
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
@@ -58,6 +60,7 @@ class MapActivityTest {
         private const val ROLE_PROPERTY_NAME_FOR_INTENT = "Role"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
+        private const val DUMMY_HEATMAP_ID = "DummyHeatmapId"
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
@@ -167,11 +170,40 @@ class MapActivityTest {
         }
         val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
-        Log.w("MAP_ACTIVITY_TEST", heatmaps.value.toString())
+
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(1))
+    }
+
+    @Test
+    fun heatmapPaintersAreGeneratedWhenLaunchingApp() {
+        val heatmapDao = MockHeatmapDao()
+        val heatmap = HeatmapData(mutableListOf(
+                HeatmapPointData(LatLng(41.0, 10.0), 10.0),
+                HeatmapPointData(LatLng(41.0, 10.0), 8.5)
+        ), FAKE_ACCOUNT_ID)
+        heatmapDao.updateHeatmap(DUMMY_GROUP_ID, heatmap)
+        HeatmapRepository.daoProvider = { heatmapDao }
+
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(1))
+
+        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        assertThat(heatmaps.value, `is`(notNullValue()))
+
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(2))
+
+        assertThat(mActivityRule.activity.heatmapPainters.size, equalTo(1))
+        //Reset default repo
+        HeatmapRepository.daoProvider = { MockHeatmapDao() }
     }
 
     @Test
