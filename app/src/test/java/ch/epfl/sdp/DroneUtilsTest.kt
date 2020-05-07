@@ -38,11 +38,11 @@ class DroneUtilsTest {
         )
 
         val expectedMissionItems = positions.map { pos ->
-            DroneUtils.generateMissionItem(pos.latitude, pos.longitude)
+            DroneUtils.generateMissionItem(pos.latitude, pos.longitude, 10f)
         }
 
         val missionsItems = DroneUtils
-                .makeDroneMission(positions)
+                .makeDroneMission(positions, 10f)
                 .getMissionItems()
 
         expectedMissionItems.zip(missionsItems).forEach { (expected, observed) ->
