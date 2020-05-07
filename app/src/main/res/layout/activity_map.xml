@@ -192,7 +192,7 @@
         android:onClick="pickStrategy"
         app:fab_colorNormal="@color/colorPrimary"
         app:fab_colorPressed="@color/colorLightGray"
-        app:fab_icon="@drawable/ic_start"
+        app:fab_icon="@drawable/ic_spiralstrat"
         app:fab_size="normal"
         app:layout_constraintBottom_toTopOf="@+id/floating_menu_button"
         app:layout_constraintEnd_toEndOf="@+id/mapView" />

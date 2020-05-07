@@ -59,6 +59,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var distanceToUserTextView: TextView
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
+    private lateinit var strategyPickerButton: FloatingActionButton
 
     private lateinit var role: Role
     private var currentStrategy: OverflightStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
@@ -159,6 +160,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
+        strategyPickerButton = findViewById(R.id.strategy_picker_button)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
         if (role == Role.RESCUER) {
@@ -423,10 +425,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             currentStrategy = SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
             searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
             searchAreaBuilder = CircleBuilder()
+            strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
         } else {
             currentStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
             searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
             searchAreaBuilder = QuadrilateralBuilder()
+            strategyPickerButton.setIcon(R.drawable.ic_spiralstrat)
         }
 
         missionBuilder.withStrategy(currentStrategy)
