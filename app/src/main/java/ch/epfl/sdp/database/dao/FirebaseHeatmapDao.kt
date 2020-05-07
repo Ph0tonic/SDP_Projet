@@ -37,7 +37,6 @@ class FirebaseHeatmapDao : HeatmapDao {
                 override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {}
 
                 override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-
                     val newHeatmapData = dataSnapshot.getValue(HeatmapData::class.java)!!
                     newHeatmapData.uuid = dataSnapshot.key
                     groupHeatmaps[groupId]!!.value!![dataSnapshot.key!!]!!.value = newHeatmapData

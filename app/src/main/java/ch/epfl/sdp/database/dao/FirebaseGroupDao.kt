@@ -16,7 +16,7 @@ class FirebaseGroupDao : GroupDao {
     private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(mutableListOf())
     private val watchedGroupsById: MutableMap<String, MutableLiveData<SearchGroupData>> = mutableMapOf()
 
-    init {
+    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
         val myRef = database.getReference("search_groups")
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -34,9 +34,6 @@ class FirebaseGroupDao : GroupDao {
                 Timber.w("Failed to read value.")
             }
         })
-    }
-
-    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
         return groups
     }
 
@@ -46,7 +43,9 @@ class FirebaseGroupDao : GroupDao {
             watchedGroupsById[groupId] = MutableLiveData()
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    watchedGroupsById[groupId]!!.value = dataSnapshot.getValue(SearchGroupData::class.java)
+                    val group = dataSnapshot.getValue(SearchGroupData::class.java)
+                    group!!.uuid = dataSnapshot.key
+                    watchedGroupsById[groupId]!!.value = group
                 }
 
                 override fun onCancelled(error: DatabaseError) {
