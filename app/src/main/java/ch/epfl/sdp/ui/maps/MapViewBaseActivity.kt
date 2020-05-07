@@ -10,9 +10,6 @@ open class MapViewBaseActivity : AppCompatActivity() {
     lateinit var mapView: MapView
 
     protected fun initMapView(savedInstanceState: Bundle?, contentViewId: Int, mapViewId: Int) {
-        // Mapbox access token is configured here. This needs to be called either in your application
-        // object or in the same activity which contains the mapview.
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(contentViewId)
         // Set up the MapView
