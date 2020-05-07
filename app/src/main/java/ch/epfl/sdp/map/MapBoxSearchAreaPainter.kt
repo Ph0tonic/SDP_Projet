@@ -9,5 +9,6 @@ abstract class MapBoxSearchAreaPainter {
     open fun unMount() {
         onMoveVertex.clear()
     }
+
     abstract fun paint(vertices: List<LatLng>)
 }
