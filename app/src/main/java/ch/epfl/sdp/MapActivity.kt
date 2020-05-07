@@ -425,12 +425,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             currentStrategy = SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
             searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
             searchAreaBuilder = CircleBuilder()
-            strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
+            strategyPickerButton.setIcon(R.drawable.ic_spiralstrat)
         } else {
             currentStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
             searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
             searchAreaBuilder = QuadrilateralBuilder()
-            strategyPickerButton.setIcon(R.drawable.ic_spiralstrat)
+            strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
         }
 
         missionBuilder.withStrategy(currentStrategy)
