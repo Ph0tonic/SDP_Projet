@@ -11,7 +11,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.map.*
+import ch.epfl.sdp.map.MapBoxMissionPainter
+import ch.epfl.sdp.map.MapBoxQuadrilateralPainter
+import ch.epfl.sdp.map.MapBoxSearchAreaPainter
+import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
@@ -184,7 +187,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            setupHeatMap(style)
+            heatmapGeoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
+                    .withCluster(true)
+                    .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
+                    .withClusterMaxZoom(13)
+            )
+            heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
+            style.addSource(heatmapGeoJsonSource)
 
             MapUtils.createLayersForHeatMap(style)
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()// Load latest location
@@ -215,21 +224,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
     }
 
-    private fun setupHeatMap(style: Style){
-        heatmapGeoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
-                .withCluster(true)
-                .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
-                .withClusterMaxZoom(13)
-        )
-        heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
-        style.addSource(heatmapGeoJsonSource)
-    }
-
-    private fun setupStrategy(style: Style){
+    private fun setupStrategy(style: Style) {
         //Create builders
         missionBuilder = MissionBuilder()
-            .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-            .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+                .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
+                .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
         searchAreaBuilder = QuadrilateralBuilder()
 
 
