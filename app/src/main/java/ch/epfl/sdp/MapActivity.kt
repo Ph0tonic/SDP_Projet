@@ -2,7 +2,6 @@ package ch.epfl.sdp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
@@ -351,18 +350,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     fun startMissionOrReturnHome(v: View) {
         if (!Drone.isConnected()) {
-            //snackbar.show()
-        }
-        Log.w("MAP_ACTIVITY", "${Drone.isFlying()}")
-        if (!Drone.isFlying()) { //TODO : return to user else
-            try {
-                Log.w("MAP_ACTIVITY", "${missionBuilder.build()}")
-            }catch(e: Exception){
-                Log.w("MAP_ACTIVITY","$e")
+            snackbar.show()
+        } else {
+            if (!Drone.isFlying()) { //TODO : return to user else
+                Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build()))
             }
-            Drone.startMission(DroneUtils.makeDroneMission(
-                    missionBuilder.build()
-            ).getMissionItems())
         }
         findViewById<FloatingActionButton>(R.id.start_or_return_button)
                 .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)

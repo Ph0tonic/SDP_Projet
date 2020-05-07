@@ -44,7 +44,6 @@ class DroneUtilsTest {
 
         val missionsItems = DroneUtils
                 .makeDroneMission(positions)
-                .getMissionItems()
 
         expectedMissionItems.zip(missionsItems).forEach { (expected, observed) ->
             Assert.assertTrue(missionEquality(expected, observed))
