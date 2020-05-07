@@ -37,4 +37,20 @@
         <item>1</item>
         <item>10</item>
     </string-array>
+
+    <string-array name="drone_altitude_entries">
+        <item>6 meters</item>
+        <item>8 meters</item>
+        <item>10 meters</item>
+        <item>12 meters</item>
+        <item>14 meters</item>
+    </string-array>
+
+    <string-array name="drone_altitude_values">
+        <item>6</item>
+        <item>8</item>
+        <item>10</item>
+        <item>12</item>
+        <item>14</item>
+    </string-array>
 </resources>
