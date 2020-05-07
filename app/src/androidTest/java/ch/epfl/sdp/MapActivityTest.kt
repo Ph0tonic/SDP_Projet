@@ -255,7 +255,7 @@ class MapActivityTest {
         // Add a point
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(1.0, 0.0))
+            mActivityRule.activity.onMapClicked(LatLng(0.0001, 0.0))
         }
 
         assertThat(searchAreaBuilder.vertices.size, equalTo(2))
