@@ -272,7 +272,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     fun startMissionOrReturnHome(v: View) {
 
-        val mission_button =  findViewById<FloatingActionButton>(R.id.start_or_return_button)
+        val missionButton =  findViewById<FloatingActionButton>(R.id.start_or_return_button)
         if (!Drone.isDroneConnected()) {
             snackbar.show()
         }
@@ -283,9 +283,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                         missionBuilder.build()
                 ).getMissionItems())
             }
-            mission_button.setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
-            if(mission_button.colorNormal==Color.RED)
-                mission_button.colorNormal = Color.WHITE
+            missionButton.setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
+            if(missionButton.colorNormal==Color.RED)
+                missionButton.colorNormal = Color.WHITE
         }
     }
 
