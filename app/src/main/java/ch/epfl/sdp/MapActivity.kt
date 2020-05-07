@@ -226,7 +226,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             //Change Button Color if Drone is not connected
             if(!Drone.isDroneConnected())
-            findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY;
+                findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY
 
 
             isMapReady = true
@@ -272,6 +272,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     fun startMissionOrReturnHome(v: View) {
 
+        val mission_button =  findViewById<FloatingActionButton>(R.id.start_or_return_button)
         if (!Drone.isDroneConnected()) {
             snackbar.show()
         }
@@ -282,8 +283,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                         missionBuilder.build()
                 ).getMissionItems())
             }
-            findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                    .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
+            mission_button.setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
+            if(mission_button.colorNormal==Color.RED)
+                mission_button.colorNormal = Color.WHITE
         }
     }
 
