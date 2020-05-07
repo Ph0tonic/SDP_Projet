@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
@@ -34,7 +35,7 @@ class DroneTest {
     }
 
     @Test
-    fun missionTestDoesNotCrashes() {
+    fun missionTestDoesNotCrash() {
         assertThat(Drone.currentMissionLiveData.value, `is`(nullValue()))
         val someLocationsList = arrayListOf(
                 LatLng(47.398979, 8.543434),
@@ -42,7 +43,9 @@ class DroneTest {
                 LatLng(47.397426, 8.544867),
                 LatLng(47.397026, 8.543067)
         )
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList).getMissionItems())
+        runOnUiThread {
+            Drone.startMission(DroneUtils.makeDroneMission(someLocationsList).getMissionItems())
+        }
         assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
     }
 

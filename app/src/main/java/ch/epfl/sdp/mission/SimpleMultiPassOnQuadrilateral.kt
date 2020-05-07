@@ -38,6 +38,9 @@ class SimpleMultiPassOnQuadrilateral(maxDistBetweenLines: Double = DEFAULT_DIST_
         val waypointsCopied = mutableListOf<LatLng>().apply { addAll(quadrilateralArea.vertices) }
         val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
         Collections.rotate(waypointsCopied, -startingIndex)
+        Log.w("MAP_ACTIVITY","Starting index: $startingIndex")
+        Log.w("MAP_ACTIVITY","Starting point: $startingPoint")
+        Log.w("MAP_ACTIVITY","Starting index: $waypointsCopied")
 
         val steps = max(2, ceil(max(
                 waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,
