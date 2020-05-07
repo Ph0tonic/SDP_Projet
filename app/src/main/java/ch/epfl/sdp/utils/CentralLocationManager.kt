@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import com.mapbox.mapboxsdk.geometry.LatLng
 
@@ -36,7 +37,7 @@ object CentralLocationManager {
         locationManager = CentralLocationManager.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (checkAndRequestPermission()) {
-            requestLocationUpdates(activity)
+            requestLocationUpdates()
         }
     }
 
@@ -47,7 +48,8 @@ object CentralLocationManager {
         return isLocationEnabled()
     }
 
-    private fun minTime(context: Context): Long {
+    private fun minTime(): Long {
+        val context = MainApplication.applicationContext()
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         return defaultSharedPrefs
                 .getString(context.getString(R.string.prefs_gps_refresh), null)
@@ -57,9 +59,9 @@ object CentralLocationManager {
 
     // ALWAYS TEST PERMISSION BEFORE LAUNCHING THIS FUNCTION !
     @SuppressLint("MissingPermission")
-    private fun requestLocationUpdates(context: Context){
+    private fun requestLocationUpdates(){
         locationManager.requestLocationUpdates(
-                GPS_PROVIDER, minTime(context), 10f, CentralLocationListener)
+                GPS_PROVIDER, minTime(), 10f, CentralLocationListener)
     }
 
     private fun showLocationDisabledAlert() {
@@ -95,7 +97,7 @@ object CentralLocationManager {
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == CentralLocationManager.requestCode && checkPermission()) {
-            requestLocationUpdates(activity)
+            requestLocationUpdates()
         }
     }
 
