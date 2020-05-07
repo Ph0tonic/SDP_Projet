@@ -20,7 +20,6 @@ class SearchGroupRepositoryTest {
     companion object {
         private const val DUMMY_GROUP_ID = "Dummy_group_id"
         private const val DUMMY_GROUP_NAME = "Dummy_group_name"
-        private const val ASYNC_CALL_TIMEOUT = 5L
         private val DUMMY_LOCATION = LatLng(0.123, 23.1234)
     }
 

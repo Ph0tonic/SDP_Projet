@@ -2,16 +2,10 @@ package ch.epfl.sdp.database.dao
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfl.sdp.database.data.HeatmapData
-import ch.epfl.sdp.database.data.HeatmapPointData
 import ch.epfl.sdp.database.data.SearchGroupData
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert
 import org.junit.Before
@@ -89,47 +83,4 @@ class FirebaseGroupDaoTest {
         tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         MatcherAssert.assertThat(tested.count, equalTo(0L))
     }
-
-//    @Test
-//    fun updateHeatmapUpdatesHeatmap() {
-//        val dao = FirebaseHeatmapDao()
-//        val initialHeatmap = HeatmapData(mutableListOf(
-//                HeatmapPointData(LatLng(41.0, 10.0), 10.0),
-//                HeatmapPointData(LatLng(41.0, 10.0), 8.5)
-//        ), DUMMY_HEATMAP_ID)
-//        val expectedHeatmap = HeatmapData(mutableListOf(
-//                HeatmapPointData(LatLng(43.0, 10.0), 10.0)
-//        ), DUMMY_HEATMAP_ID)
-//        val tested = CountDownLatch(1)
-//        var initialData = true
-//
-//        //Populate database
-//        Firebase.database.getReference("heatmaps/$DUMMY_GROUP_ID/$DUMMY_HEATMAP_ID").setValue(initialHeatmap)
-//
-//        //Testing
-//        val ref = Firebase.database.getReference("heatmaps/$DUMMY_GROUP_ID/$DUMMY_HEATMAP_ID")
-//        val listener = object : ValueEventListener {
-//            override fun onCancelled(dataSnapshot: DatabaseError) {}
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                if (!initialData) {
-//                    val actualHeatmap = dataSnapshot.getValue(HeatmapData::class.java)!!
-//                    // We do not want to compare uuids as they are generated at adding time by firebase
-//                    actualHeatmap.uuid = dataSnapshot.key
-//
-//                    MatcherAssert.assertThat(actualHeatmap, equalTo(expectedHeatmap))
-//                    tested.countDown()
-//                } else {
-//                    initialData = false
-//                }
-//            }
-//        }
-//        ref.addValueEventListener(listener)
-//
-//        //Update value
-//        dao.updateHeatmap(DUMMY_GROUP_ID, expectedHeatmap)
-//
-//        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-//        MatcherAssert.assertThat(tested.count, equalTo(0L))
-//        ref.removeEventListener(listener)
-//    }
 }
