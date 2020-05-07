@@ -3,6 +3,7 @@ package ch.epfl.sdp.mission
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
+import net.mastrgamr.mbmapboxutils.SphericalUtil.interpolate
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.ceil
@@ -11,7 +12,7 @@ import kotlin.math.max
 /**
  * Creates a path covering a quadrilateral in several passes
  */
-class SimpleMultiPassOnQuadrilateral(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINES) : OverflightStrategy {
+class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINES) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
     companion object {
@@ -38,28 +39,38 @@ class SimpleMultiPassOnQuadrilateral(maxDistBetweenLines: Double = DEFAULT_DIST_
         val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
         Collections.rotate(waypointsCopied, -startingIndex)
 
-        val steps = max(2, ceil(max(
-                waypointsCopied[0].distanceTo(waypointsCopied[1]) / maxDistBetweenLines,
-                waypointsCopied[2].distanceTo(waypointsCopied[3]) / maxDistBetweenLines)).toInt())
+        val maxDistX = max(                                 // 0-1
+                waypointsCopied[0].distanceTo(waypointsCopied[1]),  //
+                waypointsCopied[3].distanceTo(waypointsCopied[2]))  // 3-2
+
+        val maxDistY = max(                                 // 0 1
+                waypointsCopied[0].distanceTo(waypointsCopied[3]),  // | |
+                waypointsCopied[1].distanceTo(waypointsCopied[2]))  // 3 2
+
+        val numPointsX = ceil(maxDistX / maxDistBetweenLines).toInt()
+        val numPointsY = ceil(maxDistY / maxDistBetweenLines).toInt()
 
         val path = ArrayList<LatLng>()
 
-        for (step in 0 until steps) {
-            path.add(generateStepAlong(waypointsCopied[0], waypointsCopied[1], step, steps))
-            path.add(generateStepAlong(waypointsCopied[3], waypointsCopied[2], step, steps))
-            if (step % 2 != 0) {
-                Collections.swap(path, path.size - 1, path.size - 2)
+        for (y in 0..numPointsY) {
+            val yPercent = y.toDouble() / numPointsY
+
+            val leftPoint = interpolate(waypointsCopied[0], waypointsCopied[3], yPercent)
+            val rightPoint = interpolate(waypointsCopied[1], waypointsCopied[2], yPercent)
+
+            for (x in 0..numPointsX) {
+                val xPercent = x.toDouble() / numPointsX
+
+                val point =
+                        if (y % 2 != 0) {
+                            interpolate(leftPoint, rightPoint, xPercent)
+                        } else {
+                            interpolate(rightPoint, leftPoint, xPercent)
+                        }
+                path.add(point)
             }
         }
+        
         return path
-    }
-
-    /**
-     * Generates a LatLng positioned at step/steps in the segment p0---p1
-     */
-    private fun generateStepAlong(p0: LatLng, p1: LatLng, step: Int, steps: Int): LatLng {
-        val stepLat = (p1.latitude - p0.latitude) / (steps - 1)
-        val stepLng = (p1.longitude - p0.longitude) / (steps - 1)
-        return LatLng(p0.latitude + step * stepLat, p0.longitude + step * stepLng)
     }
 }

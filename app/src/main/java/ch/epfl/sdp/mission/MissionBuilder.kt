@@ -18,7 +18,7 @@ class MissionBuilder {
 
     private var startingLocation: LatLng? by Delegates.observable(null, eventChanged)
     private var searchArea: SearchArea? by Delegates.observable(null, eventChanged)
-    private var overflightStrategy: OverflightStrategy by Delegates.observable(SimpleMultiPassOnQuadrilateral(), eventChanged)
+    private var overflightStrategy: OverflightStrategy by Delegates.observable(SimpleQuadStrategy(), eventChanged)
 
     fun withStrategy(strategy: OverflightStrategy): MissionBuilder {
         this.overflightStrategy = strategy

@@ -15,7 +15,7 @@ import ch.epfl.sdp.map.*
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
-import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
@@ -210,7 +210,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             //Create builders
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+                    .withStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
             searchAreaBuilder = QuadrilateralBuilder()
 
 
