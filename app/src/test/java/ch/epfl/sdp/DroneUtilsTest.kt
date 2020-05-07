@@ -23,7 +23,7 @@ class DroneUtilsTest {
                     true, Float.NaN, Float.NaN,
                     Mission.MissionItem.CameraAction.NONE, Float.NaN,
                     1.0)
-            val expectedMission = DroneUtils.generateMissionItem(randomLatitude, randomLongitude)
+            val expectedMission = DroneUtils.generateMissionItem(randomLatitude, randomLongitude,10f)
             Assert.assertTrue(missionEquality(expectedMission, mission))
         }
     }
