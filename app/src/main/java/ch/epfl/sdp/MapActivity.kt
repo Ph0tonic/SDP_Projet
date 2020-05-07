@@ -269,14 +269,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (!Drone.isDroneConnected()) {
             snackbar.show()
         }
-        if (!isDroneFlying) { //TODO : return to user else
-            isDroneFlying = true
-            Drone.startMission(DroneUtils.makeDroneMission(
-                    missionBuilder.build()
-            ).getMissionItems())
+        else {
+            if (!isDroneFlying) { //TODO : return to user else
+                isDroneFlying = true
+                Drone.startMission(DroneUtils.makeDroneMission(
+                        missionBuilder.build()
+                ).getMissionItems())
+            }
+            findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                    .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
         }
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
     }
 
     fun storeMap(v: View) {
