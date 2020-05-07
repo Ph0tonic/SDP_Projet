@@ -2,7 +2,7 @@ package ch.epfl.sdp.database.repository
 
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseGroupDao
-import ch.epfl.sdp.database.dao.GroupDao
+import ch.epfl.sdp.database.dao.SearchGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
 
 class SearchGroupRepository {
@@ -10,10 +10,10 @@ class SearchGroupRepository {
         val DEFAULT_DAO = { FirebaseGroupDao() }
 
         // Change this for dependency injection
-        var daoProvider: () -> GroupDao = DEFAULT_DAO
+        var daoProvider: () -> SearchGroupDao = DEFAULT_DAO
     }
 
-    val dao: GroupDao = daoProvider()
+    val dao: SearchGroupDao = daoProvider()
 
     fun getGroups(): MutableLiveData<List<SearchGroupData>> {
         return dao.getGroups()

@@ -10,7 +10,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import timber.log.Timber
 
-class FirebaseGroupDao : GroupDao {
+class FirebaseGroupDao : SearchGroupDao {
     private var database: FirebaseDatabase = Firebase.database
 
     private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(mutableListOf())
