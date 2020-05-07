@@ -100,7 +100,7 @@ class MainActivityTest {
         assertThat(zoom, `is`(nullValue()))
 
         // Trigger saving mechanism by opening map and coming back
-        onView(withId(R.id.start_mission_button)).perform(click())
+        onView(withId(R.id.work_offline_button)).perform(click())
         mUiDevice.pressBack()
 
         longitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)

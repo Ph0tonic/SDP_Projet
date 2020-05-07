@@ -24,9 +24,15 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.dao.MockHeatmapDao
+import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.utils.CentralLocationManager
 import ch.epfl.sdp.drone.Drone.currentMissionLiveData
+import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import com.google.firebase.database.ktx.database
@@ -44,7 +50,6 @@ import org.junit.runner.RunWith
 class MapActivityTest {
 
     companion object {
-        // TODO change to latLng for simplicity
         private val FAKE_LOCATION_TEST = LatLng(42.125, -30.229)
         private const val FAKE_HEATMAP_POINT_INTENSITY = 8.12
 
@@ -84,7 +89,9 @@ class MapActivityTest {
         }
 
         // Do not use the real database, only use the offline version on the device
-        Firebase.database.goOffline()
+        //Firebase.database.goOffline()
+        HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        MarkerRepository.daoProvider = { MockMarkerDao() }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
 
         val targetContext: Context = getInstrumentation().targetContext
@@ -101,15 +108,17 @@ class MapActivityTest {
         onView(withId(R.id.start_or_return_button)).perform(click())
         val expectedLatLng = LatLng(47.397026, 8.543067)
 
-        // Add 4 points to the map for the strategy
         runOnUiThread {
-            mActivityRule.activity.searchAreaBuilder.reset()
-            arrayListOf(
+            val searchArea = QuadrilateralArea(arrayListOf(
+                    expectedLatLng, //we consider the closest point to the drone
                     LatLng(47.398979, 8.543434),
                     LatLng(47.398279, 8.543934),
-                    LatLng(47.397426, 8.544867),
-                    expectedLatLng //we consider the closest point to the drone
-            ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
+                    LatLng(47.397426, 8.544867)
+            ));
+            mActivityRule.activity.missionBuilder
+                    .withSearchArea(searchArea)
+                    .withStartingLocation(expectedLatLng)
+                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
         }
 
         onView(withId(R.id.start_or_return_button)).perform(click())
@@ -117,8 +126,8 @@ class MapActivityTest {
         val uploadedMission = currentMissionLiveData.value
 
         if (uploadedMission != null) {
-            assertThat(expectedLatLng.latitude, closeTo(uploadedMission[0].latitudeDeg, 0.1))
-            assertThat(expectedLatLng.longitude, closeTo(uploadedMission[0].longitudeDeg, 0.1))
+            assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
+            assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
         } else {
             Assert.fail("No MissionItem")
         }
@@ -149,8 +158,8 @@ class MapActivityTest {
     @Test
     fun addPointToHeatmapAddsPointToHeatmap() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
 

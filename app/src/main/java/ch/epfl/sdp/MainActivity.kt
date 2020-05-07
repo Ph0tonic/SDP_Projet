@@ -142,7 +142,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun workOffline(view: View) {
-
+        val intent = Intent(this, MapActivity::class.java)
+                .putExtra("groupId", "dummy")
+                .putExtra("Role", Role.RESCUER)
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

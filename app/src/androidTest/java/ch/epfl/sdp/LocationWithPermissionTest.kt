@@ -34,6 +34,7 @@ class LocationWithPermissionTest {
 
     companion object {
         private const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
+        private const val ROLE_PROPERTY_NAME_FOR_INTENT = "Role"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
     }
@@ -42,7 +43,9 @@ class LocationWithPermissionTest {
     @JvmField
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
-    private val intentWithGroup = Intent().putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
+    private val intentWithGroupAndOperator = Intent()
+            .putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
+            .putExtra(ROLE_PROPERTY_NAME_FOR_INTENT, Role.OPERATOR)
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MapActivity::class.java, true, false)
@@ -58,7 +61,7 @@ class LocationWithPermissionTest {
 
         HeatmapRepository.daoProvider = { MockHeatmapDao() }
         MarkerRepository.daoProvider = { MockMarkerDao() }
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
