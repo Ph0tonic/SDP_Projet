@@ -216,7 +216,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapView.contentDescription = getString(R.string.map_ready)// Used to detect when the map is ready in tests
 
             val (strategy, searchAreaBuilderResult) =
-                    loadStrategyPreference(this, Drone.GROUND_SENSOR_SCOPE) ?: throw Error()
+                    loadStrategyPreference(this, Drone.GROUND_SENSOR_SCOPE)
 
 
             //Create builders
@@ -242,10 +242,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun loadStrategyPreference(context: Context, groundSensorScope: Double): Pair<OverflightStrategy, SearchAreaBuilder>? {
+    private fun loadStrategyPreference(context: Context, groundSensorScope: Double): Pair<OverflightStrategy, SearchAreaBuilder> {
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         val strategyString = defaultSharedPrefs
-                .getString(context.getString(R.string.prefs_overflight_strategy), null)
+                .getString(context.getString(R.string.prefs_overflight_strategy), "")
         return when (strategyString) {
             getString(R.string.zigzag_strategy) -> Pair(
                     SimpleMultiPassOnQuadrilateral(groundSensorScope),
@@ -253,7 +253,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             getString(R.string.spiral_strategy) -> Pair(
                     SpiralStrategy(groundSensorScope),
                     CircleBuilder())
-            else -> null
+            else -> Pair(
+                    SimpleMultiPassOnQuadrilateral(groundSensorScope),
+                    QuadrilateralBuilder())
         }
     }
 
