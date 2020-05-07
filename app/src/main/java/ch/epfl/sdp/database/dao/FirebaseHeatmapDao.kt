@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.dao
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.HeatmapData
@@ -43,11 +44,10 @@ class FirebaseHeatmapDao : HeatmapDao {
                 }
 
                 override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                    //TODO fix "Can't convert object of type java.lang.String to type ch.epfl.sdp.database.data.HeatmapData"
-//                    Log.w("FIREBASE/HEATMAP/ON_CHILD_ADDED","Datasnapshot: ${dataSnapshot.toString()}")
-//                    val newHeatmapData = dataSnapshot.getValue(HeatmapData::class.java)!!
-//                    newHeatmapData.uuid = dataSnapshot.key
-//                    groupHeatmaps[groupId]!!.value!![dataSnapshot.key!!] = MutableLiveData(newHeatmapData)
+                    Log.w("HEATMAP_DAO/CHILD_ADDED","Datasnapshot: ${dataSnapshot.toString()}")
+                    val newHeatmapData = dataSnapshot.getValue(HeatmapData::class.java)!!
+                    newHeatmapData.uuid = dataSnapshot.key
+                    groupHeatmaps[groupId]!!.value!![dataSnapshot.key!!] = MutableLiveData(newHeatmapData)
 
                     // Trigger parent live data
                     groupHeatmaps[groupId]!!.value = groupHeatmaps[groupId]!!.value

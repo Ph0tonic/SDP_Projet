@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
-            android:id="@+id/search_group_selection"
+            android:id="@+id/search_group_selection_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="7"
@@ -31,7 +31,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/work_offline"
+            android:id="@+id/start_mission_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="7"
@@ -46,7 +46,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/start_mission"
+            android:id="@+id/work_offline_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="7"

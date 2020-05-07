@@ -141,8 +141,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO move "groupId" to Strings
-        require(intent.getStringExtra("groupId") != null) { "MapActivity should be provided with a searchGroupId\n" }
-        require(Auth.loggedIn.value == true) { "You need to be logged in to access this part of the app" }
+        requireNotNull(intent.getStringExtra("groupId")) { "MapActivity should be provided with a searchGroupId\n" }
+        require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
+        requireNotNull(Auth.accountId.value){"You need to have an account ID set to access MapActivity"}
+        requireNotNull(intent.getSerializableExtra("Role")) {"MapActivity should be provided with a role"}
 
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)

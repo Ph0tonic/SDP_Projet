@@ -22,6 +22,7 @@ class HeatmapRepository {
     fun addMeasureToHeatmap(groupId: String, heatmapId: String, location: LatLng, intensity: Double) {
         val heatmaps = dao.getHeatmapsOfSearchGroup(groupId).value
         val heatmapData = if (heatmaps != null && heatmaps.containsKey(heatmapId)) {
+            //TODO do we really need to make a copy ?
             heatmaps[heatmapId]?.value?.copy()!!
         } else {
             HeatmapData(mutableListOf(), heatmapId)

@@ -53,13 +53,16 @@ class MapActivityTest {
         private const val EPSILON = 1e-9
         private const val DEFAULT_ALTITUDE = " 0.0 m"
         private const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
+        private const val ROLE_PROPERTY_NAME_FOR_INTENT = "Role"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
-    private val intentWithGroup = Intent().putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
+    private val intentWithGroupAndOperator = Intent()
+            .putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
+            .putExtra(ROLE_PROPERTY_NAME_FOR_INTENT, Role.OPERATOR)
 
     @get:Rule
     var mActivityRule = IntentsTestRule(
@@ -74,15 +77,14 @@ class MapActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
-        //Fake logged in
+        //Fake login
         runOnUiThread {
             Auth.accountId.value = FAKE_ACCOUNT_ID
             Auth.loggedIn.value = true
         }
 
+        // Do not use the real database, only use the offline version on the device
         Firebase.database.goOffline()
-        //HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        //MarkerRepository.daoProvider = { MockMarkerDao() }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
 
         val targetContext: Context = getInstrumentation().targetContext
@@ -92,7 +94,7 @@ class MapActivityTest {
     @Test
     fun canStartMission() {
         // Launch activity
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -131,7 +133,7 @@ class MapActivityTest {
                 .apply()
 
         // Launch activity after setting preferences
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -146,10 +148,9 @@ class MapActivityTest {
 
     @Test
     fun addPointToHeatmapAddsPointToHeatmap() {
-        // Launch activity after setting preferences
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
 
@@ -157,7 +158,12 @@ class MapActivityTest {
             mActivityRule.activity.addPointToHeatMap(FAKE_LOCATION_TEST, FAKE_HEATMAP_POINT_INTENSITY)
         }
         val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]?.value?.dataPoints?.size, equalTo(1))
+        assertThat(heatmaps.value, `is`(notNullValue()))
+        Log.w("MAP_ACTIVITY_TEST",heatmaps.value.toString())
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(1))
     }
 
     @Test
@@ -173,19 +179,19 @@ class MapActivityTest {
 
     @Test
     fun canOnRequestPermissionResult() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 
     @Test
-    fun droneStatusIsVisible() {
-        mActivityRule.launchActivity(intentWithGroup)
+    fun droneStatusIsVisibleForoperator() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
     }
 
     @Test
     fun longClickOnMapAddAMarker() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -202,7 +208,7 @@ class MapActivityTest {
 
     @Test
     fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -222,7 +228,7 @@ class MapActivityTest {
 
     @Test
     fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -242,7 +248,7 @@ class MapActivityTest {
 
     @Test
     fun deleteButtonRemovesWaypoints() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -262,7 +268,7 @@ class MapActivityTest {
 
     @Test
     fun storeMapButtonIsWorking() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -275,7 +281,7 @@ class MapActivityTest {
 
     @Test
     fun locateButtonIsWorking() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -295,7 +301,7 @@ class MapActivityTest {
 
     @Test
     fun updateDroneBatteryChangesDroneStatus() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
 
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(null)
@@ -320,7 +326,7 @@ class MapActivityTest {
 
     @Test
     fun updateDroneAltitudeChangesDroneStatus() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
 
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.postValue(null)
@@ -346,7 +352,7 @@ class MapActivityTest {
 
     @Test
     fun updateDroneSpeedChangesDroneStatus() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
 
         runOnUiThread {
             Drone.currentSpeedLiveData.postValue(null)
@@ -372,7 +378,7 @@ class MapActivityTest {
 
     @Test
     fun updateDronePositionChangesDistToUser() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         runOnUiThread {
             CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
             Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
@@ -387,7 +393,7 @@ class MapActivityTest {
 
     @Test
     fun updateUserPositionChangesDistToUser() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         runOnUiThread {
             Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
             CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
@@ -402,7 +408,7 @@ class MapActivityTest {
 
     @Test
     fun updateBatteryLevelChangesBatteryLevelIcon() {
-        mActivityRule.launchActivity(intentWithGroup)
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         runOnUiThread {
             Drone.currentBatteryLevelLiveData.postValue(.00f)
         }
