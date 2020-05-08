@@ -23,13 +23,21 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.dao.MockHeatmapDao
+import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.data.HeatmapData
+import ch.epfl.sdp.database.data.HeatmapPointData
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.utils.CentralLocationManager
-import ch.epfl.sdp.drone.Drone.currentMissionLiveData
+import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SpiralStrategy
+import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.utils.Auth
+import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.Matchers.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,16 +48,22 @@ import org.junit.runner.RunWith
 class MapActivityTest {
 
     companion object {
-        const val LATITUDE_TEST = 42.125
-        const val LONGITUDE_TEST = -30.229
-        const val ZOOM_TEST = 0.9
-        const val MAP_LOADING_TIMEOUT = 30000L
-        const val EPSILON = 1e-10
-        const val DEFAULT_ALTITUDE = " 0.0 m"
+        private val FAKE_LOCATION_TEST = LatLng(42.125, -30.229)
+        private const val FAKE_HEATMAP_POINT_INTENSITY = 8.12
+
+        private const val ZOOM_TEST = 0.9
+        private const val MAP_LOADING_TIMEOUT = 1000L
+        private const val EPSILON = 1e-9
+        private const val DEFAULT_ALTITUDE = " 0.0 m"
+        private const val FAKE_ACCOUNT_ID = "fake_account_id"
+        private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
+    private val intentWithGroupAndOperator = Intent()
+            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
 
     @get:Rule
     var mActivityRule = IntentsTestRule(
@@ -64,11 +78,18 @@ class MapActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
-        mUiDevice = UiDevice.getInstance(getInstrumentation())
-    }
+        //Fake login
+        runOnUiThread {
+            Auth.accountId.value = FAKE_ACCOUNT_ID
+            Auth.loggedIn.value = true
+        }
 
-    @Before
-    fun setUp() {
+        // Do not use the real database, only use the offline version on the device
+        //Firebase.database.goOffline()
+        HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        MarkerRepository.daoProvider = { MockMarkerDao() }
+        mUiDevice = UiDevice.getInstance(getInstrumentation())
+
         val targetContext: Context = getInstrumentation().targetContext
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
     }
@@ -76,126 +97,195 @@ class MapActivityTest {
     @Test
     fun canStartMission() {
         // Launch activity
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
-        onView(withId(R.id.start_or_return_button)).perform(click())
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
         val expectedLatLng = LatLng(47.397026, 8.543067)
 
-        // Add 4 points to the map for the strategy
-        runOnUiThread {
-            mActivityRule.activity.searchAreaBuilder.reset()
-            arrayListOf(
-                    LatLng(47.398979, 8.543434),
-                    LatLng(47.398279, 8.543934),
-                    LatLng(47.397426, 8.544867),
-                    expectedLatLng //we consider the closest point to the drone
-            ).forEach { latLng -> mActivityRule.activity.onMapClicked(latLng) }
-        }
-
+        // TODO: Why click on menu button doesn't work ?
+        // Open menu to click on start button
         onView(withId(R.id.start_or_return_button)).perform(click())
 
-        val uploadedMission = currentMissionLiveData.value
-
-        if (uploadedMission != null) {
-            assertThat(expectedLatLng.latitude, closeTo(uploadedMission[0].latitudeDeg, 0.1))
-            assertThat(expectedLatLng.longitude, closeTo(uploadedMission[0].longitudeDeg, 0.1))
-        } else {
-            Assert.fail("No MissionItem")
+        runOnUiThread {
+            val searchArea = QuadrilateralArea(arrayListOf(
+                    expectedLatLng, //we consider the closest point to the drone
+                    LatLng(47.398979, 8.543434),
+                    LatLng(47.398279, 8.543934),
+                    LatLng(47.397426, 8.544867)
+            ))
+            mActivityRule.activity.missionBuilder
+                    .withSearchArea(searchArea)
+                    .withStartingLocation(expectedLatLng)
+                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
         }
+
+        // Then start mission officially
+        onView(withId(R.id.start_or_return_button)).perform(click())
+
+        val uploadedMission = Drone.currentMissionLiveData.value
+
+        assertThat(uploadedMission, `is`(notNullValue()))
+        assertThat(uploadedMission!!.size, not(equalTo(0)))
+        assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
+        assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
     }
 
     @Test
     fun mapboxUsesOurPreferences() {
         preferencesEditor
-                .putString(applicationContext().getString(R.string.prefs_latitude), LATITUDE_TEST.toString())
-                .putString(applicationContext().getString(R.string.prefs_longitude), LONGITUDE_TEST.toString())
+                .putString(applicationContext().getString(R.string.prefs_latitude), FAKE_LOCATION_TEST.latitude.toString())
+                .putString(applicationContext().getString(R.string.prefs_longitude), FAKE_LOCATION_TEST.longitude.toString())
                 .putString(applicationContext().getString(R.string.prefs_zoom), ZOOM_TEST.toString())
                 .apply()
 
         // Launch activity after setting preferences
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
-
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(LATITUDE_TEST, EPSILON))
-                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(LONGITUDE_TEST, EPSILON))
+                assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST), closeTo(0.0, EPSILON))
                 assertThat(mapboxMap.cameraPosition.zoom, closeTo(ZOOM_TEST, EPSILON))
             }
         }
     }
 
     @Test
-    fun mapBoxCanAddPointToHeatMap() {
-
-        mActivityRule.launchActivity(Intent())
-        assertThat(mActivityRule.activity.heatmapFeatures.size, equalTo(0))
-
-        // Wait for the map to load and add a heatmap point
+    fun addPointToHeatmapAddsPointToHeatmap() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
 
         runOnUiThread {
-            mActivityRule.activity.addPointToHeatMap(10.0, 10.0, 10.0)
+            mActivityRule.activity.addPointToHeatMap(FAKE_LOCATION_TEST, FAKE_HEATMAP_POINT_INTENSITY)
         }
-        assertThat(mActivityRule.activity.heatmapFeatures.size, equalTo(1))
+        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        assertThat(heatmaps.value, `is`(notNullValue()))
+
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(1))
+    }
+
+    @Test
+    fun heatmapPaintersAreGeneratedWhenLaunchingApp() {
+        val heatmapDao = MockHeatmapDao()
+        val heatmap = HeatmapData(mutableListOf(
+                HeatmapPointData(LatLng(41.0, 10.0), 10.0),
+                HeatmapPointData(LatLng(41.0, 10.0), 8.5)
+        ), FAKE_ACCOUNT_ID)
+        heatmapDao.updateHeatmap(DUMMY_GROUP_ID, heatmap)
+        HeatmapRepository.daoProvider = { heatmapDao }
+
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(1))
+
+        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        assertThat(heatmaps.value, `is`(notNullValue()))
+
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
+        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(2))
+
+        assertThat(mActivityRule.activity.heatmapPainters.size, equalTo(1))
+        //Reset default repo
+        HeatmapRepository.daoProvider = { MockHeatmapDao() }
     }
 
     @Test
     fun canUpdateUserLocation() {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
+        //TODO Rewrite this test
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
     }
 
     @Test
     fun canUpdateUserLocationTwice() {
-        CentralLocationManager.currentUserPosition.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
-        CentralLocationManager.currentUserPosition.postValue(LatLng(-LATITUDE_TEST, -LONGITUDE_TEST))
+        //TODO Rewrite this test
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
     }
 
     @Test
     fun canOnRequestPermissionResult() {
-        mActivityRule.launchActivity(Intent())
+        //TODO Rewrite this test
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 
     @Test
-    fun droneStatusIsVisible() {
-        mActivityRule.launchActivity(Intent())
+    fun droneStatusIsVisibleForoperator() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
     }
 
     @Test
     fun longClickOnMapAddAMarker() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         onView(withId(R.id.mapView)).perform(longClick())
         runOnUiThread {
             assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
         }
         onView(withId(R.id.mapView)).perform(longClick())
+        Thread.sleep(2000)
         runOnUiThread {
             assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
         }
     }
 
     @Test
-    fun clickOnMapInteractWithMapBoxSearchAreaBuilder() {
-        mActivityRule.launchActivity(Intent())
+    fun clickOnMapInteractWithQuadrilateralSearchArea() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
+        runOnUiThread {
+            mActivityRule.activity.setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+        }
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
 
         // Add a point
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClicked(LatLng(1.0, 0.0))
         }
 
-        assertThat(searchAreaBuilder.vertices.size, equalTo(1))
+        assertThat(searchAreaBuilder.vertices.size, equalTo(2))
+        runOnUiThread {
+            searchAreaBuilder.reset()
+        }
+        assertThat(searchAreaBuilder.vertices.size, equalTo(0))
+    }
+
+    @Test
+    fun clickOnMapInteractWithCircleSearchArea() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            mActivityRule.activity.setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+        }
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
+
+        // Add a point
+        runOnUiThread {
+            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClicked(LatLng(0.0001, 0.0))
+        }
+
+        assertThat(searchAreaBuilder.vertices.size, equalTo(2))
         runOnUiThread {
             searchAreaBuilder.reset()
         }
@@ -204,9 +294,9 @@ class MapActivityTest {
 
     @Test
     fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         // Add 5 points
         runOnUiThread {
@@ -224,9 +314,9 @@ class MapActivityTest {
 
     @Test
     fun deleteButtonRemovesWaypoints() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
         runOnUiThread {
@@ -244,9 +334,9 @@ class MapActivityTest {
 
     @Test
     fun storeMapButtonIsWorking() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         onView(withId(R.id.floating_menu_button)).perform(click())
         onView(withId(R.id.store_button)).perform(click())
@@ -257,168 +347,166 @@ class MapActivityTest {
 
     @Test
     fun locateButtonIsWorking() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), `is`(true))
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(LATITUDE_TEST, LONGITUDE_TEST))
+            Drone.currentPositionLiveData.value = FAKE_LOCATION_TEST
         }
 
         onView(withId(R.id.floating_menu_button)).perform(click())
         onView(withId(R.id.locate_button)).perform(click())
-        onView(withId(R.id.locate_button)).perform(click())
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assertThat(mapboxMap.cameraPosition.target.latitude, closeTo(LATITUDE_TEST, EPSILON))
-                assertThat(mapboxMap.cameraPosition.target.longitude, closeTo(LONGITUDE_TEST, EPSILON))
+                assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST), closeTo(0.0, EPSILON))
             }
         }
     }
 
     @Test
     fun updateDroneBatteryChangesDroneStatus() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(null)
+            Drone.currentBatteryLevelLiveData.value = null
         }
         onView(withId(R.id.battery_level)).check(matches(withText(R.string.no_info)))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(1F)
+            Drone.currentBatteryLevelLiveData.value = 1F
         }
         onView(withId(R.id.battery_level)).check(matches(withText(" 100%")))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(0F)
+            Drone.currentBatteryLevelLiveData.value = 0F
         }
         onView(withId(R.id.battery_level)).check(matches(withText(" 0%")))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(0.5F)
+            Drone.currentBatteryLevelLiveData.value = 0.5F
         }
         onView(withId(R.id.battery_level)).check(matches(withText(" 50%")))
     }
 
     @Test
     fun updateDroneAltitudeChangesDroneStatus() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
 
         runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.postValue(null)
+            Drone.currentAbsoluteAltitudeLiveData.value = null
         }
 
         onView(withId(R.id.altitude)).check(matches(withText(R.string.no_info)))
 
         runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.postValue(0F)
+            Drone.currentAbsoluteAltitudeLiveData.value = 0F
         }
         onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.postValue(1.123F)
+            Drone.currentAbsoluteAltitudeLiveData.value = 1.123F
         }
         onView(withId(R.id.altitude)).check(matches(withText(" 1.1 m")))
 
         runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.postValue(10F)
+            Drone.currentAbsoluteAltitudeLiveData.value = 10F
         }
         onView(withId(R.id.altitude)).check(matches(withText(" 10.0 m")))
     }
 
     @Test
     fun updateDroneSpeedChangesDroneStatus() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
 
         runOnUiThread {
-            Drone.currentSpeedLiveData.postValue(null)
+            Drone.currentSpeedLiveData.value = null
         }
 
         onView(withId(R.id.speed)).check(matches(withText(R.string.no_info)))
 
         runOnUiThread {
-            Drone.currentSpeedLiveData.postValue(0F)
+            Drone.currentSpeedLiveData.value = 0F
         }
         onView(withId(R.id.speed)).check(matches(withText(" 0.0 m/s")))
 
         runOnUiThread {
-            Drone.currentSpeedLiveData.postValue(1.123F)
+            Drone.currentSpeedLiveData.value = 1.123F
         }
         onView(withId(R.id.speed)).check(matches(withText(" 1.1 m/s")))
 
         runOnUiThread {
-            Drone.currentSpeedLiveData.postValue(5.2F)
+            Drone.currentSpeedLiveData.value = 5.2F
         }
         onView(withId(R.id.speed)).check(matches(withText(" 5.2 m/s")))
     }
 
     @Test
     fun updateDronePositionChangesDistToUser() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         runOnUiThread {
-            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
-            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
+            CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
+            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
         }
         onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(1.0, 0.0))
+            Drone.currentPositionLiveData.value = LatLng(1.0, 0.0)
         }
         onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
     }
 
     @Test
     fun updateUserPositionChangesDistToUser() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         runOnUiThread {
-            Drone.currentPositionLiveData.postValue(LatLng(0.0, 0.0))
-            CentralLocationManager.currentUserPosition.postValue(LatLng(0.0, 0.0))
+            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
+            CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
         }
         onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
 
         runOnUiThread {
-            CentralLocationManager.currentUserPosition.postValue(LatLng(1.0, 0.0))
+            CentralLocationManager.currentUserPosition.value = LatLng(1.0, 0.0)
         }
         onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
     }
 
     @Test
     fun updateBatteryLevelChangesBatteryLevelIcon() {
-        mActivityRule.launchActivity(Intent())
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(.00f)
+            Drone.currentBatteryLevelLiveData.value = .00f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery1))))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(.10f)
+            Drone.currentBatteryLevelLiveData.value = .10f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery2))))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(.30f)
+            Drone.currentBatteryLevelLiveData.value = .30f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery3))))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(.50f)
+            Drone.currentBatteryLevelLiveData.value = .50f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery4))))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(.70f)
+            Drone.currentBatteryLevelLiveData.value = .70f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery5))))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(.90f)
+            Drone.currentBatteryLevelLiveData.value = .90f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery6))))
 
         runOnUiThread {
-            Drone.currentBatteryLevelLiveData.postValue(.98f)
+            Drone.currentBatteryLevelLiveData.value = .98f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
     }

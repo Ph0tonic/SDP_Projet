@@ -2,7 +2,7 @@ package ch.epfl.sdp.map
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-abstract class MapBoxSearchAreaPainter {
+abstract class MapboxSearchAreaPainter {
 
     val onMoveVertex = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
 
@@ -11,4 +11,5 @@ abstract class MapBoxSearchAreaPainter {
     }
 
     abstract fun paint(vertices: List<LatLng>)
+    abstract fun getUpperLayer(): String
 }

@@ -12,7 +12,7 @@
     <!-- Launcher theme -->
     <style name="AppTheme.Launcher" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name = "android:textColor">@color/colorBlack</item>
+        <item name="android:textColor">@color/colorBlack</item>
     </style>
 
     <!-- Main activity themes -->
@@ -20,17 +20,18 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="AppTheme.PopupOverlay"  parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!-- Display data in Map Activity-->
     <style name="InformationDisplayTheme">
-        <item name = "android:layout_width"> wrap_content     </item>
-        <item name = "android:layout_height">match_parent     </item>
-        <item name = "android:textColor">    @color/colorBlack</item>
-        <item name = "android:textStyle">bold  </item>
-        <item name = "android:padding"  >2dp   </item>
-        <item name = "android:gravity"  >center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textColor">@color/colorBlack</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">2dp</item>
+        <item name="android:gravity">center</item>
     </style>
-
 </resources>

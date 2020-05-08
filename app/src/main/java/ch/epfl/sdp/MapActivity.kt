@@ -1,45 +1,41 @@
 package ch.epfl.sdp
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.map.MapBoxMissionPainter
-import ch.epfl.sdp.map.MapBoxQuadrilateralPainter
-import ch.epfl.sdp.map.MapBoxSearchAreaPainter
-import ch.epfl.sdp.map.MapUtils
+import ch.epfl.sdp.map.*
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
+import ch.epfl.sdp.mission.OverflightStrategy
 import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SpiralStrategy
+import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.Point
+import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.style.expressions.Expression
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
-import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.utils.ColorUtils
 
 /**
  * Main Activity to display map and create missions.
@@ -49,34 +45,28 @@ import com.mapbox.mapboxsdk.utils.ColorUtils
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
+    private lateinit var groupId: String
     private var isMapReady = false
-    private var isDroneFlying = false
 
     private lateinit var mapboxMap: MapboxMap
-    private lateinit var droneCircleManager: CircleManager
-    private lateinit var userCircleManager: CircleManager
     private lateinit var victimSymbolManager: SymbolManager
 
-    private lateinit var dronePositionMarker: Circle
-    var waypoints = arrayListOf<LatLng>()
-    private lateinit var userPositionMarker: Circle
-
     private lateinit var snackbar: Snackbar
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var heatmapFeatures = ArrayList<Feature>()
-    private lateinit var heatmapGeoJsonSource: GeoJsonSource
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
     private lateinit var distanceToUserTextView: TextView
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
+    private lateinit var strategyPickerButton: FloatingActionButton
+
+    private lateinit var role: Role
+    private var currentStrategy: OverflightStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
 
     private var victimSymbolLongClickConsumed = false
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val victimMarkers = mutableListOf<Symbol>()
+    val victimMarkers = mutableMapOf<String, Symbol>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -85,9 +75,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var missionBuilder: MissionBuilder
 
-    /** Painters */
-    private lateinit var searchAreaPainter: MapBoxSearchAreaPainter
-    private lateinit var missionPainter: MapBoxMissionPainter
+    /* Repositories */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val heatmapRepository = HeatmapRepository()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val markerRepository = MarkerRepository()
+
+    /* Painters */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
+    private lateinit var searchAreaPainter: MapboxSearchAreaPainter
+    private lateinit var missionPainter: MapboxMissionPainter
+    private lateinit var dronePainter: MapboxDronePainter
+    private lateinit var userPainter: MapboxUserPainter
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -99,17 +100,25 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Pair(.95, R.drawable.ic_battery7)
     )
 
+    private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? ->
+        updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT)
+    }
+    private var droneSpeedObserver = Observer<Float> { newSpeed: Float? ->
+        updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
+    }
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateDronePosition(it); updateDronePositionOnMap(it) }
+        newLatLng?.let { updateDronePosition(it); if (::dronePainter.isInitialized) dronePainter.paint(it) }
     }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it); updateUserPositionOnMap(it) }
+        newLatLng?.let { updateUserPosition(it); if (::userPainter.isInitialized) userPainter.paint(it) }
     }
-
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
-        updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT) // Always update the text string
+
+        // Always update the text string
+        updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
+
+        // Only update the icon if the battery level is not null
         newBatteryLevel?.let {
-            // Only update the icon if the battery level is not null
             val newBatteryDrawable = droneBatteryLevelDrawables
                     .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
                     .maxBy { x -> x.first }!!
@@ -118,8 +127,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             droneBatteryLevelImageView.tag = newBatteryDrawable
         }
     }
-    private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? -> updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT) }
-    private var droneSpeedObserver = Observer<Float> { newSpeed: Float? -> updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT) }
 
     companion object {
         const val ID_ICON_VICTIM: String = "airport"
@@ -127,22 +134,45 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
+        private const val COORDINATE_FORMAT = " %.7f"
+
+        private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //TODO move "groupId" to Strings
+        requireNotNull(intent.getStringExtra(getString(R.string.INTENT_KEY_GROUP_ID))) { "MapActivity should be provided with a searchGroupId\n" }
+        require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
+        requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
+        requireNotNull(intent.getSerializableExtra(getString(R.string.INTENT_KEY_ROLE))) { "MapActivity should be provided with a role" }
+
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
+
+        groupId = intent.getStringExtra(getString(R.string.INTENT_KEY_GROUP_ID))!!
+        role = intent.getSerializableExtra(getString(R.string.INTENT_KEY_ROLE)) as Role
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
         droneBatteryLevelTextView = findViewById(R.id.battery_level)
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
+        strategyPickerButton = findViewById(R.id.strategy_picker_button)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+
+        if (role == Role.RESCUER) {
+            findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
+            findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
+            findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
+        }
 
         mapView.contentDescription = getString(R.string.map_not_ready)
 
+        //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
     }
 
@@ -170,13 +200,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            droneCircleManager = CircleManager(mapView, mapboxMap, style)
-            userCircleManager = CircleManager(mapView, mapboxMap, style)
-
+            userPainter = MapboxUserPainter(mapView, mapboxMap, style)
+            dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
+            missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             setupVictimSymbolManager(style)
-
-            missionPainter = MapBoxMissionPainter(mapView, mapboxMap, style)
-            searchAreaPainter = MapBoxQuadrilateralPainter(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener {
                 onMapClicked(it)
@@ -187,59 +214,89 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 true
             }
 
-            heatmapGeoJsonSource = GeoJsonSource(getString(R.string.heatmap_source_ID), GeoJsonOptions()
-                    .withCluster(true)
-                    .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
-                    .withClusterMaxZoom(13)
-            )
-            heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
-            style.addSource(heatmapGeoJsonSource)
+            // Load latest location
+            mapboxMap.cameraPosition = MapUtils.getLastCameraState()
 
-            MapUtils.createLayersForHeatMap(style)
-            mapboxMap.cameraPosition = MapUtils.getLastCameraState()// Load latest location
-            mapView.contentDescription = getString(R.string.map_ready)// Used to detect when the map is ready in tests
+            //Create builders
+            missionBuilder = MissionBuilder()
+                    .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
 
-            setupStrategy(style)
+            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+
+            // Add listeners to builders
+            missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
+
+            // Location listener on drone
+            Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
+            onceMapReady(style)
 
-            /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-            //addVirtualPointsToHeatmap()
+            // Used to detect when the map is ready in tests
+            mapView.contentDescription = getString(R.string.map_ready)
         }
     }
 
     private fun setupVictimSymbolManager(style: Style) {
         victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
+
         victimSymbolManager.iconAllowOverlap = true
         victimSymbolManager.symbolSpacing = 0F
         victimSymbolManager.iconIgnorePlacement = true
         victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
 
         victimSymbolManager.addLongClickListener {
-            victimSymbolManager.delete(it)
-            victimMarkers.remove(it)
+            val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
+            markerRepository.removeMarkerForSearchGroup(groupId, markerId)
             victimSymbolLongClickConsumed = true
         }
 
         style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
     }
 
-    private fun setupStrategy(style: Style) {
-        //Create builders
-        missionBuilder = MissionBuilder()
-                .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-                .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
-        searchAreaBuilder = QuadrilateralBuilder()
+    /**
+     * Called once the map and the style are completely initialized
+     */
+    private fun onceMapReady(style: Style) {
+        setupMarkerObserver()
+        setupHeatmapsObservers(style)
+        /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
+        //addVirtualPointsToHeatmap()
+    }
 
+    private fun setupMarkerObserver() {
+        markerRepository.getMarkersOfSearchGroup(groupId).observe(this, Observer { markers ->
+            val removedMarkers = victimMarkers.keys - markers.map { it.uuid }
+            removedMarkers.forEach {
+                victimSymbolManager.delete(victimMarkers.remove(it))
+            }
+            markers.filter { !victimMarkers.containsKey(it.uuid) }.forEach {
+                addVictimMarker(it.location!!, it.uuid!!)
+            }
+        })
+    }
 
-        // Add listeners to builders
-        searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
-        searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
-        missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
-        searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+    /**
+     * Instantiates the heatmaps observers:
+     *  - An observer for the collection of heatmaps
+     *  - An observer for each heatmap for new points
+     */
+    private fun setupHeatmapsObservers(style: Style) {
+        val upperLayerId = victimSymbolManager.layerId
+        heatmapRepository.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
+            // Observers for heatmap creation
+            repoHeatmaps.filter { !heatmapPainters.containsKey(it.key) }
+                    .forEach { (key, value) ->
+                        heatmapPainters[key] = MapboxHeatmapPainter(style, this, value, upperLayerId)
+                    }
 
-        // Location listener on drone
-        Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
+            // Remove observers on heatmap deletion
+            val removedHeatmapIds = heatmapPainters.keys - repoHeatmaps.keys
+            removedHeatmapIds.forEach {
+                heatmapPainters[it]!!.destroy(mapboxMap.style!!)
+                heatmapPainters.remove(it)
+            }
+        })
     }
 
     /**
@@ -251,21 +308,56 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun onMapClicked(position: LatLng) {
-        try {
-            searchAreaBuilder.addVertex(position)
-        } catch (e: IllegalArgumentException) {
-            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        if (role == Role.OPERATOR) {
+            try {
+                searchAreaBuilder.addVertex(position)
+            } catch (e: IllegalArgumentException) {
+                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun onMapLongClicked(position: LatLng) {
+        if (!victimSymbolLongClickConsumed) {
+            markerRepository.addMarkerForSearchGroup(groupId, position)
+        }
+        victimSymbolLongClickConsumed = false
+    }
+
+    /**
+     * Adds a heat point to the heatmap
+     */
+    fun addPointToHeatMap(location: LatLng, intensity: Double) {
+        if (isMapReady) {
+            heatmapRepository.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
         }
     }
 
     /**
-     * Map long click to current eventListener
+     * Centers the camera on the drone
      */
-    private fun onMapLongClicked(position: LatLng) {
-        if (!victimSymbolLongClickConsumed) {
-            addVictimMarker(position)
+    fun centerCameraOnDrone(v: View) {
+        val currentZoom = mapboxMap.cameraPosition.zoom
+        if (Drone.currentPositionLiveData.value != null) {
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Drone.currentPositionLiveData.value!!,
+                    if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
         }
-        victimSymbolLongClickConsumed = false
+    }
+
+    fun startMissionOrReturnHome(v: View) {
+        if (!Drone.isConnected()) {
+            snackbar.show()
+        }
+
+        if (!Drone.isFlying()) { //TODO : return to user else
+            Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build()))
+        }
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
+    }
+
+    fun storeMap(v: View) {
+        startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
     }
 
     /**
@@ -276,55 +368,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         searchAreaBuilder.reset()
     }
 
-    fun startMissionOrReturnHome(v: View) {
-
-        if (!Drone.isDroneConnected()) {
-            snackbar.show()
-        }
-        if (!isDroneFlying) { //TODO : return to user else
-            isDroneFlying = true
-            Drone.startMission(DroneUtils.makeDroneMission(
-                    missionBuilder.build()
-            ).getMissionItems())
-        }
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
-    }
-
-    fun storeMap(v: View) {
-        startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
-    }
-
-    /**
-     * Centers the camera on the drone
-     */
-    fun centerCameraOnDrone(v: View) {
-        val currentZoom = mapboxMap.cameraPosition.zoom
-        if (::dronePositionMarker.isInitialized) {
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng,
-                    if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
-        }
-    }
-
-    /**
-     * Adds a heat point to the heatmap
-     */
-    fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
+    private fun addVictimMarker(latLng: LatLng, markerId: String) {
         if (!isMapReady) return
-        val feature: Feature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
-        feature.addNumberProperty("intensity", intensity)
-        heatmapFeatures.add(feature)
-        heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
-        /* Will be needed when we have the signal of the drone implemented */
-        //feature.addNumberProperty("intensity", Drone.getSignalStrength())
-    }
-
-    private fun addVictimMarker(latLng: LatLng) {
-        if (!isMapReady) return
+        val markerProperties = JsonObject()
+        markerProperties.addProperty(VICTIM_MARKER_ID_PROPERTY_NAME, markerId)
         val symbolOptions = SymbolOptions()
                 .withLatLng(LatLng(latLng))
                 .withIconImage(ID_ICON_VICTIM)
-        victimMarkers.add(victimSymbolManager.create(symbolOptions))
+                .withData(markerProperties)
+        victimMarkers[markerId] = victimSymbolManager.create(symbolOptions)
     }
 
     /**
@@ -333,40 +385,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * @param newLatLng new position of the vehicle
      */
     private fun updateDronePosition(newLatLng: LatLng) {
-        CentralLocationManager.currentUserPosition.value?.let {
-            updateTextView(distanceToUserTextView, it.distanceTo(newLatLng), DISTANCE_FORMAT)
+        CentralLocationManager.currentUserPosition.value.let {
+            updateTextView(distanceToUserTextView, it?.distanceTo(newLatLng), DISTANCE_FORMAT)
         }
     }
 
-    private fun updateDronePositionOnMap(newLatLng: LatLng) {
-        if (!isMapReady) return
-
-        // Add a vehicle marker and move the camera
-        if (!::dronePositionMarker.isInitialized) {
-            val circleOptions = CircleOptions()
-                    .withLatLng(newLatLng)
-                    .withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
-            dronePositionMarker = droneCircleManager.create(circleOptions)
-        } else {
-            dronePositionMarker.latLng = newLatLng
-            droneCircleManager.update(dronePositionMarker)
-        }
-    }
-
-    private fun updateUserPositionOnMap(userLatLng: LatLng) {
-        if (!isMapReady) return
-
-        // Add a vehicle marker and move the camera
-        if (!::userPositionMarker.isInitialized) {
-            val circleOptions = CircleOptions()
-                    .withLatLng(userLatLng)
-            userPositionMarker = userCircleManager.create(circleOptions)
-        } else {
-            userPositionMarker.latLng = userLatLng
-            userCircleManager.update(userPositionMarker)
-        }
-    }
-
+    /**
+     * Updates the user position if the drawing managers are ready
+     */
     private fun updateUserPosition(userLatLng: LatLng) {
         Drone.currentPositionLiveData.value?.let {
             updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
@@ -377,5 +403,40 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    fun pickStrategy(view: View) {
+        if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
+            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+        } else {
+            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+        }
+    }
+
+    fun setStrategy(strategy: OverflightStrategy) {
+        if (isMapReady) {
+            searchAreaBuilder.reset()
+            searchAreaPainter.unMount()
+        }
+
+        currentStrategy = strategy
+        when (strategy) {
+            is SimpleMultiPassOnQuadrilateral -> {
+                searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaBuilder = QuadrilateralBuilder()
+                strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
+            }
+            is SpiralStrategy -> {
+                searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaBuilder = CircleBuilder()
+                strategyPickerButton.setIcon(R.drawable.ic_spiralstrat)
+            }
+        }
+
+        missionBuilder.withStrategy(currentStrategy)
+
+        searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
+        searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
+        searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
 }
