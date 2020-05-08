@@ -56,18 +56,15 @@ class MapActivityTest {
         private const val MAP_LOADING_TIMEOUT = 1000L
         private const val EPSILON = 1e-9
         private const val DEFAULT_ALTITUDE = " 0.0 m"
-        private const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
-        private const val ROLE_PROPERTY_NAME_FOR_INTENT = "Role"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
-        private const val DUMMY_HEATMAP_ID = "DummyHeatmapId"
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
     private val intentWithGroupAndOperator = Intent()
-            .putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
-            .putExtra(ROLE_PROPERTY_NAME_FOR_INTENT, Role.OPERATOR)
+            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
 
     @get:Rule
     var mActivityRule = IntentsTestRule(

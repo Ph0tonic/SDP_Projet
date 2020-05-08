@@ -136,15 +136,15 @@ class MainActivity : AppCompatActivity() {
 
     fun startMission(view: View) {
         val intent = Intent(this, MapActivity::class.java)
-                .putExtra("groupId", currentGroupId.value)
-                .putExtra("Role", Role.OPERATOR)
+                .putExtra(getString(R.string.INTENT_KEY_GROUP_ID), currentGroupId.value)
+                .putExtra(getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
         startActivity(intent)
     }
 
     fun workOffline(view: View) {
         val intent = Intent(this, MapActivity::class.java)
-                .putExtra("groupId", "dummy")
-                .putExtra("Role", Role.RESCUER)
+                .putExtra(getString(R.string.INTENT_KEY_GROUP_ID), "dummy")
+                .putExtra(getString(R.string.INTENT_KEY_ROLE), Role.RESCUER)
         startActivity(intent)
     }
 

@@ -12,6 +12,7 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.repository.HeatmapRepository
@@ -33,8 +34,6 @@ class LocationWithPermissionTest {
     private var mUiDevice: UiDevice? = null
 
     companion object {
-        private const val GROUP_ID_PROPERTY_NAME_FOR_INTENT = "groupId"
-        private const val ROLE_PROPERTY_NAME_FOR_INTENT = "Role"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
     }
@@ -44,8 +43,8 @@ class LocationWithPermissionTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private val intentWithGroupAndOperator = Intent()
-            .putExtra(GROUP_ID_PROPERTY_NAME_FOR_INTENT, DUMMY_GROUP_ID)
-            .putExtra(ROLE_PROPERTY_NAME_FOR_INTENT, Role.OPERATOR)
+            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MapActivity::class.java, true, false)
