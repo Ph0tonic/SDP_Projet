@@ -172,11 +172,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
 
-        //TODO: Give user location if current drone position is not available
-        droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
-
         mapView.contentDescription = getString(R.string.map_not_ready)
 
+        //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
     }
 
@@ -207,20 +205,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
-            victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
-
-            victimSymbolManager.iconAllowOverlap = true
-            victimSymbolManager.symbolSpacing = 0F
-            victimSymbolManager.iconIgnorePlacement = true
-            victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
-
-            victimSymbolManager.addLongClickListener {
-                val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
-                markerRepository.removeMarkerForSearchGroup(groupId, markerId)
-                victimSymbolLongClickConsumed = true
-            }
-
-            style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
+            setupVictimSymbolManager(style)
 
             mapboxMap.addOnMapClickListener {
                 onMapClicked(it)
@@ -252,6 +237,23 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
         }
+    }
+
+    private fun setupVictimSymbolManager(style: Style) {
+        victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
+
+        victimSymbolManager.iconAllowOverlap = true
+        victimSymbolManager.symbolSpacing = 0F
+        victimSymbolManager.iconIgnorePlacement = true
+        victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
+
+        victimSymbolManager.addLongClickListener {
+            val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
+            markerRepository.removeMarkerForSearchGroup(groupId, markerId)
+            victimSymbolLongClickConsumed = true
+        }
+
+        style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
     }
 
     /**
@@ -439,18 +441,4 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
         searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
-
-    /**THIS IS JUST TO ADD SOME POINTS, IT WILL BE REMOVED AFTERWARDS**/
-//    private fun addVirtualPointsToHeatmap() {
-//        val center = LatLng(47.3975, 8.5445)
-//        //Drone.getSignalStrength={10.0}
-//        //precision should be 0.00003
-//        for (i in 0..10) {
-//            for (j in 0..10) {
-//                val point = LatLng(47.397 + j / 10000.0, 8.544 + i / 10000.0)
-//                val intensity = 10 - 1 * (center.distanceTo(point) / 10.0 - 1.0)
-//                addPointToHeatMap(point, intensity)
-//            }
-//        }
-//    }
 }

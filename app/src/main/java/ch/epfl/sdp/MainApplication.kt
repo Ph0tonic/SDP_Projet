@@ -20,14 +20,9 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // initialize for any
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
-
-        // Use ApplicationContext.
-        // example: SharedPreferences etc...
-        //val context: Context = applicationContext()
     }
 }

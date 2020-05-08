@@ -9,6 +9,7 @@ abstract class MapboxSearchAreaPainter {
     open fun unMount() {
         onMoveVertex.clear()
     }
+
     abstract fun paint(vertices: List<LatLng>)
     abstract fun getUpperLayer(): String
 }

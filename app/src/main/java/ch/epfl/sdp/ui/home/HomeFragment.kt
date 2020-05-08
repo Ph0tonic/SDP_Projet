@@ -19,14 +19,6 @@ class HomeFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
-
-        //TODO Clean of code
-//        root.findViewById<Button>(R.id.display_map).setOnClickListener {
-//            val intent = Intent(context, MapActivity::class.java)
-//                    .putExtra("groupId","g2") //TODO adapt group ID via group choosing activity or something
-//            startActivity(intent)
-//        }
-        return root
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
 }
