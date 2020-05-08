@@ -106,5 +106,6 @@ class DroneTest {
         //compare both position
         assertThat(currentLat, closeTo(expectedLatLng.latitude, EPSILON))
         assertThat(currentLong, closeTo(expectedLatLng.longitude, EPSILON))
+
     }
 }
