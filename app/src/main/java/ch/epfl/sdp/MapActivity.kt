@@ -196,6 +196,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isMapReady) {
+            userPainter.onDestroy()
+            dronePainter.onDestroy()
+            missionPainter.onDestroy()
+            victimSymbolManager.onDestroy()
+            searchAreaPainter.onDestroy()
+        }
+    }
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
 
@@ -416,7 +427,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     fun setStrategy(strategy: OverflightStrategy) {
         if (isMapReady) {
             searchAreaBuilder.reset()
-            searchAreaPainter.unMount()
+            searchAreaPainter.onDestroy()
         }
 
         currentStrategy = strategy
