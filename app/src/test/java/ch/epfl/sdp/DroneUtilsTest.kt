@@ -42,7 +42,11 @@ class DroneUtilsTest {
         }
 
         val missionPlan = DroneUtils
+<<<<<<< HEAD
                 .makeDroneMission(positions, 10f)
+=======
+                .makeDroneMission(positions)
+>>>>>>> 65e3763... correcting tests
 
         expectedMissionItems.zip(missionPlan.missionItems).forEach { (expected, observed) ->
             Assert.assertTrue(missionEquality(expected, observed))

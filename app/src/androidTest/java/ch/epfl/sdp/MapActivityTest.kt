@@ -56,8 +56,13 @@ class MapActivityTest {
 
         private const val ZOOM_TEST = 0.9
         private const val MAP_LOADING_TIMEOUT = 1000L
+<<<<<<< HEAD
         private const val EPSILON = 1e-9
         private const val DRONE_ALTITUDE = 20.0F
+=======
+        private const val EPSILON = 1e-2
+        private const val DEFAULT_ALTITUDE = " 0.0 m"
+>>>>>>> 65e3763... correcting tests
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
@@ -117,6 +122,10 @@ class MapActivityTest {
         // TODO: Why click on menu button doesn't work ?
         // Open menu to click on start button
         onView(withId(R.id.floating_menu_button)).perform(click())
+<<<<<<< HEAD
+=======
+
+>>>>>>> 65e3763... correcting tests
         onView(withId(R.id.start_or_return_button)).perform(click())
 
         runOnUiThread {

@@ -1,7 +1,9 @@
 package ch.epfl.sdp
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
@@ -36,6 +38,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
+import timber.log.Timber
 
 /**
  * Main Activity to display map and create missions.
@@ -145,7 +148,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
         requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
         requireNotNull(intent.getSerializableExtra(getString(R.string.INTENT_KEY_ROLE))) { "MapActivity should be provided with a role" }
-
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
@@ -158,6 +160,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
+
+        Drone.isFlying().subscribe(
+                { isDroneFlying ->
+                    Log.d("DEBUG", "isDroneFlying : " + isDroneFlying)
+                    findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                            .setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
+                },
+                { error -> Timber.e("Error : $error.message ") }
+        )
+
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
@@ -361,11 +373,38 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             snackbar.show()
         }
 
-        if (!Drone.isFlying()) { //TODO : return to user else
-            Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build()).getMissionPlan())
-        }
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
+        Drone.isFlying().subscribe(
+                { isFlying ->
+                    if (!isFlying) {
+                        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build()))
+                    } else {
+                        returnDroneDialog()
+                    }
+                    Log.d("DEBUG", "Is drone flying ? : " + isFlying)
+                },
+                { e -> Log.d("DEBUG", "ERROR : $e.message")})
+    }
+
+    private fun returnDroneDialog() {
+        // when the user clicks return button and require
+        // user to choose where he wants the drone back
+        val builder = AlertDialog.Builder(this@MapActivity)
+
+        // Build the dialog box
+        builder.setTitle("Do you want to return to user or to take off ?")
+                .setPositiveButton("HOME") { _, _ ->
+                    run {
+                        Drone.returnHome()
+                    }
+                }
+                .setNegativeButton("USER") { _, _ ->
+                    run {
+                        Drone.returnUser()
+                    }
+                }
+                .setNeutralButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
+        // Display the dialog
+        builder.show()
     }
 
     fun storeMap(v: View) {

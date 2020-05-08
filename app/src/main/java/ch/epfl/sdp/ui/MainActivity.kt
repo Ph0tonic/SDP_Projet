@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -154,12 +155,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startMission(view: View) {
+<<<<<<< HEAD:app/src/main/java/ch/epfl/sdp/ui/MainActivity.kt
         checkConnexion(view) {
             val intent = Intent(this, MapActivity::class.java)
                     .putExtra(getString(R.string.intent_key_group_id), currentGroupId.value)
                     .putExtra(getString(R.string.intent_key_role), Role.OPERATOR)
             startActivity(intent)
         }
+=======
+        Log.d("DEBUG", "---------------__startMission call")
+        val intent = Intent(this, MapActivity::class.java)
+                .putExtra(getString(R.string.INTENT_KEY_GROUP_ID), currentGroupId.value)
+                .putExtra(getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
+        startActivity(intent)
+>>>>>>> 65e3763... correcting tests:app/src/main/java/ch/epfl/sdp/MainActivity.kt
     }
 
     fun workOffline(view: View) {

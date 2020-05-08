@@ -83,7 +83,6 @@ class DroneTest {
         assertThat(currentLong, closeTo(expectedLatLng.longitude, EPSILON))
     }
 
-
     @Test
     fun canStartMissionAndReturnToUser() {
         val expectedLatLng = LatLng(47.297428, 8.445369) //Position near the takeoff

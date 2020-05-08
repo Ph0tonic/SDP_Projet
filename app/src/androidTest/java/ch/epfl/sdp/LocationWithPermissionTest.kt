@@ -86,7 +86,7 @@ class LocationWithPermissionTest {
         CentralLocationManager.configure(mActivityRule.activity)
         assertThat(CentralLocationManager.checkLocationSetting(), equalTo(true))
     }
-
+    
     @Test
     fun onRequestPermissionResultRequestsLocationUpdatesIfItHasPermission() {
         val activity = mock(AppCompatActivity::class.java)

@@ -1,6 +1,7 @@
 package ch.epfl.sdp.drone
 
 import android.widget.Toast
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
@@ -36,6 +37,7 @@ object Drone {
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
     val currentBatteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentAbsoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
+    val currentRelativeAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
     val currentFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData()
@@ -123,9 +125,7 @@ object Drone {
 
     fun isConnected(): Boolean {
         return try {
-            instance.core.connectionState
-                    .filter { state -> state.isConnected }
-                    .firstOrError()
+            getConnectionState()
                     .toFuture()
                     .get(WAIT_TIME, TimeUnit.MILLISECONDS).isConnected
         } catch (e: TimeoutException) {
@@ -184,4 +184,3 @@ object Drone {
                         { e -> Timber.e("ERROR LANDING : $e") }))
     }
 }
-
