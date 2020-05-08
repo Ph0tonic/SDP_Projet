@@ -74,6 +74,10 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        loadActiveGroupFromPrefs()
+    }
+
+    fun loadActiveGroupFromPrefs() {
         currentGroupId.value = PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getString(getString(R.string.prefs_current_group_id), null)
@@ -83,7 +87,6 @@ class MainActivity : AppCompatActivity() {
                     .edit()
                     .putString(getString(R.string.prefs_current_group_id), it)
                     .apply()
-            Log.w("MAIN_ACTIVITY","Observer called $it")
         })
     }
 

@@ -34,7 +34,6 @@ class SearchGroupSelectionActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     override fun onItemClicked(searchGroupData: SearchGroupData) {
-        Log.w("SEARCHGROUP_SELECTION","Clicked on $searchGroupData")
         val data = Intent();
         data.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG,searchGroupData.uuid)
         setResult(RESULT_OK, data);
