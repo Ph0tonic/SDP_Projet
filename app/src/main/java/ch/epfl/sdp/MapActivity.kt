@@ -364,8 +364,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * Clears the waypoints list and removes all the lines and points related to waypoints
      */
     fun clearWaypoints(v: View) {
-        if (!isMapReady) return
-        searchAreaBuilder.reset()
+        if (isMapReady) {
+            searchAreaBuilder.reset()
+        }
     }
 
     private fun addVictimMarker(latLng: LatLng, markerId: String) {
@@ -415,7 +416,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     fun setStrategy(strategy: OverflightStrategy) {
         if (isMapReady) {
-            searchAreaBuilder.reset()
+            searchAreaBuilder.onDestroy()
             searchAreaPainter.unMount()
         }
 

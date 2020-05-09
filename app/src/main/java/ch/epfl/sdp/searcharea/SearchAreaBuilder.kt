@@ -24,10 +24,15 @@ abstract class SearchAreaBuilder {
         searchAreaChanged.forEach { it(searchArea) }
     }
 
-    fun reset() {
-        vertices.clear()
+    fun onDestroy() {
+        reset()
         searchAreaChanged.clear()
         verticesChanged.clear()
+    }
+    
+    fun reset() {
+        vertices.clear()
+        this.vertices = this.vertices
     }
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
