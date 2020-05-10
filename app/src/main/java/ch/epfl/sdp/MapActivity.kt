@@ -158,9 +158,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
-
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+
+        //TODO: Give user location if current drone position is not available
+        droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
+        mapView.contentDescription = getString(R.string.map_not_ready)
+        CentralLocationManager.configure(this)
 
         if (role == Role.RESCUER) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
@@ -169,13 +173,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
             findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
-
-            //TODO: Give user location if current drone position is not available
-            droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
-            mapView.contentDescription = getString(R.string.map_not_ready)
-
-            //TODO: Give user location if current drone position is not available
-            CentralLocationManager.configure(this)
         }
     }
 

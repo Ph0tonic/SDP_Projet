@@ -5,16 +5,12 @@ import io.mavsdk.mission.Mission.MissionItem
 import io.mavsdk.mission.Mission.MissionPlan
 
 object DroneUtils {
-    private lateinit var missionPlan: MissionPlan
 
-    fun makeDroneMission(path: List<LatLng>) : MissionPlan {
-        val missionItems = arrayListOf<MissionItem>()
-        path.forEach { point ->
-            missionItems.add(generateMissionItem(point.latitude, point.longitude))
+    fun makeDroneMission(path: List<LatLng>): MissionPlan {
+        val missionItems = path.map { point ->
+            generateMissionItem(point.latitude, point.longitude)
         }
-
-        missionPlan = MissionPlan(missionItems)
-        return missionPlan
+        return MissionPlan(missionItems)
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): MissionItem {
@@ -26,9 +22,5 @@ object DroneUtils {
                 true, Float.NaN, Float.NaN,
                 MissionItem.CameraAction.NONE, Float.NaN,
                 1.0)
-    }
-
-    fun getMissionPlan(): MissionPlan {
-        return missionPlan
     }
 }

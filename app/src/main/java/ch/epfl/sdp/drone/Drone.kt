@@ -12,9 +12,8 @@ import java.util.concurrent.TimeoutException
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-
 object Drone {
-    private const val USE_REMOTE_BACKEND = false // False for running MavsdkServer locally, True to connect to a remote instance
+    private const val USE_REMOTE_BACKEND = true // False for running MavsdkServer locally, True to connect to a remote instance
     private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" // IP of the remote instance
     private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
 
@@ -31,13 +30,13 @@ object Drone {
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
 
     lateinit var getSignalStrength: () -> Double
+    
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
         currentPositionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
     }
 
     private val instance: System
-    private val isFlying = false
 
     init {
         if (USE_REMOTE_BACKEND) {
@@ -50,25 +49,38 @@ object Drone {
         }
 
         disposables.add(instance.telemetry.flightMode.distinct()
-                .subscribe { flightMode -> Timber.d("flight mode: $flightMode") })
+                .subscribe(
+                        { flightMode -> Timber.d("flight mode: $flightMode") },
+                        { error -> Timber.e("Error Flight Mode: $error") }
+                ))
         disposables.add(instance.telemetry.armed.distinct()
-                .subscribe { armed -> Timber.d("armed: $armed") })
-        disposables.add(instance.telemetry.position.subscribe { position ->
-            val latLng = LatLng(position.latitudeDeg, position.longitudeDeg)
-            currentPositionLiveData.postValue(latLng)
-            currentAbsoluteAltitudeLiveData.postValue(position.absoluteAltitudeM)
-        })
-        disposables.add(instance.telemetry.battery.subscribe { battery ->
-            currentBatteryLevelLiveData.postValue(battery.remainingPercent)
-        })
-        disposables.add(instance.telemetry.groundSpeedNed.subscribe { groundSpeed ->
-            val speed = sqrt(groundSpeed.velocityEastMS.pow(2) +
-                    groundSpeed.velocityEastMS.pow(2))
-            currentSpeedLiveData.postValue(speed)
-        })
+                .subscribe(
+                        { armed -> Timber.d("armed: $armed") },
+                        { error -> Timber.e("Error Armed : $error") }
+                ))
+        disposables.add(instance.telemetry.position
+                .subscribe(
+                        { position ->
+                            val latLng = LatLng(position.latitudeDeg, position.longitudeDeg)
+                            currentPositionLiveData.postValue(latLng)
+                            //absoulte Atlitude is the altitude w.r. to the sea level
+                            currentAbsoluteAltitudeLiveData.postValue(position.absoluteAltitudeM)
+                            //Relative Altitude is the altitude w.r. to the take off level
+                        },
+                        { error -> Timber.e("Error Telemetry Position : $error") }
+                ))
+        disposables.add(instance.telemetry.battery
+                .subscribe(
+                        { battery -> currentBatteryLevelLiveData.postValue(battery.remainingPercent) },
+                        { error -> Timber.e("Error Battery : $error") }
+                ))
+        disposables.add(instance.telemetry.groundSpeedNed
+                .subscribe(
+                        { groundSpeed -> currentSpeedLiveData.postValue(sqrt(2 * groundSpeed.velocityEastMS.pow(2))) },
+                        { error -> Timber.e("Error GroundSpeedNed : $error") }))
     }
 
-    fun startMission(missionPlan : Mission.MissionPlan) {
+    fun startMission(missionPlan: Mission.MissionPlan) {
         this.currentMissionLiveData.postValue(missionPlan.missionItems)
         val isConnectedCompletable = instance.core.connectionState
                 .filter { state -> state.isConnected }
@@ -100,4 +112,3 @@ object Drone {
         return instance.mission.isMissionFinished.blockingGet()
     }
 }
-
