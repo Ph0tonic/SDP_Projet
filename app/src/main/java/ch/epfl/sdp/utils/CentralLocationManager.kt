@@ -1,6 +1,5 @@
 package ch.epfl.sdp.utils
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Activity
 import android.app.AlertDialog
@@ -17,25 +16,29 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
+import ch.epfl.sdp.MainApplication
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 object CentralLocationManager {
 
     private const val requestCode = 1011
-    private val requiredPermissions = setOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+    private val requiredPermissions = setOf(ACCESS_FINE_LOCATION)
 
-    private lateinit var locationManager: LocationManager
-    private lateinit var activity: Activity
+    private val locationManager = MainApplication.applicationContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private var activity: Activity? = null
     internal var currentUserPosition: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
 
     fun configure(activity: Activity) {
-        CentralLocationManager.activity = activity
-        locationManager = CentralLocationManager.activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        this.activity = activity
 
         if (checkAndRequestPermission()) {
             locationManager.requestLocationUpdates(
                     GPS_PROVIDER, 500, 10f, CentralLocationListener)
         }
+    }
+
+    fun onDestroy() {
+        activity = null
     }
 
     fun checkLocationSetting(): Boolean {
@@ -51,7 +54,7 @@ object CentralLocationManager {
                 .setMessage("This part of the app cannot function without location, please enable it")
                 .setPositiveButton("Location Settings") { _, _ ->
                     val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    activity.startActivity(myIntent)
+                    activity!!.startActivity(myIntent)
                 }
                 .setNegativeButton("Cancel") { _, _ -> }
 
@@ -61,19 +64,15 @@ object CentralLocationManager {
     private fun checkAndRequestPermission(): Boolean {
         val hasPermission = checkPermission()
         if (!hasPermission) {
-            requestPermissions()
+            ActivityCompat.requestPermissions(activity!!, requiredPermissions.toTypedArray(), requestCode)
         }
         return hasPermission
     }
 
     private fun checkPermission(): Boolean {
         return requiredPermissions.all {
-            ActivityCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_GRANTED
+            ActivityCompat.checkSelfPermission(MainApplication.applicationContext(), it) == PackageManager.PERMISSION_GRANTED
         }
-    }
-
-    private fun requestPermissions() {
-        ActivityCompat.requestPermissions(activity, requiredPermissions.toTypedArray(), requestCode)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

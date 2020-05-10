@@ -205,6 +205,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             victimSymbolManager.onDestroy()
             searchAreaPainter.onDestroy()
         }
+
+        CentralLocationManager.onDestroy()
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
