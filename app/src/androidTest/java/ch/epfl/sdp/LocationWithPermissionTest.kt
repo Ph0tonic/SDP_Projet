@@ -69,10 +69,9 @@ class LocationWithPermissionTest {
         val activity = mock(AppCompatActivity::class.java)
         val context = mock(Context::class.java)
         val manager = mock(LocationManager::class.java)
-        Mockito.`when`(activity.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
-        Mockito.`when`(activity.applicationContext).thenReturn(context)
+        Mockito.`when`(context.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
         Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
-        CentralLocationManager.configure(activity)
+        CentralLocationManager.configure(activity, context)
         Mockito.verify(manager).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(500L), Mockito.eq(10f), Mockito.any<LocationListener>())
     }
 
@@ -85,11 +84,12 @@ class LocationWithPermissionTest {
     @Test
     fun onRequestPermissionResultRequestsLocationUpdatesIfItHasPermission() {
         val activity = mock(AppCompatActivity::class.java)
+        val context = mock(Context::class.java)
         val manager = mock(LocationManager::class.java)
-        Mockito.`when`(activity.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
-        Mockito.`when`(activity.checkSelfPermission(Mockito.any())).thenReturn(PackageManager.PERMISSION_GRANTED)
+        Mockito.`when`(context.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
+        Mockito.`when`(context.checkSelfPermission(Mockito.any())).thenReturn(PackageManager.PERMISSION_GRANTED)
         Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
-        CentralLocationManager.configure(activity)
+        CentralLocationManager.configure(activity, context)
         CentralLocationManager.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
         Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(500L), Mockito.eq(10f), Mockito.any<LocationListener>())
     }

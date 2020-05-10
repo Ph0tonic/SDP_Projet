@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
@@ -24,17 +25,23 @@ object CentralLocationManager {
     private const val requestCode = 1011
     private val requiredPermissions = setOf(ACCESS_FINE_LOCATION)
 
-    private val locationManager = MainApplication.applicationContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private lateinit var locationManager: LocationManager
     private var activity: Activity? = null
     internal var currentUserPosition: MutableLiveData<LatLng> = MutableLiveData<LatLng>()
 
-    fun configure(activity: Activity) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun configure(activity: Activity, context: Context) {
+        locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         this.activity = activity
 
-        if (checkAndRequestPermission()) {
+        if (checkAndRequestPermission(context)) {
             locationManager.requestLocationUpdates(
                     GPS_PROVIDER, 500, 10f, CentralLocationListener)
         }
+    }
+
+    fun configure(activity: Activity) {
+        this.configure(activity, MainApplication.applicationContext())
     }
 
     fun onDestroy() {
@@ -61,22 +68,22 @@ object CentralLocationManager {
         locationDisabledAlert.show()
     }
 
-    private fun checkAndRequestPermission(): Boolean {
-        val hasPermission = checkPermission()
+    private fun checkAndRequestPermission(context: Context): Boolean {
+        val hasPermission = checkPermission(context)
         if (!hasPermission) {
             ActivityCompat.requestPermissions(activity!!, requiredPermissions.toTypedArray(), requestCode)
         }
         return hasPermission
     }
 
-    private fun checkPermission(): Boolean {
+    private fun checkPermission(context: Context): Boolean {
         return requiredPermissions.all {
-            ActivityCompat.checkSelfPermission(MainApplication.applicationContext(), it) == PackageManager.PERMISSION_GRANTED
+            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == CentralLocationManager.requestCode && checkPermission()) {
+        if (requestCode == CentralLocationManager.requestCode && checkPermission(MainApplication.applicationContext())) {
             locationManager.requestLocationUpdates(
                     GPS_PROVIDER, 500, 10f, CentralLocationListener)
         }
