@@ -17,7 +17,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 class MapboxHeatmapPainter(style: Style,
                            lifecycleOwner: LifecycleOwner,
                            val heatmapData: MutableLiveData<HeatmapData>,
-                           belowLayerId: String) {
+                           belowLayerId: String) : MapboxPainter {
 
     companion object {
         private val BLUE = Expression.rgb(0, 0, 255)
@@ -88,5 +88,9 @@ class MapboxHeatmapPainter(style: Style,
                 }.toMutableList()
         )
         geoJsonSource.setGeoJson(features)
+    }
+
+    override fun onDestroy() {
+        //Nothing yet
     }
 }
