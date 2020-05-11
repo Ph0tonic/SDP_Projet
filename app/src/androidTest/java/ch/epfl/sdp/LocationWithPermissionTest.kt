@@ -11,7 +11,6 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
@@ -49,7 +48,7 @@ class LocationWithPermissionTest {
             .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
 
     @get:Rule
-    val mActivityRule = IntentsTestRule(MainActivity::class.java, true, false)
+    val mActivityRule = IntentsTestRule(MapActivity::class.java, true, false)
 
     @Before
     @Throws(Exception::class)

@@ -74,9 +74,9 @@ object Drone {
                         { battery -> currentBatteryLevelLiveData.postValue(battery.remainingPercent) },
                         { error -> Timber.e("Error Battery : $error") }
                 ))
-        disposables.add(instance.telemetry.groundSpeedNed
+        disposables.add(instance.telemetry.positionVelocityNed
                 .subscribe(
-                        { groundSpeed -> currentSpeedLiveData.postValue(sqrt(2 * groundSpeed.velocityEastMS.pow(2))) },
+                        { vector_speed -> currentSpeedLiveData.postValue(sqrt(vector_speed.velocity.eastMS.pow(2) + vector_speed.velocity.northMS.pow(2)))},
                         { error -> Timber.e("Error GroundSpeedNed : $error") }))
     }
 

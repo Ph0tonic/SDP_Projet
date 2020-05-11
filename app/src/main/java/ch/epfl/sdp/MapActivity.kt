@@ -162,7 +162,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
         //TODO: Give user location if current drone position is not available
-        droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
         mapView.contentDescription = getString(R.string.map_not_ready)
         CentralLocationManager.configure(this)
 
