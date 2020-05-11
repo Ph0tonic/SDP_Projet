@@ -2,11 +2,11 @@ package ch.epfl.sdp.map
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-abstract class MapboxSearchAreaPainter {
+abstract class MapboxSearchAreaPainter : MapboxPainter {
 
     val onMoveVertex = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
 
-    open fun unMount() {
+    override fun onDestroy() {
         onMoveVertex.clear()
     }
 

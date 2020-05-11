@@ -41,15 +41,17 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
         })
     }
 
-    override fun getUpperLayer(): String {
-        return circleManager.layerId
-    }
-
-    override fun unMount() {
-        super.unMount()
+    override fun onDestroy() {
+        super.onDestroy()
         nbVertices = 0
         fillManager.deleteAll()
         circleManager.deleteAll()
+        fillManager.onDestroy()
+        circleManager.onDestroy()
+    }
+
+    override fun getUpperLayer(): String {
+        return circleManager.layerId
     }
 
     override fun paint(vertices: List<LatLng>) {

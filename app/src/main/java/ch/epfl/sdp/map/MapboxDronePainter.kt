@@ -10,7 +10,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
 import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-class MapboxDronePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) {
+class MapboxDronePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : MapboxPainter {
     private var circleManager = CircleManager(mapView, mapboxMap, style)
     private lateinit var marker: Circle
     private var reset: Boolean = false
@@ -29,5 +29,10 @@ class MapboxDronePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) {
             marker.latLng = location
             circleManager.update(marker)
         }
+    }
+
+    override fun onDestroy() {
+        circleManager.deleteAll()
+        circleManager.onDestroy()
     }
 }
