@@ -6,4 +6,5 @@ import ch.epfl.sdp.database.data.SearchGroupData
 interface SearchGroupDao {
     fun getGroups() : MutableLiveData<List<SearchGroupData>>
     fun getGroupById(groupId: String): MutableLiveData<SearchGroupData>
+    fun createGroup(searchGroupData: SearchGroupData)
 }

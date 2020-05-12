@@ -55,4 +55,13 @@ class FirebaseGroupDao : SearchGroupDao {
         }
         return watchedGroupsById[groupId]!!
     }
+
+    /**
+     * Creates a group with the given data.
+     * The uuid of the searchgroup data will be overridden by an automatically generated one.
+     */
+    override fun createGroup(searchGroupData: SearchGroupData) {
+        val myRef = database.getReference("search_groups")
+        myRef.push().setValue(searchGroupData)
+    }
 }

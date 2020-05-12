@@ -22,4 +22,8 @@ class SearchGroupRepository {
     fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
         return dao.getGroupById(groupId)
     }
+
+    fun createGroup(searchGroupData: SearchGroupData){
+        return dao.createGroup(searchGroupData)
+    }
 }

@@ -65,5 +65,5 @@
     <string name="base_location_label">Base Location</string>
     <string name="group_edition_rescuers_label">Rescuers</string>
     <string name="group_edition_operators_label">Operators</string>
-    <string name="save_button">Save</string>
+    <string name="group_edition_create_button">Create</string>
 </resources>

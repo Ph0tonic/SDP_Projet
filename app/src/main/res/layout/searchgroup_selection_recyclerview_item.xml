@@ -21,7 +21,7 @@
             android:padding="5dp">
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/search_group_selection_edit_button"
                 android:layout_width="55dp"
                 android:layout_height="56dp"
                 android:layout_weight="1"
@@ -38,7 +38,7 @@
                 android:layout_height="0dp"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button3"
+                app:layout_constraintEnd_toStartOf="@+id/search_group_selection_edit_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 

@@ -101,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onGroupEditSaved"
-            android:text="@string/save_button" />
+            android:text="@string/group_edition_create_button" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

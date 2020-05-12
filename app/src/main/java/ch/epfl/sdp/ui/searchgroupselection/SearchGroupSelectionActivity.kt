@@ -2,20 +2,18 @@ package ch.epfl.sdp.ui.searchgroupselection
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ch.epfl.sdp.MapActivity
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
-import ch.epfl.sdp.Role
 import ch.epfl.sdp.SearchGroupEditionActivity
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 
-class SearchGroupSelectionActivity : AppCompatActivity(), OnItemClickListener {
+class SearchGroupSelectionActivity : AppCompatActivity() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
 
@@ -33,19 +31,34 @@ class SearchGroupSelectionActivity : AppCompatActivity(), OnItemClickListener {
         recyclerView.layoutManager = linearLayoutManager
 
         SearchGroupRepository().getGroups().observe(this, Observer {
-            recyclerView.adapter = SearchGroupRecyclerAdapter(it, this)
+            recyclerView.adapter = SearchGroupRecyclerAdapter(it,
+                    object : OnItemClickListener {
+                        override fun onItemClicked(searchGroupData: SearchGroupData) {
+                            joinGroup(searchGroupData)
+                        }
+                    },
+                    object : OnItemClickListener {
+                        override fun onItemClicked(searchGroupData: SearchGroupData) {
+                            editGroup(searchGroupData)
+                        }
+                    })
         })
     }
 
-    override fun onItemClicked(searchGroupData: SearchGroupData) {
+    private fun joinGroup(searchGroupData: SearchGroupData) {
         val returnDataIntent = Intent()
-        returnDataIntent.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG,searchGroupData.uuid)
+        returnDataIntent.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
         setResult(RESULT_OK, returnDataIntent)
         finish()
     }
 
+    private fun editGroup(searchGroupData: SearchGroupData){
+        val intent = Intent(MainApplication.applicationContext(), SearchGroupEditionActivity::class.java)
+        intent.putExtra(getString(R.string.intent_key_group_id), searchGroupData.uuid)
+        startActivity(intent)
+    }
+
     fun addGroup(view: View) {
-        Log.w("SEARCH_GROUP","add group called")
         val intent = Intent(this, SearchGroupEditionActivity::class.java)
         startActivity(intent)
     }

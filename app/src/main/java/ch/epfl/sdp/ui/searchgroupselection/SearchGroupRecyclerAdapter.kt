@@ -7,7 +7,8 @@ import ch.epfl.sdp.database.data.SearchGroupData
 
 class SearchGroupRecyclerAdapter(
         private val list: List<SearchGroupData>,
-        private val itemClickListener: OnItemClickListener
+        private val itemClickListener: OnItemClickListener,
+        private val editButtonClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<SearchgroupViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchgroupViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -18,6 +19,6 @@ class SearchGroupRecyclerAdapter(
 
     override fun onBindViewHolder(holder: SearchgroupViewHolder, position: Int) {
         val searchGroupData = list[position]
-        holder.bind(searchGroupData, itemClickListener)
+        holder.bind(searchGroupData, itemClickListener, editButtonClickListener)
     }
 }
