@@ -49,13 +49,11 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".ui.offlineMapsManaging.OfflineManagerActivity"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="landscape" />
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="landscape" />
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>
