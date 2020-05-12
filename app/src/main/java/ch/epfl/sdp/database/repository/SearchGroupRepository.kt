@@ -26,4 +26,8 @@ class SearchGroupRepository {
     fun createGroup(searchGroupData: SearchGroupData){
         return dao.createGroup(searchGroupData)
     }
+
+    fun updateGroup(searchGroupData: SearchGroupData) {
+        return dao.updateGroup(searchGroupData)
+    }
 }

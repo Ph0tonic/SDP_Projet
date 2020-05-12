@@ -66,4 +66,5 @@
     <string name="group_edition_rescuers_label">Rescuers</string>
     <string name="group_edition_operators_label">Operators</string>
     <string name="group_edition_create_button">Create</string>
+    <string name="save_group_changes">Save</string>
 </resources>

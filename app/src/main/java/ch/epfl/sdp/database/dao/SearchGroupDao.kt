@@ -7,4 +7,5 @@ interface SearchGroupDao {
     fun getGroups() : MutableLiveData<List<SearchGroupData>>
     fun getGroupById(groupId: String): MutableLiveData<SearchGroupData>
     fun createGroup(searchGroupData: SearchGroupData)
+    fun updateGroup(searchGroupData: SearchGroupData)
 }

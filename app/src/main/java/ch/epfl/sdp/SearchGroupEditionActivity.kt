@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -26,8 +27,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         createGroup = groupId == null
 
         if (!createGroup) {
-            Log.w("GROUP_EDIT","${groupId}")
-            Log.w("GROUP_EDIT","${groupRepo.getGroupById(groupId!!).value}")
+            findViewById<Button>(R.id.search_group_edition_create_or_save_button).text = getString(R.string.save_group_changes)
             val groupData = groupRepo.getGroupById(groupId!!).observe(this, Observer {
                 if (it != null){
                     findViewById<TextView>(R.id.group_editor_group_name).text = it.name
@@ -42,12 +42,15 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
     fun onGroupEditSaved(view: View) {
         val searchGroupRepo = SearchGroupRepository()
+        val searchGroupData = SearchGroupData()
+        //TODO also put other data
+        //TODO input validation
+        searchGroupData.name = findViewById<TextView>(R.id.group_editor_group_name).text.toString()
         if (createGroup) {
-            val searchGroupData = SearchGroupData()
-            searchGroupData.name = findViewById<TextView>(R.id.group_editor_group_name).text.toString()
             groupRepo.createGroup(searchGroupData)
         } else {
-            TODO("Edit existing group")
+            searchGroupData.uuid = groupId
+            groupRepo.updateGroup(searchGroupData)
         }
         finish()
     }

@@ -41,6 +41,7 @@ class FirebaseGroupDao : SearchGroupDao {
         if (!watchedGroupsById.containsKey(groupId)) {
             val myRef = database.getReference("search_groups/$groupId")
             watchedGroupsById[groupId] = MutableLiveData()
+            //TODO change to childEventListener ?
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val group = dataSnapshot.getValue(SearchGroupData::class.java)
@@ -63,5 +64,10 @@ class FirebaseGroupDao : SearchGroupDao {
     override fun createGroup(searchGroupData: SearchGroupData) {
         val myRef = database.getReference("search_groups")
         myRef.push().setValue(searchGroupData)
+    }
+
+    override fun updateGroup(searchGroupData: SearchGroupData) {
+        val myRef = database.getReference("search_groups/${searchGroupData.uuid}")
+        myRef.setValue(searchGroupData)
     }
 }
