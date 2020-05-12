@@ -10,6 +10,7 @@
         android:id="@+id/searchGroupSelectionRecyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="20dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,6 +24,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:clickable="true"
+        android:onClick="addGroup"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_input_add" />

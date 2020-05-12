@@ -43,8 +43,8 @@ class LocationWithPermissionTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private val intentWithGroupAndOperator = Intent()
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
+            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MapActivity::class.java, true, false)

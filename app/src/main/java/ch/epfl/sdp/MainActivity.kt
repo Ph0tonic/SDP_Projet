@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -144,15 +143,15 @@ class MainActivity : AppCompatActivity() {
 
     fun startMission(view: View) {
         val intent = Intent(this, MapActivity::class.java)
-                .putExtra(getString(R.string.INTENT_KEY_GROUP_ID), currentGroupId.value)
-                .putExtra(getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
+                .putExtra(getString(R.string.intent_key_group_id), currentGroupId.value)
+                .putExtra(getString(R.string.intent_key_role), Role.OPERATOR)
         startActivity(intent)
     }
 
     fun workOffline(view: View) {
         val intent = Intent(this, MapActivity::class.java)
-                .putExtra(getString(R.string.INTENT_KEY_GROUP_ID), "dummy")
-                .putExtra(getString(R.string.INTENT_KEY_ROLE), Role.RESCUER)
+                .putExtra(getString(R.string.intent_key_group_id), "dummy")
+                .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
         startActivity(intent)
     }
 

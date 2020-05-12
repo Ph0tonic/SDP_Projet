@@ -141,17 +141,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO move "groupId" to Strings
-        requireNotNull(intent.getStringExtra(getString(R.string.INTENT_KEY_GROUP_ID))) { "MapActivity should be provided with a searchGroupId\n" }
+        requireNotNull(intent.getStringExtra(getString(R.string.intent_key_group_id))) { "MapActivity should be provided with a searchGroupId\n" }
         require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
         requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
-        requireNotNull(intent.getSerializableExtra(getString(R.string.INTENT_KEY_ROLE))) { "MapActivity should be provided with a role" }
+        requireNotNull(intent.getSerializableExtra(getString(R.string.intent_key_role))) { "MapActivity should be provided with a role" }
 
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
-        groupId = intent.getStringExtra(getString(R.string.INTENT_KEY_GROUP_ID))!!
-        role = intent.getSerializableExtra(getString(R.string.INTENT_KEY_ROLE)) as Role
+        groupId = intent.getStringExtra(getString(R.string.intent_key_group_id))!!
+        role = intent.getSerializableExtra(getString(R.string.intent_key_role)) as Role
 
         droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
         droneBatteryLevelTextView = findViewById(R.id.battery_level)

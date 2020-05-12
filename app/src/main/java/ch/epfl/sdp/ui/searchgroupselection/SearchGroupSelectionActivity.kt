@@ -3,11 +3,15 @@ package ch.epfl.sdp.ui.searchgroupselection
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ch.epfl.sdp.MapActivity
 import ch.epfl.sdp.R
+import ch.epfl.sdp.Role
+import ch.epfl.sdp.SearchGroupEditionActivity
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 
@@ -34,9 +38,15 @@ class SearchGroupSelectionActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     override fun onItemClicked(searchGroupData: SearchGroupData) {
-        val data = Intent();
-        data.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG,searchGroupData.uuid)
-        setResult(RESULT_OK, data);
-        finish();
+        val returnDataIntent = Intent()
+        returnDataIntent.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG,searchGroupData.uuid)
+        setResult(RESULT_OK, returnDataIntent)
+        finish()
+    }
+
+    fun addGroup(view: View) {
+        Log.w("SEARCH_GROUP","add group called")
+        val intent = Intent(this, SearchGroupEditionActivity::class.java)
+        startActivity(intent)
     }
 }

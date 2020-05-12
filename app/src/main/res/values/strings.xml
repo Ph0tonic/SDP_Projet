@@ -59,6 +59,11 @@
     <string name="select_search_group">Select search group</string>
     <string name="start_mission">Start mission</string>
     <string name="work_offline">Work offline</string>
-    <string name="INTENT_KEY_GROUP_ID">groupId</string>
-    <string name="INTENT_KEY_ROLE">Role</string>
+    <string name="intent_key_group_id">groupId</string>
+    <string name="intent_key_role">Role</string>
+    <string name="default_group_name">Group Name</string>
+    <string name="base_location_label">Base Location</string>
+    <string name="group_edition_rescuers_label">Rescuers</string>
+    <string name="group_edition_operators_label">Operators</string>
+    <string name="save_button">Save</string>
 </resources>
