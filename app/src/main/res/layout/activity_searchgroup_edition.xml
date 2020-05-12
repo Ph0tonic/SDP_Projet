@@ -58,12 +58,11 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/group_edit_rescuers"
+                android:id="@+id/group_edit_operators"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/group_edition_rescuers_label"
+                android:text="@string/group_edition_operators_label"
                 android:textSize="20sp" />
-
         </TableRow>
 
         <TableRow
@@ -71,11 +70,12 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/group_edit_operators"
+                android:id="@+id/group_edit_rescuers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/group_edition_operators_label"
+                android:text="@string/group_edition_rescuers_label"
                 android:textSize="20sp" />
+
         </TableRow>
     </TableLayout>
 
