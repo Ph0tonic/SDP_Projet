@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.database.data.SearchGroupData
@@ -44,8 +45,12 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         val searchGroupRepo = SearchGroupRepository()
         val searchGroupData = SearchGroupData()
         //TODO also put other data
-        //TODO input validation
         searchGroupData.name = findViewById<TextView>(R.id.group_editor_group_name).text.toString()
+
+        if (!validateSearchgroupData(this, searchGroupData)){
+            return
+        }
+
         if (createGroup) {
             groupRepo.createGroup(searchGroupData)
         } else {
@@ -53,5 +58,20 @@ class SearchGroupEditionActivity : AppCompatActivity() {
             groupRepo.updateGroup(searchGroupData)
         }
         finish()
+    }
+
+    companion object {
+        private fun validateSearchgroupData(searchGroupEditionActivity: SearchGroupEditionActivity, searchGroupData: SearchGroupData): Boolean{
+            if (searchGroupData.name == ""){
+                Toast.makeText(
+                        searchGroupEditionActivity,
+                        searchGroupEditionActivity.getString(R.string.search_group_edition_group_name_cannot_be_empty),
+                        Toast.LENGTH_SHORT)
+                        .show()
+                return false
+            }
+            //TODO more input validation
+            return true
+        }
     }
 }
