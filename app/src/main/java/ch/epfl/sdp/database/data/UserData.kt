@@ -1,9 +1,9 @@
 package ch.epfl.sdp.database.data
 
-import com.google.firebase.database.PropertyName
+import com.google.firebase.database.Exclude
 
 data class UserData(
-        @get:PropertyName("google_id")
-        @set:PropertyName("google_id")
-        var googleId: String = ""
+        @get:Exclude
+        var googleId: String? = null,
+        var email: String = ""
 )

@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -22,9 +23,6 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
     private val groupRepo = SearchGroupRepository()
 
-    private lateinit var operatorRecyclerViewLinearLayoutManager: LinearLayoutManager
-    private lateinit var rescuerRecyclerViewLinearLayoutManager: LinearLayoutManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searchgroup_edition)
@@ -35,20 +33,18 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
         if (!createGroup) {
             findViewById<Button>(R.id.search_group_edition_create_or_save_button).text = getString(R.string.save_group_changes)
-            val groupData = groupRepo.getGroupById(groupId!!).observe(this, Observer {
+            groupRepo.getGroupById(groupId!!).observe(this, Observer {
                 if (it != null){
                     findViewById<TextView>(R.id.group_editor_group_name).text = it.name
                 }
             })
         }
 
-        operatorRecyclerViewLinearLayoutManager = LinearLayoutManager(this)
         val operatorsRecyclerView = findViewById<RecyclerView>(R.id.group_edit_operator_recyclerview)
-        operatorsRecyclerView.layoutManager = operatorRecyclerViewLinearLayoutManager
+        operatorsRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        rescuerRecyclerViewLinearLayoutManager = LinearLayoutManager(this)
         val rescuersRecyclerView = findViewById<RecyclerView>(R.id.group_edit_rescuer_recyclerview)
-        rescuersRecyclerView.layoutManager = rescuerRecyclerViewLinearLayoutManager
+        rescuersRecyclerView.layoutManager = LinearLayoutManager(this)
 
         //TODO get actual data from the database
         val user1 = UserData()
@@ -57,21 +53,21 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         val user4 = UserData()
         val user5 = UserData()
 
-        user1.googleId="test1"
-        user2.googleId="test2"
-        user3.googleId="test3"
-        user4.googleId="test4"
-        user5.googleId="test5"
+        user1.email="test1@gmail.com"
+        user2.email="test2@gmail.com"
+        user3.email="test3@gmail.com"
+        user4.email="test4@gmail.com"
+        user5.email="test5@gmail.com"
 
-        val operators = MutableLiveData(listOf(user1, user2))
-        val rescuers = MutableLiveData(listOf(user3, user4, user5))
-
-        operators.observe(this, Observer {
-            operatorsRecyclerView.adapter = UserRecyclerAdapter(it)
+        groupRepo.getOperatorsOfGroup(groupId!!).observe(this, Observer {
+            operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList())
+            Log.w("FIREBASE","operators: $it")
         })
 
-        rescuers.observe(this, Observer {
-            rescuersRecyclerView.adapter = UserRecyclerAdapter(it)
+        val rescuers = MutableLiveData(listOf(user3, user4, user5))
+
+        groupRepo.getRescuersOfGroup(groupId!!).observe(this, Observer {
+            rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList())
         })
     }
 
