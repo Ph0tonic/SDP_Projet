@@ -1,9 +1,9 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.settings
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
-
+import ch.epfl.sdp.R
 
 class SettingsActivity : AppCompatActivity() {
 

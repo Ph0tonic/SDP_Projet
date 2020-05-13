@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.searchgroupselection
+package ch.epfl.sdp.ui.search_group.selection
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

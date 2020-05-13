@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.maps
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import ch.epfl.sdp.R
+import ch.epfl.sdp.database.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
@@ -20,8 +22,7 @@ import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
-import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton

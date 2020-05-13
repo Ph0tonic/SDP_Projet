@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui
 
 import android.content.Intent
 import android.graphics.Color
@@ -19,9 +19,13 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
+import ch.epfl.sdp.ui.maps.MapActivity
+import ch.epfl.sdp.R
+import ch.epfl.sdp.database.Role
+import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.ui.searchgroupselection.SearchGroupSelectionActivity
-import ch.epfl.sdp.ui.searchgroupselection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
+import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
+import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView

@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.offlineMapsManaging
+package ch.epfl.sdp.ui.maps.offline
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -10,13 +10,13 @@ import android.widget.Toast
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.deletingInProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.downloadingInProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.endProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.startProgress
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.showErrorAndToast
+import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.deletingInProgress
+import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
+import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.endProgress
+import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.startProgress
+import ch.epfl.sdp.map.offline.OfflineRegionUtils.deleteOfflineRegion
+import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
+import ch.epfl.sdp.map.offline.OfflineRegionUtils.showErrorAndToast
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style

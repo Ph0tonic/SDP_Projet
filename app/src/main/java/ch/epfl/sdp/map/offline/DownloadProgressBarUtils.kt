@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.offlineMapsManaging
+package ch.epfl.sdp.map.offline
 
 import android.view.View
 import android.widget.Button

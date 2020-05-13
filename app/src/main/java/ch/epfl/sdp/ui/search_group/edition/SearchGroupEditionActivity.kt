@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.search_group.edition
 
 import android.os.Bundle
 import android.util.Log
@@ -7,13 +7,12 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
-import ch.epfl.sdp.ui.searchgroupselection.UserRecyclerAdapter
 
 class SearchGroupEditionActivity : AppCompatActivity() {
 
@@ -48,7 +47,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
                 operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList())
                 Log.w("FIREBASE", "operators: $it")
             })
-            
+
             groupRepo.getRescuersOfGroup(groupId!!).observe(this, Observer {
                 rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList())
             })

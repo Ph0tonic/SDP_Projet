@@ -1,9 +1,10 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.camera
 
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import ch.epfl.sdp.R
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer

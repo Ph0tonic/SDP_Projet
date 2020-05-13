@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.searchgroupselection
+package ch.epfl.sdp.ui.search_group.selection
 
 import ch.epfl.sdp.database.data.SearchGroupData
 

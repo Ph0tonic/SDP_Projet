@@ -13,10 +13,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.Auth
-import com.android.dx.command.Main
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Before

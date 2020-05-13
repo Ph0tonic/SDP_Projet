@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.mapsManaging
+package ch.epfl.sdp.ui.maps.offline
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

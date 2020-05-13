@@ -6,7 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.search_group.edition.SearchGroupEditionActivity">
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -87,7 +88,6 @@
                             android:id="@+id/group_edit_add_operator_text_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:editable="false"
                             android:text="@string/group_edit_add_operator"
                             android:textColor="@color/colorAccent"
                             android:textSize="20sp" />
@@ -123,7 +123,6 @@
                             android:id="@+id/group_edit_add_rescuer_text_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:editable="false"
                             android:text="@string/group_edit_add_rescuer"
                             android:textColor="@color/colorAccent"
                             android:textSize="20sp" />

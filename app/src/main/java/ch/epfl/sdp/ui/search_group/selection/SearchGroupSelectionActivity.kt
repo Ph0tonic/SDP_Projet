@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.searchgroupselection
+package ch.epfl.sdp.ui.search_group.selection
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
-import ch.epfl.sdp.SearchGroupEditionActivity
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 
 class SearchGroupSelectionActivity : AppCompatActivity() {
 
@@ -54,7 +54,7 @@ class SearchGroupSelectionActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun editGroup(searchGroupData: SearchGroupData){
+    private fun editGroup(searchGroupData: SearchGroupData) {
         val intent = Intent(MainApplication.applicationContext(), SearchGroupEditionActivity::class.java)
         intent.putExtra(getString(R.string.intent_key_group_id), searchGroupData.uuid)
         startActivity(intent)

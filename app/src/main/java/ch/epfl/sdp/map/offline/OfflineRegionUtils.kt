@@ -1,10 +1,11 @@
-package ch.epfl.sdp.ui.offlineMapsManaging
+package ch.epfl.sdp.map.offline
 
 import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
-import ch.epfl.sdp.ui.offlineMapsManaging.DownloadProgressBarUtils.hideProgressBar
+import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.hideProgressBar
+import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import org.json.JSONObject

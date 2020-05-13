@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/nav_maps_managing"
-        android:name="ch.epfl.sdp.ui.mapsManaging.MapsManagingFragment"
+        android:name="ch.epfl.sdp.ui.maps.offline.MapsManagingFragment"
         android:label="@string/menu_maps_managing"
         tools:layout="@layout/fragment_maps_managing" />
 </navigation>

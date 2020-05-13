@@ -5,6 +5,7 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiT
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
+import ch.epfl.sdp.ui.maps.MapActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*

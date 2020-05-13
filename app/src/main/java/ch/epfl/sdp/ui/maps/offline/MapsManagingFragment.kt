@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.mapsManaging
+package ch.epfl.sdp.ui.maps.offline
 
 import android.os.Bundle
 import android.view.LayoutInflater

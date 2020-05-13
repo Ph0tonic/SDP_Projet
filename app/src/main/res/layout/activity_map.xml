@@ -142,7 +142,7 @@
         app:fab_expandDirection="left"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
-        tools:context="ch.epfl.sdp.MapActivity">
+        tools:context="ch.epfl.sdp.ui.maps.MapActivity">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/start_or_return_button"

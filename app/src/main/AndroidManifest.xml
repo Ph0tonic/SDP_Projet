@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.epfl.sdp" >
+    package="ch.epfl.sdp">
 
     <uses-feature android:name="android.hardware.screen.landscape" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MainApplication"
@@ -16,19 +15,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="landscape"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
-            android:name=".SearchGroupEditionActivity"
-            android:parentActivityName=".ui.searchgroupselection.SearchGroupSelectionActivity">
-        </activity>
+            android:name=".ui.search_group.edition.SearchGroupEditionActivity"
+            android:parentActivityName=".ui.search_group.selection.SearchGroupSelectionActivity" />
         <activity
-            android:name=".ui.searchgroupselection.SearchGroupSelectionActivity"
-            android:parentActivityName=".MainActivity"
-            />
+            android:name=".ui.search_group.selection.SearchGroupSelectionActivity"
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.Launcher" >
+            android:theme="@style/AppTheme.Launcher">
             <!--
              The theme set here is launcher, but it gets set to no_actionBar in MainActivity.kt
              when the activity is launched
@@ -39,21 +36,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".VlcActivity"
-            android:parentActivityName=".MainActivity"
+            android:name=".ui.camera.VlcActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".MapActivity"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:name=".ui.maps.MapActivity"
+            android:parentActivityName=".ui.MainActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.maps.offline.OfflineManagerActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.offlineMapsManaging.OfflineManagerActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".ui.MainActivity" />
     </application>
-
 </manifest>
