@@ -24,7 +24,7 @@ class SearchGroupSelectionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search_group_selection)
+        setContentView(R.layout.activity_searchgroup_selection)
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
