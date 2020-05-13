@@ -26,6 +26,8 @@ class SearchGroupSelectionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_group_selection)
 
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
         linearLayoutManager = LinearLayoutManager(this)
         val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
         recyclerView.layoutManager = linearLayoutManager

@@ -17,25 +17,24 @@
         android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
-        <activity android:name=".SearchGroupEditionActivity" >
+        <activity
+            android:name=".SearchGroupEditionActivity"
+            android:parentActivityName=".ui.searchgroupselection.SearchGroupSelectionActivity">
         </activity>
-        <activity android:name=".ui.searchgroupselection.SearchGroupSelectionActivity" />
+        <activity
+            android:name=".ui.searchgroupselection.SearchGroupSelectionActivity"
+            android:parentActivityName=".MainActivity"
+            />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.Launcher" >
-
-            <!--
-             The theme set here is launcher, but it gets set to no_actionBar in MainActivity.kt
-             when the activity is launched
-            -->
             <!--
              The theme set here is launcher, but it gets set to no_actionBar in MainActivity.kt
              when the activity is launched
             -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -46,6 +45,7 @@
         <activity
             android:name=".MapActivity"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="landscape" />
         <activity
             android:name=".ui.offlineMapsManaging.OfflineManagerActivity"
