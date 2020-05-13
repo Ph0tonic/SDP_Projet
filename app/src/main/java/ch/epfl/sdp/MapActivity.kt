@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
@@ -61,7 +62,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var strategyPickerButton: FloatingActionButton
 
     private lateinit var role: Role
-    private var currentStrategy: OverflightStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+    private lateinit var currentStrategy: OverflightStrategy
 
     private var victimSymbolLongClickConsumed = false
 
@@ -171,6 +172,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
 
         mapView.contentDescription = getString(R.string.map_not_ready)
+
+
+
+        setStrategy(loadStrategyPreference())
 
         //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
@@ -418,6 +423,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
+    private fun loadStrategyPreference(): OverflightStrategy {
+        val context = MainApplication.applicationContext()
+        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val strategyString = defaultSharedPrefs
+                .getString(context.getString(R.string.prefs_overflight_strategy), "")
+        return when (strategyString) {
+            getString(R.string.zigzag_strategy) ->
+                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+            getString(R.string.spiral_strategy) ->
+                    SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
+            else ->
+                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+        }
+    }
+
 
     fun pickStrategy(view: View) {
         if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
