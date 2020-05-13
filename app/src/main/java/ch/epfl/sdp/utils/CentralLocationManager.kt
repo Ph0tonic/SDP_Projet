@@ -94,7 +94,8 @@ object CentralLocationManager {
         return hasPermission
     }
 
-    private fun checkPermission(context: Context): Boolean {
+    private fun checkPermission(): Boolean {
+        val context = MainApplication.applicationContext()
         return requiredPermissions.all {
             ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
