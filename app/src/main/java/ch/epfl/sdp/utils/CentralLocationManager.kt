@@ -21,7 +21,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
-import ch.epfl.sdp.MainApplication
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 object CentralLocationManager {
@@ -87,8 +86,8 @@ object CentralLocationManager {
         locationDisabledAlert.show()
     }
 
-    private fun checkAndRequestPermission(context: Context): Boolean {
-        val hasPermission = checkPermission(context)
+    private fun checkAndRequestPermission(): Boolean {
+        val hasPermission = checkPermission()
         if (!hasPermission) {
             ActivityCompat.requestPermissions(activity!!, requiredPermissions.toTypedArray(), requestCode)
         }
