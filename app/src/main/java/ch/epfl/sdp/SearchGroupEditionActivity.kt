@@ -1,16 +1,19 @@
 package ch.epfl.sdp
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.ui.searchgroupselection.UserRecyclerAdapter
 
 class SearchGroupEditionActivity : AppCompatActivity() {
 
@@ -18,6 +21,9 @@ class SearchGroupEditionActivity : AppCompatActivity() {
     private var createGroup = true
 
     private val groupRepo = SearchGroupRepository()
+
+    private lateinit var operatorRecyclerViewLinearLayoutManager: LinearLayoutManager
+    private lateinit var rescuerRecyclerViewLinearLayoutManager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +41,38 @@ class SearchGroupEditionActivity : AppCompatActivity() {
                 }
             })
         }
+
+        operatorRecyclerViewLinearLayoutManager = LinearLayoutManager(this)
+        val operatorsRecyclerView = findViewById<RecyclerView>(R.id.group_edit_operator_recyclerview)
+        operatorsRecyclerView.layoutManager = operatorRecyclerViewLinearLayoutManager
+
+        rescuerRecyclerViewLinearLayoutManager = LinearLayoutManager(this)
+        val rescuersRecyclerView = findViewById<RecyclerView>(R.id.group_edit_rescuer_recyclerview)
+        rescuersRecyclerView.layoutManager = rescuerRecyclerViewLinearLayoutManager
+
+        //TODO get actual data from the database
+        val user1 = UserData()
+        val user2 = UserData()
+        val user3 = UserData()
+        val user4 = UserData()
+        val user5 = UserData()
+
+        user1.googleId="test1"
+        user2.googleId="test2"
+        user3.googleId="test3"
+        user4.googleId="test4"
+        user5.googleId="test5"
+
+        val operators = MutableLiveData(listOf(user1, user2))
+        val rescuers = MutableLiveData(listOf(user3, user4, user5))
+
+        operators.observe(this, Observer {
+            operatorsRecyclerView.adapter = UserRecyclerAdapter(it)
+        })
+
+        rescuers.observe(this, Observer {
+            rescuersRecyclerView.adapter = UserRecyclerAdapter(it)
+        })
     }
 
     fun onGroupEditCanceled(view: View) {

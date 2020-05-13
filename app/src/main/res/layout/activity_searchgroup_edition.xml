@@ -43,6 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/base_location_label"
+                android:textAlignment="viewEnd"
                 android:textSize="20sp" />
 
             <Button
@@ -62,7 +63,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/group_edition_operators_label"
+                android:textAlignment="viewEnd"
                 android:textSize="20sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/group_edit_operator_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </TableRow>
 
         <TableRow
@@ -74,7 +81,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/group_edition_rescuers_label"
+                android:textAlignment="viewEnd"
                 android:textSize="20sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/group_edit_rescuer_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </TableRow>
     </TableLayout>
