@@ -21,6 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -31,6 +32,10 @@ import org.junit.runner.RunWith
 class MainActivityTest {
 
     private lateinit var mUiDevice: UiDevice
+
+    companion object {
+        private const val FAKE_ACCOUNT_ID = "fake_account_id"
+    }
 
     @Rule
     @JvmField
@@ -81,6 +86,12 @@ class MainActivityTest {
 
         sharedPreferences.edit().clear().apply()
 
+        //Fake logged in
+        runOnUiThread {
+            Auth.accountId.value = FAKE_ACCOUNT_ID
+            Auth.loggedIn.value = true
+        }
+
         var longitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
         var latitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
         var zoom: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
@@ -89,7 +100,7 @@ class MainActivityTest {
         assertThat(zoom, `is`(nullValue()))
 
         // Trigger saving mechanism by opening map and coming back
-        onView(withId(R.id.display_map)).perform(click())
+        onView(withId(R.id.work_offline_button)).perform(click())
         mUiDevice.pressBack()
 
         longitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
@@ -108,5 +119,4 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
         mUiDevice.pressBack()
     }
-
 }
