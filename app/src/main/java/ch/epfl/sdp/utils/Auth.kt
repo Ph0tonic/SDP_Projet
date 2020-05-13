@@ -16,11 +16,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 object Auth : ViewModel() {
 
     private const val RC_SIGN_IN = 9001
+    private var onLoginCallback: MutableList<(Boolean) -> Unit> = mutableListOf()
 
     val loggedIn: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val email: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val profileImageURL: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val name: MutableLiveData<String> by lazy { MutableLiveData<String>() }
+    val accountId: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     init {
         GoogleSignIn.getLastSignedInAccount(MainApplication.applicationContext())
@@ -41,11 +43,13 @@ object Auth : ViewModel() {
      *  Allow to launch the connect from a Fragment or anActivity
      *  Need to override onActivityResult and call Auth.onActivityResult
      */
-    fun login(fragment: Fragment) {
+    fun login(fragment: Fragment, callback: ((success: Boolean) -> Unit)? = null) {
+        callback?.let { onLoginCallback.add(it) }
         fragment.startActivityForResult(createGoogleSignClient().signInIntent, RC_SIGN_IN)
     }
 
-    fun login(activity: Activity) {
+    fun login(activity: Activity, callback: ((success: Boolean) -> Unit)? = null) {
+        callback?.let { onLoginCallback.add(it) }
         activity.startActivityForResult(createGoogleSignClient().signInIntent, RC_SIGN_IN)
     }
 
@@ -55,8 +59,12 @@ object Auth : ViewModel() {
             GoogleSignIn.getSignedInAccountFromIntent(data)
                     .addOnSuccessListener {
                         updateLoginStateFromAccount(it)
+                        onLoginCallback.forEach { it(true) }
+                        onLoginCallback.clear()
                     }.addOnFailureListener {
                         Toast.makeText(context, context.getString(R.string.sign_in_error), Toast.LENGTH_SHORT).show()
+                        onLoginCallback.forEach { it(false) }
+                        onLoginCallback.clear()
                     }
         }
     }
@@ -70,9 +78,10 @@ object Auth : ViewModel() {
     }
 
     private fun updateLoginStateFromAccount(account: GoogleSignInAccount) {
-        email.postValue(account.email)
-        name.postValue(account.displayName)
-        profileImageURL.postValue(account.photoUrl.toString())
-        loggedIn.postValue(true)
+        email.value = account.email
+        name.value = account.displayName
+        profileImageURL.value = account.photoUrl.toString()
+        loggedIn.value = true
+        accountId.value = account.id
     }
 }

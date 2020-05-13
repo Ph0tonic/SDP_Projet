@@ -4,5 +4,5 @@ class CircleBuilder : SearchAreaBuilder() {
     override val sizeLowerBound: Int? = 2
     override val sizeUpperBound: Int? = 2
     override val shapeName: String = "Circle"
-    override fun buildIfComplete(): CircleArea = CircleArea(vertices[0], vertices[1])
+    override fun buildIfComplete() = CircleArea(vertices[0], vertices[1])
 }

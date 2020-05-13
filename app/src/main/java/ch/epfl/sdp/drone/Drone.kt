@@ -36,6 +36,7 @@ object Drone {
     }
 
     private val instance: System
+    private val isFlying = false
 
     init {
         //Require a arm64-v8a simulator to run
@@ -67,7 +68,7 @@ object Drone {
     }
 
     fun startMission(mission: List<Mission.MissionItem>) {
-        this.currentMissionLiveData.postValue(mission)
+        this.currentMissionLiveData.value = mission
         val isConnectedCompletable = instance.core.connectionState
                 .filter { state -> state.isConnected }
                 .firstOrError()
@@ -81,7 +82,7 @@ object Drone {
                 .subscribe()
     }
 
-    fun isDroneConnected(): Boolean {
+    fun isConnected(): Boolean {
         return try {
             instance.core.connectionState
                     .filter { state -> state.isConnected }
@@ -92,5 +93,9 @@ object Drone {
         } catch (e: TimeoutException) {
             false
         }
+    }
+
+    fun isFlying(): Boolean {
+        return instance.mission.isMissionFinished.blockingGet()
     }
 }

@@ -1,5 +1,6 @@
 package ch.epfl.sdp.mission
 
+import android.util.Log
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlin.properties.Delegates
@@ -36,8 +37,8 @@ class MissionBuilder {
     }
 
     fun build(): List<LatLng> {
-        require(searchArea != null) { "Invalid search area" }
-        require(startingLocation != null) { "Invalid starting location" }
+        require(searchArea != null) { "Search area cannot be null" }
+        require(startingLocation != null) { "Starting location cannot be null" }
         require(overflightStrategy.acceptArea(searchArea!!)) { "This strategy doesn't accept this search area" }
         return overflightStrategy.createFlightPath(startingLocation!!, searchArea!!)
     }
