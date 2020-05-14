@@ -30,7 +30,7 @@ import ch.epfl.sdp.database.data.HeatmapPointData
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
@@ -117,7 +117,7 @@ class MapActivityTest {
             mActivityRule.activity.missionBuilder
                     .withSearchArea(searchArea)
                     .withStartingLocation(expectedLatLng)
-                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+                    .withStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
 
         // Then start mission officially
@@ -251,7 +251,7 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
-            mActivityRule.activity.setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            mActivityRule.activity.setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
 
