@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
@@ -13,7 +14,10 @@ import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
-import ch.epfl.sdp.mission.*
+import ch.epfl.sdp.mission.MissionBuilder
+import ch.epfl.sdp.mission.OverflightStrategy
+import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
@@ -58,7 +62,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var strategyPickerButton: FloatingActionButton
 
     private lateinit var role: Role
-    private var currentStrategy: OverflightStrategy = SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
+    private lateinit var currentStrategy: OverflightStrategy
 
     private var victimSymbolLongClickConsumed = false
 
@@ -158,6 +162,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
+        //TODO: Give user location if current drone position is not available
+        CentralLocationManager.configure(this)
+        mapView.contentDescription = getString(R.string.map_not_ready)
+
         if (role == Role.RESCUER) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
@@ -166,11 +174,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
-
-        mapView.contentDescription = getString(R.string.map_not_ready)
-
-        //TODO: Give user location if current drone position is not available
-        CentralLocationManager.configure(this)
     }
 
     override fun onResume() {
@@ -231,7 +234,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
 
-            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(loadStrategyPreference())
 
             // Add listeners to builders
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
@@ -414,6 +417,21 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun loadStrategyPreference(): OverflightStrategy {
+        val context = MainApplication.applicationContext()
+        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val strategyString = defaultSharedPrefs
+                .getString(context.getString(R.string.prefs_overflight_strategy), "")
+        return when (strategyString) {
+            getString(R.string.zigzag_strategy) ->
+                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+            getString(R.string.spiral_strategy) ->
+                    SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
+            else ->
+                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+        }
     }
 
     fun pickStrategy(view: View) {
