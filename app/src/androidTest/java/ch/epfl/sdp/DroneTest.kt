@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
@@ -19,6 +20,9 @@ class DroneTest {
         const val SIGNAL_STRENGTH = 1.0
         private const val EPSILON = 1e-3
     }
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     var mActivityRule = ActivityTestRule(
