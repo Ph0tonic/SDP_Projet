@@ -176,7 +176,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
         mapView.contentDescription = getString(R.string.map_not_ready)
-        resizeFragment(mapView)
+        resizeCameraFragment(mapView)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
 
@@ -413,7 +413,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
 
-    fun resizeFragment(v : View){
+    fun resizeCameraFragment(v : View){
         isFragmentBig = !isFragmentBig
 
         val size = android.graphics.Point()
