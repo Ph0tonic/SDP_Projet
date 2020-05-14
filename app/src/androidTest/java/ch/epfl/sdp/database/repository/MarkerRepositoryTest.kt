@@ -3,6 +3,7 @@ package ch.epfl.sdp.database.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import ch.epfl.sdp.database.dao.EmptyMockMarkerDao
 import ch.epfl.sdp.database.dao.MarkerDao
 import ch.epfl.sdp.database.data.MarkerData
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -29,14 +30,12 @@ class MarkerRepositoryTest {
     @Test
     fun getMarkersOfSearchGroupCallsGetMarkersOfSearchGroupFromDao() {
         val expectedData = MutableLiveData(setOf(MarkerData(uuid = "UUID-1")))
-        val dao = object : MarkerDao {
+        //TODO add latch
+
+        val dao = object : EmptyMockMarkerDao(){
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
                 return expectedData
             }
-
-            override fun addMarker(groupId: String, markerData: MarkerData) {}
-            override fun removeMarker(groupId: String, markerId: String) {}
-            override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
         }
         MarkerRepository.daoProvider = { dao }
 
@@ -47,19 +46,15 @@ class MarkerRepositoryTest {
 
     @Test
     fun addMarkerCallsAddMarkerFromDao() {
+        //TODO replace with latch
         var wasCalled = false
-        val dao = object : MarkerDao {
-            override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
-                return MutableLiveData()
-            }
 
+        val dao = object : EmptyMockMarkerDao(){
             override fun addMarker(groupId: String, markerData: MarkerData) {
-                wasCalled = true
+                wasCalled =  true
             }
-
-            override fun removeMarker(groupId: String, markerId: String) {}
-            override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
         }
+
         MarkerRepository.daoProvider = { dao }
 
         MarkerRepository().addMarkerForSearchGroup("DummyGroupId", MarkerData(LatLng(0.0, 0.0)))
@@ -76,19 +71,13 @@ class MarkerRepositoryTest {
         lateinit var actualGroupId: String
         lateinit var actualMarkerId: String
 
-        val dao = object : MarkerDao {
-            override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
-                return MutableLiveData()
-            }
-
-            override fun addMarker(groupId: String, markerData: MarkerData) {}
+        val dao = object : EmptyMockMarkerDao(){
             override fun removeMarker(groupId: String, markerId: String) {
                 called.countDown()
                 actualGroupId = groupId
             }
-
-            override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
         }
+
         MarkerRepository.daoProvider = { dao }
 
         MarkerRepository().removeMarkerOfSearchGroup(DUMMY_GROUP_ID, DUMMY_MARKER_ID)

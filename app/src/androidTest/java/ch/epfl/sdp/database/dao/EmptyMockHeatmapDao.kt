@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.HeatmapData
 
-class EmptyMockHeatmapDao : HeatmapDao {
+open class EmptyMockHeatmapDao : HeatmapDao {
     override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
         return MutableLiveData()
     }

@@ -3,7 +3,7 @@ package ch.epfl.sdp.database.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfl.sdp.database.dao.SearchGroupDao
+import ch.epfl.sdp.database.dao.EmptyMockSearchGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
@@ -29,19 +29,13 @@ class SearchGroupRepositoryTest {
         val expectedData = MutableLiveData(listOf(
                 SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
         ))
-        val dao = object : SearchGroupDao {
+
+        val dao = object : EmptyMockSearchGroupDao(){
             override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
                 return expectedData
             }
-
-            override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
-                return MutableLiveData()
-            }
-
-            override fun createGroup(searchGroupData: SearchGroupData) {}
-            override fun updateGroup(searchGroupData: SearchGroupData) {}
-            override fun removeSearchGroup(searchGroupId: String) {}
         }
+
         SearchGroupRepository.daoProvider = { dao }
 
         val repo = SearchGroupRepository()
@@ -54,20 +48,14 @@ class SearchGroupRepositoryTest {
                 SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
         )
         var wasCalled = false
-        val dao = object : SearchGroupDao {
-            override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
-                return MutableLiveData()
-            }
 
+        val dao = object : EmptyMockSearchGroupDao(){
             override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
                 wasCalled = true
                 return expectedData
             }
-
-            override fun createGroup(searchGroupData: SearchGroupData) {}
-            override fun updateGroup(searchGroupData: SearchGroupData) {}
-            override fun removeSearchGroup(searchGroupId: String) {}
         }
+
         SearchGroupRepository.daoProvider = { dao }
 
         assertThat(SearchGroupRepository().getGroupById(DUMMY_GROUP_ID), equalTo(expectedData))

@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import ch.epfl.sdp.database.dao.EmptyMockHeatmapDao
 import ch.epfl.sdp.database.dao.HeatmapDao
 import ch.epfl.sdp.database.data.HeatmapData
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -36,10 +37,7 @@ class HeatmapRepositoryTest {
         val called = CountDownLatch(1)
         val expectedData: LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> = MutableLiveData(mutableMapOf())
 
-        val dao = object : HeatmapDao {
-            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
-            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
-
+        val dao =  object : EmptyMockHeatmapDao(){
             override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
                 called.countDown()
                 return expectedData
@@ -67,17 +65,11 @@ class HeatmapRepositoryTest {
         lateinit var actualGroupId: String
         lateinit var actualHeatmapData: HeatmapData
 
-        val dao = object : HeatmapDao {
+        val dao =  object : EmptyMockHeatmapDao(){
             override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
                 called.countDown()
                 actualGroupId = groupId
                 actualHeatmapData = heatmapData
-            }
-
-            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
-
-            override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
-                return MutableLiveData()
             }
         }
 
