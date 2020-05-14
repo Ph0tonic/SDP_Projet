@@ -37,7 +37,7 @@ object CentralLocationManager {
         locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         this.activity = activity
 
-        if (checkAndRequestPermission()) {
+        if (checkAndRequestPermission(context)) {
             requestLocationUpdates()
         }
     }
@@ -86,23 +86,22 @@ object CentralLocationManager {
         locationDisabledAlert.show()
     }
 
-    private fun checkAndRequestPermission(): Boolean {
-        val hasPermission = checkPermission()
+    private fun checkAndRequestPermission(context: Context): Boolean {
+        val hasPermission = checkPermission(context)
         if (!hasPermission) {
             ActivityCompat.requestPermissions(activity!!, requiredPermissions.toTypedArray(), requestCode)
         }
         return hasPermission
     }
 
-    private fun checkPermission(): Boolean {
-        val context = MainApplication.applicationContext()
+    private fun checkPermission(context: Context): Boolean {
         return requiredPermissions.all {
             ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == CentralLocationManager.requestCode && checkPermission()) {
+        if (requestCode == CentralLocationManager.requestCode && checkPermission(MainApplication.applicationContext())) {
             requestLocationUpdates()
         }
     }

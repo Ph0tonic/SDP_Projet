@@ -173,8 +173,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         mapView.contentDescription = getString(R.string.map_not_ready)
 
-
-
         setStrategy(loadStrategyPreference())
 
         //TODO: Give user location if current drone position is not available
