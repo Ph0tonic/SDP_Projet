@@ -10,6 +10,15 @@
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
+
+        android:defaultValue="10"
+        android:entries="@array/drone_altitude_entries"
+        android:entryValues="@array/drone_altitude_values"
+        android:key="@string/prefs_drone_altitude"
+        android:title="@string/drone_altitude_header"
+        app:useSimpleSummaryProvider="true" />
+
+    <ListPreference
         android:defaultValue="@string/zigzag_strategy"
         android:entries="@array/overflight_strategy_entries"
         android:entryValues="@array/overflight_strategy_values"

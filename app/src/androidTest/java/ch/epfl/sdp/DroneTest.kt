@@ -43,10 +43,10 @@ class DroneTest {
                 LatLng(47.397026, 8.543067)
         )
 
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList))
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, 10f))
 
         // This assert prevent the app to crash in cash the mission has not been updated
         assertThat(Drone.currentMissionLiveData.value, `is`(notNullValue()))
-        assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
+
     }
 }

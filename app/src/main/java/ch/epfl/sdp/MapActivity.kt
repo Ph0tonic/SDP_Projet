@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -52,7 +53,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
 
-    private lateinit var snackbar: Snackbar
+    private lateinit var connectedSnackbar: Snackbar
+    private lateinit var waypointsSnackbar: Snackbar
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -82,6 +84,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markerRepository = MarkerRepository()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var isTest : Boolean = false
 
     /* Painters */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -160,7 +165,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
-        snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+        connectedSnackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+        waypointsSnackbar = Snackbar.make(mapView, R.string.not_enough_waypoints_message, Snackbar.LENGTH_LONG)
 
         //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
@@ -246,6 +252,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             onceMapReady(style)
 
             setStrategy(loadStrategyPreference())
+
+            //Change button color if the drone is not connected
+            if(!Drone.isConnected()){
+                findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY
+            }
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
@@ -360,15 +371,21 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun startMissionOrReturnHome(v: View) {
-        if (!Drone.isConnected()) {
-            snackbar.show()
+        if (!Drone.isConnected() && !isTest) {
+            connectedSnackbar.show()
         }
-
-        if (!Drone.isFlying()) { //TODO : return to user else
-            Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build()))
+        else if(searchAreaBuilder.vertices.size<4 && currentStrategy is SimpleMultiPassOnQuadrilateral
+                || searchAreaBuilder.vertices.size<2 && currentStrategy is SpiralStrategy){
+            waypointsSnackbar.show()
         }
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
+        if(isTest || Drone.isConnected()) {
+            if (!Drone.isFlying()) { //TODO : return to user else
+                val altitude = getUserPrefAltitude()
+                Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+            }
+            findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                    .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
+        }
     }
 
     fun storeMap(v: View) {
@@ -419,6 +436,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+    private fun getUserPrefAltitude() : Float{
+        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+        return defaultSharedPrefs.getString(this.getString(R.string.prefs_drone_altitude),"").toString().toFloat()
     }
 
     private fun loadStrategyPreference(): OverflightStrategy {
