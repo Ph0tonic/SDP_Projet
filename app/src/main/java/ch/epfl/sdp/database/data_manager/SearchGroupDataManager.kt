@@ -30,7 +30,7 @@ class SearchGroupDataManager {
     }
 
     fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
-        return searchGroupRepository.getGroups()
+        return searchGroupRepository.getAllGroups()
     }
 
     fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {

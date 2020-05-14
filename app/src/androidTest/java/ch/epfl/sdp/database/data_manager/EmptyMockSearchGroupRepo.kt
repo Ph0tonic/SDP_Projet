@@ -5,7 +5,7 @@ import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.ISearchGroupRepository
 
 open class EmptyMockSearchGroupRepo : ISearchGroupRepository {
-    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
+    override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
         return MutableLiveData()
     }
 

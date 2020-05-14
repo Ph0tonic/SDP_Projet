@@ -1,19 +1,12 @@
 package ch.epfl.sdp.database.data_manager
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.database.data.HeatmapData
-import ch.epfl.sdp.database.data.MarkerData
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
 import ch.epfl.sdp.database.providers.UserRepositoryProvider
-import ch.epfl.sdp.database.repository.IHeatmapRepository
-import ch.epfl.sdp.database.repository.IMarkerRepository
-import ch.epfl.sdp.database.repository.ISearchGroupRepository
-import ch.epfl.sdp.database.repository.IUserRepository
+import ch.epfl.sdp.database.repository.SearchGroupRepository
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -50,8 +43,8 @@ class SearchGroupDataManagerTest {
 
         calledSearchGroupRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
-        assertThat(actualGroupIdInSearchGroup, equalTo(DUMMY_GROUP_ID))
         assertThat(calledSearchGroupRepository.count, equalTo(0L))
+        assertThat(actualGroupIdInSearchGroup, equalTo(DUMMY_GROUP_ID))
     }
 
     @Test
@@ -76,8 +69,8 @@ class SearchGroupDataManagerTest {
 
         calledUserRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
-        assertThat(actualGroupIdInUser, equalTo(DUMMY_GROUP_ID))
         assertThat(calledUserRepository.count, equalTo(0L))
+        assertThat(actualGroupIdInUser, equalTo(DUMMY_GROUP_ID))
     }
 
     @Test
@@ -102,8 +95,8 @@ class SearchGroupDataManagerTest {
 
         calledMarkerRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
-        assertThat(actualGroupIdInMarker, equalTo(DUMMY_GROUP_ID))
         assertThat(calledMarkerRepository.count, equalTo(0L))
+        assertThat(actualGroupIdInMarker, equalTo(DUMMY_GROUP_ID))
     }
 
     @Test
@@ -128,11 +121,42 @@ class SearchGroupDataManagerTest {
 
         calledHeatmapRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
-        assertThat(actualGroupIdInHeatmap, equalTo(DUMMY_GROUP_ID))
         assertThat(calledHeatmapRepository.count, equalTo(0L))
+        assertThat(actualGroupIdInHeatmap, equalTo(DUMMY_GROUP_ID))
     }
-//    fun createSearchGroup(name: String): String
-//    fun getAllGroups(): MutableLiveData<List<SearchGroupData>>
+
+    //    fun createSearchGroup(name: String): String
+    @Test
+    fun createSearchGroupCallsCreateSearchGroup() {
+        TODO("Not implemented yet")
+    }
+
+    @Test
+    fun createSearchGroupCallsCreateUser() {
+        TODO("Not implemented yet")
+    }
+
+    @Test
+    fun getAllGroupsCallsGetAllGroupsAndReturnsCorrectGroups() {
+        val called = CountDownLatch(1)
+
+        val expectedGroups = MutableLiveData(listOf(SearchGroupData(DUMMY_GROUP_ID)))
+
+        val searchGroupRepo = object : EmptyMockSearchGroupRepo() {
+            override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
+                called.countDown()
+                return expectedGroups
+            }
+        }
+
+        SearchGroupRepositoryProvider.provide = {searchGroupRepo}
+
+        val actualGroups = SearchGroupDataManager().getAllGroups()
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+
+        assertThat(called.count, equalTo(0L))
+        assertThat(actualGroups.value, equalTo(expectedGroups.value))
+    }
 //    fun getGroupById(groupId: String): MutableLiveData<SearchGroupData>
 //    fun editGroup(searchGroupData: SearchGroupData)
 //    fun getOperatorsOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>>

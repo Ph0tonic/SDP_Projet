@@ -3,9 +3,7 @@ package ch.epfl.sdp.database.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfl.sdp.database.dao.MarkerDao
 import ch.epfl.sdp.database.dao.SearchGroupDao
-import ch.epfl.sdp.database.data.MarkerData
 import ch.epfl.sdp.database.data.SearchGroupData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
@@ -47,7 +45,7 @@ class SearchGroupRepositoryTest {
         SearchGroupRepository.daoProvider = { dao }
 
         val repo = SearchGroupRepository()
-        assertThat(repo.getGroups(), equalTo(expectedData))
+        assertThat(repo.getAllGroups(), equalTo(expectedData))
     }
 
     @Test

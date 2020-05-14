@@ -15,7 +15,7 @@ class SearchGroupRepository : ISearchGroupRepository {
 
     val dao: SearchGroupDao = daoProvider()
 
-    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
+    override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
         return dao.getGroups()
     }
 
