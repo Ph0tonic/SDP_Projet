@@ -286,7 +286,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 ).getMissionItems())
             }
             missionButton.setIcon(if (isDroneFlying) R.drawable.ic_return else R.drawable.ic_start)
-            if(missionButton.colorNormal==Color.RED)
+            if(missionButton.colorNormal==Color.GRAY)
                 missionButton.colorNormal = Color.WHITE
         }
     }
