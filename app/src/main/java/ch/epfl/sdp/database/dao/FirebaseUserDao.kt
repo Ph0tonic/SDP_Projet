@@ -43,14 +43,14 @@ class FirebaseUserDao : UserDao {
                 override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
                     val user = dataSnapshot.getValue(UserData::class.java)!!
                     if (user.role == role) {
-                        user.googleId = dataSnapshot.key!!
+                        user.uuid = dataSnapshot.key!!
                         mapData[groupId]!!.value = mapData[groupId]!!.value!!.plus(user)
                     }
                 }
 
                 override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                     val user = dataSnapshot.getValue(UserData::class.java)!!
-                    user.googleId = dataSnapshot.key!!
+                    user.uuid = dataSnapshot.key!!
                     mapData[groupId]!!.value = mapData[groupId]!!.value!!.minus(user)
                 }
             })

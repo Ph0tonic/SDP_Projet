@@ -32,7 +32,7 @@ class UserRepository {
         dao.removeAllUserOfSearchGroup(searchGroupId)
     }
 
-    fun addUserToSearchGroup(searchGroupId: String, user: Any) {
-//        dao.addUserToSearchgroup
+    fun addUserToSearchGroup(searchGroupId: String, user: UserData) {
+        dao.addUserToSearchGroup(searchGroupId, user)
     }
 }

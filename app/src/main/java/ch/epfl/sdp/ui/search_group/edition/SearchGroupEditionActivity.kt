@@ -62,7 +62,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
             val userRemovedListener = object : OnItemClickListener<UserData> {
                 override fun onItemClicked(user: UserData) {
-                    searchGroupManager.removeUserOfSearchGroup(groupId!!, user.googleId!!)
+                    searchGroupManager.removeUserOfSearchGroup(groupId!!, user.uuid!!)
                 }
             }
             searchGroupManager.getOperatorsOfSearchGroup(groupId!!).observe(this, Observer {

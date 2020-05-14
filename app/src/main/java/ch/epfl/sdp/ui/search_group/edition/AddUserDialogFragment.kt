@@ -9,10 +9,6 @@ import androidx.fragment.app.Fragment
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 /**
  * A simple [Fragment] subclass.
  * Use the [AddUserDialogFragment.newInstance] factory method to
@@ -28,6 +24,7 @@ class AddUserDialogFragment(val role: Role, val userAddListener: UserAddListener
             builder.setView(view)
                     // Add action buttons
                     .setPositiveButton(R.string.add_a_user) { dialog, id ->
+                        //TODO Validate email
                         userAddListener.addUser(view.findViewById<EditText>(R.id.email_address).text.toString(), role)
                     }
                     .setNegativeButton(R.string.cancel) { dialog, id ->
