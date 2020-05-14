@@ -1,5 +1,6 @@
 package ch.epfl.sdp.mission
 
+import android.util.Log
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng

@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="0dp"
@@ -22,9 +21,8 @@
         tools:layout_constraintBottom_creator="1"
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1">
-
     </com.mapbox.mapboxsdk.maps.MapView>
-
+  
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/floating_menu_button"
         android:layout_width="wrap_content"
@@ -80,6 +78,19 @@
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/strategy_picker_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="pickStrategy"
+        app:fab_colorNormal="@color/colorPrimary"
+        app:fab_colorPressed="@color/colorLightGray"
+        app:fab_icon="@drawable/ic_spiralstrat"
+        app:fab_size="normal"
+        app:layout_constraintBottom_toTopOf="@+id/floating_menu_button"
+        app:layout_constraintEnd_toEndOf="@+id/mapView" />
+
     <fragment
         android:id="@+id/vlc_fragment"
         android:name="ch.epfl.sdp.ui.vlc.VlcFragment"
@@ -102,11 +113,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintLeft_creator="1">
-
         <TableRow
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
-
             <ImageView
                 android:id="@+id/battery_level_icon"
                 android:layout_width="wrap_content"
@@ -115,18 +124,14 @@
                 android:padding="@dimen/tiny_padding"
                 android:rotation="90"
                 app:srcCompat="@drawable/ic_battery1" />
-
             <TextView
                 android:id="@+id/battery_level"
                 android:theme="@style/InformationDisplayTheme"
                 android:text="@string/no_info"/>
-
         </TableRow>
-
         <TableRow
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
-
             <ImageView
                 android:id="@+id/imageView4"
                 android:layout_width="21dp"
@@ -134,18 +139,15 @@
                 android:contentDescription="@string/map_not_ready"
                 android:padding="@dimen/tiny_padding"
                 app:srcCompat="@drawable/ic_altitude" />
-
             <TextView
                 android:id="@+id/altitude"
                 android:theme="@style/InformationDisplayTheme"
                 android:text="@string/no_info"/>
-
         </TableRow>
 
         <TableRow
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
-
             <ImageView
                 android:id="@+id/imageView2"
                 android:layout_width="18dp"
@@ -153,7 +155,6 @@
                 android:contentDescription="@string/map_not_ready"
                 android:padding="@dimen/tiny_padding"
                 app:srcCompat="@drawable/ic_speed" />
-
             <TextView
                 android:id="@+id/speed"
                 android:theme="@style/InformationDisplayTheme"
@@ -163,7 +164,6 @@
         <TableRow
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
-
             <ImageView
                 android:id="@+id/imageView3"
                 android:layout_width="wrap_content"
@@ -171,18 +171,14 @@
                 android:contentDescription="@string/map_not_ready"
                 android:paddingVertical="@dimen/tiny_padding"
                 app:srcCompat="@drawable/ic_distancetodrone" />
-
             <TextView
                 android:id="@+id/distance_to_user"
                 android:theme="@style/InformationDisplayTheme"
                 android:text="@string/no_info"/>
-
         </TableRow>
-
         <TableRow
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
-
             <ImageView
                 android:id="@+id/imageView5"
                 android:layout_width="wrap_content"
@@ -190,15 +186,11 @@
                 android:contentDescription="@string/map_not_ready"
                 android:paddingVertical="@dimen/tiny_padding"
                 app:srcCompat="@drawable/ic_distancetohome" />
-
             <TextView
                 android:id="@+id/distance_to_base"
                 android:theme="@style/InformationDisplayTheme"
                 android:text="@string/no_info"/>
-
         </TableRow>
-
-
     </TableLayout>
 
 

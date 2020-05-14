@@ -10,7 +10,6 @@ abstract class SearchAreaBuilder {
     abstract val sizeUpperBound: Int?
     abstract val shapeName: String
 
-
     val searchAreaChanged = mutableListOf<(SearchArea?) -> Unit>()
     val verticesChanged = mutableListOf<(MutableList<LatLng>) -> Unit>()
 
@@ -25,8 +24,15 @@ abstract class SearchAreaBuilder {
         searchAreaChanged.forEach { it(searchArea) }
     }
 
+    fun onDestroy() {
+        reset()
+        searchAreaChanged.clear()
+        verticesChanged.clear()
+    }
+    
     fun reset() {
-        vertices = mutableListOf()
+        vertices.clear()
+        this.vertices = this.vertices
     }
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {

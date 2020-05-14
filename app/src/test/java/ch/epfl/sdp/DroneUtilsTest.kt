@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import ch.epfl.sdp.drone.DroneUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert
 import org.junit.Test
 import kotlin.random.Random.Default.nextDouble
@@ -41,11 +42,11 @@ class DroneUtilsTest {
             DroneUtils.generateMissionItem(pos.latitude, pos.longitude)
         }
 
-        val missionsItems = DroneUtils
+        val missionPlan = DroneUtils
                 .makeDroneMission(positions)
-                .getMissionItems()
 
-        expectedMissionItems.zip(missionsItems).forEach { (expected, observed) ->
+
+        expectedMissionItems.zip(missionPlan.missionItems).forEach { (expected, observed) ->
             Assert.assertTrue(missionEquality(expected, observed))
         }
     }

@@ -5,21 +5,22 @@ connected_check_task:
     TARGET: default
     ARCH: x86
     CC_TEST_REPORTER_ID: ENCRYPTED[437c27bfb64040626acf7f420701b9391f80e46bcdc9b1a11f5a8a8ed35ee5f66576f7289bb71ff7e18c822219e8a620]
+    GRADLE_OPTS: -Dkotlin.compiler.execution.strategy=in-process
   container:
     image: reactivecircus/android-emulator-28:latest
     kvm: true
     cpu: 8
     memory: 24G
   create_mavsdk_server_script:
-    - curl -L https://github.com/mavlink/MAVSDK/releases/download/v0.24.0/mavsdk_server_manylinux1-x64 > ./mavsdk_server_manylinux1-x64
+    - curl -L https://github.com/mavlink/MAVSDK/releases/download/v0.25.0/mavsdk_server_manylinux2010-x64 > ./mavsdk_server_manylinux1-x64
     - chmod +x ./mavsdk_server_manylinux1-x64
     - ./mavsdk_server_manylinux1-x64 -p 50051 &
   create_device_script:
     echo no | avdmanager create avd --force --name "api-${API_LEVEL}" --abi "${TARGET}/${ARCH}" --package "system-images;android-${API_LEVEL};${TARGET};${ARCH}"
   start_emulator_background_script:
     $ANDROID_HOME/emulator/emulator -avd "api-${API_LEVEL}" -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-  gradle_build_script:
-    ./gradlew build
+  assemble_instrumented_tests_script:
+    ./gradlew assembleDebugAndroidTest
   wait_for_emulator_script:
     adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 3; done; input keyevent 82'
   disable_animations_script: |

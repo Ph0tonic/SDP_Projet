@@ -1,30 +1,25 @@
 package ch.epfl.sdp.drone
 
 import com.mapbox.mapboxsdk.geometry.LatLng
-import io.mavsdk.mission.Mission
+import io.mavsdk.mission.Mission.MissionItem
+import io.mavsdk.mission.Mission.MissionPlan
 
 object DroneUtils {
-    private val missionItems = arrayListOf<Mission.MissionItem>()
 
-    fun makeDroneMission(path: List<LatLng>): DroneUtils {
-        path.forEach { point ->
-            missionItems.add(generateMissionItem(point.latitude, point.longitude))
-        }
-        return this
+    fun makeDroneMission(path: List<LatLng>): MissionPlan {
+        return MissionPlan(path.map { point ->
+            generateMissionItem(point.latitude, point.longitude)
+        })
     }
 
-    fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
-        return Mission.MissionItem(
+    fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): MissionItem {
+        return MissionItem(
                 latitudeDeg,
                 longitudeDeg,
                 10f,
                 10f,
                 true, Float.NaN, Float.NaN,
-                Mission.MissionItem.CameraAction.NONE, Float.NaN,
+                MissionItem.CameraAction.NONE, Float.NaN,
                 1.0)
-    }
-
-    fun getMissionItems(): ArrayList<Mission.MissionItem> {
-        return missionItems
     }
 }

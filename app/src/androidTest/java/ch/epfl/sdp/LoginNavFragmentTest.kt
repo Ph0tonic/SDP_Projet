@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.Context
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -62,7 +61,7 @@ class LoginNavFragmentTest {
                 .requestEmail()
                 .build()
     }
-    
+
     private fun openDrawer() {
         onView(withId(R.id.drawer_layout))
                 .check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) // Check that drawer is closed to begin with
@@ -89,15 +88,15 @@ class LoginNavFragmentTest {
     fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
         runOnUiThread {
             Auth.logout()
-            Auth.loggedIn.postValue(false)
+            Auth.loggedIn.value = false
         }
 
         openDrawer()
         runOnUiThread {
-            Auth.email.postValue(FAKE_EMAIL)
-            Auth.name.postValue(FAKE_NAME)
-            Auth.profileImageURL.postValue(FAKE_PROFILE_IMAGE_URL)
-            Auth.loggedIn.postValue(true)
+            Auth.email.value = FAKE_EMAIL
+            Auth.name.value = FAKE_NAME
+            Auth.profileImageURL.value = FAKE_PROFILE_IMAGE_URL
+            Auth.loggedIn.value = true
         }
 
         onView(withId(R.id.nav_username)).check(matches(withText(FAKE_NAME)))
@@ -108,7 +107,7 @@ class LoginNavFragmentTest {
 
         runOnUiThread {
             Auth.logout()
-            Auth.loggedIn.postValue(false)
+            Auth.loggedIn.value = false
         }
 
         openDrawer()
