@@ -60,7 +60,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     var waypoints = arrayListOf<LatLng>()
     private lateinit var userPositionMarker: Circle
 
-    private lateinit var snackbar: Snackbar
+    private lateinit var connectedSnackbar: Snackbar
+    private lateinit var waypointsSnackbar: Snackbar
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var heatmapFeatures = ArrayList<Feature>()
@@ -138,7 +139,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
-        snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+        connectedSnackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+        waypointsSnackbar = Snackbar.make(mapView, R.string.not_enough_waypoints_message, Snackbar.LENGTH_LONG)
 
         mapView.contentDescription = getString(R.string.map_not_ready)
 
@@ -275,7 +277,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         val missionButton =  findViewById<FloatingActionButton>(R.id.start_or_return_button)
         if (!Drone.isDroneConnected()) {
-            snackbar.show()
+            connectedSnackbar.show()
+        }
+        else if(searchAreaBuilder.vertices.size<4){
+            waypointsSnackbar.show()
         }
         else {
             if (!isDroneFlying) { //TODO : return to user else
