@@ -7,6 +7,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="tiny_margin">5dp</dimen>
     <dimen name="tiny_padding">2dp</dimen>
-    <dimen name="widget_width">192dp</dimen>
-    <dimen name="widget_height">108dp</dimen>
+
 </resources>

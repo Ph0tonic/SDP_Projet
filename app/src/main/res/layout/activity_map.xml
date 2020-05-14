@@ -25,6 +25,72 @@
 
     </com.mapbox.mapboxsdk.maps.MapView>
 
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/floating_menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        app:fab_addButtonColorNormal="@color/colorPrimaryDark"
+        app:fab_addButtonColorPressed="@color/colorPrimary"
+        app:fab_addButtonPlusIconColor="@color/colorWhite"
+        app:fab_expandDirection="left"
+        tools:context="ch.epfl.sdp.MapActivity"
+        >
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/start_or_return_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startMissionOrReturnHome"
+            app:fab_colorNormal="@color/colorPrimary"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_start"
+            app:fab_size="mini" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/clear_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="clearWaypoints"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_clear"
+            app:fab_size="mini"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/locate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="centerCameraOnDrone"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_locate"
+            app:fab_size="mini"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/store_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="storeMap"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_store"
+            app:fab_size="mini"/>
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+    <fragment
+        android:id="@+id/vlc_fragment"
+        android:name="ch.epfl.sdp.ui.vlc.VlcFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/tiny_margin"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
     <TableLayout
         android:id="@+id/drone_status"
         android:layout_width="wrap_content"
@@ -135,83 +201,17 @@
 
     </TableLayout>
 
-    <fragment
-        android:id="@+id/camera_fragment"
-        android:name="ch.epfl.sdp.ui.vlc.VlcFragment"
-        android:layout_width="@dimen/widget_width"
-        android:layout_height="@dimen/widget_height"
-        android:layout_margin="@dimen/tiny_margin"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"/>
 
-
-
-
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/floating_menu_button"
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/switch_button"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintStart_toStartOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        mapbox:layout_constraintBottom_toBottomOf="parent"
-        mapbox:layout_constraintEnd_toEndOf="parent"
-        app:fab_addButtonColorNormal="@color/colorPrimaryDark"
-        app:fab_addButtonColorPressed="@color/colorPrimary"
-        app:fab_addButtonPlusIconColor="@color/colorWhite"
-        app:fab_expandDirection="left"
-        tools:context="ch.epfl.sdp.MapActivity"
-        >
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/start_or_return_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="startMissionOrReturnHome"
-            app:fab_colorNormal="@color/colorPrimary"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_start"
-            app:fab_size="mini" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/switch_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="startMissionOrReturnHome"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_camera"
-            app:fab_size="mini" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/clear_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="clearWaypoints"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_clear"
-            app:fab_size="mini"/>
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/locate_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="centerCameraOnDrone"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_locate"
-            app:fab_size="mini"/>
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/store_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="storeMap"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_store"
-            app:fab_size="mini"/>
-
-    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+        android:onClick="resizeFragment"
+        app:fab_colorNormal="@color/colorWhite"
+        app:fab_colorPressed="@color/colorLightGray"
+        app:fab_icon="@drawable/ic_camera"
+        app:fab_size="mini" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

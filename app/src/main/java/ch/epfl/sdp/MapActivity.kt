@@ -1,17 +1,24 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.map.*
+import ch.epfl.sdp.map.MapBoxMissionPainter
+import ch.epfl.sdp.map.MapBoxQuadrilateralPainter
+import ch.epfl.sdp.map.MapBoxSearchAreaPainter
+import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
@@ -48,6 +55,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private var isMapReady = false
     private var isDroneFlying = false
+    private var isFragmentBig = true
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var droneCircleManager: CircleManager
@@ -119,6 +127,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private var droneSpeedObserver = Observer<Float> { newSpeed: Float? -> updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT) }
 
     companion object {
+        const val SCALE_FACTOR = 4
         const val ID_ICON_VICTIM: String = "airport"
 
         private const val DISTANCE_FORMAT = " %.1f m"
@@ -139,6 +148,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
         mapView.contentDescription = getString(R.string.map_not_ready)
+        resizeFragment(mapView)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        actionBar?.hide()
+
 
         CentralLocationManager.configure(this)
     }
@@ -149,6 +162,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        actionBar?.hide()
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
     }
 
@@ -292,6 +307,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dronePositionMarker.latLng,
                     if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
         }
+    }
+
+    fun resizeFragment(v : View){
+        isFragmentBig = !isFragmentBig
+
+        val display = windowManager.defaultDisplay
+        val size = android.graphics.Point()
+        display.getSize(size)
+        val margin = 2*resources.getDimension(R.dimen.tiny_margin).toInt()
+        val width: Int = (if (isFragmentBig) size.x else size.x/SCALE_FACTOR) - margin
+        val height: Int = (if (isFragmentBig) size.y else size.y/SCALE_FACTOR) - margin
+
+        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.width = width
+        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.height = height
+
+        findViewById<ConstraintLayout>(R.id.vlc_fragment).requestLayout()
     }
 
     /**
