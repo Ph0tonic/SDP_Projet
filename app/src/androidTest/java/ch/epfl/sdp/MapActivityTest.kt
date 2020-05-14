@@ -513,8 +513,8 @@ class MapActivityTest {
     }
 
     @Test
-    fun resizeButtonWorks(){
-        mActivityRule.launchActivity(Intent())
+    fun resizeButtonIsWorking(){
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
         onView(withId(R.id.resize_button)).perform(click())
