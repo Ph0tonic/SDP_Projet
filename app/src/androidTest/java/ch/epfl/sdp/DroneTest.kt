@@ -47,6 +47,6 @@ class DroneTest {
 
         // This assert prevent the app to crash in cash the mission has not been updated
         assertThat(Drone.currentMissionLiveData.value, `is`(notNullValue()))
-
+        assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
     }
 }

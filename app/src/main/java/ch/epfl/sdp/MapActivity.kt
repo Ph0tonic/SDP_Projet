@@ -27,7 +27,6 @@ import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -52,9 +51,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
-
-    private lateinit var connectedSnackbar: Snackbar
-    private lateinit var waypointsSnackbar: Snackbar
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -86,7 +82,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     val markerRepository = MarkerRepository()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var isTest : Boolean = false
+    var isTest: Boolean = false
 
     /* Painters */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -165,8 +161,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
-        connectedSnackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
-        waypointsSnackbar = Snackbar.make(mapView, R.string.not_enough_waypoints_message, Snackbar.LENGTH_LONG)
 
         //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
@@ -179,6 +173,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
             findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
+        }
+
+        //Change button color if the drone is not connected
+        if (!Drone.isConnected()) {
+            findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY
         }
     }
 
@@ -252,11 +251,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             onceMapReady(style)
 
             setStrategy(loadStrategyPreference())
-
-            //Change button color if the drone is not connected
-            if(!Drone.isConnected()){
-                findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY
-            }
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
@@ -372,13 +366,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     fun startMissionOrReturnHome(v: View) {
         if (!Drone.isConnected() && !isTest) {
-            connectedSnackbar.show()
+            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
+        } else if (searchAreaBuilder.vertices.size < 4 && currentStrategy is SimpleMultiPassOnQuadrilateral
+                || searchAreaBuilder.vertices.size < 2 && currentStrategy is SpiralStrategy) {
+            Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
         }
-        else if(searchAreaBuilder.vertices.size<4 && currentStrategy is SimpleMultiPassOnQuadrilateral
-                || searchAreaBuilder.vertices.size<2 && currentStrategy is SpiralStrategy){
-            waypointsSnackbar.show()
-        }
-        if(isTest || Drone.isConnected()) {
+        if (isTest || Drone.isConnected()) {
             if (!Drone.isFlying()) { //TODO : return to user else
                 val altitude = getUserPrefAltitude()
                 Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
@@ -437,9 +430,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-    private fun getUserPrefAltitude() : Float{
+
+    private fun getUserPrefAltitude(): Float {
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
-        return defaultSharedPrefs.getString(this.getString(R.string.prefs_drone_altitude),"").toString().toFloat()
+        return defaultSharedPrefs.getString(this.getString(R.string.prefs_drone_altitude), "").toString().toFloat()
     }
 
     private fun loadStrategyPreference(): OverflightStrategy {
@@ -449,11 +443,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .getString(context.getString(R.string.prefs_overflight_strategy), "")
         return when (strategyString) {
             getString(R.string.zigzag_strategy) ->
-                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+                SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
             getString(R.string.spiral_strategy) ->
-                    SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
+                SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
             else ->
-                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+                SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
         }
     }
 
@@ -491,6 +485,5 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
         searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
         searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
-
     }
 }

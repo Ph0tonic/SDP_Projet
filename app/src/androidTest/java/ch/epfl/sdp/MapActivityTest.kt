@@ -126,10 +126,10 @@ class MapActivityTest {
 
         val uploadedMission = Drone.currentMissionLiveData.value
 
-            assertThat(uploadedMission, `is`(notNullValue()))
-            assertThat(uploadedMission!!.size, not(equalTo(0)))
-            assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
-            assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
+        assertThat(uploadedMission, `is`(notNullValue()))
+        assertThat(uploadedMission!!.size, not(equalTo(0)))
+        assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
+        assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
         mActivityRule.activity.isTest = false
 
     }
