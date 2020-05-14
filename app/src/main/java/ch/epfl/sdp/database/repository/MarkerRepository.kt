@@ -24,7 +24,7 @@ class MarkerRepository : IMarkerRepository {
         dao.addMarker(groupId, marker)
     }
 
-    override fun removeMarkerForSearchGroup(groupId: String, markerId: String) {
+    override fun removeMarkerOfSearchGroup(groupId: String, markerId: String) {
         dao.removeMarker(groupId, markerId)
     }
 

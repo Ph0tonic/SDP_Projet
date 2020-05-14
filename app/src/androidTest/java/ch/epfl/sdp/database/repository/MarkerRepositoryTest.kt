@@ -75,7 +75,7 @@ class MarkerRepositoryTest {
         }
         MarkerRepository.daoProvider = { dao }
 
-        MarkerRepository().removeMarkerForSearchGroup("DummyGroupId", "DummyMarkerId")
+        MarkerRepository().removeMarkerOfSearchGroup("DummyGroupId", "DummyMarkerId")
         assertThat(wasCalled, equalTo(true))
     }
 

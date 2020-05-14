@@ -1,11 +1,8 @@
 package ch.epfl.sdp.database.data_manager
 
 import androidx.lifecycle.MutableLiveData
-import ch.epfl.sdp.database.dao.FirebaseMarkersDao
-import ch.epfl.sdp.database.dao.MarkerDao
 import ch.epfl.sdp.database.data.MarkerData
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
-import ch.epfl.sdp.database.repository.MarkerRepository
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 class MarkerDataManager {
@@ -21,7 +18,7 @@ class MarkerDataManager {
     }
 
     fun removeMarkerForSearchGroup(groupId: String, markerId: String) {
-        markerRepository.removeMarkerForSearchGroup(groupId, markerId)
+        markerRepository.removeMarkerOfSearchGroup(groupId, markerId)
     }
 
     fun removeAllMarkersOfSearchGroup(searchGroupId: String) {
