@@ -12,10 +12,7 @@ import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.map.MapBoxMissionPainter
-import ch.epfl.sdp.map.MapBoxQuadrilateralPainter
-import ch.epfl.sdp.map.MapBoxSearchAreaPainter
-import ch.epfl.sdp.map.MapUtils
+import ch.epfl.sdp.map.*
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
@@ -32,6 +29,9 @@ import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -183,7 +183,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-            findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
+            findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
     }
@@ -412,19 +412,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         vlcFragment.layoutParams.height = (if (isFragmentBig) size.y else size.y/SCALE_FACTOR) - margin
         vlcFragment.requestLayout()
     }
-
-    /**
-     * Adds a heat point to the heatmap
-     */
-    fun addPointToHeatMap(longitude: Double, latitude: Double, intensity: Double) {
-        if (!isMapReady) return
-        val feature: Feature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
-        feature.addNumberProperty("intensity", intensity)
-        heatmapFeatures.add(feature)
-        heatmapGeoJsonSource.setGeoJson(FeatureCollection.fromFeatures(heatmapFeatures))
-        /* Will be needed when we have the signal of the drone implemented */
-        //feature.addNumberProperty("intensity", Drone.getSignalStrength())
-    }
+    
 
     private fun addVictimMarker(latLng: LatLng, markerId: String) {
         if (!isMapReady) return
