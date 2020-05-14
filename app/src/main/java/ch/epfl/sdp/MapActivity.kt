@@ -94,6 +94,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var userPainter: MapboxUserPainter
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var isTest : Boolean = false
+
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
             Pair(.05, R.drawable.ic_battery2),
@@ -367,7 +370,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun startMissionOrReturnHome(v: View) {
-        if (!Drone.isConnected()) {
+        if (!Drone.isConnected() && !isTest) {
             connectedSnackbar.show()
         }
         else if(searchAreaBuilder.vertices.size<4 && currentStrategy is SimpleMultiPassOnQuadrilateral
