@@ -83,7 +83,7 @@ object Drone {
     }
 
     fun startMission(missionPlan: Mission.MissionPlan) {
-        this.currentMissionLiveData.postValue(missionPlan.missionItems)
+        this.currentMissionLiveData.value = missionPlan.missionItems
         val isConnectedCompletable = instance.core.connectionState
                 .filter { state -> state.isConnected }
                 .firstOrError()
