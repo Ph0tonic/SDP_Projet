@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
@@ -61,7 +62,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var strategyPickerButton: FloatingActionButton
 
     private lateinit var role: Role
-    private var currentStrategy: OverflightStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+    private lateinit var currentStrategy: OverflightStrategy
 
     private var victimSymbolLongClickConsumed = false
 
@@ -162,8 +163,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
         //TODO: Give user location if current drone position is not available
-        mapView.contentDescription = getString(R.string.map_not_ready)
         CentralLocationManager.configure(this)
+        mapView.contentDescription = getString(R.string.map_not_ready)
 
         if (role == Role.RESCUER) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
@@ -243,6 +244,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             onceMapReady(style)
+
+            setStrategy(loadStrategyPreference())
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
@@ -418,6 +421,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    private fun loadStrategyPreference(): OverflightStrategy {
+        val context = MainApplication.applicationContext()
+        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val strategyString = defaultSharedPrefs
+                .getString(context.getString(R.string.prefs_overflight_strategy), "")
+        return when (strategyString) {
+            getString(R.string.zigzag_strategy) ->
+                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+            getString(R.string.spiral_strategy) ->
+                    SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
+            else ->
+                    SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+        }
+    }
+
+
     fun pickStrategy(view: View) {
         if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
             setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
@@ -451,5 +470,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
         searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
         searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+
     }
 }
