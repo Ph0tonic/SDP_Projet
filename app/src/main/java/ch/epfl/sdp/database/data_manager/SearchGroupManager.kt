@@ -1,6 +1,7 @@
 package ch.epfl.sdp.database.data_manager
 
 import androidx.lifecycle.MutableLiveData
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.repository.HeatmapRepository
@@ -51,5 +52,11 @@ class SearchGroupManager {
     fun removeUserOfSearchGroup(searchGroupId: String, userId: String) {
         //TODO check rights
         userRepository.removeUserFromSearchGroup(searchGroupId, userId)
+    }
+
+    fun addUserToSearchgroup(searchGroupId: String, email: String, role: Role) {
+        val user = UserData(email, )
+        user.role = role
+        userRepository.addUserToSearchGroup(searchGroupId, user)
     }
 }

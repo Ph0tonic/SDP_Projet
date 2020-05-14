@@ -10,12 +10,28 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.data_manager.SearchGroupManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 
 class SearchGroupEditionActivity : AppCompatActivity() {
+
+    companion object {
+        private fun validateSearchgroupData(searchGroupEditionActivity: SearchGroupEditionActivity, searchGroupData: SearchGroupData): Boolean {
+            if (searchGroupData.name == "") {
+                Toast.makeText(
+                        searchGroupEditionActivity,
+                        searchGroupEditionActivity.getString(R.string.search_group_edition_group_name_cannot_be_empty),
+                        Toast.LENGTH_SHORT)
+                        .show()
+                return false
+            }
+            //TODO more input validation
+            return true
+        }
+    }
 
     private var groupId: String? = null
     private var createGroup = true
@@ -88,18 +104,19 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         finish()
     }
 
-    companion object {
-        private fun validateSearchgroupData(searchGroupEditionActivity: SearchGroupEditionActivity, searchGroupData: SearchGroupData): Boolean {
-            if (searchGroupData.name == "") {
-                Toast.makeText(
-                        searchGroupEditionActivity,
-                        searchGroupEditionActivity.getString(R.string.search_group_edition_group_name_cannot_be_empty),
-                        Toast.LENGTH_SHORT)
-                        .show()
-                return false
+    fun addUser(role: Role) {
+        val dialog = AddUserDialogFragment(role, object : UserAddListener {
+            override fun addUser(name: String, role: Role) {
+                searchGroupManager.addUserToSearchgroup(groupId!!, name, role)
             }
-            //TODO more input validation
-            return true
-        }
+        })
+        dialog.show(supportFragmentManager, "Add user")
+    }
+
+    fun addOperator(view: View) {
+        addUser(Role.OPERATOR)
+    }
+    fun addRescuer(view: View) {
+        addUser(Role.RESCUER)
     }
 }
