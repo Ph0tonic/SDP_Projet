@@ -24,7 +24,7 @@ class DroneUtilsTest {
                     true, Float.NaN, Float.NaN,
                     Mission.MissionItem.CameraAction.NONE, Float.NaN,
                     1.0)
-            val expectedMission = DroneUtils.generateMissionItem(randomLatitude, randomLongitude,10f)
+            val expectedMission = DroneUtils.generateMissionItem(randomLatitude, randomLongitude)
             Assert.assertTrue(missionEquality(expectedMission, mission))
         }
     }
@@ -39,11 +39,12 @@ class DroneUtilsTest {
         )
 
         val expectedMissionItems = positions.map { pos ->
-            DroneUtils.generateMissionItem(pos.latitude, pos.longitude, 10f)
+            DroneUtils.generateMissionItem(pos.latitude, pos.longitude)
         }
 
         val missionPlan = DroneUtils
-                .makeDroneMission(positions, 10f)
+                .makeDroneMission(positions)
+
 
         expectedMissionItems.zip(missionPlan.missionItems).forEach { (expected, observed) ->
             Assert.assertTrue(missionEquality(expected, observed))
