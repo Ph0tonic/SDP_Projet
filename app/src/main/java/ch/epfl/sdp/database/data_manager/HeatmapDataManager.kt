@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
 
 class HeatmapDataManager {
 
-    val heatmapRepository = HeatmapRepositoryProvider.provide()
+    private val heatmapRepository = HeatmapRepositoryProvider.provide()
 
     fun addMeasureToHeatmap(groupId: String, heatmapId: String, location: LatLng, intensity: Double) {
         val heatmaps = heatmapRepository.getGroupHeatmaps(groupId).value

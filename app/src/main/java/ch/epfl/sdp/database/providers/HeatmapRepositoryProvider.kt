@@ -4,5 +4,5 @@ import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.IHeatmapRepository
 
 object HeatmapRepositoryProvider : RepositoryProvider<IHeatmapRepository>() {
-    override val defaultProvider = { HeatmapRepository() }
+    override var provide: () -> IHeatmapRepository = { HeatmapRepository() }
 }

@@ -4,5 +4,5 @@ import ch.epfl.sdp.database.repository.ISearchGroupRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 
 object SearchGroupRepositoryProvider : RepositoryProvider<ISearchGroupRepository>() {
-    override val defaultProvider = { SearchGroupRepository() }
+    override var provide: () -> ISearchGroupRepository = { SearchGroupRepository() }
 }
