@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -66,6 +67,9 @@ class MapActivityTest {
             .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
 
     @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
     var mActivityRule = IntentsTestRule(
             MapActivity::class.java,
             true,
@@ -96,7 +100,6 @@ class MapActivityTest {
 
     @Test
     fun canStartMission() {
-
         PreferenceManager.getDefaultSharedPreferences(applicationContext())
                 .edit()
                 .putString(applicationContext().getString(R.string.prefs_drone_altitude), "20")
