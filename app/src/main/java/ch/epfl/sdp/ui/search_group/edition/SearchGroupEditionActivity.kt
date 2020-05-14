@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
+import ch.epfl.sdp.database.data_manager.SearchGroupManager
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
@@ -21,6 +22,8 @@ class SearchGroupEditionActivity : AppCompatActivity() {
     private var groupId: String? = null
     private var createGroup = true
 
+    //TODO: Remove repo and user DataManager
+    private val searchGroupManager = SearchGroupManager()
     private val groupRepo = SearchGroupRepository()
     private val userRepo = UserRepository()
 
@@ -59,6 +62,13 @@ class SearchGroupEditionActivity : AppCompatActivity() {
                 rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
             })
         }
+    }
+
+    fun onGroupDelete(view: View) {
+        //TODO: Ask for confirmation
+        searchGroupManager.deleteSearchGroup(groupId!!)
+        finish()
+        Toast.makeText(this, "Search group deleted successfully", Toast.LENGTH_SHORT).show()
     }
 
     fun onGroupEditCanceled(view: View) {

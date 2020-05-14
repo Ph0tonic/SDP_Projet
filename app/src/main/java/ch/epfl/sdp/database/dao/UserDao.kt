@@ -8,4 +8,5 @@ import ch.epfl.sdp.database.data.UserData
 interface UserDao {
     fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>>
     fun removeUserFromSearchGroup(searchGroupId: String, userId: String)
+    fun removeAllUserOfSearchGroup(searchGroupId: String)
 }

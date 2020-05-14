@@ -28,4 +28,8 @@ class MarkerRepository {
     fun removeMarkerForSearchGroup(groupId: String, markerId: String) {
         dao.removeMarker(groupId, markerId)
     }
+
+    fun removeAllMarkersOfSearchGroup(searchGroupId: String) {
+        dao.removeAllMarkersOfSearchGroup(searchGroupId)
+    }
 }

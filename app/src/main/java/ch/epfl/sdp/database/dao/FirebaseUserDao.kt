@@ -56,4 +56,8 @@ class FirebaseUserDao : UserDao {
     override fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
         database.getReference("users/$searchGroupId/$userId").removeValue()
     }
+
+    override fun removeAllUserOfSearchGroup(searchGroupId: String) {
+        database.getReference("users/${searchGroupId}").removeValue()
+    }
 }

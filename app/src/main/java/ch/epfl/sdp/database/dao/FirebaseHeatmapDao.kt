@@ -24,6 +24,10 @@ class FirebaseHeatmapDao : HeatmapDao {
                 .setValue(heatmapData)
     }
 
+    override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
+        database.getReference("heatmaps/${searchGroupId}").removeValue()
+    }
+
     override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
         if (!groupHeatmaps.containsKey(groupId)) {
             val myRef = database.getReference("heatmaps/$groupId")

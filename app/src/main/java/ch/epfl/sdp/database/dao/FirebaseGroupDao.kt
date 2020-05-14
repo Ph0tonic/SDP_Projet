@@ -61,12 +61,14 @@ class FirebaseGroupDao : SearchGroupDao {
      * The uuid of the searchgroup data will be overridden by an automatically generated one.
      */
     override fun createGroup(searchGroupData: SearchGroupData) {
-        val myRef = database.getReference("search_groups")
-        myRef.push().setValue(searchGroupData)
+        database.getReference("search_groups").push().setValue(searchGroupData)
     }
 
     override fun updateGroup(searchGroupData: SearchGroupData) {
-        val myRef = database.getReference("search_groups/${searchGroupData.uuid}")
-        myRef.setValue(searchGroupData)
+        database.getReference("search_groups/${searchGroupData.uuid}").setValue(searchGroupData)
+    }
+
+    override fun removeSearchGroup(searchGroupId: String) {
+        database.getReference("search_groups/${searchGroupId}").removeValue()
     }
 }

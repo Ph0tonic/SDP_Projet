@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseGroupDao
 import ch.epfl.sdp.database.dao.SearchGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.data.UserData
 
 class SearchGroupRepository {
     companion object {
@@ -30,5 +29,9 @@ class SearchGroupRepository {
 
     fun updateGroup(searchGroupData: SearchGroupData) {
         return dao.updateGroup(searchGroupData)
+    }
+
+    fun removeSearchGroup(searchGroupId: String) {
+        dao.removeSearchGroup(searchGroupId)
     }
 }

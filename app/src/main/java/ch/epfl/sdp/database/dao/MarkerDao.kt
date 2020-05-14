@@ -7,4 +7,5 @@ interface MarkerDao {
     fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>>
     fun addMarker(groupId: String, markerData: MarkerData)
     fun removeMarker(groupId: String, markerId: String)
+    fun removeAllMarkersOfSearchGroup(searchGroupId: String)
 }

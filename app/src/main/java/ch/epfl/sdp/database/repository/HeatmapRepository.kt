@@ -33,4 +33,8 @@ class HeatmapRepository {
     fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
         return dao.getHeatmapsOfSearchGroup(groupId)
     }
+
+    fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
+        dao.removeAllHeatmapsOfSearchGroup(searchGroupId)
+    }
 }

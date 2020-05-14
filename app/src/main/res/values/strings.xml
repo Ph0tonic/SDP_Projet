@@ -70,4 +70,6 @@
     <string name="search_group_edition_group_name_cannot_be_empty">The group name cannot be empty</string>
     <string name="group_edit_add_operator"><u>Add operator</u></string>
     <string name="group_edit_add_rescuer"><u>Add rescuer</u></string>
+    <string name="danger_zone">Danger zone</string>
+    <string name="delete_this_group">Delete this group</string>
 </resources>
