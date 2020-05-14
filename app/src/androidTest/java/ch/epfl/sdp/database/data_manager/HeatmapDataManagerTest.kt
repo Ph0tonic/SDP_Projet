@@ -129,7 +129,6 @@ class HeatmapDataManagerTest {
             override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
                 tested.countDown()
                 return expectedHeatMapData
-                TODO("should not be used")
             }
 
             override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
