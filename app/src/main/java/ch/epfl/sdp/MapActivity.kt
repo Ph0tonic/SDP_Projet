@@ -29,9 +29,6 @@ import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -412,7 +409,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         vlcFragment.layoutParams.height = (if (isFragmentBig) size.y else size.y/SCALE_FACTOR) - margin
         vlcFragment.requestLayout()
     }
-    
+
 
     private fun addVictimMarker(latLng: LatLng, markerId: String) {
         if (!isMapReady) return
