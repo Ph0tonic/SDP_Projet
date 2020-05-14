@@ -412,7 +412,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }
     }
 
-
     fun resizeCameraFragment(v : View){
         isFragmentBig = !isFragmentBig
 
