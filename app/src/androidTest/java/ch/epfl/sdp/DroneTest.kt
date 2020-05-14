@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
@@ -43,10 +42,11 @@ class DroneTest {
                 LatLng(47.397426, 8.544867),
                 LatLng(47.397026, 8.543067)
         )
-        runOnUiThread {
-            Drone.startMission(DroneUtils.makeDroneMission(someLocationsList))
-        }
+
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList))
+
+        // This assert prevent the app to crash in cash the mission has not been updated
+        assertThat(Drone.currentMissionLiveData.value, `is`(notNullValue()))
         assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
     }
-
 }
