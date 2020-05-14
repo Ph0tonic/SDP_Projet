@@ -162,6 +162,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
         snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
 
+        //TODO: Give user location if current drone position is not available
+        CentralLocationManager.configure(this)
+        mapView.contentDescription = getString(R.string.map_not_ready)
+
         if (role == Role.RESCUER) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
@@ -170,12 +174,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
-
-        mapView.contentDescription = getString(R.string.map_not_ready)
-
-
-        //TODO: Give user location if current drone position is not available
-        CentralLocationManager.configure(this)
     }
 
     override fun onResume() {

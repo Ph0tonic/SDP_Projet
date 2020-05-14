@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.test.annotation.UiThreadTest
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
@@ -75,8 +76,9 @@ class LocationWithPermissionTest {
         Mockito.verify(manager).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(500L), Mockito.eq(10f), Mockito.any<LocationListener>())
     }
 
-    @Test
+    @UiThreadTest
     fun checkLocationReturnsTrueIfLocationIsEnabled() {
+        //Found help here : https://github.com/skyisle/android-test-kit/issues/121
         CentralLocationManager.configure(mActivityRule.activity)
         assertThat(CentralLocationManager.checkLocationSetting(), equalTo(true))
     }
