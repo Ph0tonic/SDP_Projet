@@ -24,9 +24,7 @@ class VlcFragment : Fragment() {
         private const val ASSET_FILENAME = "rtsp://192.168.1.131:8554/live" //must be your IP
         private val ARGS = arrayListOf("-vvv")//, "--live-caching=200")
     }
-
-    private lateinit var vlcViewModel: VlcViewModel
-
+    
 
     private lateinit var mVideoLayout: VLCVideoLayout
     private lateinit var mLibVLC: LibVLC
@@ -47,7 +45,6 @@ class VlcFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        vlcViewModel = ViewModelProvider(this).get(VlcViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_vlc, container, false)
         root.findViewById<Button>(R.id.switch_button).setOnClickListener { v -> switchVideo(v) }
         return root
