@@ -31,12 +31,4 @@ class SearchGroupRepository {
     fun updateGroup(searchGroupData: SearchGroupData) {
         return dao.updateGroup(searchGroupData)
     }
-
-    fun getOperatorsOfGroup(groupId: String): MutableLiveData<Set<UserData>> {
-        return dao.getOperatorsOfGroup(groupId)
-    }
-
-    fun getRescuersOfGroup(groupId: String): MutableLiveData<Set<UserData>> {
-        return dao.getRescuersOfGroup(groupId)
-    }
 }

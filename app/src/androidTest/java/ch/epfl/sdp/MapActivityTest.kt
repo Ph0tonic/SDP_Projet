@@ -23,7 +23,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
-import ch.epfl.sdp.database.Role
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.data.HeatmapData

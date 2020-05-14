@@ -9,6 +9,4 @@ interface SearchGroupDao {
     fun getGroupById(groupId: String): MutableLiveData<SearchGroupData>
     fun createGroup(searchGroupData: SearchGroupData)
     fun updateGroup(searchGroupData: SearchGroupData)
-    fun getOperatorsOfGroup(groupId: String): MutableLiveData<Set<UserData>>
-    fun getRescuersOfGroup(groupId: String): MutableLiveData<Set<UserData>>
 }

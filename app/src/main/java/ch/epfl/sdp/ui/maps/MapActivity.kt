@@ -7,7 +7,7 @@ import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.R
-import ch.epfl.sdp.database.Role
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone

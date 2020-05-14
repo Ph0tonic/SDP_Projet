@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.repository.UserRepository
 
 class SearchGroupEditionActivity : AppCompatActivity() {
 
@@ -20,6 +21,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
     private var createGroup = true
 
     private val groupRepo = SearchGroupRepository()
+    private val userRepo = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +45,12 @@ class SearchGroupEditionActivity : AppCompatActivity() {
             val rescuersRecyclerView = findViewById<RecyclerView>(R.id.group_edit_rescuer_recyclerview)
             rescuersRecyclerView.layoutManager = LinearLayoutManager(this)
 
-            groupRepo.getOperatorsOfGroup(groupId!!).observe(this, Observer {
+            userRepo.getOperatorsOfSearchGroup(groupId!!).observe(this, Observer {
                 operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList())
                 Log.w("FIREBASE", "operators: $it")
             })
 
-            groupRepo.getRescuersOfGroup(groupId!!).observe(this, Observer {
+            userRepo.getRescuersOfSearchGroup(groupId!!).observe(this, Observer {
                 rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList())
             })
         }

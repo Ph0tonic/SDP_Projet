@@ -15,9 +15,6 @@ class FirebaseGroupDao : SearchGroupDao {
     private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(mutableListOf())
     private val watchedGroupsById: MutableMap<String, MutableLiveData<SearchGroupData>> = mutableMapOf()
 
-    private val groupOperators: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
-    private val groupRescuers: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
-
     override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
         val myRef = database.getReference("search_groups")
         myRef.addValueEventListener(object : ValueEventListener {
@@ -71,66 +68,5 @@ class FirebaseGroupDao : SearchGroupDao {
     override fun updateGroup(searchGroupData: SearchGroupData) {
         val myRef = database.getReference("search_groups/${searchGroupData.uuid}")
         myRef.setValue(searchGroupData)
-    }
-
-    //TODO refactor code, this is very similar to getRescuersOfGroup()
-    override fun getOperatorsOfGroup(groupId: String): MutableLiveData<Set<UserData>> {
-        if (!groupOperators.containsKey(groupId)) {
-            //Initialise data
-            val myRef = database.getReference("operators/$groupId")
-            groupOperators[groupId] = MutableLiveData(setOf())
-
-            myRef.addChildEventListener(object : ChildEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    Timber.w("Failed to read value.")
-                }
-                override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
-                override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                    TODO("An operator has changed, no action implemented")
-                }
-                override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
-                    val user = dataSnapshot.getValue(UserData::class.java)!!
-                    user.googleId = dataSnapshot.key!!
-                    groupOperators[groupId]!!.value = groupOperators[groupId]!!.value!!.plus(user)
-                }
-                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                    val user = dataSnapshot.getValue(UserData::class.java)!!
-                    user.email = dataSnapshot.key!!
-                    groupOperators[groupId]!!.value = groupOperators[groupId]!!.value!!.minus(user)
-                }
-            })
-        }
-        return groupOperators[groupId]!!
-    }
-
-    //TODO refactor code, this is very similar to getOperatorsOfGroup()
-    override fun getRescuersOfGroup(groupId: String): MutableLiveData<Set<UserData>> {
-        Log.w("FIREBASE","get rescuers called")
-        if (!groupRescuers.containsKey(groupId)) {
-            //Initialise data
-            val myRef = database.getReference("rescuers/$groupId")
-            groupRescuers[groupId] = MutableLiveData(setOf())
-
-            myRef.addChildEventListener(object : ChildEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    Timber.w("Failed to read value.")
-                }
-                override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
-                override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                    TODO("A rescuer has changed, no action implemented")
-                }
-                override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
-                    val user = dataSnapshot.getValue(UserData::class.java)!!
-                    user.googleId = dataSnapshot.key!!
-                    groupRescuers[groupId]!!.value = groupRescuers[groupId]!!.value!!.plus(user)
-                }
-                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                    val user = dataSnapshot.getValue(UserData::class.java)!!
-                    user.email = dataSnapshot.key!!
-                    groupRescuers[groupId]!!.value = groupRescuers[groupId]!!.value!!.minus(user)
-                }
-            })
-        }
-        return groupRescuers[groupId]!!
     }
 }

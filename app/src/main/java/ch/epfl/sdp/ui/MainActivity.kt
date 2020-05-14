@@ -21,7 +21,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.R
-import ch.epfl.sdp.database.Role
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
