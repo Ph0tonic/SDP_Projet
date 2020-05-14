@@ -5,6 +5,7 @@ import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import net.mastrgamr.mbmapboxutils.SphericalUtil.interpolate
+import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.ceil
@@ -63,7 +64,7 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
                 val xPercent = x.toDouble() / numPointsX
 
                 val point =
-                        if (y % 2 != 0) {
+                        if (y % 2 == 0) {
                             interpolate(leftPoint, rightPoint, xPercent)
                         } else {
                             interpolate(rightPoint, leftPoint, xPercent)
@@ -71,7 +72,6 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
                 path.add(point)
             }
         }
-        
         return path
     }
 }
