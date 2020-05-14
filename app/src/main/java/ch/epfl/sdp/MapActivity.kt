@@ -377,7 +377,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 || searchAreaBuilder.vertices.size<2 && currentStrategy is SpiralStrategy){
             waypointsSnackbar.show()
         }
-        else{
+        if(isTest||Drone.isConnected()) {
             if (!Drone.isFlying()) { //TODO : return to user else
                 val altitude = getUserPrefAltitude()
                 Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
@@ -385,6 +385,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)
                     .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
         }
+
     }
 
     fun storeMap(v: View) {
