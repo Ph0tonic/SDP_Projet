@@ -519,5 +519,7 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
         onView(withId(R.id.resize_button)).perform(click())
         assertThat(mActivityRule.activity.isFragmentBig, `is`(true))
+        onView(withId(R.id.resize_button)).perform(click())
+        assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
     }
 }
