@@ -22,6 +22,86 @@
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1">
     </com.mapbox.mapboxsdk.maps.MapView>
+  
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/floating_menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        app:fab_addButtonColorNormal="@color/colorPrimaryDark"
+        app:fab_addButtonColorPressed="@color/colorPrimary"
+        app:fab_addButtonPlusIconColor="@color/colorWhite"
+        app:fab_expandDirection="left"
+        tools:context="ch.epfl.sdp.MapActivity"
+        >
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/start_or_return_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startMissionOrReturnHome"
+            app:fab_colorNormal="@color/colorPrimary"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_start"
+            app:fab_size="mini" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/clear_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="clearWaypoints"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_clear"
+            app:fab_size="mini"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/locate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="centerCameraOnDrone"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_locate"
+            app:fab_size="mini"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/store_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="storeMap"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_store"
+            app:fab_size="mini"/>
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/strategy_picker_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="pickStrategy"
+        app:fab_colorNormal="@color/colorPrimary"
+        app:fab_colorPressed="@color/colorLightGray"
+        app:fab_icon="@drawable/ic_spiralstrat"
+        app:fab_size="normal"
+        app:layout_constraintBottom_toTopOf="@+id/floating_menu_button"
+        app:layout_constraintEnd_toEndOf="@+id/mapView" />
+
+    <fragment
+        android:id="@+id/vlc_fragment"
+        android:name="ch.epfl.sdp.ui.vlc.VlcFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/tiny_margin"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
     <TableLayout
         android:id="@+id/drone_status"
         android:layout_width="wrap_content"
@@ -112,88 +192,18 @@
                 android:text="@string/no_info"/>
         </TableRow>
     </TableLayout>
-    <LinearLayout
-        android:id="@+id/switch_button"
-        android:layout_width="@dimen/widget_width"
-        android:layout_height="@dimen/widget_height"
-        android:layout_margin="@dimen/tiny_margin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1">
-        <org.videolan.libvlc.util.VLCVideoLayout
-            android:id="@+id/video_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent">
-        </org.videolan.libvlc.util.VLCVideoLayout>
-    </LinearLayout>
 
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/floating_menu_button"
-        android:layout_width="629dp"
-        android:layout_height="319dp"
-        app:fab_addButtonColorNormal="@color/colorPrimaryDark"
-        app:fab_addButtonColorPressed="@color/colorPrimary"
-        app:fab_addButtonPlusIconColor="@color/colorWhite"
-        app:fab_expandDirection="left"
-        mapbox:layout_constraintBottom_toBottomOf="parent"
-        mapbox:layout_constraintEnd_toEndOf="parent"
-        tools:context="ch.epfl.sdp.MapActivity">
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/start_or_return_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="startMissionOrReturnHome"
-            app:fab_colorNormal="@color/colorPrimary"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_start"
-            app:fab_size="normal" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/clear_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="clearWaypoints"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_clear"
-            app:fab_size="normal" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/locate_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="centerCameraOnDrone"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_locate"
-            app:fab_size="normal" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/store_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="storeMap"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_store"
-            app:fab_size="normal" />
-    </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/strategy_picker_button"
+        android:id="@+id/resize_button"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintStart_toStartOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="pickStrategy"
-        app:fab_colorNormal="@color/colorPrimary"
+        android:onClick="resizeCameraFragment"
+        app:fab_colorNormal="@color/colorWhite"
         app:fab_colorPressed="@color/colorLightGray"
-        app:fab_icon="@drawable/ic_spiralstrat"
-        app:fab_size="normal"
-        app:layout_constraintBottom_toTopOf="@+id/floating_menu_button"
-        app:layout_constraintEnd_toEndOf="@+id/mapView" />
+        app:fab_icon="@drawable/ic_camera"
+        app:fab_size="mini" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
