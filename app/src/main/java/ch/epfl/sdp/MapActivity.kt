@@ -1,13 +1,9 @@
 package ch.epfl.sdp
 
 import android.content.Intent
-import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
-import android.util.TypedValue
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -319,10 +315,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val margin = 2*resources.getDimension(R.dimen.tiny_margin).toInt()
 
         //findViewById<Button>(R.id.switch_button).visibility = if(isFragmentBig) View.VISIBLE else View.GONE
-        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.width = (if (isFragmentBig) size.x else size.x/SCALE_FACTOR) - margin
-        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.height = (if (isFragmentBig) size.y else size.y/SCALE_FACTOR) - margin
-        findViewById<ConstraintLayout>(R.id.vlc_fragment).requestLayout()
-
+        val vlcFragment = findViewById<ConstraintLayout>(R.id.vlc_fragment)
+        vlcFragment.layoutParams.width =  (if (isFragmentBig) size.x else size.x/SCALE_FACTOR) - margin
+        vlcFragment.layoutParams.height = (if (isFragmentBig) size.y else size.y/SCALE_FACTOR) - margin
+        vlcFragment.requestLayout()
     }
 
     /**
