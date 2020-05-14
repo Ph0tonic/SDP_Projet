@@ -17,24 +17,24 @@ class SimpleQuadStrategyTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Test(expected = IllegalArgumentException::class)
-    fun simpleMultiPassOnQuadrangleDoesNotAcceptNegativeMaxDistance() {
+    fun doesNotAcceptNegativeMaxDistance() {
         SimpleQuadStrategy(-10.0)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun simpleMultiPassOnQuadrangleDoesNotAcceptZeroMaxDistance() {
+    fun doesNotAcceptZeroMaxDistance() {
         SimpleQuadStrategy(0.0)
     }
 
     @Test(expected = java.lang.IllegalArgumentException::class)
-    fun simpleMultiPassOnQuadrangleDoesNotAcceptIncompleteSearchArea() {
+    fun doesNotAcceptIncompleteSearchArea() {
         val searchArea = QuadrilateralArea(listOf(LatLng(0.0, 0.0)))
         SimpleQuadStrategy(10.0)
                 .createFlightPath(LatLng(0.0, 0.0), searchArea)
     }
 
     @Test
-    fun simpleMultiPassCreatesGoodNumberOfPointsForSmallArea() {
+    fun createsCorrectNumberOfPointsForSmallArea() {
         val searchArea = QuadrilateralArea(listOf(
                 LatLng(0.0, 0.0),
                 LatLng(1.0, 0.0),
