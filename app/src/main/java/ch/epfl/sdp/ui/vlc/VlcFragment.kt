@@ -24,7 +24,6 @@ class VlcFragment : Fragment() {
         private const val ASSET_FILENAME = "rtsp://192.168.1.131:8554/live" //must be your IP
         private val ARGS = arrayListOf("-vvv")//, "--live-caching=200")
     }
-    
 
     private lateinit var mVideoLayout: VLCVideoLayout
     private lateinit var mLibVLC: LibVLC
