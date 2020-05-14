@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import android.widget.ProgressBar
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -15,11 +14,9 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
-import ch.epfl.sdp.database.dao.FirebaseMarkerDaoTest
 import ch.epfl.sdp.map.MapUtils.getCameraWithParameters
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
+import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
+import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion

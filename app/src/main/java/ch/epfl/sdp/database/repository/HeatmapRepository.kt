@@ -6,7 +6,7 @@ import ch.epfl.sdp.database.dao.FirebaseHeatmapDao
 import ch.epfl.sdp.database.dao.HeatmapDao
 import ch.epfl.sdp.database.data.HeatmapData
 
-class HeatmapRepository {
+class HeatmapRepository : IHeatmapRepository {
 
     companion object {
         val DEFAULT_DAO = { FirebaseHeatmapDao() }
@@ -17,15 +17,15 @@ class HeatmapRepository {
 
     private val dao: HeatmapDao = daoProvider()
 
-    fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
+    override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
         dao.updateHeatmap(groupId, heatmapData)
     }
 
-    fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
+    override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
         return dao.getHeatmapsOfSearchGroup(groupId)
     }
 
-    fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
+    override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
         dao.removeAllHeatmapsOfSearchGroup(searchGroupId)
     }
 }

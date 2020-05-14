@@ -4,17 +4,17 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
-import ch.epfl.sdp.database.repository.HeatmapRepository
-import ch.epfl.sdp.database.repository.MarkerRepository
-import ch.epfl.sdp.database.repository.SearchGroupRepository
-import ch.epfl.sdp.database.repository.UserRepository
+import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
+import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
+import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
+import ch.epfl.sdp.database.providers.UserRepositoryProvider
 
-class SearchGroupManager {
+class SearchGroupDataManager {
 
-    private val searchGroupRepository = SearchGroupRepository()
-    private val userRepository = UserRepository()
-    private val markerRepository = MarkerRepository()
-    private val heatmapRepository = HeatmapRepository()
+    private val searchGroupRepository = SearchGroupRepositoryProvider.provide()
+    private val userRepository = UserRepositoryProvider.provide()
+    private val markerRepository = MarkerRepositoryProvider.provide()
+    private val heatmapRepository = HeatmapRepositoryProvider.provide()
 
     fun deleteSearchGroup(searchGroupId: String) {
         searchGroupRepository.removeSearchGroup(searchGroupId)

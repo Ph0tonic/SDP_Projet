@@ -4,12 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseMarkersDao
 import ch.epfl.sdp.database.dao.MarkerDao
 import ch.epfl.sdp.database.data.MarkerData
+import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.repository.MarkerRepository
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-class MarkerManager {
+class MarkerDataManager {
 
-    val markerRepository = MarkerRepository()
+    val markerRepository = MarkerRepositoryProvider.provide()
 
     fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
         return markerRepository.getMarkersOfSearchGroup(groupId)

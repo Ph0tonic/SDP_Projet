@@ -23,11 +23,11 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
-import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.data.HeatmapPointData
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
@@ -35,7 +35,7 @@ import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.maps.MapActivity
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -44,7 +44,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-
 
 @RunWith(AndroidJUnit4::class)
 class MapActivityTest {
@@ -160,12 +159,12 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
+        assertThat(mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
 
         runOnUiThread {
             mActivityRule.activity.addPointToHeatMap(FAKE_LOCATION_TEST, FAKE_HEATMAP_POINT_INTENSITY)
         }
-        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        val heatmaps = mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
 
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
@@ -188,9 +187,9 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(1))
+        assertThat(mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(1))
 
-        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        val heatmaps = mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
 
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))

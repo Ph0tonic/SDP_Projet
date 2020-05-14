@@ -6,13 +6,14 @@ import ch.epfl.sdp.database.dao.FirebaseHeatmapDao
 import ch.epfl.sdp.database.dao.HeatmapDao
 import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.data.HeatmapPointData
+import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
 
-class HeatmapManager {
+class HeatmapDataManager {
 
-    val heatmapRepository = HeatmapRepository()
+    val heatmapRepository = HeatmapRepositoryProvider.provide()
 
     fun addMeasureToHeatmap(groupId: String, heatmapId: String, location: LatLng, intensity: Double) {
         val heatmaps = heatmapRepository.getGroupHeatmaps(groupId).value

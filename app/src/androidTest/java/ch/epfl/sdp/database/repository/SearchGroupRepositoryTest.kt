@@ -39,6 +39,10 @@ class SearchGroupRepositoryTest {
             override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
                 return MutableLiveData()
             }
+
+            override fun createGroup(searchGroupData: SearchGroupData) {}
+            override fun updateGroup(searchGroupData: SearchGroupData) {}
+            override fun removeSearchGroup(searchGroupId: String) {}
         }
         SearchGroupRepository.daoProvider = { dao }
 
@@ -61,10 +65,19 @@ class SearchGroupRepositoryTest {
                 wasCalled = true
                 return expectedData
             }
+
+            override fun createGroup(searchGroupData: SearchGroupData) {}
+            override fun updateGroup(searchGroupData: SearchGroupData) {}
+            override fun removeSearchGroup(searchGroupId: String) {}
         }
         SearchGroupRepository.daoProvider = { dao }
 
         assertThat(SearchGroupRepository().getGroupById(DUMMY_GROUP_ID), equalTo(expectedData))
         assertThat(wasCalled, equalTo(true))
     }
+
+    //TODO TEST :
+    //    override fun createGroup(searchGroupData: SearchGroupData) {}
+    //    override fun updateGroup(searchGroupData: SearchGroupData) {}
+    //    override fun removeSearchGroup(searchGroupId: String) {}
 }

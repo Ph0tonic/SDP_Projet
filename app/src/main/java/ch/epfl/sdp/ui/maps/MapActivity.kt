@@ -8,8 +8,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
-import ch.epfl.sdp.database.data_manager.HeatmapManager
-import ch.epfl.sdp.database.data_manager.MarkerManager
+import ch.epfl.sdp.database.data_manager.HeatmapDataManager
+import ch.epfl.sdp.database.data_manager.MarkerDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
@@ -78,10 +78,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     /* Repositories */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val heatmapManager = HeatmapManager()
+    val heatmapManager = HeatmapDataManager()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val markerManager = MarkerManager()
+    val markerManager = MarkerDataManager()
 
     /* Painters */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

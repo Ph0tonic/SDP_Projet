@@ -13,7 +13,7 @@ import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
-import ch.epfl.sdp.database.data_manager.SearchGroupManager
+import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 
 class SearchGroupEditionActivity : AppCompatActivity() {
@@ -36,7 +36,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
     private var groupId: String? = null
     private var createGroup = true
 
-    private val searchGroupManager = SearchGroupManager()
+    private val searchGroupManager = SearchGroupDataManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

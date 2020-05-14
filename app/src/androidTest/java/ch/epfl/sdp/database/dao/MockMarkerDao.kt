@@ -33,4 +33,9 @@ class MockMarkerDao : MarkerDao {
         }
         data[groupId]!!.value = data[groupId]!!.value!!.filter { it.uuid != markerId }.toSet()
     }
+
+    override fun removeAllMarkersOfSearchGroup(groupId: String) {
+        data[groupId]?.value = setOf()
+        data.remove(groupId)
+    }
 }

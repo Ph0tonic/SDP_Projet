@@ -25,10 +25,12 @@ class MarkerRepositoryTest {
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
                 return expectedData
             }
+
             override fun addMarker(groupId: String, markerData: MarkerData) {}
             override fun removeMarker(groupId: String, markerId: String) {}
+            override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
         }
-        MarkerRepository.daoProvider = {dao}
+        MarkerRepository.daoProvider = { dao }
 
         val repo = MarkerRepository()
 
@@ -42,14 +44,17 @@ class MarkerRepositoryTest {
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
                 return MutableLiveData()
             }
+
             override fun addMarker(groupId: String, markerData: MarkerData) {
                 wasCalled = true
             }
-            override fun removeMarker(groupId: String, markerId: String) {}
-        }
-        MarkerRepository.daoProvider = {dao}
 
-        MarkerRepository().addMarkerForSearchGroup("DummyGroupId", LatLng(0.0, 0.0))
+            override fun removeMarker(groupId: String, markerId: String) {}
+            override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
+        }
+        MarkerRepository.daoProvider = { dao }
+
+        MarkerRepository().addMarkerForSearchGroup("DummyGroupId", MarkerData(LatLng(0.0, 0.0)))
         assertThat(wasCalled, equalTo(true))
     }
 
@@ -60,14 +65,21 @@ class MarkerRepositoryTest {
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
                 return MutableLiveData()
             }
+
             override fun addMarker(groupId: String, markerData: MarkerData) {}
             override fun removeMarker(groupId: String, markerId: String) {
                 wasCalled = true
             }
-        }
-        MarkerRepository.daoProvider = {dao}
 
-        MarkerRepository().removeMarkerForSearchGroup("DummyGroupId","DummyMarkerId")
+            override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
+        }
+        MarkerRepository.daoProvider = { dao }
+
+        MarkerRepository().removeMarkerForSearchGroup("DummyGroupId", "DummyMarkerId")
         assertThat(wasCalled, equalTo(true))
     }
+
+    //TODO TEST:
+    // override fun removeMarker(groupId: String, markerId: String) {}
+    // override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
 }

@@ -28,4 +28,9 @@ class MockHeatmapDao : HeatmapDao {
             data[groupId]!!.value!![heatmapData.uuid!!]!!.value = heatmapData
         }
     }
+
+    override fun removeAllHeatmapsOfSearchGroup(groupId: String) {
+        data[groupId]?.value = mutableMapOf()
+        data.remove(groupId)
+    }
 }

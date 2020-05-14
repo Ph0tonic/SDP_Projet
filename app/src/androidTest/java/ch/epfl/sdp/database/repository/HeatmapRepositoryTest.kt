@@ -36,6 +36,8 @@ class HeatmapRepositoryTest {
 
         val dao = object : HeatmapDao {
             override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
+            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
+
             override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
                 return expectedData
             }
@@ -46,41 +48,7 @@ class HeatmapRepositoryTest {
         assertThat(repo.getGroupHeatmaps(DUMMY_GROUP_ID), equalTo(expectedData))
     }
 
-    @Test
-    fun addMeasureToHeatmapForNewHeatmapCreateNewHeatmap() {
-        val dao = MockHeatmapDao()
-        HeatmapRepository.daoProvider = { dao }
-        val repo = HeatmapRepository()
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_1, DUMMY_INTENSITY_1)
+    //TODO Test
+    // updateHeatmap
 
-        assertThat(dao.data[DUMMY_GROUP_ID]!!.value!!.containsKey(DUMMY_HEATMAP_ID), equalTo(true))
-    }
-
-    @Test
-    fun addMeasureToHeatmapForNewHeatmapCreateValidHeatmapData() {
-        val dao = MockHeatmapDao()
-        HeatmapRepository.daoProvider = { dao }
-        val repo = HeatmapRepository()
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_1, DUMMY_INTENSITY_1)
-
-        val expectedHeatmapData = HeatmapData(mutableListOf(HeatmapPointData(DUMMY_LOCATION_1, DUMMY_INTENSITY_1)), DUMMY_HEATMAP_ID)
-        val heatmapData = dao.data[DUMMY_GROUP_ID]!!.value!![DUMMY_HEATMAP_ID]!!.value
-        assertThat(heatmapData, equalTo(expectedHeatmapData))
-    }
-
-    @Test
-    fun addMeasureToHeatmapForExistingHeatmapUpdateExistingHeatmap() {
-        val dao = MockHeatmapDao()
-        HeatmapRepository.daoProvider = { dao }
-        val repo = HeatmapRepository()
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_1, DUMMY_INTENSITY_1)
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_2, DUMMY_INTENSITY_2)
-
-        val expectedHeatmapData = HeatmapData(mutableListOf(
-                HeatmapPointData(DUMMY_LOCATION_1, DUMMY_INTENSITY_1),
-                HeatmapPointData(DUMMY_LOCATION_2, DUMMY_INTENSITY_2)
-        ), DUMMY_HEATMAP_ID)
-        val heatmapData = dao.data[DUMMY_GROUP_ID]!!.value!![DUMMY_HEATMAP_ID]!!.value
-        assertThat(heatmapData, equalTo(expectedHeatmapData))
-    }
 }

@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.data_manager.SearchGroupManager
+import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 
 class SearchGroupSelectionActivity : AppCompatActivity() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private val searchGroupManager = SearchGroupManager()
+    private val searchGroupManager = SearchGroupDataManager()
 
     companion object {
         const val SEARH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
