@@ -12,6 +12,11 @@ import com.google.firebase.ktx.Firebase
 import timber.log.Timber
 
 class FirebaseUserDao : UserDao {
+
+    companion object {
+        private const val ROOT_PATH = "users"
+    }
+
     private var database: FirebaseDatabase = Firebase.database
 
     private val groupOperators: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
@@ -22,7 +27,7 @@ class FirebaseUserDao : UserDao {
 
         if (!mapData.containsKey(groupId)) {
             //Initialise data
-            val myRef = database.getReference("users/$groupId")
+            val myRef = database.getReference("$ROOT_PATH/$groupId")
             mapData[groupId] = MutableLiveData(setOf())
 
             myRef.addChildEventListener(object : ChildEventListener {
@@ -54,10 +59,10 @@ class FirebaseUserDao : UserDao {
     }
 
     override fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
-        database.getReference("users/$searchGroupId/$userId").removeValue()
+        database.getReference("$ROOT_PATH/$searchGroupId/$userId").removeValue()
     }
 
     override fun removeAllUserOfSearchGroup(searchGroupId: String) {
-        database.getReference("users/${searchGroupId}").removeValue()
+        database.getReference("$ROOT_PATH/${searchGroupId}").removeValue()
     }
 }

@@ -1,6 +1,5 @@
 package ch.epfl.sdp.database.dao
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.HeatmapData
@@ -14,23 +13,27 @@ import timber.log.Timber
 
 class FirebaseHeatmapDao : HeatmapDao {
 
+    companion object {
+        private const val ROOT_PATH = "heatmaps"
+    }
+
     private var database: FirebaseDatabase = Firebase.database
 
     // group_id / user_id / heatmap_data
     val groupHeatmaps: MutableMap<String, MutableLiveData<MutableMap<String, MutableLiveData<HeatmapData>>>> = mutableMapOf()
 
     override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
-        database.getReference("heatmaps/$groupId/${heatmapData.uuid}")
+        database.getReference("$ROOT_PATH/$groupId/${heatmapData.uuid}")
                 .setValue(heatmapData)
     }
 
     override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
-        database.getReference("heatmaps/${searchGroupId}").removeValue()
+        database.getReference("$ROOT_PATH/${searchGroupId}").removeValue()
     }
 
     override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
         if (!groupHeatmaps.containsKey(groupId)) {
-            val myRef = database.getReference("heatmaps/$groupId")
+            val myRef = database.getReference("$ROOT_PATH/$groupId")
             groupHeatmaps[groupId] = MutableLiveData(mutableMapOf())
 
             myRef.addChildEventListener(object : ChildEventListener {

@@ -10,13 +10,18 @@ import com.google.firebase.ktx.Firebase
 import timber.log.Timber
 
 class FirebaseGroupDao : SearchGroupDao {
+
+    companion object {
+        private const val ROOT_PATH = "search_groups"
+    }
+
     private var database: FirebaseDatabase = Firebase.database
 
     private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(mutableListOf())
     private val watchedGroupsById: MutableMap<String, MutableLiveData<SearchGroupData>> = mutableMapOf()
 
     override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
-        val myRef = database.getReference("search_groups")
+        val myRef = database.getReference(ROOT_PATH)
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 groups.value = (dataSnapshot.children.map { c ->
@@ -38,7 +43,7 @@ class FirebaseGroupDao : SearchGroupDao {
 
     override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
         if (!watchedGroupsById.containsKey(groupId)) {
-            val myRef = database.getReference("search_groups/$groupId")
+            val myRef = database.getReference("$ROOT_PATH/$groupId")
             watchedGroupsById[groupId] = MutableLiveData()
             //TODO change to childEventListener ?
             myRef.addValueEventListener(object : ValueEventListener {
@@ -61,14 +66,14 @@ class FirebaseGroupDao : SearchGroupDao {
      * The uuid of the searchgroup data will be overridden by an automatically generated one.
      */
     override fun createGroup(searchGroupData: SearchGroupData) {
-        database.getReference("search_groups").push().setValue(searchGroupData)
+        database.getReference(ROOT_PATH).push().setValue(searchGroupData)
     }
 
     override fun updateGroup(searchGroupData: SearchGroupData) {
-        database.getReference("search_groups/${searchGroupData.uuid}").setValue(searchGroupData)
+        database.getReference("$ROOT_PATH/${searchGroupData.uuid}").setValue(searchGroupData)
     }
 
     override fun removeSearchGroup(searchGroupId: String) {
-        database.getReference("search_groups/${searchGroupId}").removeValue()
+        database.getReference("$ROOT_PATH/${searchGroupId}").removeValue()
     }
 }
