@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseMarkersDao
 import ch.epfl.sdp.database.dao.MarkerDao
 import ch.epfl.sdp.database.data.MarkerData
-import com.mapbox.mapboxsdk.geometry.LatLng
 
 class MarkerRepository {
 
@@ -21,8 +20,8 @@ class MarkerRepository {
         return dao.getMarkersOfSearchGroup(groupId)
     }
 
-    fun addMarkerForSearchGroup(groupId: String, position: LatLng) {
-        dao.addMarker(groupId, MarkerData(position))
+    fun addMarkerForSearchGroup(groupId: String, marker: MarkerData) {
+        dao.addMarker(groupId, marker)
     }
 
     fun removeMarkerForSearchGroup(groupId: String, markerId: String) {

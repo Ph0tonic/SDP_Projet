@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.data_manager
 
+import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
