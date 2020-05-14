@@ -3,11 +3,12 @@ package ch.epfl.sdp.database.dao
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.data.UserData
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import timber.log.Timber
 
 class FirebaseGroupDao : SearchGroupDao {
 
@@ -35,7 +36,7 @@ class FirebaseGroupDao : SearchGroupDao {
 
             override fun onCancelled(error: DatabaseError) {
                 // Failed to read value
-                Timber.w("Failed to read value.")
+                Log.w("Firebase", "Failed to read value.")
             }
         })
         return groups
@@ -54,7 +55,7 @@ class FirebaseGroupDao : SearchGroupDao {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Timber.w("Failed to read group from firebase.")
+                    Log.w("Firebase", "Failed to read group from firebase.")
                 }
             })
         }

@@ -8,8 +8,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
-import ch.epfl.sdp.database.repository.HeatmapRepository
-import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.database.data_manager.HeatmapManager
+import ch.epfl.sdp.database.data_manager.MarkerManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
@@ -78,10 +78,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     /* Repositories */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val heatmapRepository = HeatmapRepository()
+    val heatmapManager = HeatmapManager()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val markerRepository = MarkerRepository()
+    val markerManager = MarkerManager()
 
     /* Painters */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -261,7 +261,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         victimSymbolManager.addLongClickListener {
             val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
-            markerRepository.removeMarkerForSearchGroup(groupId, markerId)
+            markerManager.removeMarkerForSearchGroup(groupId, markerId)
             victimSymbolLongClickConsumed = true
         }
 
@@ -279,7 +279,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun setupMarkerObserver() {
-        markerRepository.getMarkersOfSearchGroup(groupId).observe(this, Observer { markers ->
+        markerManager.getMarkersOfSearchGroup(groupId).observe(this, Observer { markers ->
             val removedMarkers = victimMarkers.keys - markers.map { it.uuid }
             removedMarkers.forEach {
                 victimSymbolManager.delete(victimMarkers.remove(it))
@@ -297,7 +297,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     private fun setupHeatmapsObservers(style: Style) {
         val upperLayerId = victimSymbolManager.layerId
-        heatmapRepository.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
+        heatmapManager.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
             // Observers for heatmap creation
             repoHeatmaps.filter { !heatmapPainters.containsKey(it.key) }
                     .forEach { (key, value) ->
@@ -333,7 +333,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun onMapLongClicked(position: LatLng) {
         if (!victimSymbolLongClickConsumed) {
-            markerRepository.addMarkerForSearchGroup(groupId, position)
+            markerManager.addMarkerForSearchGroup(groupId, position)
         }
         victimSymbolLongClickConsumed = false
     }
@@ -343,7 +343,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapRepository.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
+            heatmapManager.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
         }
     }
 

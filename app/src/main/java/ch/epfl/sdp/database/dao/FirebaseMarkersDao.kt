@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.dao
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.MarkerData
 import com.google.firebase.database.ChildEventListener
@@ -8,7 +9,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import timber.log.Timber
 
 class FirebaseMarkersDao : MarkerDao {
 
@@ -28,7 +28,7 @@ class FirebaseMarkersDao : MarkerDao {
 
             myRef.addChildEventListener(object : ChildEventListener {
                 override fun onCancelled(p0: DatabaseError) {
-                    Timber.w("Failed to read value.")
+                    Log.w("Firebase", "Failed to read value.")
                 }
 
                 override fun onChildMoved(p0: DataSnapshot, p1: String?) {}

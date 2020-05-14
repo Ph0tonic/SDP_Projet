@@ -1,5 +1,7 @@
 package ch.epfl.sdp.database.data_manager
 
+import androidx.lifecycle.MutableLiveData
+import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
@@ -21,6 +23,33 @@ class SearchGroupManager {
     }
 
     fun createSearchGroup(name: String): String {
-        TODO("Not implemented yet")
+        val groupId = searchGroupRepository.createGroup(SearchGroupData(null, name))
+        TODO("Not implemented yet need to add new user to search group")
+//        return groupId
+    }
+
+    fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
+        return searchGroupRepository.getGroups()
+    }
+
+    fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
+        return searchGroupRepository.getGroupById(groupId)
+    }
+
+    fun editGroup(searchGroupData: SearchGroupData) {
+        return searchGroupRepository.updateGroup(searchGroupData)
+    }
+
+    fun getOperatorsOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
+        return userRepository.getOperatorsOfSearchGroup(searchGroupId)
+    }
+
+    fun getRescuersOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
+        return userRepository.getRescuersOfSearchGroup(searchGroupId)
+    }
+
+    fun removeUserOfSearchGroup(searchGroupId: String, userId: String) {
+        //TODO check rights
+        userRepository.removeUserFromSearchGroup(searchGroupId, userId)
     }
 }

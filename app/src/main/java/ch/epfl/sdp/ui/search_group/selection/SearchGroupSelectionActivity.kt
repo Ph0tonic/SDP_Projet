@@ -10,13 +10,14 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.data_manager.SearchGroupManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 
 class SearchGroupSelectionActivity : AppCompatActivity() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private val searchGroupManager = SearchGroupManager()
 
     companion object {
         const val SEARH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
@@ -33,7 +34,7 @@ class SearchGroupSelectionActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
         recyclerView.layoutManager = linearLayoutManager
 
-        SearchGroupRepository().getGroups().observe(this, Observer {
+        searchGroupManager.getAllGroups().observe(this, Observer {
             recyclerView.adapter = SearchGroupRecyclerAdapter(it,
                     object : OnItemClickListener<SearchGroupData> {
                         override fun onItemClicked(searchGroupData: SearchGroupData) {

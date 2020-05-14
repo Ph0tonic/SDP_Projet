@@ -13,8 +13,6 @@ import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.data_manager.SearchGroupManager
-import ch.epfl.sdp.database.repository.SearchGroupRepository
-import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 
 class SearchGroupEditionActivity : AppCompatActivity() {
@@ -22,10 +20,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
     private var groupId: String? = null
     private var createGroup = true
 
-    //TODO: Remove repo and user DataManager
     private val searchGroupManager = SearchGroupManager()
-    private val groupRepo = SearchGroupRepository()
-    private val userRepo = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +32,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
         if (!createGroup) {
             findViewById<Button>(R.id.search_group_edition_create_or_save_button).text = getString(R.string.save_group_changes)
-            groupRepo.getGroupById(groupId!!).observe(this, Observer {
+            searchGroupManager.getGroupById(groupId!!).observe(this, Observer {
                 if (it != null) {
                     findViewById<TextView>(R.id.group_editor_group_name).text = it.name
                 }
@@ -51,14 +46,14 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
             val userRemovedListener = object : OnItemClickListener<UserData> {
                 override fun onItemClicked(user: UserData) {
-                    userRepo.removeUserFromSearchGroup(groupId!!, user.googleId!!)
+                    searchGroupManager.removeUserOfSearchGroup(groupId!!, user.googleId!!)
                 }
             }
-            userRepo.getOperatorsOfSearchGroup(groupId!!).observe(this, Observer {
+            searchGroupManager.getOperatorsOfSearchGroup(groupId!!).observe(this, Observer {
                 operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
             })
 
-            userRepo.getRescuersOfSearchGroup(groupId!!).observe(this, Observer {
+            searchGroupManager.getRescuersOfSearchGroup(groupId!!).observe(this, Observer {
                 rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
             })
         }
@@ -76,7 +71,6 @@ class SearchGroupEditionActivity : AppCompatActivity() {
     }
 
     fun onGroupEditSaved(view: View) {
-        val searchGroupRepo = SearchGroupRepository()
         val searchGroupData = SearchGroupData()
         //TODO also put other data
         searchGroupData.name = findViewById<TextView>(R.id.group_editor_group_name).text.toString()
@@ -86,10 +80,10 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         }
 
         if (createGroup) {
-            groupRepo.createGroup(searchGroupData)
+            searchGroupManager.createSearchGroup(searchGroupData.name)
         } else {
             searchGroupData.uuid = groupId
-            groupRepo.updateGroup(searchGroupData)
+            searchGroupManager.editGroup(searchGroupData)
         }
         finish()
     }

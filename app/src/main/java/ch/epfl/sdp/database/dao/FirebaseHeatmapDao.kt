@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.dao
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.HeatmapData
@@ -9,7 +10,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import timber.log.Timber
 
 class FirebaseHeatmapDao : HeatmapDao {
 
@@ -38,7 +38,7 @@ class FirebaseHeatmapDao : HeatmapDao {
 
             myRef.addChildEventListener(object : ChildEventListener {
                 override fun onCancelled(error: DatabaseError) {
-                    Timber.w("Failed to read heatmaps of search group from firebase.")
+                    Log.w("Firebase", "Failed to read heatmaps of search group from firebase.")
                 }
 
                 override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {}
