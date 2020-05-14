@@ -8,6 +8,10 @@ import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
 import ch.epfl.sdp.database.providers.UserRepositoryProvider
+import ch.epfl.sdp.database.repository.EmptyMockHeatmapRepo
+import ch.epfl.sdp.database.repository.EmptyMockMarkerRepo
+import ch.epfl.sdp.database.repository.EmptyMockSearchGroupRepo
+import ch.epfl.sdp.database.repository.EmptyMockUserRepo
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before

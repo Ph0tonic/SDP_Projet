@@ -1,4 +1,4 @@
-package ch.epfl.sdp.database.data_manager
+package ch.epfl.sdp.database.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -1,11 +1,10 @@
-package ch.epfl.sdp.database.data_manager
+package ch.epfl.sdp.database.dao
 
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.repository.ISearchGroupRepository
 
-open class EmptyMockSearchGroupRepo : ISearchGroupRepository {
-    override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
+class EmptyMockGroupDao : SearchGroupDao {
+    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
         return MutableLiveData()
     }
 

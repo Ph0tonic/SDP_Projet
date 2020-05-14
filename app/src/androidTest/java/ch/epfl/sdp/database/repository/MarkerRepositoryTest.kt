@@ -11,9 +11,17 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class MarkerRepositoryTest {
+
+    companion object{
+        private const val ASYNC_CALL_TIMEOUT = 5L
+        private const val DUMMY_GROUP_ID = "Dummy_group_id"
+        private const val DUMMY_MARKER_ID = "Dummy_marker_id"
+    }
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -59,8 +67,15 @@ class MarkerRepositoryTest {
     }
 
     @Test
-    fun removeMarkerCallsRemoveMarkerFromDao() {
-        var wasCalled = false
+    fun removeMarkerCallsRemoveMarkerFromDaoWithCorrectGroupId() {
+        val called = CountDownLatch(1)
+
+        val expectedGroupId = DUMMY_GROUP_ID
+        val expectedMarkerId = DUMMY_MARKER_ID
+
+        lateinit var actualGroupId: String
+        lateinit var actualMarkerId: String
+
         val dao = object : MarkerDao {
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
                 return MutableLiveData()
@@ -68,15 +83,18 @@ class MarkerRepositoryTest {
 
             override fun addMarker(groupId: String, markerData: MarkerData) {}
             override fun removeMarker(groupId: String, markerId: String) {
-                wasCalled = true
+                called.countDown()
+                actualGroupId = groupId
             }
 
             override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
         }
         MarkerRepository.daoProvider = { dao }
 
-        MarkerRepository().removeMarkerOfSearchGroup("DummyGroupId", "DummyMarkerId")
-        assertThat(wasCalled, equalTo(true))
+        MarkerRepository().removeMarkerOfSearchGroup(DUMMY_GROUP_ID, DUMMY_MARKER_ID)
+
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     //TODO TEST:
