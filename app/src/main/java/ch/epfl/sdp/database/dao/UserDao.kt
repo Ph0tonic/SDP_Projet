@@ -9,4 +9,5 @@ interface UserDao {
     fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>>
     fun removeUserFromSearchGroup(searchGroupId: String, userId: String)
     fun removeAllUserOfSearchGroup(searchGroupId: String)
+    fun addUserToSearchGroup(searchGroupId: String, user: UserData)
 }

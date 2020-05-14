@@ -55,7 +55,7 @@ class SearchGroupManager {
     }
 
     fun addUserToSearchgroup(searchGroupId: String, email: String, role: Role) {
-        val user = UserData(email, )
+        val user = UserData(email)
         user.role = role
         userRepository.addUserToSearchGroup(searchGroupId, user)
     }

@@ -7,7 +7,7 @@ import com.google.firebase.database.PropertyName
 data class UserData(
         var email: String = "",
         @get:Exclude
-        var googleId: String? = null,
+        var uuid: String? = null,
         @get:Exclude
         @set:Exclude
         var role: Role = Role.RESCUER) {
