@@ -40,11 +40,11 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
         val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
         Collections.rotate(waypointsCopied, -startingIndex)
 
-        val maxDistX = max(                                 // 0-1
+        val maxDistX = max(                                         // 0-1
                 waypointsCopied[0].distanceTo(waypointsCopied[1]),  //
                 waypointsCopied[3].distanceTo(waypointsCopied[2]))  // 3-2
 
-        val maxDistY = max(                                 // 0 1
+        val maxDistY = max(                                         // 0 1
                 waypointsCopied[0].distanceTo(waypointsCopied[3]),  // | |
                 waypointsCopied[1].distanceTo(waypointsCopied[2]))  // 3 2
 

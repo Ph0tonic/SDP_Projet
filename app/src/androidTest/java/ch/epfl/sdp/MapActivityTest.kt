@@ -301,10 +301,10 @@ class MapActivityTest {
         // Add 5 points
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(1.0, 1.0))
-            mActivityRule.activity.onMapClicked(LatLng(2.0, 2.0))
-            mActivityRule.activity.onMapClicked(LatLng(3.0, 3.0))
-            mActivityRule.activity.onMapClicked(LatLng(4.0, 4.0))
+            mActivityRule.activity.onMapClicked(LatLng(0.00001, 0.00001))
+            mActivityRule.activity.onMapClicked(LatLng(0.00002, 0.00002))
+            mActivityRule.activity.onMapClicked(LatLng(0.00003, 0.00003))
+            mActivityRule.activity.onMapClicked(LatLng(0.00004, 0.00004))
         }
 
         onView(withText("Already enough points"))
