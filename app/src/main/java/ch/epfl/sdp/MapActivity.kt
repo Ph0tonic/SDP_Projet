@@ -81,9 +81,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markerRepository = MarkerRepository()
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var isTest: Boolean = false
-
     /* Painters */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
@@ -365,21 +362,27 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun startMissionOrReturnHome(v: View) {
-        if (!Drone.isConnected() && !isTest) {
+        if (!Drone.isConnected()) {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
-        } else if (searchAreaBuilder.vertices.size < 4 && currentStrategy is SimpleMultiPassOnQuadrilateral
-                || searchAreaBuilder.vertices.size < 2 && currentStrategy is SpiralStrategy) {
+        } else if (!searchAreaBuilder.isComplete()) {
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
         }
-        if (isTest || Drone.isConnected()) {
-            if (!Drone.isFlying()) { //TODO : return to user else
-                val altitude = getUserPrefAltitude()
-                Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
-            }
-            findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                    .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
+        if (Drone.isConnected()) {
+            launchMission()
         }
     }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun launchMission() {
+        if (!Drone.isFlying()) { //TODO : return to user else
+            val altitude = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString(this.getString(R.string.prefs_drone_altitude), "").toString().toFloat()
+            Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        }
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
+    }
+
 
     fun storeMap(v: View) {
         startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
@@ -429,11 +432,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    private fun getUserPrefAltitude(): Float {
-        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
-        return defaultSharedPrefs.getString(this.getString(R.string.prefs_drone_altitude), "").toString().toFloat()
     }
 
     private fun loadStrategyPreference(): OverflightStrategy {

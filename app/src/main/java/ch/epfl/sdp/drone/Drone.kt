@@ -7,6 +7,7 @@ import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
+import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.math.pow
@@ -19,6 +20,7 @@ object Drone {
 
     // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
+    const val DEFAULT_ALTITUDE: Float = 20.0F
 
     private const val WAIT_TIME: Long = 200
 
@@ -30,7 +32,7 @@ object Drone {
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
 
     lateinit var getSignalStrength: () -> Double
-    
+
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
         currentPositionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
@@ -39,13 +41,13 @@ object Drone {
     private val instance: System
 
     init {
-        if (USE_REMOTE_BACKEND) {
-            instance = System(REMOTE_BACKEND_IP_ADDRESS, REMOTE_BACKEND_PORT)
+        instance = if (USE_REMOTE_BACKEND) {
+            System(REMOTE_BACKEND_IP_ADDRESS, REMOTE_BACKEND_PORT)
         } else {
             // Works for armeabi-v7a and arm64-v8a (not x86 or x86_64)
             val mavsdkServer = MavsdkServer()
             val mavsdkServerPort = mavsdkServer.run()
-            instance = System("localhost", mavsdkServerPort)
+            System("localhost", mavsdkServerPort)
         }
 
         disposables.add(instance.telemetry.flightMode.distinct()
@@ -76,7 +78,7 @@ object Drone {
                 ))
         disposables.add(instance.telemetry.positionVelocityNed
                 .subscribe(
-                        { vector_speed -> currentSpeedLiveData.postValue(sqrt(vector_speed.velocity.eastMS.pow(2) + vector_speed.velocity.northMS.pow(2)))},
+                        { vector_speed -> currentSpeedLiveData.postValue(sqrt(vector_speed.velocity.eastMS.pow(2) + vector_speed.velocity.northMS.pow(2))) },
                         { error -> Timber.e("Error GroundSpeedNed : $error") }))
     }
 
@@ -102,13 +104,16 @@ object Drone {
                     .firstOrError()
                     .toFuture()
                     .get(WAIT_TIME, TimeUnit.MILLISECONDS).isConnected
-
         } catch (e: TimeoutException) {
             false
         }
     }
 
     fun isFlying(): Boolean {
-        return instance.mission.isMissionFinished.blockingGet()
+        return try {
+            !instance.mission.isMissionFinished.blockingGet()
+        } catch (e: RuntimeException) {
+            false
+        }
     }
 }

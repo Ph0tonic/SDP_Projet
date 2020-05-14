@@ -100,7 +100,6 @@ class MapActivityTest {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-        mActivityRule.activity.isTest = true
 
         val expectedLatLng = LatLng(47.397026, 8.543067)
 
@@ -123,6 +122,9 @@ class MapActivityTest {
 
         // Then start mission officially
         onView(withId(R.id.start_or_return_button)).perform(click())
+        runOnUiThread {
+            mActivityRule.activity.launchMission()
+        }
 
         val uploadedMission = Drone.currentMissionLiveData.value
 
@@ -130,8 +132,6 @@ class MapActivityTest {
         assertThat(uploadedMission!!.size, not(equalTo(0)))
         assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
         assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
-        mActivityRule.activity.isTest = false
-
     }
 
     @Test
