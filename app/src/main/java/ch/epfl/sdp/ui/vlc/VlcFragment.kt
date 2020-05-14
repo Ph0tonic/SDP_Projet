@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ch.epfl.sdp.R
@@ -47,7 +48,9 @@ class VlcFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         vlcViewModel = ViewModelProvider(this).get(VlcViewModel::class.java)
-        return inflater.inflate(R.layout.fragment_vlc, container, false)
+        val root = inflater.inflate(R.layout.fragment_vlc, container, false)
+        root.findViewById<Button>(R.id.switch_button).setOnClickListener { v -> switchVideo(v) }
+        return root
     }
 
     override fun onStart() {
@@ -55,7 +58,7 @@ class VlcFragment : Fragment() {
         mMediaPlayer.attachViews(mVideoLayout, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
     }
 
-    fun switchVideo(view: View) {
+    fun switchVideo(v: View) {
         started = if (started) stopVideo()
         else startVideo()
     }

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -55,7 +56,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private var isMapReady = false
     private var isDroneFlying = false
-    private var isFragmentBig = true
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var isFragmentBig = true
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var droneCircleManager: CircleManager
@@ -312,17 +314,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     fun resizeFragment(v : View){
         isFragmentBig = !isFragmentBig
 
-        val display = windowManager.defaultDisplay
         val size = android.graphics.Point()
-        display.getSize(size)
+        windowManager.defaultDisplay.getSize(size)
         val margin = 2*resources.getDimension(R.dimen.tiny_margin).toInt()
-        val width: Int = (if (isFragmentBig) size.x else size.x/SCALE_FACTOR) - margin
-        val height: Int = (if (isFragmentBig) size.y else size.y/SCALE_FACTOR) - margin
 
-        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.width = width
-        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.height = height
-
+        //findViewById<Button>(R.id.switch_button).visibility = if(isFragmentBig) View.VISIBLE else View.GONE
+        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.width = (if (isFragmentBig) size.x else size.x/SCALE_FACTOR) - margin
+        findViewById<ConstraintLayout>(R.id.vlc_fragment).layoutParams.height = (if (isFragmentBig) size.y else size.y/SCALE_FACTOR) - margin
         findViewById<ConstraintLayout>(R.id.vlc_fragment).requestLayout()
+
     }
 
     /**

@@ -6,48 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".ui.vlc.VlcFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:orientation="vertical">
-
-
-    <LinearLayout
-            android:id="@+id/wrapper_layout"
+        <org.videolan.libvlc.util.VLCVideoLayout
+            android:id="@+id/video_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimary"
-            app:layout_constraintBottom_toTopOf="@id/vlc_button_layout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:orientation="vertical">
-
-            <org.videolan.libvlc.util.VLCVideoLayout
-                android:id="@+id/video_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fitsSystemWindows="false"
-                tools:layout_editor_absoluteX="0dp"
-                tools:layout_editor_absoluteY="-48dp" />
-
-        </LinearLayout>
+            android:fitsSystemWindows="false"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="-48dp" />
 
         <Button
-            android:id="@+id/vlc_button_layout"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/wrapper_layout"
+            android:id="@+id/switch_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="bip boup"
-            android:background="@color/colorWhite"/>
-    </LinearLayout>
+            android:text="@string/switch_video"
+            app:layout_constraintBottom_toBottomOf="@+id/video_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:onClick="switchVideo"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

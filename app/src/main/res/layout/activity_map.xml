@@ -203,7 +203,7 @@
 
 
     <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/switch_button"
+        android:id="@+id/resize_button"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintStart_toStartOf="parent"
         android:layout_width="wrap_content"
