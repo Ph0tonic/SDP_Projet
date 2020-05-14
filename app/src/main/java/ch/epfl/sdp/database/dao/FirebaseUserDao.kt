@@ -1,6 +1,5 @@
 package ch.epfl.sdp.database.dao
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.UserData
@@ -19,7 +18,6 @@ class FirebaseUserDao : UserDao {
     private val groupRescuers: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
 
     override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
-        Log.w("FIREBASE", "get rescuers called")
         val mapData = if (role == Role.OPERATOR) groupOperators else groupRescuers
 
         if (!mapData.containsKey(groupId)) {
@@ -34,23 +32,28 @@ class FirebaseUserDao : UserDao {
 
                 override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
                 override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                    TODO("A rescuer has changed, no action implemented")
+                    TODO("A user has changed, no action implemented")
                 }
 
                 override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
                     val user = dataSnapshot.getValue(UserData::class.java)!!
-                    Log.w("FIREBASE", "$user")
-                    user.googleId = dataSnapshot.key!!
-                    mapData[groupId]!!.value = mapData[groupId]!!.value!!.plus(user)
+                    if (user.role == role) {
+                        user.googleId = dataSnapshot.key!!
+                        mapData[groupId]!!.value = mapData[groupId]!!.value!!.plus(user)
+                    }
                 }
 
                 override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                     val user = dataSnapshot.getValue(UserData::class.java)!!
-                    user.email = dataSnapshot.key!!
+                    user.googleId = dataSnapshot.key!!
                     mapData[groupId]!!.value = mapData[groupId]!!.value!!.minus(user)
                 }
             })
         }
         return mapData[groupId]!!
+    }
+
+    override fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
+        database.getReference("users/$searchGroupId/$userId").removeValue()
     }
 }

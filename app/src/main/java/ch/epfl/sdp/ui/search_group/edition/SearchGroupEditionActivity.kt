@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui.search_group.edition
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -12,8 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
+import ch.epfl.sdp.ui.search_group.OnItemClickListener
 
 class SearchGroupEditionActivity : AppCompatActivity() {
 
@@ -45,13 +46,17 @@ class SearchGroupEditionActivity : AppCompatActivity() {
             val rescuersRecyclerView = findViewById<RecyclerView>(R.id.group_edit_rescuer_recyclerview)
             rescuersRecyclerView.layoutManager = LinearLayoutManager(this)
 
+            val userRemovedListener = object : OnItemClickListener<UserData> {
+                override fun onItemClicked(user: UserData) {
+                    userRepo.removeUserFromSearchGroup(groupId!!, user.googleId!!)
+                }
+            }
             userRepo.getOperatorsOfSearchGroup(groupId!!).observe(this, Observer {
-                operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList())
-                Log.w("FIREBASE", "operators: $it")
+                operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
             })
 
             userRepo.getRescuersOfSearchGroup(groupId!!).observe(this, Observer {
-                rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList())
+                rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
             })
         }
     }

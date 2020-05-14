@@ -4,11 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.ui.search_group.OnItemClickListener
 
 class SearchGroupRecyclerAdapter(
         private val list: List<SearchGroupData>,
-        private val itemClickListener: OnItemClickListener,
-        private val editButtonClickListener: OnItemClickListener
+        private val itemClickListener: OnItemClickListener<SearchGroupData>,
+        private val editButtonClickListener: OnItemClickListener<SearchGroupData>
 ) : RecyclerView.Adapter<SearchgroupViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchgroupViewHolder {
         val inflater = LayoutInflater.from(parent.context)

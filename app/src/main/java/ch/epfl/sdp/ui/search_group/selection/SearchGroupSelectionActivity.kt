@@ -11,6 +11,7 @@ import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 
 class SearchGroupSelectionActivity : AppCompatActivity() {
@@ -34,12 +35,12 @@ class SearchGroupSelectionActivity : AppCompatActivity() {
 
         SearchGroupRepository().getGroups().observe(this, Observer {
             recyclerView.adapter = SearchGroupRecyclerAdapter(it,
-                    object : OnItemClickListener {
+                    object : OnItemClickListener<SearchGroupData> {
                         override fun onItemClicked(searchGroupData: SearchGroupData) {
                             joinGroup(searchGroupData)
                         }
                     },
-                    object : OnItemClickListener {
+                    object : OnItemClickListener<SearchGroupData> {
                         override fun onItemClicked(searchGroupData: SearchGroupData) {
                             editGroup(searchGroupData)
                         }

@@ -23,4 +23,8 @@ class UserRepository {
     fun getRescuersOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
         return dao.getUsersOfGroupWithRole(searchGroupId, Role.RESCUER)
     }
+
+    fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
+        dao.removeUserFromSearchGroup(searchGroupId, userId)
+    }
 }
