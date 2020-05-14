@@ -173,7 +173,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         mapView.contentDescription = getString(R.string.map_not_ready)
 
-        setStrategy(loadStrategyPreference())
 
         //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
@@ -247,6 +246,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             onceMapReady(style)
+
+            setStrategy(loadStrategyPreference())
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
@@ -471,5 +472,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
         searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
         searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+
     }
 }
