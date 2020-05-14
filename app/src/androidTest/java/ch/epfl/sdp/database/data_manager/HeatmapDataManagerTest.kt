@@ -29,15 +29,11 @@ class HeatmapDataManagerTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-//    fun addMeasureToHeatmap(groupId: String, heatmapId: String, location: LatLng, intensity: Double)
-//    fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>>
-//    fun removeAllHeatmapsOfSearchGroup(searchGroupId: String)
-
     @Test
     fun addMeasureToHeatmapForNewHeatmapCallsUpdateHeatmap() {
         val tested = CountDownLatch(1)
         val expectedHeatMapData = HeatmapData(mutableListOf(
-                HeatmapPointData(DUMMY_LOCATION)
+                HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
         ), DUMMY_HEATMAP_ID)
         lateinit var actualHeatmapData: HeatmapData
 
@@ -68,7 +64,7 @@ class HeatmapDataManagerTest {
     fun addMeasureToHeatmapForExistingHeatmapCallsUpdateHeatmap() {
         val tested = CountDownLatch(1)
         val expectedHeatMapData = HeatmapData(mutableListOf(
-                HeatmapPointData(DUMMY_LOCATION)
+                HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
         ), DUMMY_HEATMAP_ID)
         val previousHeatMapData = HeatmapData(mutableListOf(), DUMMY_HEATMAP_ID)
         lateinit var actualHeatmapData: HeatmapData
@@ -94,5 +90,58 @@ class HeatmapDataManagerTest {
         assertThat(tested.count, equalTo(0L))
 
         assertThat(actualHeatmapData, equalTo(expectedHeatMapData))
+    }
+
+    @Test
+    fun removeAllHeatmapsOfSearchCallsGroupRemoveAllHeatmapsOfSearch() {
+        val tested = CountDownLatch(1)
+
+        val repo = object : IHeatmapRepository {
+            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
+            override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
+                TODO("should not be used")
+            }
+
+            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
+                tested.countDown()
+            }
+        }
+
+        HeatmapRepositoryProvider.provide = { repo }
+        val manager = HeatmapDataManager()
+        manager.removeAllHeatmapsOfSearchGroup(DUMMY_GROUP_ID)
+
+        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(tested.count, equalTo(0L))
+    }
+
+    @Test
+    fun getGroupHeatmpasCallsgetGroupsHeatmaps() {
+        val tested = CountDownLatch(1)
+        val expectedHeatMapData =
+                MutableLiveData(mutableMapOf(Pair(DUMMY_HEATMAP_ID, MutableLiveData(HeatmapData(mutableListOf(
+                        HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
+                ), DUMMY_HEATMAP_ID)))))
+
+        val repo = object : IHeatmapRepository {
+            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
+
+            override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
+                tested.countDown()
+                return expectedHeatMapData
+                TODO("should not be used")
+            }
+
+            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
+        }
+
+        HeatmapRepositoryProvider.provide = { repo }
+        val manager = HeatmapDataManager()
+        val actualHeatmapData = manager.getGroupHeatmaps(DUMMY_GROUP_ID)
+
+        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(tested.count, equalTo(0L))
+
+        assertThat(actualHeatmapData.value, equalTo(expectedHeatMapData.value))
     }
 }
