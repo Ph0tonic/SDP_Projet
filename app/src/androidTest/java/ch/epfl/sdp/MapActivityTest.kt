@@ -96,6 +96,12 @@ class MapActivityTest {
 
     @Test
     fun canStartMission() {
+
+        PreferenceManager.getDefaultSharedPreferences(applicationContext())
+                .edit()
+                .putString(applicationContext().getString(R.string.prefs_drone_altitude), "20")
+                .apply()
+
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
