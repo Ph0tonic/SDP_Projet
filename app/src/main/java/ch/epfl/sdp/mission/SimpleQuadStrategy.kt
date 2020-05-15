@@ -1,13 +1,10 @@
 package ch.epfl.sdp.mission
 
-import android.util.Log
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import net.mastrgamr.mbmapboxutils.SphericalUtil.interpolate
-import timber.log.Timber
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -37,31 +34,28 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
         require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
         val quadrilateralArea = searchArea as QuadrilateralArea
         // Make a mutable copy of the waypoints to be able to reorder them
-        val waypointsCopied = mutableListOf<LatLng>().apply { addAll(quadrilateralArea.vertices) }
+        val waypointsCopied: MutableList<LatLng> = quadrilateralArea.vertices.toMutableList()
         val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
         Collections.rotate(waypointsCopied, -startingIndex)
 
-        val numPoints = computeMaxDists(waypointsCopied).toList().map { ceil(it / maxDistBetweenLines).toInt() }
+        val (numPointsX, numPointsY) = computeMaxDists(waypointsCopied).toList().map { ceil(it / maxDistBetweenLines).toInt() }
 
-        val numPointsX = numPoints[0]
-        val numPointsY = numPoints[1]
-
-         return (0..numPointsY).flatMap {y ->
-                val yPercent = y.toDouble() / numPointsY
-                val leftPoint = interpolate(waypointsCopied[0], waypointsCopied[3], yPercent)
-                val rightPoint = interpolate(waypointsCopied[1], waypointsCopied[2], yPercent)
-                (0..numPointsX).map {x ->
-                    val xPercent = x.toDouble() / numPointsX
-                        if (y % 2 == 0) {
-                            interpolate(leftPoint, rightPoint, xPercent)
-                        } else {
-                            interpolate(rightPoint, leftPoint, xPercent)
-                        }
+        return (0..numPointsY).flatMap { y ->
+            val yPercent = y.toDouble() / numPointsY
+            val leftPoint = interpolate(waypointsCopied[0], waypointsCopied[3], yPercent)
+            val rightPoint = interpolate(waypointsCopied[1], waypointsCopied[2], yPercent)
+            (0..numPointsX).map { x ->
+                val xPercent = x.toDouble() / numPointsX
+                if (y % 2 == 0) {
+                    interpolate(leftPoint, rightPoint, xPercent)
+                } else {
+                    interpolate(rightPoint, leftPoint, xPercent)
                 }
             }
+        }
     }
 
-    private fun computeMaxDists(waypoints: List<LatLng>): Pair<Double,Double> {
+    private fun computeMaxDists(waypoints: List<LatLng>): Pair<Double, Double> {
         val maxDistX = max(                             // 0-1
                 waypoints[0].distanceTo(waypoints[1]),  //
                 waypoints[3].distanceTo(waypoints[2]))  // 3-2
@@ -70,5 +64,4 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
                 waypoints[1].distanceTo(waypoints[2]))  // 3 2
         return Pair(maxDistX, maxDistY)
     }
-
 }

@@ -58,11 +58,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
 
-    private lateinit var droneBatteryLevelImageView: ImageView
-    private lateinit var droneBatteryLevelTextView: TextView
-    private lateinit var distanceToUserTextView: TextView
-    private lateinit var droneAltitudeTextView: TextView
-    private lateinit var droneSpeedTextView: TextView
     private lateinit var strategyPickerButton: FloatingActionButton
 
     private lateinit var role: Role
@@ -95,50 +90,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var userPainter: MapboxUserPainter
 
-    private val droneBatteryLevelDrawables = listOf(
-            Pair(.0, R.drawable.ic_battery1),
-            Pair(.05, R.drawable.ic_battery2),
-            Pair(.23, R.drawable.ic_battery3),
-            Pair(.41, R.drawable.ic_battery4),
-            Pair(.59, R.drawable.ic_battery5),
-            Pair(.77, R.drawable.ic_battery6),
-            Pair(.95, R.drawable.ic_battery7)
-    )
-
-    private var droneAltitudeObserver = Observer<Float> { newAltitude: Float? ->
-        updateTextView(droneAltitudeTextView, newAltitude?.toDouble(), DISTANCE_FORMAT)
-    }
-    private var droneSpeedObserver = Observer<Float> { newSpeed: Float? ->
-        updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
-    }
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateDronePosition(it); if (::dronePainter.isInitialized) dronePainter.paint(it) }
+        newLatLng?.let { if (::dronePainter.isInitialized) dronePainter.paint(it) }
     }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it); if (::userPainter.isInitialized) userPainter.paint(it) }
-    }
-    private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
-        // Always update the text string
-        updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
-
-        // Only update the icon if the battery level is not null
-        newBatteryLevel?.let {
-            val newBatteryDrawable = droneBatteryLevelDrawables
-                    .filter { x -> x.first <= newBatteryLevel.coerceAtLeast(0f) }
-                    .maxBy { x -> x.first }!!
-                    .second
-            droneBatteryLevelImageView.setImageResource(newBatteryDrawable)
-            droneBatteryLevelImageView.tag = newBatteryDrawable
-        }
+        newLatLng?.let { if (::userPainter.isInitialized) userPainter.paint(it) }
     }
 
     companion object {
         const val SCALE_FACTOR = 4
         const val ID_ICON_VICTIM: String = "airport"
-
-        private const val DISTANCE_FORMAT = " %.1f m"
-        private const val PERCENTAGE_FORMAT = " %.0f%%"
-        private const val SPEED_FORMAT = " %.1f m/s"
 
         private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
     }
@@ -156,11 +117,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         groupId = intent.getStringExtra(getString(R.string.intent_key_group_id))!!
         role = intent.getSerializableExtra(getString(R.string.intent_key_role)) as Role
 
-        droneBatteryLevelImageView = findViewById(R.id.battery_level_icon)
-        droneBatteryLevelTextView = findViewById(R.id.battery_level)
-        droneAltitudeTextView = findViewById(R.id.altitude)
-        distanceToUserTextView = findViewById(R.id.distance_to_user)
-        droneSpeedTextView = findViewById(R.id.speed)
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
 
         //TODO: Give user location if current drone position is not available
@@ -177,7 +133,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
             findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
-            findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
+            findViewById<TableLayout>(R.id.drone_status_fragment)!!.visibility = View.GONE
         }
 
         //Change button color if the drone is not connected
@@ -188,22 +144,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
+        CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
         Drone.currentPositionLiveData.observe(this, dronePositionObserver)
-        Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
-        Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
-        Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
-        CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
     }
 
     override fun onPause() {
         super.onPause()
         CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
         Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
-        Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
-        Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
-        Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
 
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
@@ -243,9 +193,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
 
             //Create builders
-            missionBuilder = MissionBuilder()
-                    .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-
+            missionBuilder = MissionBuilder().withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
             setStrategy(loadStrategyPreference())
 
             // Add listeners to builders
@@ -322,14 +270,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 heatmapPainters.remove(it)
             }
         })
-    }
-
-    /**
-     * Updates the text of the given textView with the given value and format, or the default string
-     * if the value is null
-     */
-    private fun updateTextView(textView: TextView, value: Double?, formatString: String) {
-        textView.text = value?.let { formatString.format(it) } ?: getString(R.string.no_info)
     }
 
     fun onMapClicked(position: LatLng) {
@@ -426,26 +366,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .withIconImage(ID_ICON_VICTIM)
                 .withData(markerProperties)
         victimMarkers[markerId] = victimSymbolManager.create(symbolOptions)
-    }
-
-    /**
-     * Update [currentPositionMarker] position with a new [position].
-     *
-     * @param newLatLng new position of the vehicle
-     */
-    private fun updateDronePosition(newLatLng: LatLng) {
-        CentralLocationManager.currentUserPosition.value.let {
-            updateTextView(distanceToUserTextView, it?.distanceTo(newLatLng), DISTANCE_FORMAT)
-        }
-    }
-
-    /**
-     * Updates the user position if the drawing managers are ready
-     */
-    private fun updateUserPosition(userLatLng: LatLng) {
-        Drone.currentPositionLiveData.value?.let {
-            updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
