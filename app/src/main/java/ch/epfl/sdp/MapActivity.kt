@@ -86,9 +86,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markerRepository = MarkerRepository()
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var isTest: Boolean = false
-
     /* Painters */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
@@ -142,7 +139,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
-        private const val COORDINATE_FORMAT = " %.7f"
 
         private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
     }
@@ -379,18 +375,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
-        } else {
+        } else if (!Drone.isFlying()) {
             launchMission()
         }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun launchMission() {
-        if (!Drone.isFlying()) { //TODO : return to user else
-            val altitude = PreferenceManager.getDefaultSharedPreferences(this)
-                    .getString(this.getString(R.string.prefs_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-            Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
-        }
+        val altitude = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(this.getString(R.string.prefs_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+
         findViewById<FloatingActionButton>(R.id.start_or_return_button)
                 .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
     }
