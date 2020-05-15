@@ -1,5 +1,6 @@
 package ch.epfl.sdp
 
+import MapActivity
 import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
@@ -521,5 +522,16 @@ class MapActivityTest {
             Drone.currentBatteryLevelLiveData.value = .98f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
+    }
+
+    @Test
+    fun resizeButtonIsWorking() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
+        onView(withId(R.id.resize_button)).perform(click())
+        assertThat(mActivityRule.activity.isFragmentBig, `is`(true))
+        onView(withId(R.id.resize_button)).perform(click())
+        assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
     }
 }

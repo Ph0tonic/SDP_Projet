@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".VlcActivity"
+            android:name=".ui.vlc.VlcFragment"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="landscape" />
         <activity

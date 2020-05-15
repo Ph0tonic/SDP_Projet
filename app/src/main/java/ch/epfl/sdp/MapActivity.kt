@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
@@ -49,6 +50,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var groupId: String
     private var isMapReady = false
 
+    //TODO rename to a more meaningful name
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var isFragmentBig = true
+
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
 
@@ -80,6 +85,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markerRepository = MarkerRepository()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var isTest: Boolean = false
 
     /* Painters */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -128,6 +136,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     companion object {
+        const val SCALE_FACTOR = 4
         const val ID_ICON_VICTIM: String = "airport"
 
         private const val DISTANCE_FORMAT = " %.1f m"
@@ -163,12 +172,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         CentralLocationManager.configure(this)
         mapView.contentDescription = getString(R.string.map_not_ready)
 
+        resizeCameraFragment(mapView)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        actionBar?.hide()
+
         if (role == Role.RESCUER) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-            findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
+            findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
 
@@ -184,6 +197,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        actionBar?.hide()
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
     }
 
@@ -277,8 +292,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun onceMapReady(style: Style) {
         setupMarkerObserver()
         setupHeatmapsObservers(style)
-        /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-        //addVirtualPointsToHeatmap()
     }
 
     private fun setupMarkerObserver() {
@@ -383,7 +396,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
     }
 
-
     fun storeMap(v: View) {
         startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
     }
@@ -396,6 +408,21 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             searchAreaBuilder.reset()
         }
     }
+
+    fun resizeCameraFragment(v: View) {
+        isFragmentBig = !isFragmentBig
+
+        val size = android.graphics.Point()
+        windowManager.defaultDisplay.getSize(size)
+        val margin = 2 * resources.getDimension(R.dimen.tiny_margin).toInt()
+
+        //findViewById<Button>(R.id.switch_button).visibility = if(isFragmentBig) View.VISIBLE else View.GONE
+        val vlcFragment = findViewById<ConstraintLayout>(R.id.vlc_fragment)
+        vlcFragment.layoutParams.width = (if (isFragmentBig) size.x else size.x / SCALE_FACTOR) - margin
+        vlcFragment.layoutParams.height = (if (isFragmentBig) size.y else size.y / SCALE_FACTOR) - margin
+        vlcFragment.requestLayout()
+    }
+
 
     private fun addVictimMarker(latLng: LatLng, markerId: String) {
         if (!isMapReady) return
@@ -436,8 +463,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     private fun loadStrategyPreference(): OverflightStrategy {
         val context = MainApplication.applicationContext()
-        val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-        val strategyString = defaultSharedPrefs
+        val strategyString = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(context.getString(R.string.prefs_overflight_strategy), "")
         return when (strategyString) {
             getString(R.string.zigzag_strategy) ->
@@ -448,7 +474,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
         }
     }
-
 
     fun pickStrategy(view: View) {
         if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
