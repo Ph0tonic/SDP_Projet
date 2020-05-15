@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -100,6 +101,7 @@ class MapActivityTest {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+        mActivityRule.activity.isTest = true
 
         val expectedLatLng = LatLng(47.397026, 8.543067)
 
@@ -125,10 +127,12 @@ class MapActivityTest {
 
         val uploadedMission = Drone.currentMissionLiveData.value
 
-        assertThat(uploadedMission, `is`(notNullValue()))
-        assertThat(uploadedMission!!.size, not(equalTo(0)))
-        assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
-        assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
+            assertThat(uploadedMission, `is`(notNullValue()))
+            assertThat(uploadedMission!!.size, not(equalTo(0)))
+            assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
+            assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
+        mActivityRule.activity.isTest = false
+
     }
 
     @Test
@@ -509,5 +513,16 @@ class MapActivityTest {
             Drone.currentBatteryLevelLiveData.value = .98f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
+    }
+
+    @Test
+    fun resizeButtonIsWorking(){
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
+        onView(withId(R.id.resize_button)).perform(click())
+        assertThat(mActivityRule.activity.isFragmentBig, `is`(true))
+        onView(withId(R.id.resize_button)).perform(click())
+        assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
     }
 }

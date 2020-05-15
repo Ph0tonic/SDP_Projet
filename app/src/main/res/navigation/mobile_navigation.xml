@@ -16,4 +16,5 @@
         android:name="ch.epfl.sdp.ui.mapsManaging.MapsManagingFragment"
         android:label="@string/menu_maps_managing"
         tools:layout="@layout/fragment_maps_managing" />
+
 </navigation>

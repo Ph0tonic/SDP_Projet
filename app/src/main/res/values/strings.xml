@@ -21,6 +21,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_maps_managing">Maps managing</string>
     <string name="not_connected_message">You are currently not connected to the drone</string>
+    <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
 
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
 
@@ -55,14 +56,14 @@
     <string name="map_button">Start new mission</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="sign_out_success">Sign out successful</string>
-
+    <string name="prefs_drone_altitude">Drone altitude</string>
+    <string name="drone_altitude_header">Default drone altitude</string>
     <string name="prefs_gps_refresh">gps_refresh</string>
-
     <string name="prefs_overflight_strategy">overflight_strategy</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
     <string name="zigzag_strategy">zigzag</string>
     <string name="spiral_strategy">spiral</string>
-    
+
     <string name="select_search_group">Select search group</string>
     <string name="start_mission">Start mission</string>
     <string name="work_offline">Work offline</string>
