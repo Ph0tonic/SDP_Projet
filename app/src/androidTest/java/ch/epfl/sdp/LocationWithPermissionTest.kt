@@ -40,6 +40,7 @@ class LocationWithPermissionTest {
         private const val DUMMY_GROUP_ID = "DummyGroupId"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val REFRESH_RATE = 500L
+        private const val MIN_DIST = 10f
     }
 
     @Rule
@@ -76,7 +77,7 @@ class LocationWithPermissionTest {
         Mockito.`when`(context.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
         Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
         CentralLocationManager.configure(activity, context)
-        Mockito.verify(manager).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(10f), Mockito.any<LocationListener>())
+        Mockito.verify(manager).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(MIN_DIST), Mockito.any<LocationListener>())
     }
 
     @UiThreadTest
@@ -96,6 +97,6 @@ class LocationWithPermissionTest {
         Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
         CentralLocationManager.configure(activity, context)
         CentralLocationManager.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
-        Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(10f), Mockito.any<LocationListener>())
+        Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(MIN_DIST), Mockito.any<LocationListener>())
     }
 }
