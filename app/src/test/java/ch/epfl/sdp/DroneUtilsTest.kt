@@ -12,7 +12,7 @@ class DroneUtilsTest {
     @Test
     fun generateMissionItemTest() {
         val n = 100
-        for (x in 0..n) {
+        repeat(n) {
             val randomLatitude = nextDouble(-90.0, 90.0)
             val randomLongitude = nextDouble(0.0, 180.0)
             val mission = Mission.MissionItem(

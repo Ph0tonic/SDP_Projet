@@ -50,9 +50,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var groupId: String
     private var isMapReady = false
 
-    //TODO rename to a more meaningful name
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var isFragmentBig = true
+    var isCameraFragmentFullScreen = true
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
@@ -404,7 +403,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun resizeCameraFragment(v: View) {
-        isFragmentBig = !isFragmentBig
+        isCameraFragmentFullScreen = !isCameraFragmentFullScreen
 
         val size = android.graphics.Point()
         windowManager.defaultDisplay.getSize(size)
@@ -412,8 +411,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         //findViewById<Button>(R.id.switch_button).visibility = if(isFragmentBig) View.VISIBLE else View.GONE
         val vlcFragment = findViewById<ConstraintLayout>(R.id.vlc_fragment)
-        vlcFragment.layoutParams.width = (if (isFragmentBig) size.x else size.x / SCALE_FACTOR) - margin
-        vlcFragment.layoutParams.height = (if (isFragmentBig) size.y else size.y / SCALE_FACTOR) - margin
+        vlcFragment.layoutParams.width = (if (isCameraFragmentFullScreen) size.x else size.x / SCALE_FACTOR) - margin
+        vlcFragment.layoutParams.height = (if (isCameraFragmentFullScreen) size.y else size.y / SCALE_FACTOR) - margin
         vlcFragment.requestLayout()
     }
 

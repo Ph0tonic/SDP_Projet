@@ -523,10 +523,10 @@ class MapActivityTest {
     fun resizeButtonIsWorking() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
+        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
         onView(withId(R.id.resize_button)).perform(click())
-        assertThat(mActivityRule.activity.isFragmentBig, `is`(true))
+        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))
         onView(withId(R.id.resize_button)).perform(click())
-        assertThat(mActivityRule.activity.isFragmentBig, `is`(false))
+        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
     }
 }
