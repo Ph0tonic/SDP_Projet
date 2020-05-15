@@ -47,7 +47,7 @@ class FirebaseUserDaoTest {
     @Test
     fun getUsersOfGroupWithRoleGetsRescuersCorrectly() {
 
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val expectedRescuer = UserData(DUMMY_USER_EMAIL_1, DUMMY_RESCUER_ID, Role.RESCUER)
         val controlOperator = UserData(DUMMY_USER_EMAIL_2, DUMMY_OPERATOR_ID, Role.OPERATOR)
@@ -65,23 +65,23 @@ class FirebaseUserDaoTest {
             // Test once database has been populated
             if (it.isNotEmpty()) {
                 actualRescuer = it.first()
-                tested.countDown()
+                called.countDown()
             }
         }
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
         // Uuid is generated automatically so we don't test
         expectedRescuer.uuid = actualRescuer.uuid
 
         assertThat(actualRescuer, equalTo(expectedRescuer))
-        assertThat(tested.count, equalTo(0L))
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun getUsersOfGroupWithRoleGetsOperatorsCorrectly() {
 
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val expectedOperator = UserData(uuid = DUMMY_OPERATOR_ID, role = Role.OPERATOR)
         val controlRescuer = UserData(uuid = DUMMY_RESCUER_ID, role = Role.RESCUER)
@@ -99,23 +99,23 @@ class FirebaseUserDaoTest {
             // Test once database has been populated
             if (it.isNotEmpty()) {
                 actualOperator = it.first()
-                tested.countDown()
+                called.countDown()
             }
         }
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
         // Uuid is generated automatically so we don't test
         expectedOperator.uuid = actualOperator.uuid
 
         assertThat(actualOperator, equalTo(expectedOperator))
-        assertThat(tested.count, equalTo(0L))
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun removeUserFromSearchGroupRemovesUserFromSearchGroup() {
         val added = CountDownLatch(1)
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val expectedRemovedUser = UserData(DUMMY_USER_EMAIL_1, DUMMY_USER_ID, Role.RESCUER)
 
@@ -134,7 +134,7 @@ class FirebaseUserDaoTest {
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 actualRemovedUser = dataSnapshot.getValue(UserData::class.java)!!
                 actualRemovedUser.uuid = dataSnapshot.key!!
-                tested.countDown()
+                called.countDown()
             }
         }
 
@@ -148,7 +148,7 @@ class FirebaseUserDaoTest {
         val dao = FirebaseUserDao()
 
         dao.removeUserFromSearchGroup(DUMMY_GROUP_ID, expectedRemovedUser.uuid!!)
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
         // Uuid is generated automatically so we don't test
         actualRemovedUser.uuid = expectedRemovedUser.uuid
@@ -159,7 +159,7 @@ class FirebaseUserDaoTest {
     @Test
     fun removeAllUserOfSearchGroupRemovesAllUsersFromSearchGroup() {
         val added = CountDownLatch(2)
-        val tested = CountDownLatch(2)
+        val called = CountDownLatch(2)
 
         //They both have uuid = null to avoid complications with uuid retrieval
         val expectedRemovedUser1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
@@ -178,7 +178,7 @@ class FirebaseUserDaoTest {
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 val removedUser = dataSnapshot.getValue(UserData::class.java)!!
                 actualRemovedUsers.add(removedUser)
-                tested.countDown()
+                called.countDown()
             }
         }
 
@@ -193,7 +193,7 @@ class FirebaseUserDaoTest {
         val dao = FirebaseUserDao()
 
         dao.removeAllUserOfSearchGroup(DUMMY_GROUP_ID)
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
         assertThat(actualRemovedUsers, containsInAnyOrder(expectedRemovedUser1, expectedRemovedUser2))
         ref.removeEventListener(listener)

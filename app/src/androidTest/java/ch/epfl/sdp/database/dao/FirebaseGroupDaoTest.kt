@@ -38,7 +38,7 @@ class FirebaseGroupDaoTest {
     fun getSearchGroupsReturnsExpectedValues() {
         val dao = FirebaseGroupDao()
         val expectedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         //Populate database
         Firebase.database.getReference("search_groups/$DUMMY_GROUP_ID")
@@ -52,19 +52,19 @@ class FirebaseGroupDaoTest {
                 val actualGroup = groups.find { it.uuid == DUMMY_GROUP_ID }
 
                 MatcherAssert.assertThat(actualGroup, equalTo(expectedGroup))
-                tested.countDown()
+                called.countDown()
             }
         }
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        MatcherAssert.assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun getSearchGroupsByIdReturnsExpectedValues() {
         val dao = FirebaseGroupDao()
         val expectedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         //Populate database
         Firebase.database.getReference("search_groups/$DUMMY_GROUP_ID")
@@ -76,11 +76,11 @@ class FirebaseGroupDaoTest {
             // Test once database has been populated
             if (group != null) {
                 MatcherAssert.assertThat(group, equalTo(expectedGroup))
-                tested.countDown()
+                called.countDown()
             }
         }
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        MatcherAssert.assertThat(called.count, equalTo(0L))
     }
 }

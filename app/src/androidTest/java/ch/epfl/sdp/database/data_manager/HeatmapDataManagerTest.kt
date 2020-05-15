@@ -31,7 +31,7 @@ class HeatmapDataManagerTest {
 
     @Test
     fun addMeasureToHeatmapForNewHeatmapCallsUpdateHeatmap() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedHeatMapData = HeatmapData(mutableListOf(
                 HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
         ), DUMMY_HEATMAP_ID)
@@ -40,7 +40,7 @@ class HeatmapDataManagerTest {
         val repo = object : IHeatmapRepository {
             override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
                 actualHeatmapData = heatmapData
-                tested.countDown()
+                called.countDown()
             }
 
             override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
@@ -54,15 +54,15 @@ class HeatmapDataManagerTest {
         val manager = HeatmapDataManager()
         manager.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualHeatmapData, equalTo(expectedHeatMapData))
     }
 
     @Test
     fun addMeasureToHeatmapForExistingHeatmapCallsUpdateHeatmap() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedHeatMapData = HeatmapData(mutableListOf(
                 HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
         ), DUMMY_HEATMAP_ID)
@@ -72,7 +72,7 @@ class HeatmapDataManagerTest {
         val repo = object : IHeatmapRepository {
             override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
                 actualHeatmapData = heatmapData
-                tested.countDown()
+                called.countDown()
             }
 
             override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
@@ -86,15 +86,15 @@ class HeatmapDataManagerTest {
         val manager = HeatmapDataManager()
         manager.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualHeatmapData, equalTo(expectedHeatMapData))
     }
 
     @Test
     fun removeAllHeatmapsOfSearchCallsGroupRemoveAllHeatmapsOfSearch() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val repo = object : IHeatmapRepository {
             override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
@@ -103,7 +103,7 @@ class HeatmapDataManagerTest {
             }
 
             override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
-                tested.countDown()
+                called.countDown()
             }
         }
 
@@ -111,13 +111,13 @@ class HeatmapDataManagerTest {
         val manager = HeatmapDataManager()
         manager.removeAllHeatmapsOfSearchGroup(DUMMY_GROUP_ID)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun getGroupHeatmpasCallsgetGroupsHeatmaps() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedHeatMapData =
                 MutableLiveData(mutableMapOf(Pair(DUMMY_HEATMAP_ID, MutableLiveData(HeatmapData(mutableListOf(
                         HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
@@ -127,7 +127,7 @@ class HeatmapDataManagerTest {
             override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
 
             override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
-                tested.countDown()
+                called.countDown()
                 return expectedHeatMapData
             }
 
@@ -138,8 +138,8 @@ class HeatmapDataManagerTest {
         val manager = HeatmapDataManager()
         val actualHeatmapData = manager.getGroupHeatmaps(DUMMY_GROUP_ID)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualHeatmapData.value, equalTo(expectedHeatMapData.value))
     }

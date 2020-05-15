@@ -20,9 +20,9 @@ import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers.*
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.Matchers.closeTo
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -99,7 +99,7 @@ class OfflineManagerActivityTest {
             override fun onError(error: String) {} //left intentionally empty
         })
         checkedIfEmpty.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(checkedIfEmpty.count, CoreMatchers.equalTo(0L))
+        assertThat(checkedIfEmpty.count, equalTo(0L))
 
 
         //DOWNLOAD part
@@ -116,19 +116,19 @@ class OfflineManagerActivityTest {
 //                .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
 //                .check(matches(isDisplayed()))
 
-        val called = CountDownLatch(1)
+        val calledList = CountDownLatch(1)
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 //check that the region has been downloaded
                 assertThat(getRegionName(offlineRegions[0]), equalTo(FAKE_MAP_NAME_1))
-                called.countDown()
+                calledList.countDown()
             }
 
             override fun onError(error: String) {} //left intentionally empty
         })
 
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(called.count, CoreMatchers.equalTo(0L))
+        calledList.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(calledList.count, equalTo(0L))
 
         onView(withId(R.id.list_button)).perform(click())
         onView(withId(NEGATIVE_BUTTON_ID)).perform(click())
@@ -143,17 +143,17 @@ class OfflineManagerActivityTest {
         assertThat(mActivityRule.activity.mapView.contentDescription.toString(), equalTo(applicationContext().getString(R.string.map_ready)))
 
         //check that the downloaded list map is empty
-        val tested = CountDownLatch(1)
+        val calledDelete = CountDownLatch(1)
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assert(offlineRegions.isEmpty())
-                tested.countDown()
+                calledDelete.countDown()
             }
 
             override fun onError(error: String) {} //left intentionally empty
         })
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, CoreMatchers.equalTo(0L))
+        calledDelete.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(calledDelete.count, equalTo(0L))
     }
 
     /**
@@ -229,17 +229,17 @@ class OfflineManagerActivityTest {
                 .check(matches(isDisplayed()))
 
         //check that the downloaded list map is empty
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
                 assertThat(offlineRegions.isEmpty(), equalTo(true))
-                tested.countDown()
+                called.countDown()
             }
 
             override fun onError(error: String) {} //left intentionally empty
         })
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, CoreMatchers.equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test

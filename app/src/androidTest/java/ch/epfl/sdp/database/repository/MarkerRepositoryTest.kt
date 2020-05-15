@@ -28,12 +28,12 @@ class MarkerRepositoryTest {
 
     @Test
     fun getMarkersOfSearchGroupCallsGetMarkersOfSearchGroupFromDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = MutableLiveData(setOf(MarkerData(uuid = DUMMY_MARKER_ID)))
 
         val dao = object : EmptyMockMarkerDao() {
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
-                tested.countDown()
+                called.countDown()
                 return expectedData
             }
         }
@@ -45,24 +45,24 @@ class MarkerRepositoryTest {
 
     @Test
     fun addMarkerCallsAddMarkerFromDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val dao = object : EmptyMockMarkerDao() {
             override fun addMarker(groupId: String, markerData: MarkerData) {
-                tested.countDown()
+                called.countDown()
             }
         }
 
         MarkerRepository.daoProvider = { dao }
         MarkerRepository().addMarkerForSearchGroup(DUMMY_GROUP_ID, MarkerData(LatLng(0.0, 0.0)))
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun removeMarkerCallsRemoveMarkerFromDaoWithCorrectGroupId() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val expectedGroupId = DUMMY_GROUP_ID
         val expectedMarkerId = DUMMY_MARKER_ID
@@ -74,15 +74,15 @@ class MarkerRepositoryTest {
             override fun removeMarker(groupId: String, markerId: String) {
                 actualGroupId = groupId
                 actualMarkerId = markerId
-                tested.countDown()
+                called.countDown()
             }
         }
 
         MarkerRepository.daoProvider = { dao }
         MarkerRepository().removeMarkerOfSearchGroup(expectedGroupId, expectedMarkerId)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualGroupId, equalTo(expectedGroupId))
         assertThat(actualMarkerId, equalTo(expectedMarkerId))
@@ -90,7 +90,7 @@ class MarkerRepositoryTest {
 
     @Test
     fun removeAllMarkersCallsRemoveAllMarkersFromDaoWithCorrectGroupId() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedGroupId = DUMMY_GROUP_ID
 
         lateinit var actualGroupId: String
@@ -98,15 +98,15 @@ class MarkerRepositoryTest {
         val dao = object : EmptyMockMarkerDao() {
             override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {
                 actualGroupId = searchGroupId
-                tested.countDown()
+                called.countDown()
             }
         }
 
         MarkerRepository.daoProvider = { dao }
         MarkerRepository().removeAllMarkersOfSearchGroup(expectedGroupId)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualGroupId, equalTo(expectedGroupId))
     }

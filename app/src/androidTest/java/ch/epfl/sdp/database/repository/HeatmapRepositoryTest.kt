@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.dao.EmptyMockHeatmapDao
-import ch.epfl.sdp.database.dao.HeatmapDao
 import ch.epfl.sdp.database.data.HeatmapData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
@@ -37,7 +36,7 @@ class HeatmapRepositoryTest {
         val called = CountDownLatch(1)
         val expectedData: LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> = MutableLiveData(mutableMapOf())
 
-        val dao =  object : EmptyMockHeatmapDao(){
+        val dao = object : EmptyMockHeatmapDao() {
             override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
                 called.countDown()
                 return expectedData
@@ -65,7 +64,7 @@ class HeatmapRepositoryTest {
         lateinit var actualGroupId: String
         lateinit var actualHeatmapData: HeatmapData
 
-        val dao =  object : EmptyMockHeatmapDao(){
+        val dao = object : EmptyMockHeatmapDao() {
             override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
                 called.countDown()
                 actualGroupId = groupId
@@ -82,5 +81,29 @@ class HeatmapRepositoryTest {
 
         assertThat(actualGroupId, equalTo(expectedGroupId))
         assertThat(actualHeatmapData, equalTo(expectedHeatmapData))
+    }
+
+    @Test
+    fun removeAllHeatmapsOfSearchGroupCallsRemoveAllHeatmapsOfSearchGroupDao() {
+        val called = CountDownLatch(1)
+        val expectedGroupId = DUMMY_GROUP_ID
+
+        lateinit var actualGroupId: String
+
+        val dao = object : EmptyMockHeatmapDao() {
+            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
+                called.countDown()
+                actualGroupId = searchGroupId
+            }
+        }
+
+        HeatmapRepository.daoProvider = { dao }
+
+        HeatmapRepository().removeAllHeatmapsOfSearchGroup(expectedGroupId)
+
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
+
+        assertThat(actualGroupId, equalTo(expectedGroupId))
     }
 }

@@ -30,13 +30,13 @@ class MarkerDataManagerTest {
 
     @Test
     fun getMarkersOfSearchGroupCallsGetMarkersOfSearchGroupAndGetsCorrectMarkers() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val expectedMarkers = MutableLiveData(setOf(MarkerData(DUMMY_LOCATION, DUMMY_MARKER_ID)))
 
         val repo = object : IMarkerRepository {
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
-                tested.countDown()
+                called.countDown()
                 return expectedMarkers
             }
 
@@ -49,14 +49,14 @@ class MarkerDataManagerTest {
         val manager = MarkerDataManager()
         val actualMarkers = manager.getMarkersOfSearchGroup(DUMMY_GROUP_ID).value
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
         assertThat(actualMarkers, equalTo(expectedMarkers.value))
     }
 
     @Test
     fun addMarkerForSearchGroupCallsAddMarkerForSearchGroup() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val expectedMarker = MarkerData(DUMMY_LOCATION)
 
@@ -68,7 +68,7 @@ class MarkerDataManagerTest {
             }
 
             override fun addMarkerForSearchGroup(groupId: String, marker: MarkerData) {
-                tested.countDown()
+                called.countDown()
                 actualMarker = marker
             }
 
@@ -80,14 +80,14 @@ class MarkerDataManagerTest {
         val manager = MarkerDataManager()
         manager.addMarkerForSearchGroup(DUMMY_GROUP_ID, DUMMY_LOCATION)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
         assertThat(actualMarker, equalTo(expectedMarker))
     }
 
     @Test
     fun removeMarkerForSearchGroupCallsRemoveMarkerOfSearchGroup() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val repo = object : IMarkerRepository {
             override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
@@ -96,7 +96,7 @@ class MarkerDataManagerTest {
 
             override fun addMarkerForSearchGroup(groupId: String, marker: MarkerData) {}
             override fun removeMarkerOfSearchGroup(groupId: String, markerId: String) {
-                tested.countDown()
+                called.countDown()
             }
 
             override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {}
@@ -106,13 +106,13 @@ class MarkerDataManagerTest {
 
         MarkerDataManager().removeMarkerForSearchGroup(DUMMY_GROUP_ID, DUMMY_MARKER_ID)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun removeAllMarkersOfSearchGroupCallsRemoveAllMarkersOfSearchGroup() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val expectedMarker = MarkerData(DUMMY_LOCATION)
 
@@ -124,7 +124,7 @@ class MarkerDataManagerTest {
             override fun addMarkerForSearchGroup(groupId: String, marker: MarkerData) {}
             override fun removeMarkerOfSearchGroup(groupId: String, markerId: String) {}
             override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {
-                tested.countDown()
+                called.countDown()
             }
         }
 
@@ -132,7 +132,7 @@ class MarkerDataManagerTest {
 
         MarkerDataManager().removeAllMarkersOfSearchGroup(DUMMY_GROUP_ID)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 }

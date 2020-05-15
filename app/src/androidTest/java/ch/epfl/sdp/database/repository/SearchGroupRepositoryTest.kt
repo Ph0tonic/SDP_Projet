@@ -29,14 +29,14 @@ class SearchGroupRepositoryTest {
 
     @Test
     fun getGroupsCallsGetGroupsFromSearchGroupDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = MutableLiveData(listOf(
                 SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
         ))
 
         val dao = object : EmptyMockSearchGroupDao() {
             override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
-                tested.countDown()
+                called.countDown()
                 return expectedData
             }
         }
@@ -46,20 +46,20 @@ class SearchGroupRepositoryTest {
         val repo = SearchGroupRepository()
         assertThat(repo.getAllGroups(), equalTo(expectedData))
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun getGroupByIdCallsGetGroupByIdFromSearchGroupDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = MutableLiveData(
                 SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
         )
 
         val dao = object : EmptyMockSearchGroupDao() {
             override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
-                tested.countDown()
+                called.countDown()
                 return expectedData
             }
         }
@@ -68,19 +68,19 @@ class SearchGroupRepositoryTest {
 
         assertThat(SearchGroupRepository().getGroupById(DUMMY_GROUP_ID), equalTo(expectedData))
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun createGroupCallsCreateGroupDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
         lateinit var actualSearchGroup: SearchGroupData
 
         val dao = object : EmptyMockSearchGroupDao() {
             override fun createGroup(searchGroupData: SearchGroupData) {
-                tested.countDown()
+                called.countDown()
                 actualSearchGroup = searchGroupData
             }
         }
@@ -88,21 +88,21 @@ class SearchGroupRepositoryTest {
         SearchGroupRepository.daoProvider = { dao }
         SearchGroupRepository().createGroup(expectedData)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualSearchGroup, equalTo(expectedData))
     }
 
     @Test
     fun updateGroupCallsUpdateGroupDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
         lateinit var actualSearchGroup: SearchGroupData
 
         val dao = object : EmptyMockSearchGroupDao() {
             override fun updateGroup(searchGroupData: SearchGroupData) {
-                tested.countDown()
+                called.countDown()
                 actualSearchGroup = searchGroupData
             }
         }
@@ -110,21 +110,21 @@ class SearchGroupRepositoryTest {
         SearchGroupRepository.daoProvider = { dao }
         SearchGroupRepository().updateGroup(expectedData)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualSearchGroup, equalTo(expectedData))
     }
 
     @Test
     fun removeSearchGroupCallsRemoveSearchGroupDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = DUMMY_GROUP_ID
         lateinit var actualSearchGroup: String
 
         val dao = object : EmptyMockSearchGroupDao() {
             override fun removeSearchGroup(searchGroupId: String) {
-                tested.countDown()
+                called.countDown()
                 actualSearchGroup = searchGroupId
             }
         }
@@ -132,8 +132,8 @@ class SearchGroupRepositoryTest {
         SearchGroupRepository.daoProvider = { dao }
         SearchGroupRepository().removeSearchGroup(expectedData)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualSearchGroup, equalTo(expectedData))
     }

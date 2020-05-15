@@ -29,7 +29,7 @@ class UserRepositoryTest {
 
     @Test
     fun getOperatorsOfSearchGroupCallsGetUsersOfGroupWithRoleFromDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = MutableLiveData(setOf(UserData(uuid = DUMMY_USER_ID)))
         val expectedRole = Role.OPERATOR
         lateinit var actualRole: Role
@@ -37,7 +37,7 @@ class UserRepositoryTest {
 
         val dao = object : EmptyMockUserDao() {
             override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
-                tested.countDown()
+                called.countDown()
                 actualRole = role
                 actualGroupId = groupId
                 return expectedData
@@ -48,8 +48,8 @@ class UserRepositoryTest {
         val repo = UserRepository()
         assertThat(repo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData))
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualRole, equalTo(expectedRole))
         assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
@@ -57,7 +57,7 @@ class UserRepositoryTest {
 
     @Test
     fun getRescuersOfSearchGroupCallsGetUsersOfGroupWithRoleFromDao() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedData = MutableLiveData(setOf(UserData(uuid = DUMMY_USER_ID)))
         val expectedRole = Role.RESCUER
         lateinit var actualRole: Role
@@ -65,7 +65,7 @@ class UserRepositoryTest {
 
         val dao = object : EmptyMockUserDao() {
             override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
-                tested.countDown()
+                called.countDown()
                 actualGroupId = groupId
                 actualRole = role
                 return expectedData
@@ -76,8 +76,8 @@ class UserRepositoryTest {
 
         assertThat(repo.getRescuersOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData))
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualRole, equalTo(expectedRole))
         assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
@@ -85,13 +85,13 @@ class UserRepositoryTest {
 
     @Test
     fun removeUserFromSearchGroupCallsRemoveUserFromSearchGroupWithCorrectParameters() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         lateinit var actualGroupId: String
         lateinit var actualUserId: String
 
         val dao = object : EmptyMockUserDao() {
             override fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
-                tested.countDown()
+                called.countDown()
                 actualGroupId = searchGroupId
                 actualUserId = userId
             }
@@ -101,8 +101,8 @@ class UserRepositoryTest {
 
         repo.removeUserFromSearchGroup(DUMMY_GROUP_ID, DUMMY_USER_ID)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualUserId, equalTo(DUMMY_USER_ID))
         assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
@@ -110,12 +110,12 @@ class UserRepositoryTest {
 
     @Test
     fun removeAllUserFromSearchGroupCallsRemoveAllUserFromSearchGroupWithCorrectParameters() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         lateinit var actualGroupId: String
 
         val dao = object : EmptyMockUserDao() {
             override fun removeAllUserOfSearchGroup(searchGroupId: String) {
-                tested.countDown()
+                called.countDown()
                 actualGroupId = searchGroupId
             }
         }
@@ -124,8 +124,8 @@ class UserRepositoryTest {
 
         repo.removeAllUserOfSearchGroup(DUMMY_GROUP_ID)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
     }
@@ -134,14 +134,14 @@ class UserRepositoryTest {
 
     @Test
     fun addUserToSearchGroupCallsAddUserToSearchGroupWithCorrectParameters() {
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val expectedUserData = UserData(DUMMY_EMAIL, DUMMY_USER_ID, Role.RESCUER)
         lateinit var actualGroupId: String
         lateinit var actualUser: UserData
 
         val dao = object : EmptyMockUserDao() {
             override fun addUserToSearchGroup(searchGroupId: String, user: UserData) {
-                tested.countDown()
+                called.countDown()
                 actualGroupId = searchGroupId
                 actualUser = user
             }
@@ -151,8 +151,8 @@ class UserRepositoryTest {
 
         repo.addUserToSearchGroup(DUMMY_GROUP_ID, expectedUserData)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
         assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
         assertThat(actualUser, equalTo(expectedUserData))

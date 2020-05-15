@@ -40,7 +40,7 @@ class FirebaseMarkerDaoTest {
     fun getMarkersOfSearchGroupReturnsExpectedValues() {
         val dao = FirebaseMarkersDao()
         val marker = MarkerData(LatLng(41.0, 10.0))
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         //Populate database
         Firebase.database.getReference("markers/$DUMMY_GROUP_ID")
@@ -54,19 +54,19 @@ class FirebaseMarkerDaoTest {
                 // Uuid is generated automatically so we don't test
                 marker.uuid = it.first().uuid
                 assertThat(it.firstOrNull(), equalTo(marker))
-                tested.countDown()
+                called.countDown()
             }
         }
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
     }
 
     @Test
     fun addMarkerAddsMarker() {
         val dao = FirebaseMarkersDao()
         val expectedMarker = MarkerData(LatLng(41.0, 10.0))
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         val ref = Firebase.database.getReference("markers/$DUMMY_GROUP_ID")
 
@@ -79,7 +79,7 @@ class FirebaseMarkerDaoTest {
                 // We do not want to compare uuids as they are generated at adding time by firebase
                 expectedMarker.uuid = actualMarker.uuid
                 assertThat(actualMarker, equalTo(expectedMarker))
-                tested.countDown()
+                called.countDown()
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
@@ -88,8 +88,8 @@ class FirebaseMarkerDaoTest {
 
         dao.addMarker(DUMMY_GROUP_ID, expectedMarker)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
         ref.removeEventListener(listener)
     }
 
@@ -97,7 +97,7 @@ class FirebaseMarkerDaoTest {
     fun removeMarkerRemovesMarker() {
         val dao = FirebaseMarkersDao()
         val expectedRemovedMarker = MarkerData(LatLng(41.0, 10.0), DUMMY_MARKER_ID)
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         val added = CountDownLatch(1)
         val ref = Firebase.database.getReference("markers/$DUMMY_GROUP_ID")
 
@@ -116,7 +116,7 @@ class FirebaseMarkerDaoTest {
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 actualRemovedMarker = dataSnapshot.getValue(MarkerData::class.java)!!
                 actualRemovedMarker!!.uuid = dataSnapshot.key!!
-                tested.countDown()
+                called.countDown()
             }
         }
         ref.addChildEventListener(listener)
@@ -125,7 +125,7 @@ class FirebaseMarkerDaoTest {
         added.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
         dao.removeMarker(DUMMY_GROUP_ID, expectedRemovedMarker.uuid!!)
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
         assertThat(actualRemovedMarker, equalTo(expectedRemovedMarker))
         ref.removeEventListener(listener)
