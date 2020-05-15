@@ -459,7 +459,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val strategyString = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(context.getString(R.string.pref_key_overflight_strategy), "")
         return when (strategyString) {
-            getString(R.array.overflight_strategy_values) ->
+            getString(R.string.pref_value_strategy_zigzag) ->
                 SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
             getString(R.string.pref_value_strategy_spiral) ->
                 SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
