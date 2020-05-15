@@ -103,7 +103,7 @@ class MapActivityTest {
     @Test
     fun clickingOnLaunchMissionStartAndGenerateAMission() {
         preferencesEditor
-                .putString(applicationContext().getString(R.string.prefs_drone_altitude), DRONE_ALTITUDE.toString())
+                .putString(applicationContext().getString(R.string.pref_key_drone_altitude), DRONE_ALTITUDE.toString())
                 .apply()
 
         // Launch activity

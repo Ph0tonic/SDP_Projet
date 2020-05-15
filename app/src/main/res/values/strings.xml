@@ -18,7 +18,8 @@
     <string name="pref_key_zoom" translatable="false">zoom</string>
     <string name="pref_key_gps_refresh_rate" translatable="false">gps_refresh</string>
     <string name="pref_key_current_group_id" translatable="false">current_group_id</string>
-    <string name="pref_key_overflight_strategy">overflight_strategy</string>
+    <string name="pref_key_drone_altitude" translatable="false">drone_altitude</string>
+    <string name="pref_key_overflight_strategy" translatable="false">overflight_strategy</string>
 
     <!-- Mapbox State -->
     <string name="map_ready" translatable="false">MAP READY</string>
@@ -88,7 +89,6 @@
 
     <string name="no_info">No data</string>
 
-    <string name="prefs_drone_altitude">Drone altitude</string>
     <string name="drone_altitude_header">Default drone altitude</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
 

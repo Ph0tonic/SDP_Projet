@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ListPreference
-        android:defaultValue="2"
+        android:defaultValue="500"
         android:entries="@array/gps_refresh_rate_entries"
         android:entryValues="@array/gps_refresh_rate_values"
         android:key="@string/pref_key_gps_refresh_rate"
@@ -10,16 +10,15 @@
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
-
-        android:defaultValue="2"
+        android:defaultValue="10"
         android:entries="@array/drone_altitude_entries"
         android:entryValues="@array/drone_altitude_values"
-        android:key="@string/prefs_drone_altitude"
+        android:key="@string/pref_key_drone_altitude"
         android:title="@string/drone_altitude_header"
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
-        android:defaultValue="0"
+        android:defaultValue="@string/pref_value_strategy_zigzag"
         android:entries="@array/overflight_strategy_entries"
         android:entryValues="@array/overflight_strategy_values"
         android:key="@string/pref_key_overflight_strategy"
