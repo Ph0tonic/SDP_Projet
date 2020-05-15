@@ -51,9 +51,9 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
         symbolManager.iconRotationAlignment = Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 
         symbolManager.addLongClickListener {
+            victimSymbolLongClickConsumed = true
             val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
             markerManager.removeMarkerForSearchGroup(groupId, markerId)
-            victimSymbolLongClickConsumed = true
         }
 
         style.addImage(ID_ICON_VICTIM, MainApplication.applicationContext().getDrawable(R.drawable.ic_victim)!!)

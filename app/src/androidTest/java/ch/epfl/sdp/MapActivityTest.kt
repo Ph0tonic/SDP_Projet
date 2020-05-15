@@ -91,8 +91,11 @@ class MapActivityTest {
 
         // Do not use the real database, only use the offline version on the device
         //Firebase.database.goOffline()
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        val heatmapDao = MockHeatmapDao()
+        val markerDao = MockMarkerDao()
+
+        HeatmapRepository.daoProvider = { heatmapDao }
+        MarkerRepository.daoProvider = { markerDao }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
 
         val targetContext: Context = getInstrumentation().targetContext
