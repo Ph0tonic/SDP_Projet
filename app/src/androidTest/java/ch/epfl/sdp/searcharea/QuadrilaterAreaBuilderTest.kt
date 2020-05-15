@@ -19,7 +19,7 @@ class QuadrilaterAreaBuilderTest {
     fun canAddFourAngles() {
         val size = 4
         val area = QuadrilateralBuilder()
-        for (i in 1..size) {
+        repeat(size) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         assertThat(area.vertices.size, CoreMatchers.equalTo(size))
@@ -40,7 +40,7 @@ class QuadrilaterAreaBuilderTest {
     @Test(expected = IllegalArgumentException::class)
     fun cannotAddMoreThanFourAngles() {
         val area = QuadrilateralBuilder()
-        for (i in 0..4) {
+        repeat(4) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))

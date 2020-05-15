@@ -41,8 +41,6 @@
     <string name="region_name_error">Unknown Region name</string>
     <string name="switch_video">Switch video</string>
 
-    <string name="heatmap_source_ID">HeatMapSourceID</string>
-
     <string name="no_info">No data</string>
     <string name="map_ready">MAP READY</string>
     <string name="map_not_ready">MAP NOT READY</string>
@@ -53,7 +51,6 @@
     <string name="prefs_longitude">longitude</string>
     <string name="prefs_zoom">zoom</string>
     <string name="prefs_current_group_id">current_group_id</string>
-    <string name="map_button">Start new mission</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
     <string name="sign_out_success">Sign out successful</string>
     <string name="prefs_drone_altitude">Drone altitude</string>
