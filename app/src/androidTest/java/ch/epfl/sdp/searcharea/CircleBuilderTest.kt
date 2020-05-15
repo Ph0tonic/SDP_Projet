@@ -40,7 +40,7 @@ class CircleBuilderTest {
     @Test(expected = IllegalArgumentException::class)
     fun cannotAddMoreThanTwoPoints() {
         val area = CircleBuilder()
-        repeat(3) {
+        repeat(2) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
