@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import MapActivity
 import android.Manifest.permission
 import android.content.Context
 import android.content.Intent

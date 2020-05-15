@@ -377,10 +377,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     fun startMissionOrReturnHome(v: View) {
         if (!Drone.isConnected()) {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
-        } else if (!searchAreaBuilder.isComplete()) {
+        } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
-        }
-        if (Drone.isConnected()) {
+        } else {
             launchMission()
         }
     }
