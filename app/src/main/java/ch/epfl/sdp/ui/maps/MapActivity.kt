@@ -1,11 +1,15 @@
 package ch.epfl.sdp.ui.maps
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.HeatmapDataManager
@@ -17,7 +21,7 @@ import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
 import ch.epfl.sdp.mission.MissionBuilder
 import ch.epfl.sdp.mission.OverflightStrategy
-import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
@@ -26,7 +30,6 @@ import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -49,10 +52,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var groupId: String
     private var isMapReady = false
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var isCameraFragmentFullScreen = true
+
     private lateinit var mapboxMap: MapboxMap
     private lateinit var victimSymbolManager: SymbolManager
-
-    private lateinit var snackbar: Snackbar
 
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
@@ -62,7 +66,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var strategyPickerButton: FloatingActionButton
 
     private lateinit var role: Role
-    private var currentStrategy: OverflightStrategy = SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+    private lateinit var currentStrategy: OverflightStrategy
 
     private var victimSymbolLongClickConsumed = false
 
@@ -76,7 +80,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var missionBuilder: MissionBuilder
 
-    /* Repositories */
+    /* Data managers */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val heatmapManager = HeatmapDataManager()
 
@@ -114,7 +118,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         newLatLng?.let { updateUserPosition(it); if (::userPainter.isInitialized) userPainter.paint(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
-
         // Always update the text string
         updateTextView(droneBatteryLevelTextView, newBatteryLevel?.times(100)?.toDouble(), PERCENTAGE_FORMAT)
 
@@ -130,12 +133,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     companion object {
+        const val SCALE_FACTOR = 4
         const val ID_ICON_VICTIM: String = "airport"
 
         private const val DISTANCE_FORMAT = " %.1f m"
         private const val PERCENTAGE_FORMAT = " %.0f%%"
         private const val SPEED_FORMAT = " %.1f m/s"
-        private const val COORDINATE_FORMAT = " %.7f"
 
         private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
     }
@@ -160,21 +163,28 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         distanceToUserTextView = findViewById(R.id.distance_to_user)
         droneSpeedTextView = findViewById(R.id.speed)
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
-        snackbar = Snackbar.make(mapView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
+
+        //TODO: Give user location if current drone position is not available
+        CentralLocationManager.configure(this)
+        mapView.contentDescription = getString(R.string.map_not_ready)
+
+        resizeCameraFragment(mapView)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        actionBar?.hide()
 
         if (role == Role.RESCUER) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-            findViewById<LinearLayout>(R.id.switch_button)!!.visibility = View.GONE
+            findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
 
-        mapView.contentDescription = getString(R.string.map_not_ready)
-
-        //TODO: Give user location if current drone position is not available
-        CentralLocationManager.configure(this)
+        //Change button color if the drone is not connected
+        if (!Drone.isConnected()) {
+            findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY
+        }
     }
 
     override fun onResume() {
@@ -183,6 +193,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        actionBar?.hide()
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
     }
 
@@ -235,7 +247,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
 
-            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(loadStrategyPreference())
 
             // Add listeners to builders
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
@@ -245,6 +257,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             isMapReady = true
             onceMapReady(style)
+
+            setStrategy(loadStrategyPreference())
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
@@ -274,8 +288,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun onceMapReady(style: Style) {
         setupMarkerObserver()
         setupHeatmapsObservers(style)
-        /**Uncomment this to see a virtual heatmap, if uncommented, tests won't pass**/
-        //addVirtualPointsToHeatmap()
     }
 
     private fun setupMarkerObserver() {
@@ -360,12 +372,20 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     fun startMissionOrReturnHome(v: View) {
         if (!Drone.isConnected()) {
-            snackbar.show()
+            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
+        } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
+            Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
+        } else if (!Drone.isFlying()) {
+            launchMission()
         }
+    }
 
-        if (!Drone.isFlying()) { //TODO : return to user else
-            Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build()))
-        }
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun launchMission() {
+        val altitude = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(this.getString(R.string.prefs_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+
         findViewById<FloatingActionButton>(R.id.start_or_return_button)
                 .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
     }
@@ -382,6 +402,21 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             searchAreaBuilder.reset()
         }
     }
+
+    fun resizeCameraFragment(v: View) {
+        isCameraFragmentFullScreen = !isCameraFragmentFullScreen
+
+        val size = android.graphics.Point()
+        windowManager.defaultDisplay.getSize(size)
+        val margin = 2 * resources.getDimension(R.dimen.tiny_margin).toInt()
+
+        //findViewById<Button>(R.id.switch_button).visibility = if(isFragmentBig) View.VISIBLE else View.GONE
+        val vlcFragment = findViewById<ConstraintLayout>(R.id.vlc_fragment)
+        vlcFragment.layoutParams.width = (if (isCameraFragmentFullScreen) size.x else size.x / SCALE_FACTOR) - margin
+        vlcFragment.layoutParams.height = (if (isCameraFragmentFullScreen) size.y else size.y / SCALE_FACTOR) - margin
+        vlcFragment.requestLayout()
+    }
+
 
     private fun addVictimMarker(latLng: LatLng, markerId: String) {
         if (!isMapReady) return
@@ -420,11 +455,25 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    private fun loadStrategyPreference(): OverflightStrategy {
+        val context = MainApplication.applicationContext()
+        val strategyString = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(context.getString(R.string.prefs_overflight_strategy), "")
+        return when (strategyString) {
+            getString(R.string.zigzag_strategy) ->
+                SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
+            getString(R.string.spiral_strategy) ->
+                SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
+            else ->
+                SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
+        }
+    }
+
     fun pickStrategy(view: View) {
-        if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
-            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+        if (currentStrategy is SimpleQuadStrategy) {
+            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         } else {
-            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
     }
 
@@ -436,7 +485,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         currentStrategy = strategy
         when (strategy) {
-            is SimpleMultiPassOnQuadrilateral -> {
+            is SimpleQuadStrategy -> {
                 searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = QuadrilateralBuilder()
                 strategyPickerButton.setIcon(R.drawable.ic_quadstrat)

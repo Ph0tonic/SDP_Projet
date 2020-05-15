@@ -36,10 +36,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.camera.VlcActivity"
-            android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="landscape" />
-        <activity
             android:name=".ui.maps.MapActivity"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="landscape"

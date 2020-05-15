@@ -3,7 +3,6 @@ package ch.epfl.sdp
 import ch.epfl.sdp.drone.DroneUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
-import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert
 import org.junit.Test
 import kotlin.random.Random.Default.nextDouble
@@ -13,7 +12,7 @@ class DroneUtilsTest {
     @Test
     fun generateMissionItemTest() {
         val n = 100
-        for (x in 0..n) {
+        repeat(n) {
             val randomLatitude = nextDouble(-90.0, 90.0)
             val randomLongitude = nextDouble(0.0, 180.0)
             val mission = Mission.MissionItem(
@@ -24,7 +23,7 @@ class DroneUtilsTest {
                     true, Float.NaN, Float.NaN,
                     Mission.MissionItem.CameraAction.NONE, Float.NaN,
                     1.0)
-            val expectedMission = DroneUtils.generateMissionItem(randomLatitude, randomLongitude)
+            val expectedMission = DroneUtils.generateMissionItem(randomLatitude, randomLongitude, 10f)
             Assert.assertTrue(missionEquality(expectedMission, mission))
         }
     }
@@ -39,13 +38,13 @@ class DroneUtilsTest {
         )
 
         val expectedMissionItems = positions.map { pos ->
-            DroneUtils.generateMissionItem(pos.latitude, pos.longitude)
+            DroneUtils.generateMissionItem(pos.latitude, pos.longitude, 10f)
         }
 
-        val missionsItems = DroneUtils
-                .makeDroneMission(positions)
+        val missionPlan = DroneUtils
+                .makeDroneMission(positions, 10f)
 
-        expectedMissionItems.zip(missionsItems).forEach { (expected, observed) ->
+        expectedMissionItems.zip(missionPlan.missionItems).forEach { (expected, observed) ->
             Assert.assertTrue(missionEquality(expected, observed))
         }
     }

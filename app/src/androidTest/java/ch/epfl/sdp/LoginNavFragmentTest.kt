@@ -84,7 +84,6 @@ class LoginNavFragmentTest {
         mUiDevice.pressBack()
     }
 
-
     @Test
     fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
         runOnUiThread {

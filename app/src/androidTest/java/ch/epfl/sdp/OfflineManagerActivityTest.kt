@@ -77,17 +77,6 @@ class OfflineManagerActivityTest {
 
     @Test
     fun checkToastWhenNoMapsHaveBeenDownloaded() {
-//        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-//            override fun onList(offlineRegions: Array<OfflineRegion>) {
-//                if (offlineRegions.isNotEmpty()) {
-//                    for (or in offlineRegions) {
-//                        deleteOfflineRegion(or, ProgressBar(applicationContext()), mActivityRule.activity.mapView)
-//                    }
-//                }
-//            }
-//
-//            override fun onError(error: String) {} //left intentionally empty
-//        })
         onView(withId(R.id.list_button)).perform(click())
         onView(withText(applicationContext().getString(R.string.toast_no_regions_yet)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))

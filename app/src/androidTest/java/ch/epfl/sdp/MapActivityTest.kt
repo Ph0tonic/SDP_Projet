@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -31,7 +32,7 @@ import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
+import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.ui.maps.MapActivity
@@ -55,7 +56,8 @@ class MapActivityTest {
         private const val ZOOM_TEST = 0.9
         private const val MAP_LOADING_TIMEOUT = 1000L
         private const val EPSILON = 1e-9
-        private const val DEFAULT_ALTITUDE = " 0.0 m"
+        private const val DRONE_ALTITUDE = 20.0F
+        private const val DEFAULT_ALTITUDE_DISPLAY = " 0.0 m"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
@@ -65,6 +67,9 @@ class MapActivityTest {
     private val intentWithGroupAndOperator = Intent()
             .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
             .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     var mActivityRule = IntentsTestRule(
@@ -96,13 +101,15 @@ class MapActivityTest {
     }
 
     @Test
-    fun canStartMission() {
+    fun clickingOnLaunchMissionStartAndGenerateAMission() {
+        preferencesEditor
+                .putString(applicationContext().getString(R.string.prefs_drone_altitude), DRONE_ALTITUDE.toString())
+                .apply()
+
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
-        val expectedLatLng = LatLng(47.397026, 8.543067)
 
         // TODO: Why click on menu button doesn't work ?
         // Open menu to click on start button
@@ -110,26 +117,27 @@ class MapActivityTest {
 
         runOnUiThread {
             val searchArea = QuadrilateralArea(arrayListOf(
-                    expectedLatLng, //we consider the closest point to the drone
+                    LatLng(47.397026, 8.543067), //we consider the closest point to the drone
                     LatLng(47.398979, 8.543434),
                     LatLng(47.398279, 8.543934),
                     LatLng(47.397426, 8.544867)
             ))
             mActivityRule.activity.missionBuilder
                     .withSearchArea(searchArea)
-                    .withStartingLocation(expectedLatLng)
-                    .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+                    .withStartingLocation(LatLng(47.397026, 8.543067))
+                    .withStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
 
         // Then start mission officially
         onView(withId(R.id.start_or_return_button)).perform(click())
+        runOnUiThread {
+            mActivityRule.activity.launchMission()
+        }
 
         val uploadedMission = Drone.currentMissionLiveData.value
 
         assertThat(uploadedMission, `is`(notNullValue()))
         assertThat(uploadedMission!!.size, not(equalTo(0)))
-        assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
-        assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
     }
 
     @Test
@@ -252,7 +260,7 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
-            mActivityRule.activity.setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            mActivityRule.activity.setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
 
@@ -302,10 +310,10 @@ class MapActivityTest {
         // Add 5 points
         runOnUiThread {
             mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(1.0, 1.0))
-            mActivityRule.activity.onMapClicked(LatLng(2.0, 2.0))
-            mActivityRule.activity.onMapClicked(LatLng(3.0, 3.0))
-            mActivityRule.activity.onMapClicked(LatLng(4.0, 4.0))
+            mActivityRule.activity.onMapClicked(LatLng(0.00001, 0.00001))
+            mActivityRule.activity.onMapClicked(LatLng(0.00002, 0.00002))
+            mActivityRule.activity.onMapClicked(LatLng(0.00003, 0.00003))
+            mActivityRule.activity.onMapClicked(LatLng(0.00004, 0.00004))
         }
 
         onView(withText("Already enough points"))
@@ -404,7 +412,7 @@ class MapActivityTest {
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.value = 0F
         }
-        onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE)))
+        onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
 
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.value = 1.123F
@@ -450,12 +458,12 @@ class MapActivityTest {
             CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
             Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
 
         runOnUiThread {
             Drone.currentPositionLiveData.value = LatLng(1.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
     }
 
     @Test
@@ -465,12 +473,12 @@ class MapActivityTest {
             Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
             CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
 
         runOnUiThread {
             CentralLocationManager.currentUserPosition.value = LatLng(1.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
     }
 
     @Test
@@ -510,5 +518,16 @@ class MapActivityTest {
             Drone.currentBatteryLevelLiveData.value = .98f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
+    }
+
+    @Test
+    fun resizeButtonIsWorking() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
+        onView(withId(R.id.resize_button)).perform(click())
+        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))
+        onView(withId(R.id.resize_button)).perform(click())
+        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
     }
 }

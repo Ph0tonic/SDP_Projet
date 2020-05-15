@@ -90,6 +90,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         regionNameEdit.hint = getString(R.string.set_region_name_hint)
         regionNameEdit.id = R.id.dialog_textfield_id
 
+        //TODO: Use DialogueFragment
         // Build the dialog box
         builder.setTitle(getString(R.string.dialog_title))
                 .setView(regionNameEdit)

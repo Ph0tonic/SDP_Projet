@@ -77,6 +77,8 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        PreferenceManager
+                .setDefaultValues(this, R.xml.root_preferences, false);
         loadActiveGroupFromPrefs()
     }
 

@@ -8,9 +8,14 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
+/app/.classpath
+/app/.project
+/app/.settings/
+/.settings/
 /build
 /captures
+.DS_Store
+.project
 .externalNativeBuild
 .cxx
 .ignored

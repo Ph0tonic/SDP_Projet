@@ -1,23 +1,27 @@
 package ch.epfl.sdp.drone
 
+import ch.epfl.sdp.ui.maps.MapActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
-import io.mavsdk.mission.Mission
+import io.mavsdk.mission.Mission.MissionItem
+import io.mavsdk.mission.Mission.MissionPlan
 
 object DroneUtils {
-    fun makeDroneMission(path: List<LatLng>): List<Mission.MissionItem> {
-        return path.map {
-            generateMissionItem(it.latitude, it.longitude)
-        }
+
+    fun makeDroneMission(path: List<LatLng>, altitude: Float): MissionPlan {
+        return MissionPlan(path.map { point ->
+            generateMissionItem(point.latitude, point.longitude, altitude)
+        })
     }
 
-    fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double): Mission.MissionItem {
-        return Mission.MissionItem(
+    fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double, altitude: Float): MissionItem {
+        MapActivity.ID_ICON_VICTIM
+        return MissionItem(
                 latitudeDeg,
                 longitudeDeg,
-                10f,
+                altitude,
                 10f,
                 true, Float.NaN, Float.NaN,
-                Mission.MissionItem.CameraAction.NONE, Float.NaN,
+                MissionItem.CameraAction.NONE, Float.NaN,
                 1.0)
     }
 }
