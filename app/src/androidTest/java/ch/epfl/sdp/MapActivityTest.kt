@@ -55,7 +55,8 @@ class MapActivityTest {
         private const val ZOOM_TEST = 0.9
         private const val MAP_LOADING_TIMEOUT = 1000L
         private const val EPSILON = 1e-9
-        private const val DEFAULT_ALTITUDE = " 0.0 m"
+        private const val DRONE_ALTITUDE = 20.0F
+        private const val DEFAULT_ALTITUDE_DISPLAY = " 0.0 m"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
@@ -100,9 +101,8 @@ class MapActivityTest {
 
     @Test
     fun clickingOnLaunchMissionStartAndGenerateAMission() {
-        PreferenceManager.getDefaultSharedPreferences(applicationContext())
-                .edit()
-                .putString(applicationContext().getString(R.string.prefs_drone_altitude), "20")
+        preferencesEditor
+                .putString(applicationContext().getString(R.string.prefs_drone_altitude), DRONE_ALTITUDE.toString())
                 .apply()
 
         // Launch activity
@@ -411,7 +411,7 @@ class MapActivityTest {
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.value = 0F
         }
-        onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE)))
+        onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
 
         runOnUiThread {
             Drone.currentAbsoluteAltitudeLiveData.value = 1.123F
@@ -457,12 +457,12 @@ class MapActivityTest {
             CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
             Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
 
         runOnUiThread {
             Drone.currentPositionLiveData.value = LatLng(1.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
     }
 
     @Test
@@ -472,12 +472,12 @@ class MapActivityTest {
             Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
             CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE)))
+        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
 
         runOnUiThread {
             CentralLocationManager.currentUserPosition.value = LatLng(1.0, 0.0)
         }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE))))
+        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
     }
 
     @Test
