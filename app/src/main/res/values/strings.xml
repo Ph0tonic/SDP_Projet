@@ -97,4 +97,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="ReturnDroneDialogFragment">Return Home Drone</string>
+    <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ? </string>
+    <string name="ReturnDroneDialogHome">Home</string>
+    <string name="ReturnDroneDialogUser">User</string>
+
 </resources>

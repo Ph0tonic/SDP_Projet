@@ -135,18 +135,32 @@ object Drone {
                 .firstOrError().toCompletable()
     }
 
+    /**
+     * Throws an IllegalStateException is the home position is not available
+     */
     fun returnHome() {
-        disposables.add(
-                getConnectionState()
-                        .andThen(instance.action.returnToLaunch())
-                        .subscribe())
+        val returnLocation = currentHomeLiveData.value?.let { LatLng(it.latitudeDeg, it.longitudeDeg) }
+        if (returnLocation != null) {
+            this.currentMissionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
+            disposables.add(
+                    getConnectionState()
+                            .andThen(instance.mission.pauseMission())
+                            .andThen(instance.mission.clearMission())
+                            .andThen(instance.action.returnToLaunch())
+                            .subscribe())
+        } else {
+            throw IllegalStateException(MainApplication.applicationContext().getString(R.string.drone_home_error))
+        }
     }
 
+    /**
+     * If the user position is not available, the drone will go to his home location by default
+     */
     fun returnUser() {
         val returnLocation = CentralLocationManager.currentUserPosition.value
                 ?: currentHomeLiveData.value?.let { LatLng(it.latitudeDeg, it.longitudeDeg) }
         if (returnLocation != null) {
-            this.currentMissionLiveData.postValue(listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat())))
+            this.currentMissionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
             getConnectionState()
                     .andThen(instance.mission.pauseMission())
                     .andThen(instance.mission.clearMission())
