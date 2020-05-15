@@ -78,7 +78,6 @@
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
-
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/strategy_picker_button"
         android:layout_width="wrap_content"

@@ -4,12 +4,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.TableLayout
+import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
-import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.HeatmapDataManager
@@ -29,17 +30,13 @@ import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
+import ch.epfl.sdp.utils.StrategyUtils.loadDefaultStrategyFromPreferences
 import com.getbase.floatingactionbutton.FloatingActionButton
-import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.Symbol
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 
 /**
  * Main Activity to display map and create missions.
@@ -56,17 +53,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     var isCameraFragmentFullScreen = true
 
     private lateinit var mapboxMap: MapboxMap
-    private lateinit var victimSymbolManager: SymbolManager
 
     private lateinit var strategyPickerButton: FloatingActionButton
 
     private lateinit var role: Role
     private lateinit var currentStrategy: OverflightStrategy
-
-    private var victimSymbolLongClickConsumed = false
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val victimMarkers = mutableMapOf<String, Symbol>()
 
     /** Builders */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -90,6 +81,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var userPainter: MapboxUserPainter
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var victimSymbolManager: VictimSymbolManager
+
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { if (::dronePainter.isInitialized) dronePainter.paint(it) }
     }
@@ -98,10 +92,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     companion object {
-        const val SCALE_FACTOR = 4
-        const val ID_ICON_VICTIM: String = "airport"
-
-        private const val VICTIM_MARKER_ID_PROPERTY_NAME = "id"
+        private const val SCALE_FACTOR = 4
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -177,8 +168,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
+            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, groupId)
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
-            setupVictimSymbolManager(style)
 
             mapboxMap.addOnMapClickListener {
                 onMapClicked(it)
@@ -194,7 +185,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
             //Create builders
             missionBuilder = MissionBuilder().withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
-            setStrategy(loadStrategyPreference())
+            setStrategy(loadDefaultStrategyFromPreferences())
 
             // Add listeners to builders
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
@@ -205,48 +196,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             isMapReady = true
             onceMapReady(style)
 
-            setStrategy(loadStrategyPreference())
-
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
         }
-    }
-
-    private fun setupVictimSymbolManager(style: Style) {
-        victimSymbolManager = SymbolManager(mapView, mapboxMap, style)
-
-        victimSymbolManager.iconAllowOverlap = true
-        victimSymbolManager.symbolSpacing = 0F
-        victimSymbolManager.iconIgnorePlacement = true
-        victimSymbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
-
-        victimSymbolManager.addLongClickListener {
-            val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
-            markerManager.removeMarkerForSearchGroup(groupId, markerId)
-            victimSymbolLongClickConsumed = true
-        }
-
-        style.addImage(ID_ICON_VICTIM, getDrawable(R.drawable.ic_victim)!!)
     }
 
     /**
      * Called once the map and the style are completely initialized
      */
     private fun onceMapReady(style: Style) {
-        setupMarkerObserver()
         setupHeatmapsObservers(style)
-    }
-
-    private fun setupMarkerObserver() {
-        markerManager.getMarkersOfSearchGroup(groupId).observe(this, Observer { markers ->
-            val removedMarkers = victimMarkers.keys - markers.map { it.uuid }
-            removedMarkers.forEach {
-                victimSymbolManager.delete(victimMarkers.remove(it))
-            }
-            markers.filter { !victimMarkers.containsKey(it.uuid) }.forEach {
-                addVictimMarker(it.location!!, it.uuid!!)
-            }
-        })
     }
 
     /**
@@ -255,7 +214,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      *  - An observer for each heatmap for new points
      */
     private fun setupHeatmapsObservers(style: Style) {
-        val upperLayerId = victimSymbolManager.layerId
+        val upperLayerId = victimSymbolManager.layerId()
         heatmapManager.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
             // Observers for heatmap creation
             repoHeatmaps.filter { !heatmapPainters.containsKey(it.key) }
@@ -283,10 +242,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     private fun onMapLongClicked(position: LatLng) {
-        if (!victimSymbolLongClickConsumed) {
+        // Need mapbox update to remove this test
+        if (!victimSymbolManager.victimSymbolLongClickConsumed) {
             markerManager.addMarkerForSearchGroup(groupId, position)
         }
-        victimSymbolLongClickConsumed = false
+        victimSymbolManager.victimSymbolLongClickConsumed = false
     }
 
     /**
@@ -356,36 +316,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         vlcFragment.requestLayout()
     }
 
-
-    private fun addVictimMarker(latLng: LatLng, markerId: String) {
-        if (!isMapReady) return
-        val markerProperties = JsonObject()
-        markerProperties.addProperty(VICTIM_MARKER_ID_PROPERTY_NAME, markerId)
-        val symbolOptions = SymbolOptions()
-                .withLatLng(LatLng(latLng))
-                .withIconImage(ID_ICON_VICTIM)
-                .withData(markerProperties)
-        victimMarkers[markerId] = victimSymbolManager.create(symbolOptions)
-    }
-
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    private fun loadStrategyPreference(): OverflightStrategy {
-        val context = MainApplication.applicationContext()
-        val strategyString = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(context.getString(R.string.pref_key_overflight_strategy), "")
-        return when (strategyString) {
-            getString(R.string.pref_value_strategy_zigzag) ->
-                SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
-            getString(R.string.pref_value_strategy_spiral) ->
-                SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
-            else ->
-                SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
-        }
     }
 
     fun pickStrategy(view: View) {

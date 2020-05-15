@@ -1,6 +1,5 @@
 package ch.epfl.sdp.drone
 
-import ch.epfl.sdp.ui.maps.MapActivity
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission.MissionItem
 import io.mavsdk.mission.Mission.MissionPlan
@@ -14,7 +13,6 @@ object DroneUtils {
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double, altitude: Float): MissionItem {
-        MapActivity.ID_ICON_VICTIM
         return MissionItem(
                 latitudeDeg,
                 longitudeDeg,

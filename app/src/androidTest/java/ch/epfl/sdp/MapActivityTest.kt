@@ -243,12 +243,12 @@ class MapActivityTest {
 
         onView(withId(R.id.mapView)).perform(longClick())
         runOnUiThread {
-            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
+            assertThat(mActivityRule.activity.victimSymbolManager.markers.size, equalTo(1))
         }
         onView(withId(R.id.mapView)).perform(longClick())
         Thread.sleep(2000)
         runOnUiThread {
-            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
+            assertThat(mActivityRule.activity.victimSymbolManager.markers.size, equalTo(0))
         }
     }
 
