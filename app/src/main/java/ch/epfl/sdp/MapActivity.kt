@@ -16,12 +16,16 @@ import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
-import ch.epfl.sdp.mission.*
+import ch.epfl.sdp.mission.MissionBuilder
+import ch.epfl.sdp.mission.OverflightStrategy
+import ch.epfl.sdp.mission.SimpleQuadStrategy
+import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
+import ch.epfl.sdp.ui.maps.ReturnDroneDialogFragment
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -381,7 +385,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
-        } else if (!Drone.currentFlyingLiveData.value!!) launchMission() else returnDroneDialog()
+        } else if (!Drone.currentFlyingLiveData.value!!) {
+            launchMission()
+        } else {
+            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -389,24 +397,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.prefs_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
         Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
-    }
-
-    private fun returnDroneDialog() {
-        // when the user clicks return button and require
-        // user to choose where he wants the drone back
-        AlertDialog.Builder(this@MapActivity)
-                // Build the dialog box
-                .setTitle("Do you want to return to user or to take off ?")
-                .setPositiveButton("HOME") { _, _ -> Drone.returnHome() }
-                .setNegativeButton("USER") { _, _ ->
-                    try{
-                        Drone.returnUser()
-                    } catch (e : IllegalStateException){
-                        Toast.makeText(this, this.getText(R.string.drone_home_error), Toast.LENGTH_SHORT).show()
-                    }}
-                .setNeutralButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
-                // Display the dialog
-                .show()
     }
 
     fun storeMap(v: View) {
