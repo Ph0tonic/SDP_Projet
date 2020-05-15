@@ -19,7 +19,7 @@ class QuadrilaterAreaBuilderTest {
     fun canAddFourAngles() {
         val size = 4
         val area = QuadrilateralBuilder()
-        repeat(size - 1) {
+        repeat(size) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         assertThat(area.vertices.size, CoreMatchers.equalTo(size))
