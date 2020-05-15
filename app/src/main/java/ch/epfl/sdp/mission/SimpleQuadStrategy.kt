@@ -40,14 +40,11 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
         val waypointsCopied = mutableListOf<LatLng>().apply { addAll(quadrilateralArea.vertices) }
         val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
         Collections.rotate(waypointsCopied, -startingIndex)
-        val maxDistX = max(                                         // 0-1
-                waypointsCopied[0].distanceTo(waypointsCopied[1]),  //
-                waypointsCopied[3].distanceTo(waypointsCopied[2]))  // 3-2
-        val maxDistY = max(                                         // 0 1
-                waypointsCopied[0].distanceTo(waypointsCopied[3]),  // | |
-                waypointsCopied[1].distanceTo(waypointsCopied[2]))  // 3 2
-        val numPointsX = ceil(maxDistX / maxDistBetweenLines).toInt()
-        val numPointsY = ceil(maxDistY / maxDistBetweenLines).toInt()
+
+        val numPoints = computeMaxDists(waypointsCopied).toList().map { ceil(it / maxDistBetweenLines).toInt() }
+
+        val numPointsX = numPoints[0]
+        val numPointsY = numPoints[1]
 
          return (0..numPointsY).flatMap {y ->
                 val yPercent = y.toDouble() / numPointsY
@@ -63,4 +60,15 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
                 }
             }
     }
+
+    private fun computeMaxDists(waypoints: List<LatLng>): Pair<Double,Double> {
+        val maxDistX = max(                             // 0-1
+                waypoints[0].distanceTo(waypoints[1]),  //
+                waypoints[3].distanceTo(waypoints[2]))  // 3-2
+        val maxDistY = max(                             // 0 1
+                waypoints[0].distanceTo(waypoints[3]),  // | |
+                waypoints[1].distanceTo(waypoints[2]))  // 3 2
+        return Pair(maxDistX, maxDistY)
+    }
+
 }
