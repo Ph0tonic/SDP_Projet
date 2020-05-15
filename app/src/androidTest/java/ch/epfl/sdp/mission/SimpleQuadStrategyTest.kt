@@ -45,4 +45,6 @@ class SimpleQuadStrategyTest {
         val pathSize = path.size
         assertThat(pathSize, equalTo(4))
     }
+
+    //TODO test that starting location is taken into account.
 }

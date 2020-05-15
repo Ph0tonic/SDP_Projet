@@ -1,6 +1,5 @@
 package ch.epfl.sdp
 
-import android.widget.ProgressBar
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -15,10 +14,8 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
-import ch.epfl.sdp.database.dao.FirebaseMarkerDaoTest
 import ch.epfl.sdp.map.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.deleteOfflineRegion
 import ch.epfl.sdp.ui.offlineMapsManaging.OfflineRegionUtils.getRegionName
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
@@ -80,17 +77,6 @@ class OfflineManagerActivityTest {
 
     @Test
     fun checkToastWhenNoMapsHaveBeenDownloaded() {
-//        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-//            override fun onList(offlineRegions: Array<OfflineRegion>) {
-//                if (offlineRegions.isNotEmpty()) {
-//                    for (or in offlineRegions) {
-//                        deleteOfflineRegion(or, ProgressBar(applicationContext()), mActivityRule.activity.mapView)
-//                    }
-//                }
-//            }
-//
-//            override fun onError(error: String) {} //left intentionally empty
-//        })
         onView(withId(R.id.list_button)).perform(click())
         onView(withText(applicationContext().getString(R.string.toast_no_regions_yet)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))

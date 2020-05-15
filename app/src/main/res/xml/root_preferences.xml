@@ -11,7 +11,7 @@
 
     <ListPreference
 
-        android:defaultValue="10"
+        android:defaultValue="10.0"
         android:entries="@array/drone_altitude_entries"
         android:entryValues="@array/drone_altitude_values"
         android:key="@string/prefs_drone_altitude"

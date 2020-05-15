@@ -60,18 +60,14 @@ class SpiralStrategy(maxDistBetweenLinesIn: Double) : OverflightStrategy {
         val c = max(protoC, 0.0) //if distance is short, behaves as a straight line
         val steps = ceil(1.0 / (1 - c * c)).toInt()
 
-        val path = ArrayList<LatLng>()
-
-        for (step in 0..steps) {
+        return (0..steps).map { step ->
             val s = step.toDouble() / steps
             val t = sqrt(s)
             val theta = maxTheta * t
             val distance = theta * EARTH_RADIUS
             val phi = 2 * PI * turns * t
 
-            path.add(computeOffset(center, distance, Math.toDegrees(phi0 + phi)))
+            computeOffset(center, distance, Math.toDegrees(phi0 + phi))
         }
-
-        return path
     }
 }

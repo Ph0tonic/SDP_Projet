@@ -13,10 +13,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.utils.Auth
-import com.android.dx.command.Main
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Before
@@ -42,15 +40,15 @@ class SearchGroupEditionActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
-    companion object{
+    companion object {
         private const val DUMMY_SEARCHGROUP_ID = "DummySearchGroupId"
         private const val DUMMY_SEARCHGROUP_NAME = "DummySearchGroupName"
-        private val DUMMY_LOCATION = LatLng(0.0,0.0)
+        private val DUMMY_LOCATION = LatLng(0.0, 0.0)
         private const val FAKE_ACCOUNT_ID = "FakeAccountId"
     }
 
     @Test
-    fun groupNamesAreDisplayed(){
+    fun groupNamesAreDisplayed() {
         val groupDao = MockGroupDao(
                 listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION))
         )
@@ -63,7 +61,7 @@ class SearchGroupEditionActivityTest {
     }
 
     @Test
-    fun changingGroupChangesGroupInPreferences(){
+    fun changingGroupChangesGroupInPreferences() {
         val groupDao = MockGroupDao(
                 listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION))
         )
@@ -74,11 +72,11 @@ class SearchGroupEditionActivityTest {
                 .apply()
 
         mActivityRule.launchActivity(Intent())
-        
+
         onView(withId(R.id.search_group_selection_button)).perform(click())
         onView(withText(DUMMY_SEARCHGROUP_NAME)).perform(click())
         val actualGroupId = PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_current_group_id),null)
+                .getString(mActivityRule.activity.getString(R.string.prefs_current_group_id), null)
         assertThat(actualGroupId, equalTo(DUMMY_SEARCHGROUP_ID))
     }
 }

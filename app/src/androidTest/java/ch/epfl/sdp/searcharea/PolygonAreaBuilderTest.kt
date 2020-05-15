@@ -20,7 +20,7 @@ class PolygonAreaBuilderTest {
     fun canAddHundredAngles() {
         val size = 100
         val area = PolygonBuilder()
-        for (i in 1..size) {
+        repeat(size) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         assertThat(area.vertices.size, equalTo(size))

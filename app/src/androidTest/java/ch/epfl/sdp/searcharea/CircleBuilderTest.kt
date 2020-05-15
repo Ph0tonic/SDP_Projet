@@ -18,7 +18,7 @@ class CircleBuilderTest {
     fun canAddTwoPoints() {
         val size = 2
         val area = CircleBuilder()
-        for (i in 1..size) {
+        repeat(size) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         assertThat(area.vertices.size, CoreMatchers.equalTo(size))
@@ -40,7 +40,7 @@ class CircleBuilderTest {
     @Test(expected = IllegalArgumentException::class)
     fun cannotAddMoreThanTwoPoints() {
         val area = CircleBuilder()
-        for (i in 0..2) {
+        repeat(2) {
             area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
         }
         area.addVertex(LatLng(Random.nextDouble(), Random.nextDouble()))
