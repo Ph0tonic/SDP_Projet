@@ -382,7 +382,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 	      if (!Drone.isConnected() && !isTest) {
 	          connectedSnackbar.show()
 	      }
-	      else if(searchAreaBuilder.vertices.size<4 && currentStrategy is SimpleMultiPassOnQuadrilateral
+	      else if(searchAreaBuilder.vertices.size<4 && currentStrategy is SimpleQuadStrategy
 	              || searchAreaBuilder.vertices.size<2 && currentStrategy is SpiralStrategy){
 	          waypointsSnackbar.show()
 	      }
