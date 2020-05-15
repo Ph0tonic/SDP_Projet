@@ -48,8 +48,8 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
                 waypointsCopied[1].distanceTo(waypointsCopied[2]))  // 3 2
         val numPointsX = ceil(maxDistX / maxDistBetweenLines).toInt()
         val numPointsY = ceil(maxDistY / maxDistBetweenLines).toInt()
-        val path =
-            (0..numPointsY).flatMap {y ->
+
+         return (0..numPointsY).flatMap {y ->
                 val yPercent = y.toDouble() / numPointsY
                 val leftPoint = interpolate(waypointsCopied[0], waypointsCopied[3], yPercent)
                 val rightPoint = interpolate(waypointsCopied[1], waypointsCopied[2], yPercent)
@@ -62,6 +62,5 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
                         }
                 }
             }
-        return path
     }
 }
