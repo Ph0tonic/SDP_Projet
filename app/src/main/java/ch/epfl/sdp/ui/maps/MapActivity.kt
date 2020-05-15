@@ -194,18 +194,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
 
             isMapReady = true
-            onceMapReady(style)
+
+            // Once map is ready
+            setupHeatmapsObservers(style)
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
         }
-    }
-
-    /**
-     * Called once the map and the style are completely initialized
-     */
-    private fun onceMapReady(style: Style) {
-        setupHeatmapsObservers(style)
     }
 
     /**
