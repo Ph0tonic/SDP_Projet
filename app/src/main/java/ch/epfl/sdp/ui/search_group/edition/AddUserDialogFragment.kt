@@ -25,7 +25,7 @@ class AddUserDialogFragment(val role: Role, val userAddListener: UserAddListener
                     // Add action buttons
                     .setPositiveButton(R.string.add_a_user) { dialog, id ->
                         //TODO Validate email
-                        userAddListener.addUser(view.findViewById<EditText>(R.id.email_address).text.toString(), role)
+                        userAddListener.addUser(view.findViewById<EditText>(R.id.add_user_email_address).text.toString(), role)
                     }
                     .setNegativeButton(R.string.cancel) { dialog, id ->
                         dialog.cancel()
