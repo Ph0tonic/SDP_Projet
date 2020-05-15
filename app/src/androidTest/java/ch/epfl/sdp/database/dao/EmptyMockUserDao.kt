@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.UserData
 
-class EmptyMockUserDao : UserDao {
+open class EmptyMockUserDao : UserDao {
     override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
         return MutableLiveData()
     }
