@@ -144,7 +144,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO move "groupId" to Strings
         requireNotNull(intent.getStringExtra(getString(R.string.intent_key_group_id))) { "MapActivity should be provided with a searchGroupId\n" }
         require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
         requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
@@ -458,11 +457,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private fun loadStrategyPreference(): OverflightStrategy {
         val context = MainApplication.applicationContext()
         val strategyString = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(context.getString(R.string.prefs_overflight_strategy), "")
+                .getString(context.getString(R.string.pref_key_overflight_strategy), "")
         return when (strategyString) {
-            getString(R.string.zigzag_strategy) ->
+            getString(R.array.overflight_strategy_values) ->
                 SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
-            getString(R.string.spiral_strategy) ->
+            getString(R.string.pref_value_strategy_spiral) ->
                 SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
             else ->
                 SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)

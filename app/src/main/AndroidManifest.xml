@@ -24,7 +24,7 @@
             android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.MainActivity"
-            android:label="@string/title_activity_main"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.Launcher">
             <!--
              The theme set here is launcher, but it gets set to no_actionBar in MainActivity.kt

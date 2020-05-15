@@ -61,7 +61,7 @@ object CentralLocationManager {
         val context = MainApplication.applicationContext()
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         return defaultSharedPrefs
-                .getString(context.getString(R.string.prefs_gps_refresh), null)
+                .getString(context.getString(R.string.pref_key_gps_refresh_rate), null)
                 ?.toLongOrNull()
                 ?: 500
     }

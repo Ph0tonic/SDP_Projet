@@ -143,9 +143,9 @@ class MapActivityTest {
     @Test
     fun mapboxUsesOurPreferences() {
         preferencesEditor
-                .putString(applicationContext().getString(R.string.prefs_latitude), FAKE_LOCATION_TEST.latitude.toString())
-                .putString(applicationContext().getString(R.string.prefs_longitude), FAKE_LOCATION_TEST.longitude.toString())
-                .putString(applicationContext().getString(R.string.prefs_zoom), ZOOM_TEST.toString())
+                .putString(applicationContext().getString(R.string.pref_key_latitude), FAKE_LOCATION_TEST.latitude.toString())
+                .putString(applicationContext().getString(R.string.pref_key_longitude), FAKE_LOCATION_TEST.longitude.toString())
+                .putString(applicationContext().getString(R.string.pref_key_zoom), ZOOM_TEST.toString())
                 .apply()
 
         // Launch activity after setting preferences

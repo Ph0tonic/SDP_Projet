@@ -85,12 +85,12 @@ class MainActivity : AppCompatActivity() {
     fun loadActiveGroupFromPrefs() {
         currentGroupId.value = PreferenceManager
                 .getDefaultSharedPreferences(this)
-                .getString(getString(R.string.prefs_current_group_id), null)
+                .getString(getString(R.string.pref_key_current_group_id), null)
         currentGroupId.observe(this, Observer {
             PreferenceManager
                     .getDefaultSharedPreferences(this)
                     .edit()
-                    .putString(getString(R.string.prefs_current_group_id), it)
+                    .putString(getString(R.string.pref_key_current_group_id), it)
                     .apply()
         })
     }
