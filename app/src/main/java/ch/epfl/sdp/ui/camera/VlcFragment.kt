@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import ch.epfl.sdp.R
-import ch.epfl.sdp.ui.mapsManaging.MapsManagingViewModel
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
@@ -20,8 +19,8 @@ class VlcFragment : Fragment() {
     companion object {
         private const val USE_TEXTURE_VIEW = false
         private const val ENABLE_SUBTITLES = false
-        private const val ASSET_FILENAME = "rtsp://192.168.1.131:8554/live" //must be your IP
-        private val ARGS = arrayListOf("-vvv")//, "--live-caching=200")
+        private const val RTSP_SOURCE = "rtsp://192.168.1.131:8554/live" //must be your IP
+        private val libvlcArguments = arrayListOf("-vvv")//, "--live-caching=200")
     }
 
     private lateinit var mVideoLayout: VLCVideoLayout
@@ -33,7 +32,7 @@ class VlcFragment : Fragment() {
         super.onCreate(savedInstanceState)
         requireActivity().setContentView(R.layout.fragment_vlc)
 
-        mLibVLC = LibVLC(requireActivity(), ARGS)
+        mLibVLC = LibVLC(requireActivity(), libvlcArguments)
         mMediaPlayer = MediaPlayer(mLibVLC)
         mVideoLayout = requireActivity().findViewById(R.id.video_layout)
     }
@@ -60,7 +59,7 @@ class VlcFragment : Fragment() {
 
     private fun startVideo(): Boolean {
         try {
-            val media = Media(mLibVLC, Uri.parse(ASSET_FILENAME))
+            val media = Media(mLibVLC, Uri.parse(RTSP_SOURCE))
             mMediaPlayer.media = media
             media.release()
         } catch (e: IOException) {
