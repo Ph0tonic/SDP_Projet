@@ -388,7 +388,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     fun launchMission() {
         if (!Drone.isFlying()) { //TODO : return to user else
             val altitude = PreferenceManager.getDefaultSharedPreferences(this)
-                    .getString(this.getString(R.string.prefs_drone_altitude), "").toString().toFloat()
+                    .getString(this.getString(R.string.prefs_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
             Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
         }
         findViewById<FloatingActionButton>(R.id.start_or_return_button)

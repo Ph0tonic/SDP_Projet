@@ -99,7 +99,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun canStartMission() {
+    fun clickingOnLaunchMissionStartAndGenerateAMission() {
         PreferenceManager.getDefaultSharedPreferences(applicationContext())
                 .edit()
                 .putString(applicationContext().getString(R.string.prefs_drone_altitude), "20")
@@ -110,22 +110,20 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-        val expectedLatLng = LatLng(47.397026, 8.543067)
-
         // TODO: Why click on menu button doesn't work ?
         // Open menu to click on start button
         onView(withId(R.id.start_or_return_button)).perform(click())
 
         runOnUiThread {
             val searchArea = QuadrilateralArea(arrayListOf(
-                    expectedLatLng, //we consider the closest point to the drone
+                    LatLng(47.397026, 8.543067), //we consider the closest point to the drone
                     LatLng(47.398979, 8.543434),
                     LatLng(47.398279, 8.543934),
                     LatLng(47.397426, 8.544867)
             ))
             mActivityRule.activity.missionBuilder
                     .withSearchArea(searchArea)
-                    .withStartingLocation(expectedLatLng)
+                    .withStartingLocation(LatLng(47.397026, 8.543067))
                     .withStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
         }
 
@@ -139,8 +137,6 @@ class MapActivityTest {
 
         assertThat(uploadedMission, `is`(notNullValue()))
         assertThat(uploadedMission!!.size, not(equalTo(0)))
-        assertThat(uploadedMission[0].latitudeDeg, closeTo(expectedLatLng.latitude, EPSILON))
-        assertThat(uploadedMission[0].longitudeDeg, closeTo(expectedLatLng.longitude, EPSILON))
     }
 
     @Test
