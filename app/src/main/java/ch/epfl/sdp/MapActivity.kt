@@ -16,10 +16,7 @@ import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.map.*
 import ch.epfl.sdp.map.MapUtils.DEFAULT_ZOOM
 import ch.epfl.sdp.map.MapUtils.ZOOM_TOLERANCE
-import ch.epfl.sdp.mission.MissionBuilder
-import ch.epfl.sdp.mission.OverflightStrategy
-import ch.epfl.sdp.mission.SimpleMultiPassOnQuadrilateral
-import ch.epfl.sdp.mission.SpiralStrategy
+import ch.epfl.sdp.mission.*
 import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
@@ -246,7 +243,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             missionBuilder = MissionBuilder()
                     .withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
 
-            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(loadStrategyPreference())
 
             // Add listeners to builders
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
@@ -460,19 +457,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 .getString(context.getString(R.string.prefs_overflight_strategy), "")
         return when (strategyString) {
             getString(R.string.zigzag_strategy) ->
-                SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+                SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
             getString(R.string.spiral_strategy) ->
                 SpiralStrategy(Drone.GROUND_SENSOR_SCOPE)
             else ->
-                SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE)
+                SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)
         }
     }
 
     fun pickStrategy(view: View) {
-        if (currentStrategy is SimpleMultiPassOnQuadrilateral) {
-            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+        if (currentStrategy is SimpleQuadStrategy) {
+            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         } else {
-            setStrategy(SimpleMultiPassOnQuadrilateral(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
     }
 
@@ -484,7 +481,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
         currentStrategy = strategy
         when (strategy) {
-            is SimpleMultiPassOnQuadrilateral -> {
+            is SimpleQuadStrategy -> {
                 searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = QuadrilateralBuilder()
                 strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
