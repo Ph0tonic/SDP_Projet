@@ -54,8 +54,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     private lateinit var mapboxMap: MapboxMap
 
-    private lateinit var strategyPickerButton: FloatingActionButton
-
     private lateinit var role: Role
     private lateinit var currentStrategy: OverflightStrategy
 
@@ -108,8 +106,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         groupId = intent.getStringExtra(getString(R.string.intent_key_group_id))!!
         role = intent.getSerializableExtra(getString(R.string.intent_key_role)) as Role
-
-        strategyPickerButton = findViewById(R.id.strategy_picker_button)
 
         //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
@@ -315,12 +311,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             is SimpleQuadStrategy -> {
                 searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = QuadrilateralBuilder()
-                strategyPickerButton.setIcon(R.drawable.ic_quadstrat)
+                findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_quadstrat)
             }
             is SpiralStrategy -> {
                 searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = CircleBuilder()
-                strategyPickerButton.setIcon(R.drawable.ic_spiralstrat)
+                findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_spiralstrat)
             }
         }
 

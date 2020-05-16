@@ -47,32 +47,36 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         createGroup = groupId == null
 
         if (!createGroup) {
-            findViewById<Button>(R.id.search_group_edition_create_or_save_button).text = getString(R.string.save_group_changes)
-            searchGroupManager.getGroupById(groupId!!).observe(this, Observer {
-                if (it != null) {
-                    findViewById<TextView>(R.id.group_editor_group_name).text = it.name
-                }
-            })
-
-            val operatorsRecyclerView = findViewById<RecyclerView>(R.id.group_edit_operator_recyclerview)
-            operatorsRecyclerView.layoutManager = LinearLayoutManager(this)
-
-            val rescuersRecyclerView = findViewById<RecyclerView>(R.id.group_edit_rescuer_recyclerview)
-            rescuersRecyclerView.layoutManager = LinearLayoutManager(this)
-
-            val userRemovedListener = object : OnItemClickListener<UserData> {
-                override fun onItemClicked(user: UserData) {
-                    searchGroupManager.removeUserOfSearchGroup(groupId!!, user.uuid!!)
-                }
-            }
-            searchGroupManager.getOperatorsOfSearchGroup(groupId!!).observe(this, Observer {
-                operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
-            })
-
-            searchGroupManager.getRescuersOfSearchGroup(groupId!!).observe(this, Observer {
-                rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
-            })
+            loadInitialData()
         }
+    }
+
+    fun loadInitialData() {
+        findViewById<Button>(R.id.search_group_edition_create_or_save_button).text = getString(R.string.save_group_changes)
+        searchGroupManager.getGroupById(groupId!!).observe(this, Observer {
+            if (it != null) {
+                findViewById<TextView>(R.id.group_editor_group_name).text = it.name
+            }
+        })
+
+        val operatorsRecyclerView = findViewById<RecyclerView>(R.id.group_edit_operator_recyclerview)
+        operatorsRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        val rescuersRecyclerView = findViewById<RecyclerView>(R.id.group_edit_rescuer_recyclerview)
+        rescuersRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        val userRemovedListener = object : OnItemClickListener<UserData> {
+            override fun onItemClicked(user: UserData) {
+                searchGroupManager.removeUserOfSearchGroup(groupId!!, user.uuid!!)
+            }
+        }
+        searchGroupManager.getOperatorsOfSearchGroup(groupId!!).observe(this, Observer {
+            operatorsRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
+        })
+
+        searchGroupManager.getRescuersOfSearchGroup(groupId!!).observe(this, Observer {
+            rescuersRecyclerView.adapter = UserRecyclerAdapter(it.toList(), userRemovedListener)
+        })
     }
 
     fun onGroupDelete(view: View) {
