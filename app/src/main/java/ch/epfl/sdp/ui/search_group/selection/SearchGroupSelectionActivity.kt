@@ -14,7 +14,7 @@ import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 
-class SearchGroupSelectionActivity : AppCompatActivity() {
+class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGroupData>> {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val searchGroupManager = SearchGroupDataManager()
@@ -34,19 +34,22 @@ class SearchGroupSelectionActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
         recyclerView.layoutManager = linearLayoutManager
 
-        searchGroupManager.getAllGroups().observe(this, Observer {
-            recyclerView.adapter = SearchGroupRecyclerAdapter(it,
-                    object : OnItemClickListener<SearchGroupData> {
-                        override fun onItemClicked(searchGroupData: SearchGroupData) {
-                            joinGroup(searchGroupData)
-                        }
-                    },
-                    object : OnItemClickListener<SearchGroupData> {
-                        override fun onItemClicked(searchGroupData: SearchGroupData) {
-                            editGroup(searchGroupData)
-                        }
-                    })
-        })
+        searchGroupManager.getAllGroups().observe(this, this)
+    }
+
+    override fun onChanged(searchGroups: List<SearchGroupData>) {
+        val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
+        recyclerView.adapter = SearchGroupRecyclerAdapter(searchGroups,
+                object : OnItemClickListener<SearchGroupData> {
+                    override fun onItemClicked(searchGroupData: SearchGroupData) {
+                        joinGroup(searchGroupData)
+                    }
+                },
+                object : OnItemClickListener<SearchGroupData> {
+                    override fun onItemClicked(searchGroupData: SearchGroupData) {
+                        editGroup(searchGroupData)
+                    }
+                })
     }
 
     private fun joinGroup(searchGroupData: SearchGroupData) {

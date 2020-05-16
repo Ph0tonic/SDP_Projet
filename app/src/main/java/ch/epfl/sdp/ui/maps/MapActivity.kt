@@ -120,18 +120,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         actionBar?.hide()
 
         if (role == Role.RESCUER) {
-            findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
-            findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
-            findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
-            findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-            findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
-            findViewById<TableLayout>(R.id.drone_status_fragment)!!.visibility = View.GONE
+            hideOperatorUiComponents()
         }
 
         //Change button color if the drone is not connected
         if (!Drone.isConnected()) {
             findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY
         }
+    }
+
+    private fun hideOperatorUiComponents() {
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
+        findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
+        findViewById<TableLayout>(R.id.drone_status_fragment)!!.visibility = View.GONE
     }
 
     override fun onResume() {
@@ -157,6 +161,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             dronePainter.onDestroy()
             missionPainter.onDestroy()
             victimSymbolManager.onDestroy()
+            measureHeatmapManager.onDestroy()
             searchAreaPainter.onDestroy()
         }
 
