@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
@@ -173,7 +174,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
             findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-            findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
+            findViewById<FloatingActionButton>(R.id.resize_button)!!.visibility = View.GONE
+            findViewById<ConstraintLayout>(R.id.vlc_fragment)!!.visibility = View.GONE
             findViewById<TableLayout>(R.id.drone_status)!!.visibility = View.GONE
         }
 
