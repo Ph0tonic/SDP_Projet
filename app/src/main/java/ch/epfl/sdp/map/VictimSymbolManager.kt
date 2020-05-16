@@ -22,16 +22,6 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
     // Temporary trick until update of mapbox
     var victimSymbolLongClickConsumed = false
 
-    private val observer: Observer<Set<MarkerData>> = Observer { markers ->
-        val removedMarkers = this.markers.keys - markers.map { it.uuid }
-        removedMarkers.forEach {
-            symbolManager.delete(this.markers.remove(it))
-        }
-        markers.filter { !this.markers.containsKey(it.uuid) }.forEach {
-            addVictimMarker(it.location!!, it.uuid!!)
-        }
-    }
-
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markers = mutableMapOf<String, Symbol>()
 
@@ -64,7 +54,7 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
             addVictimMarker(it.location!!, it.uuid!!)
         }
     }
-    
+
     fun onDestroy() {
         symbolManager.onDestroy()
     }
