@@ -44,7 +44,7 @@ import com.mapbox.mapboxsdk.maps.Style
  * 2. Long click on map to add a waypoint
  * 3. Hit play to start mission.
  */
-class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
+class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLongClickListener, MapboxMap.OnMapClickListener {
 
     private lateinit var groupId: String
     private var isMapReady = false
@@ -74,8 +74,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     val markerManager = MarkerDataManager()
 
     /* Painters */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
     private lateinit var searchAreaPainter: MapboxSearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
@@ -83,6 +81,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var victimSymbolManager: VictimSymbolManager
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var measureHeatmapManager: MeasureHeatmapManager
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { if (::dronePainter.isInitialized) dronePainter.paint(it) }
@@ -168,19 +169,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
-            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, groupId) { markerId ->
+            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId ->
                 markerManager.removeMarkerForSearchGroup(groupId, markerId)
             }
+            measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
 
-            mapboxMap.addOnMapClickListener {
-                onMapClicked(it)
-                true
-            }
-            mapboxMap.addOnMapLongClickListener {
-                onMapLongClicked(it)
-                true
-            }
+            mapboxMap.addOnMapClickListener(this)
+            mapboxMap.addOnMapLongClickListener(this)
 
             // Load latest location
             mapboxMap.cameraPosition = MapUtils.getLastCameraState()
@@ -190,46 +186,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             setStrategy(loadDefaultStrategyFromPreferences())
 
             // Configure listeners
-            markerManager.getMarkersOfSearchGroup(groupId).observe(this, Observer {
-                victimSymbolManager.updateData(it)
-            })
+            markerManager.getMarkersOfSearchGroup(groupId).observe(this, victimSymbolManager)
+            heatmapManager.getGroupHeatmaps(groupId).observe(this, measureHeatmapManager)
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
 
             isMapReady = true
-
-            // Once map is ready
-            setupHeatmapsObservers(style)
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
         }
     }
 
-    /**
-     * Instantiates the heatmaps observers:
-     *  - An observer for the collection of heatmaps
-     *  - An observer for each heatmap for new points
-     */
-    private fun setupHeatmapsObservers(style: Style) {
-        val upperLayerId = victimSymbolManager.layerId()
-        heatmapManager.getGroupHeatmaps(groupId).observe(this, Observer { repoHeatmaps ->
-            // Observers for heatmap creation
-            repoHeatmaps.filter { !heatmapPainters.containsKey(it.key) }
-                    .forEach { (key, value) ->
-                        heatmapPainters[key] = MapboxHeatmapPainter(style, this, value, upperLayerId)
-                    }
-
-            // Remove observers on heatmap deletion
-            val removedHeatmapIds = heatmapPainters.keys - repoHeatmaps.keys
-            removedHeatmapIds.forEach {
-                heatmapPainters[it]!!.destroy(mapboxMap.style!!)
-                heatmapPainters.remove(it)
-            }
-        })
-    }
-
-    fun onMapClicked(position: LatLng) {
+    override fun onMapClick(position: LatLng): Boolean {
         if (role == Role.OPERATOR) {
             try {
                 searchAreaBuilder.addVertex(position)
@@ -237,14 +206,16 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
             }
         }
+        return true
     }
 
-    private fun onMapLongClicked(position: LatLng) {
+    override fun onMapLongClick(position: LatLng): Boolean {
         // Need mapbox update to remove this test
         if (!victimSymbolManager.victimSymbolLongClickConsumed) {
             markerManager.addMarkerForSearchGroup(groupId, position)
         }
         victimSymbolManager.victimSymbolLongClickConsumed = false
+        return true
     }
 
     /**

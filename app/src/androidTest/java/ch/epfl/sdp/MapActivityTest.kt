@@ -207,7 +207,7 @@ class MapActivityTest {
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(2))
 
-        assertThat(mActivityRule.activity.heatmapPainters.size, equalTo(1))
+        assertThat(mActivityRule.activity.measureHeatmapManager.heatmapPainters.size, equalTo(1))
         //Reset default repo
         HeatmapRepository.daoProvider = { MockHeatmapDao() }
     }
@@ -268,8 +268,8 @@ class MapActivityTest {
 
         // Add a point
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(1.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(1.0, 0.0))
         }
 
         assertThat(searchAreaBuilder.vertices.size, equalTo(2))
@@ -292,8 +292,8 @@ class MapActivityTest {
 
         // Add a point
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(0.0001, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0001, 0.0))
         }
 
         assertThat(searchAreaBuilder.vertices.size, equalTo(2))
@@ -311,11 +311,11 @@ class MapActivityTest {
 
         // Add 5 points
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(0.00001, 0.00001))
-            mActivityRule.activity.onMapClicked(LatLng(0.00002, 0.00002))
-            mActivityRule.activity.onMapClicked(LatLng(0.00003, 0.00003))
-            mActivityRule.activity.onMapClicked(LatLng(0.00004, 0.00004))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.00001, 0.00001))
+            mActivityRule.activity.onMapClick(LatLng(0.00002, 0.00002))
+            mActivityRule.activity.onMapClick(LatLng(0.00003, 0.00003))
+            mActivityRule.activity.onMapClick(LatLng(0.00004, 0.00004))
         }
 
         onView(withText("Already enough points"))
@@ -331,7 +331,7 @@ class MapActivityTest {
 
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
         }
         assertThat(searchAreaBuilder.vertices.size, equalTo(1))
 

@@ -1,6 +1,5 @@
 package ch.epfl.sdp.map
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import ch.epfl.sdp.database.data.HeatmapData
@@ -14,8 +13,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
-class MapboxHeatmapPainter(style: Style,
-                           lifecycleOwner: LifecycleOwner,
+class MapboxHeatmapPainter(val style: Style,
                            val heatmapData: MutableLiveData<HeatmapData>,
                            belowLayerId: String) : MapboxPainter {
 
@@ -66,7 +64,7 @@ class MapboxHeatmapPainter(style: Style,
     init {
         val heatmapId = heatmapData.value!!.uuid!!
         style.addSource(geoJsonSource)
-        heatmapData.observe(lifecycleOwner, heatmapRedrawObserver)
+        heatmapData.observeForever(heatmapRedrawObserver)
         unclusteredLayerData(heatmapId, style, belowLayerId)
         clusteredLayerData(heatmapId, style, belowLayerId)
 
@@ -74,8 +72,7 @@ class MapboxHeatmapPainter(style: Style,
         paint()
     }
 
-    fun destroy(style: Style) {
-        style.removeSource(geoJsonSource)
+    override fun onDestroy() {
         heatmapData.removeObserver(heatmapRedrawObserver)
     }
 
@@ -88,9 +85,5 @@ class MapboxHeatmapPainter(style: Style,
                 }.toMutableList()
         )
         geoJsonSource.setGeoJson(features)
-    }
-
-    override fun onDestroy() {
-        //Nothing yet
     }
 }

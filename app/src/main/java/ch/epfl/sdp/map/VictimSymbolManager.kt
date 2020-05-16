@@ -15,7 +15,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property
 
-class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, val groupId: String, onMarkerRemove: (String) -> Unit) {
+class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, onMarkerRemove: (String) -> Unit) : Observer<Set<MarkerData>> {
 
     private var symbolManager: SymbolManager = SymbolManager(mapView, mapboxMap, style)
 
@@ -55,7 +55,7 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
         style.addImage(ID_ICON_VICTIM, MainApplication.applicationContext().getDrawable(R.drawable.ic_victim)!!)
     }
 
-    fun updateData(markers: Set<MarkerData>) {
+    override fun onChanged(markers: Set<MarkerData>) {
         val removedMarkers = this.markers.keys - markers.map { it.uuid }
         removedMarkers.forEach {
             symbolManager.delete(this.markers.remove(it))
@@ -64,7 +64,7 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
             addVictimMarker(it.location!!, it.uuid!!)
         }
     }
-
+    
     fun onDestroy() {
         symbolManager.onDestroy()
     }
