@@ -3,7 +3,6 @@ package ch.epfl.sdp.ui.maps
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TableLayout
@@ -169,7 +168,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
-            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, groupId)
+            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, groupId) { markerId ->
+                markerManager.removeMarkerForSearchGroup(groupId, markerId)
+            }
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener {
@@ -188,11 +189,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             missionBuilder = MissionBuilder().withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
             setStrategy(loadDefaultStrategyFromPreferences())
 
-            // Add listeners to builders
-            missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
-
-            // Location listener on drone
+            // Configure listeners
+            markerManager.getMarkersOfSearchGroup(groupId).observe(this, Observer {
+                victimSymbolManager.updateData(it)
+            })
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
+            missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
 
             isMapReady = true
 

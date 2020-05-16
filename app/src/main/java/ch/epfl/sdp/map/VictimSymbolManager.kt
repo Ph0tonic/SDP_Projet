@@ -5,7 +5,6 @@ import androidx.lifecycle.Observer
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.MarkerData
-import ch.epfl.sdp.database.data_manager.MarkerDataManager
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -16,7 +15,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property
 
-class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, val groupId: String) {
+class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, val groupId: String, onMarkerRemove: (String) -> Unit) {
 
     private var symbolManager: SymbolManager = SymbolManager(mapView, mapboxMap, style)
 
@@ -32,9 +31,6 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
             addVictimMarker(it.location!!, it.uuid!!)
         }
     }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val markerManager = MarkerDataManager()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markers = mutableMapOf<String, Symbol>()
@@ -53,17 +49,24 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
         symbolManager.addLongClickListener {
             victimSymbolLongClickConsumed = true
             val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
-            markerManager.removeMarkerForSearchGroup(groupId, markerId)
+            onMarkerRemove(markerId)
         }
 
         style.addImage(ID_ICON_VICTIM, MainApplication.applicationContext().getDrawable(R.drawable.ic_victim)!!)
+    }
 
-        markerManager.getMarkersOfSearchGroup(groupId).observeForever(observer)
+    fun updateData(markers: Set<MarkerData>) {
+        val removedMarkers = this.markers.keys - markers.map { it.uuid }
+        removedMarkers.forEach {
+            symbolManager.delete(this.markers.remove(it))
+        }
+        markers.filter { !this.markers.containsKey(it.uuid) }.forEach {
+            addVictimMarker(it.location!!, it.uuid!!)
+        }
     }
 
     fun onDestroy() {
         symbolManager.onDestroy()
-        markerManager.getMarkersOfSearchGroup(groupId).removeObserver(observer)
     }
 
     fun layerId(): String {
