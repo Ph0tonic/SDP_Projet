@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import ch.epfl.sdp.R
 import ch.epfl.sdp.drone.Drone
 
@@ -16,11 +17,7 @@ class ReturnDroneDialogFragment : DialogFragment() {
             // Build the dialog box
             builder.setTitle(getString(R.string.ReturnDroneDialogTitle))
                     .setPositiveButton(getString(R.string.ReturnDroneDialogHome)) { _, _ ->
-                        try {
-                            Drone.returnHome()
-                        } catch (e: java.lang.IllegalStateException) {
-                            Toast.makeText(it, it.getText(R.string.drone_home_error), Toast.LENGTH_SHORT).show()
-                        }
+                        tryReturnHome(it)
                     }
                     .setNeutralButton(R.string.ReturnDroneDialogUser) { _, _ ->
                         try {
@@ -28,11 +25,7 @@ class ReturnDroneDialogFragment : DialogFragment() {
                             // If the user position is not available, we show it to user and return home instead
                         } catch (e: java.lang.IllegalStateException) {
                             Toast.makeText(it, it.getText(R.string.drone_user_error), Toast.LENGTH_SHORT).show()
-                            try {
-                                Drone.returnHome()
-                            } catch (e : java.lang.IllegalStateException){
-                                Toast.makeText(it, it.getText(R.string.drone_home_error), Toast.LENGTH_SHORT).show()
-                            }
+                            tryReturnHome(it)
                         }
                     }
                     .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
@@ -40,5 +33,13 @@ class ReturnDroneDialogFragment : DialogFragment() {
             // Create the AlertDialog object and return it
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    private fun tryReturnHome(activity : FragmentActivity){
+        try {
+            Drone.returnHome()
+        } catch (e: java.lang.IllegalStateException) {
+            Toast.makeText(activity, activity.getText(R.string.drone_home_error), Toast.LENGTH_SHORT).show()
+        }
     }
 }
