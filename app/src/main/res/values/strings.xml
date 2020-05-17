@@ -33,6 +33,12 @@
 
     <string name="drone_home_error">No Home Available</string>
 
+    <string name="drone_user_error">User position not available</string>
+    <string name="drone_user_success">Returning to user</string>
+    <string name="drone_home_success">Returning home</string>
+    <string name="drone_mission_success">Mission started successfully</string>
+    <string name="drone_mission_error">Failed to start Mission</string>
+
     <!-- Settings -->
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>

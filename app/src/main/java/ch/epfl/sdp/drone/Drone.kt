@@ -1,8 +1,10 @@
 package ch.epfl.sdp.drone
 
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.ui.toast.ToastHandler
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
@@ -18,8 +20,9 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
+
 object Drone {
-    private const val USE_REMOTE_BACKEND = true // False for running MavsdkServer locally, True to connect to a remote instance
+    private const val USE_REMOTE_BACKEND = true// False for running MavsdkServer locally, True to connect to a remote instance
     private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" // IP of the remote instance
     private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
 
@@ -29,6 +32,7 @@ object Drone {
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
     private const val WAIT_TIME: Long = 200
+    private var mToastHandler: ToastHandler
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -98,6 +102,8 @@ object Drone {
                         { home -> currentHomeLiveData.postValue(home) },
                         { error -> Timber.e("Error home : $error") }
                 ))
+
+        mToastHandler = ToastHandler(MainApplication.applicationContext())
     }
 
     fun startMission(missionPlan: Mission.MissionPlan) {
@@ -114,8 +120,8 @@ object Drone {
                         .andThen(instance.action.arm())
                         .andThen(instance.mission.startMission())
                         .subscribe(
-                                { Timber.d("Mission started successfully") },
-                                { error -> Timber.e("Error : %s", error.message) }))
+                                { mToastHandler.showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                                { _ -> mToastHandler.showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) }))
     }
 
     fun isConnected(): Boolean {
@@ -137,47 +143,55 @@ object Drone {
     }
 
     /**
-     * Throws an IllegalStateException is the home position is not available
+     * @throws IllegalStateException
+     * if the home position is not available
      */
     fun returnHome() {
         val returnLocation = currentHomeLiveData.value?.let { LatLng(it.latitudeDeg, it.longitudeDeg) }
-        if (returnLocation != null) {
-            this.currentMissionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
-            disposables.add(
-                    getConnectionState()
-                            .andThen(instance.mission.pauseMission())
-                            .andThen(instance.mission.clearMission())
-                            .andThen(instance.action.returnToLaunch())
-                            .subscribe())
-        } else {
-            throw IllegalStateException(MainApplication.applicationContext().getString(R.string.drone_home_error))
-        }
+                ?: throw IllegalStateException(MainApplication.applicationContext().getString(R.string.drone_home_error))
+        this.currentMissionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
+        disposables.add(
+                getConnectionState()
+                        .andThen(instance.mission.pauseMission())
+                        .andThen(instance.mission.clearMission())
+                        .andThen(instance.action.returnToLaunch())
+                        .subscribe(
+                                { mToastHandler.showToast(R.string.drone_home_success, Toast.LENGTH_SHORT) },
+                                { e ->
+                                    val errorMsg = MainApplication.applicationContext().getString(R.string.drone_home_error) + ", error message :  $e"
+                                    Timber.e(errorMsg)
+                                    mToastHandler.showToast(errorMsg, Toast.LENGTH_SHORT)
+                                }))
     }
 
     /**
-     * If the user position is not available, the drone will go to his home location by default
+     * @throws IllegalStateException
+     * if user position is not available
      */
     fun returnUser() {
         val returnLocation = CentralLocationManager.currentUserPosition.value
-                ?: currentHomeLiveData.value?.let { LatLng(it.latitudeDeg, it.longitudeDeg) }
-        if (returnLocation != null) {
-            this.currentMissionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
-            getConnectionState()
-                    .andThen(instance.mission.pauseMission())
-                    .andThen(instance.mission.clearMission())
-                    .andThen(instance.action.gotoLocation(returnLocation.latitude, returnLocation.longitude, 20.0F, 0F))
-                    .subscribe()
+                ?: throw IllegalStateException(MainApplication.applicationContext().getString(R.string.drone_user_error))
+        this.currentMissionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
+        disposables.add(
+                getConnectionState()
+                        .andThen(instance.mission.pauseMission())
+                        .andThen(instance.mission.clearMission())
+                        .andThen(instance.action.gotoLocation(returnLocation.latitude, returnLocation.longitude, 20.0F, 0F))
+                        .subscribe(
+                                { mToastHandler.showToast(R.string.drone_user_success, Toast.LENGTH_SHORT) },
+                                { e ->
+                                    val errorMsg = MainApplication.applicationContext().getString(R.string.drone_user_error) + ", error message :  $e"
+                                    Timber.e(errorMsg)
+                                    mToastHandler.showToast(errorMsg, Toast.LENGTH_SHORT)
+                                }))
 
-            disposables.add(
-                    instance.telemetry.position.subscribe(
-                            { pos ->
-                                val isRightPos = LatLng(pos.latitudeDeg, pos.longitudeDeg).distanceTo(returnLocation).roundToInt() == 0
-                                val isStopped = currentSpeedLiveData.value?.roundToInt() == 0
-                                if (isRightPos.and(isStopped)) instance.action.land().blockingAwait()
-                            },
-                            { e -> Timber.e("ERROR LANDING : $e") }))
-        } else {
-            throw IllegalStateException(MainApplication.applicationContext().getString(R.string.drone_home_error))
-        }
+        disposables.add(
+                instance.telemetry.position.subscribe(
+                        { pos ->
+                            val isRightPos = LatLng(pos.latitudeDeg, pos.longitudeDeg).distanceTo(returnLocation).roundToInt() == 0
+                            val isStopped = currentSpeedLiveData.value?.roundToInt() == 0
+                            if (isRightPos.and(isStopped)) instance.action.land().blockingAwait()
+                        },
+                        { e -> Timber.e("ERROR LANDING : $e") }))
     }
 }

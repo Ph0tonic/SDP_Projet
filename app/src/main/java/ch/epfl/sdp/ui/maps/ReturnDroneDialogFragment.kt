@@ -25,8 +25,14 @@ class ReturnDroneDialogFragment : DialogFragment() {
                     .setNeutralButton(R.string.ReturnDroneDialogUser) { _, _ ->
                         try {
                             Drone.returnUser()
+                            // If the user position is not available, we show it to user and return home instead
                         } catch (e: java.lang.IllegalStateException) {
-                            Toast.makeText(it, it.getText(R.string.drone_home_error), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(it, it.getText(R.string.drone_user_error), Toast.LENGTH_SHORT).show()
+                            try {
+                                Drone.returnHome()
+                            } catch (e : java.lang.IllegalStateException){
+                                Toast.makeText(it, it.getText(R.string.drone_home_error), Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                     .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
