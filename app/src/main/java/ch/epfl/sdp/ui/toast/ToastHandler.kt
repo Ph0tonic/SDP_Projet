@@ -49,23 +49,4 @@ class ToastHandler {
         }
         runRunnable(runnable)
     }
-
-    /*
-    NOT USEFUL YET (may be later or may delete that if juged useless)
-
-    /**
-     * Shows a `Toast` using a `Handler`. Can be used in
-     * background processes.
-     *
-     * @param _text
-     * The text to show. Can be formatted text.
-     * @param _duration
-     * How long to display the message. Only use LENGTH_LONG or
-     * LENGTH_SHORT from `Toast`.
-     */
-    fun showToast(text: CharSequence?, duration: Int) {
-        val runnable = Runnable { Toast.makeText(mContext, _text, _duration).show() }
-        runRunnable(runnable)
-    }
-     */
 }

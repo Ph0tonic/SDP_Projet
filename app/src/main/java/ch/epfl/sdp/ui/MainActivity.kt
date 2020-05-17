@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         CentralLocationManager.configure(this)
-        if (currentRole.value == Role.OPERATOR && !Drone.isConnected()) {
+        if (currentRole.value == Role.OPERATOR && !Drone.isConnectedLiveData.value!!) {
             snackbar.show()
         }
     }

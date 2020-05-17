@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.espresso.core.internal.deps.guava.collect.ImmutableList
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
@@ -24,7 +23,7 @@ class DroneTest {
         const val SIGNAL_STRENGTH = 1.0
         private const val EPSILON = 1e-5
         private const val DEFAULT_ALTITUDE = 10f
-        val someLocationsList : ImmutableList<LatLng> = ImmutableList.of(
+        val someLocationsList = listOf(
                 LatLng(47.398979, 8.543434),
                 LatLng(47.398279, 8.543934),
                 LatLng(47.397426, 8.544867),
@@ -50,29 +49,29 @@ class DroneTest {
 
     @Test
     fun missionTestDoesNotCrash() {
-        Drone.currentMissionLiveData.value = null
-        assertThat(Drone.currentMissionLiveData.value, `is`(nullValue()))
+        Drone.missionLiveData.value = null
+        assertThat(Drone.missionLiveData.value, `is`(nullValue()))
 
         Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
 
         // This assert prevent the app to crash in cash the mission has not been updated
-        assertThat(Drone.currentMissionLiveData.value, `is`(notNullValue()))
-        assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
+        assertThat(Drone.missionLiveData.value, `is`(notNullValue()))
+        assertThat(Drone.missionLiveData.value?.isEmpty(), `is`(false))
     }
 
     @Test
     fun canStartMissionAndReturnHome() {
         val expectedLatLng = LatLng(47.397428, 8.545369) //Position of the drone before take off
 
-        Drone.currentPositionLiveData.value = expectedLatLng
-        Drone.currentHomeLiveData.value =
+        Drone.positionLiveData.value = expectedLatLng
+        Drone.homeLocationLiveData.value =
                 Telemetry.Position(expectedLatLng.latitude, expectedLatLng.longitude, 400f, 50f)
         Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
 
-        Drone.returnHome()
+        Drone.returnToHomeLocationAndLand()
 
-        assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
-        val returnToUserMission = Drone.currentMissionLiveData.value?.get(0)
+        assertThat(Drone.missionLiveData.value?.isEmpty(), `is`(false))
+        val returnToUserMission = Drone.missionLiveData.value?.get(0)
         val currentLat = returnToUserMission?.latitudeDeg
         val currentLong = returnToUserMission?.longitudeDeg
 
@@ -93,10 +92,10 @@ class DroneTest {
         Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
 
         assertThat(CentralLocationManager.currentUserPosition.value, `is`(notNullValue()))
-        Drone.returnUser()
+        Drone.returnToUserLocationAndLand()
 
-        assertThat(Drone.currentMissionLiveData.value?.isEmpty(), `is`(false))
-        val returnToUserMission = Drone.currentMissionLiveData.value?.get(0)
+        assertThat(Drone.missionLiveData.value?.isEmpty(), `is`(false))
+        val returnToUserMission = Drone.missionLiveData.value?.get(0)
 
         val currentLat = returnToUserMission?.latitudeDeg
         val currentLong = returnToUserMission?.longitudeDeg

@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
@@ -40,6 +41,7 @@ import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
+import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -51,6 +53,7 @@ class MapActivityTest {
 
     companion object {
         private val FAKE_LOCATION_TEST = LatLng(42.125, -30.229)
+        private val FAKE_LOCATION_TEST_2 = LatLng(46.311206999999015, 7.372623000000999)
         private const val FAKE_HEATMAP_POINT_INTENSITY = 8.12
 
         private const val ZOOM_TEST = 0.9
@@ -113,11 +116,6 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-        // TODO: Why click on menu button doesn't work ?
-        // Open menu to click on start button
-        onView(withId(R.id.floating_menu_button)).perform(click())
-        onView(withId(R.id.start_or_return_button)).perform(click())
-
         runOnUiThread {
             val searchArea = QuadrilateralArea(arrayListOf(
                     LatLng(47.397026, 8.543067), //we consider the closest point to the drone
@@ -132,13 +130,11 @@ class MapActivityTest {
         }
 
         // Then start mission officially
-        onView(withId(R.id.start_or_return_button)).perform(click())
         runOnUiThread {
             mActivityRule.activity.launchMission()
         }
 
-        val uploadedMission = Drone.currentMissionLiveData.value
-
+        val uploadedMission = Drone.missionLiveData.value
         assertThat(uploadedMission, `is`(notNullValue()))
         assertThat(uploadedMission!!.size, not(equalTo(0)))
     }
@@ -358,21 +354,100 @@ class MapActivityTest {
     }
 
     @Test
+    fun clickOnReturnButtonWhenDroneFlyingButNotConnectedShowsToast(){
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = true
+        }
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+
+        onView(withId(R.id.start_or_return_button)).perform(click())
+        onView(withId(R.id.start_or_return_button)).perform(click())
+
+        // Test that the toast is displayed
+        onView(withText(applicationContext().getString(R.string.not_connected_message)))
+                .inRoot(withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
+
+        runOnUiThread{
+            Drone.isFlyingLiveData.value = false
+        }
+    }
+
+    @Test
+    fun startMissionButtonBecomesReturnWhenDroneFlying(){
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+        runOnUiThread{
+            Drone.isFlyingLiveData.value = false
+        }
+        //TODO : Find a way to know what icon a button displays
+        //check that the icon is ic_start
+        //fake the drone flying
+        //check that the icon is ic_return
+        //return to normal
+    }
+
+    @Test
+    fun returnHomeOrUserButtonShowsDialogWhenClicked(){
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = true
+            Drone.isConnectedLiveData.value = true
+
+
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.00001, 0.00001))
+            mActivityRule.activity.onMapClick(LatLng(0.00002, 0.00002))
+            mActivityRule.activity.onMapClick(LatLng(0.00003, 0.00003))
+
+        }
+
+        onView(withId(R.id.start_or_return_button)).perform(click())
+        onView(withId(R.id.start_or_return_button)).perform(click())
+
+        onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
+                .check(matches(isDisplayed()))
+
+        runOnUiThread{
+            Drone.isFlyingLiveData.value = false
+            Drone.isConnectedLiveData.value = false
+        }
+    }
+
+    @Test
     fun locateButtonIsWorking() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
-            Drone.currentPositionLiveData.value = FAKE_LOCATION_TEST
+            Drone.positionLiveData.value = FAKE_LOCATION_TEST_2
         }
 
         onView(withId(R.id.floating_menu_button)).perform(click())
         onView(withId(R.id.locate_button)).perform(click())
+        onView(withId(R.id.locate_button)).perform(click())
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST), closeTo(0.0, EPSILON))
+                Log.d("DEBUG", "CameraLat : " + mapboxMap.cameraPosition.target.latitude)
+                Log.d("DEBUG", "FakeLat   : " + FAKE_LOCATION_TEST_2.latitude)
+                Log.d("DEBUG", "CameraLon : " + mapboxMap.cameraPosition.target.longitude)
+                Log.d("DEBUG", "FakeLon   : " + FAKE_LOCATION_TEST_2.longitude)
+                Log.d("DEBUG", "Distance  : " + (mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST_2)))
+                assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST_2), closeTo(0.0, EPSILON))
             }
         }
     }
@@ -381,6 +456,8 @@ class MapActivityTest {
     fun resizeButtonIsWorking() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
         onView(withId(R.id.resize_button)).perform(click())
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))

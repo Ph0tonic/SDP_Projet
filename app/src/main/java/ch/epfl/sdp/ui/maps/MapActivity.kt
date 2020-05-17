@@ -39,6 +39,7 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import io.mavsdk.telemetry.Telemetry
 
 /**
  * Main Activity to display map and create missions.
@@ -77,6 +78,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     private lateinit var searchAreaPainter: SearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
+    private lateinit var homePainter: MapboxHomePainter
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var victimSymbolManager: VictimSymbolManager
@@ -84,8 +86,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var measureHeatmapManager: MeasureHeatmapManager
 
-    private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
+    private var dronePositionObserver = Observer<LatLng> { newLatLng ->
         newLatLng?.let { if (::dronePainter.isInitialized) dronePainter.paint(it) }
+    }
+
+    private var homePositionObserver = Observer<Telemetry.Position> {
+        newPosition: Telemetry.Position? ->
+        newPosition?.let {
+            if (::homePainter.isInitialized) homePainter.paint(LatLng(it.latitudeDeg, it.longitudeDeg))
+        }
+    }
+
+    private var droneFlyingStatusObserver = Observer<Boolean> {
+        updateDroneFlyingStatus(it)
     }
 
     companion object {
@@ -118,8 +131,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         }
 
         //Change button color if the drone is not connected
-        if (!Drone.isConnected()) {
-            findViewById<FloatingActionButton>(R.id.start_or_return_button).colorNormal = Color.GRAY
+        if (!Drone.isConnectedLiveData.value!!) {
+            findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.colorNormal = Color.GRAY
         }
     }
 
@@ -136,14 +149,18 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     override fun onResume() {
         super.onResume()
-        Drone.currentPositionLiveData.observe(this, dronePositionObserver)
+        Drone.positionLiveData.observe(this, dronePositionObserver)
+        Drone.homeLocationLiveData.observe(this, homePositionObserver)
+        Drone.isFlyingLiveData.observe(this, droneFlyingStatusObserver)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
     }
 
     override fun onPause() {
         super.onPause()
-        Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
+        Drone.positionLiveData.removeObserver(dronePositionObserver)
+        Drone.homeLocationLiveData.removeObserver(homePositionObserver)
+        Drone.isFlyingLiveData.removeObserver(droneFlyingStatusObserver)
 
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
@@ -153,9 +170,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         if (isMapReady) {
             dronePainter.onDestroy()
             missionPainter.onDestroy()
+            homePainter.onDestroy()
+            searchAreaPainter.onDestroy()
             victimSymbolManager.onDestroy()
             measureHeatmapManager.onDestroy()
-            searchAreaPainter.onDestroy()
         }
 
         CentralLocationManager.onDestroy()
@@ -167,6 +185,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }
+            homePainter = MapboxHomePainter(mapView, mapboxMap, style)
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, style)
@@ -184,7 +203,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             // Configure listeners
             markerManager.getMarkersOfSearchGroup(groupId).observe(this, victimSymbolManager)
             heatmapManager.getGroupHeatmaps(groupId).observe(this, measureHeatmapManager)
-            Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
+            Drone.positionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
 
             val locationComponent = mapboxMap.locationComponent
@@ -220,6 +239,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         return true
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     /**
      * Adds a heat point to the heatmap
      */
@@ -234,19 +259,27 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun centerCameraOnDrone(v: View) {
         val currentZoom = mapboxMap.cameraPosition.zoom
-        if (Drone.currentPositionLiveData.value != null) {
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Drone.currentPositionLiveData.value!!,
+        if (Drone.positionLiveData.value != null) {
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Drone.positionLiveData.value!!,
                     if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
         }
     }
 
+    /**
+     * Shows a Toast if the drone is not connected or
+     * if there are not enough waypoints for a mission
+     * If the drone is on ground -> starts mission
+     * If the drone is flying -> shows return dialog
+     */
     fun startMissionOrReturnHome(v: View) {
-        if (!Drone.isConnected()) {
+        if (!Drone.isConnectedLiveData.value!!) {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
-        } else if (!Drone.isFlying()) {
+        } else if (!Drone.isFlyingLiveData.value!!) {
             launchMission()
+        } else {
+            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
         }
     }
 
@@ -255,11 +288,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
         Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
-
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)
-                .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
     }
 
+    /**
+     * Starts OfflineManagerActivity
+     */
     fun storeMap(v: View) {
         startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
     }
@@ -287,17 +320,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         vlcFragment.requestLayout()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     fun pickStrategy(view: View) {
         if (currentStrategy is SimpleQuadStrategy) {
             setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
         } else {
-            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
     }
 
@@ -327,5 +354,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         searchAreaBuilder.onVerticesChanged.add { searchAreaPainter.paint(searchAreaBuilder) }
 
         searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+    }
+
+    private fun updateDroneFlyingStatus(isFlying: Boolean) {
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.setIcon(if (isFlying) R.drawable.ic_return else R.drawable.ic_start)
     }
 }

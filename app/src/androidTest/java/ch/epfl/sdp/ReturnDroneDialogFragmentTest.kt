@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
@@ -17,12 +18,12 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.maps.ReturnDroneDialogFragment
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
-import com.google.type.LatLng
-import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
 import org.junit.Before
@@ -34,7 +35,6 @@ import org.junit.runner.RunWith
 class ReturnDroneDialogFragmentTest {
 
     companion object {
-
         private const val MAP_LOADING_TIMEOUT = 1000L
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
@@ -42,8 +42,8 @@ class ReturnDroneDialogFragmentTest {
 
     private lateinit var mUiDevice: UiDevice
     private val intentWithGroupAndOperator = Intent()
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
+            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -71,7 +71,7 @@ class ReturnDroneDialogFragmentTest {
     }
 
     @Test
-    fun testShowDialog() {
+    fun testLaunchDialogShowsReturnHomeDialog() {
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -84,7 +84,7 @@ class ReturnDroneDialogFragmentTest {
     }
 
     @Test
-    fun testClickOnNegativeButton() {
+    fun testClickOnNegativeButtonClosesDialog() {
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -96,6 +96,9 @@ class ReturnDroneDialogFragmentTest {
         onView(withText(applicationContext()
                 .getString(R.string.dialog_negative_button)))
                 .perform(click())
+
+        onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
+                .check(doesNotExist())
     }
 
     @Test
@@ -108,7 +111,7 @@ class ReturnDroneDialogFragmentTest {
         // Show Dialog
         ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
 
-        Drone.currentHomeLiveData.value = null
+        Drone.homeLocationLiveData.value = null
 
         // Click on return home
         onView(withText(MainApplication.applicationContext()
@@ -131,7 +134,6 @@ class ReturnDroneDialogFragmentTest {
         // Show Dialog
         ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
 
-        Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0.0F, 0.0F)
         CentralLocationManager.currentUserPosition.value = null
 
         // Click on return user
