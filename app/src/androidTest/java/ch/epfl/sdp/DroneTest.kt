@@ -1,7 +1,6 @@
 package ch.epfl.sdp
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.espresso.core.internal.deps.guava.collect.ImmutableList
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.drone.Drone
@@ -24,7 +23,7 @@ class DroneTest {
         const val SIGNAL_STRENGTH = 1.0
         private const val EPSILON = 1e-5
         private const val DEFAULT_ALTITUDE = 10f
-        val someLocationsList : ImmutableList<LatLng> = ImmutableList.of(
+        val someLocationsList = listOf(
                 LatLng(47.398979, 8.543434),
                 LatLng(47.398279, 8.543934),
                 LatLng(47.397426, 8.544867),

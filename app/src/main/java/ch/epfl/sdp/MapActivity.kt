@@ -99,6 +99,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var userPainter: MapboxUserPainter
+    private lateinit var homePainter: MapboxHomePainter
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -124,7 +125,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
     private var homePositionObserver = Observer<Telemetry.Position> {
         newPosition: Telemetry.Position? ->
-        newPosition?.let { updateHomeDroneDistance(it) }
+        newPosition?.let {
+            updateHomeDroneDistance(LatLng(it.latitudeDeg, it.longitudeDeg))
+            if (::homePainter.isInitialized) homePainter.paint(LatLng(it.latitudeDeg, it.longitudeDeg))
+        }
     }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { updateUserDroneDistance(it); if (::userPainter.isInitialized) userPainter.paint(it) }
@@ -239,6 +243,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             missionPainter.onDestroy()
             victimSymbolManager.onDestroy()
             searchAreaPainter.onDestroy()
+            homePainter.onDestroy()
         }
 
         CentralLocationManager.onDestroy()
@@ -251,6 +256,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
             userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            homePainter = MapboxHomePainter(mapView, mapboxMap, style)
             setupVictimSymbolManager(style)
 
             mapboxMap.addOnMapClickListener {
@@ -486,9 +492,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
      *
      * @param homeLatLng new home position
      */
-    private fun updateHomeDroneDistance(homePosition: Telemetry.Position) {
-        Drone.currentPositionLiveData.value.let {
-            updateTextView(distanceToHomeTextView, it?.distanceTo(LatLng(homePosition.latitudeDeg, homePosition.longitudeDeg)), DISTANCE_FORMAT)
+    private fun updateHomeDroneDistance(homePosition: LatLng) {
+        Drone.currentPositionLiveData.value?.let {
+            updateTextView(distanceToHomeTextView, it.distanceTo(homePosition), DISTANCE_FORMAT)
         }
     }
 

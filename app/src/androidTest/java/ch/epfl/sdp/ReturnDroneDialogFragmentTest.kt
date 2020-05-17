@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
@@ -34,7 +35,6 @@ import org.junit.runner.RunWith
 class ReturnDroneDialogFragmentTest {
 
     companion object {
-
         private const val MAP_LOADING_TIMEOUT = 1000L
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
@@ -71,7 +71,7 @@ class ReturnDroneDialogFragmentTest {
     }
 
     @Test
-    fun testShowDialog() {
+    fun testLaunchDialogShowsIt() {
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -84,7 +84,7 @@ class ReturnDroneDialogFragmentTest {
     }
 
     @Test
-    fun testClickOnNegativeButton() {
+    fun testClickOnNegativeButtonClosesDialog() {
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -96,6 +96,9 @@ class ReturnDroneDialogFragmentTest {
         onView(withText(applicationContext()
                 .getString(R.string.dialog_negative_button)))
                 .perform(click())
+
+        onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
+                .check(doesNotExist())
     }
 
     @Test
@@ -131,7 +134,6 @@ class ReturnDroneDialogFragmentTest {
         // Show Dialog
         ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
 
-        Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0.0F, 0.0F)
         CentralLocationManager.currentUserPosition.value = null
 
         // Click on return user

@@ -22,7 +22,7 @@ import kotlin.math.sqrt
 
 
 object Drone {
-    private const val USE_REMOTE_BACKEND = true// False for running MavsdkServer locally, True to connect to a remote instance
+    private const val USE_REMOTE_BACKEND = true // False for running MavsdkServer locally, True to connect to a remote instance
     private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" // IP of the remote instance
     private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
 
@@ -31,7 +31,6 @@ object Drone {
     const val DEFAULT_ALTITUDE: Float = 20.0F
 
     private const val WAIT_TIME: Long = 200
-    private var mToastHandler: ToastHandler
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -102,7 +101,6 @@ object Drone {
                         { error -> Timber.e("Error home : $error") }
                 ))
 
-        mToastHandler = ToastHandler(MainApplication.applicationContext())
     }
 
     fun startMission(missionPlan: Mission.MissionPlan) {
@@ -119,8 +117,8 @@ object Drone {
                         .andThen(instance.action.arm())
                         .andThen(instance.mission.startMission())
                         .subscribe(
-                                { mToastHandler.showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
-                                { _ -> mToastHandler.showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) }))
+                                { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                                { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }))
     }
 
     fun isConnected(): Boolean {
@@ -155,12 +153,8 @@ object Drone {
                         .andThen(instance.mission.clearMission())
                         .andThen(instance.action.returnToLaunch())
                         .subscribe(
-                                { mToastHandler.showToast(R.string.drone_home_success, Toast.LENGTH_SHORT) },
-                                { e ->
-                                    val errorMsg = MainApplication.applicationContext().getString(R.string.drone_home_error) + ", error message :  $e"
-                                    Timber.e(errorMsg)
-                                    mToastHandler.showToast(errorMsg, Toast.LENGTH_SHORT)
-                                }))
+                                { ToastHandler().showToast(R.string.drone_home_success, Toast.LENGTH_SHORT) },
+                                { ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT) }))
     }
 
     /**
@@ -177,12 +171,8 @@ object Drone {
                         .andThen(instance.mission.clearMission())
                         .andThen(instance.action.gotoLocation(returnLocation.latitude, returnLocation.longitude, 20.0F, 0F))
                         .subscribe(
-                                { mToastHandler.showToast(R.string.drone_user_success, Toast.LENGTH_SHORT) },
-                                { e ->
-                                    val errorMsg = MainApplication.applicationContext().getString(R.string.drone_user_error) + ", error message :  $e"
-                                    Timber.e(errorMsg)
-                                    mToastHandler.showToast(errorMsg, Toast.LENGTH_SHORT)
-                                }))
+                                { ToastHandler().showToast(R.string.drone_user_success, Toast.LENGTH_SHORT) },
+                                { ToastHandler().showToast(R.string.drone_user_error, Toast.LENGTH_SHORT) }))
 
         disposables.add(
                 instance.telemetry.position.subscribe(

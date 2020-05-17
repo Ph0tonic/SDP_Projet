@@ -40,6 +40,7 @@ import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
+import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -381,10 +382,45 @@ class MapActivityTest {
     fun resizeButtonIsWorking() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
         onView(withId(R.id.resize_button)).perform(click())
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))
         onView(withId(R.id.resize_button)).perform(click())
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
+    }
+
+    @Test
+    fun updateDronePositionChangesDistToHome() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
+            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
+        }
+
+        onView(withId(R.id.distance_to_home)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
+
+        runOnUiThread {
+            Drone.currentPositionLiveData.value = LatLng(1.0, 0.0)
+        }
+        onView(withId(R.id.distance_to_home)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
+    }
+
+    @Test
+    fun updateHomePositionChangesDistToHome() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
+            Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
+        }
+
+        onView(withId(R.id.distance_to_home)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
+
+        runOnUiThread {
+            Drone.currentHomeLiveData.value = Telemetry.Position(1.0, 0.0, 0f, 0f)
+        }
+
+        onView(withId(R.id.distance_to_home)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
     }
 }
