@@ -21,6 +21,8 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.ReturnDroneDialogFragment
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
+import com.google.type.LatLng
+import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
 import org.junit.Before
@@ -129,7 +131,7 @@ class ReturnDroneDialogFragmentTest {
         // Show Dialog
         ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
 
-        Drone.currentHomeLiveData.value = null
+        Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0.0F, 0.0F)
         CentralLocationManager.currentUserPosition.value = null
 
         // Click on return user
@@ -138,7 +140,7 @@ class ReturnDroneDialogFragmentTest {
                 .perform(click())
 
         // Test that the toast is displayed
-        onView(withText(applicationContext().getString(R.string.drone_home_error)))
+        onView(withText(applicationContext().getString(R.string.drone_user_error)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
     }
