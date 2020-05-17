@@ -42,6 +42,7 @@ import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPO
 import android.app.AlertDialog
 import ch.epfl.sdp.database.data.Role
 import java.lang.IllegalStateException
+import io.mavsdk.telemetry.Telemetry
 
 /**
  * Main Activity to display map and create missions.
@@ -63,6 +64,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var droneBatteryLevelImageView: ImageView
     private lateinit var droneBatteryLevelTextView: TextView
     private lateinit var distanceToUserTextView: TextView
+    private lateinit var distanceToHomeTextView: TextView
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
     private lateinit var strategyPickerButton: FloatingActionButton
@@ -115,10 +117,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateDronePosition(it); if (::dronePainter.isInitialized) dronePainter.paint(it) }
+        newLatLng?.let {
+            updateDroneUserDistance(it)
+            updateDroneHomeDistance(it)
+            if (::dronePainter.isInitialized) dronePainter.paint(it) }
+    }
+    private var homePositionObserver = Observer<Telemetry.Position> {
+        newPosition: Telemetry.Position? ->
+        newPosition?.let { updateHomeDroneDistance(it) }
     }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it); if (::userPainter.isInitialized) userPainter.paint(it) }
+        newLatLng?.let { updateUserDroneDistance(it); if (::userPainter.isInitialized) userPainter.paint(it) }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
 
@@ -168,6 +177,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         droneBatteryLevelTextView = findViewById(R.id.battery_level)
         droneAltitudeTextView = findViewById(R.id.altitude)
         distanceToUserTextView = findViewById(R.id.distance_to_user)
+        distanceToHomeTextView = findViewById(R.id.distance_to_home)
         droneSpeedTextView = findViewById(R.id.speed)
         strategyPickerButton = findViewById(R.id.strategy_picker_button)
         startOrReturnHomeButton = findViewById(R.id.start_or_return_button)
@@ -202,6 +212,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
         Drone.currentFlyingLiveData.observe(this, droneFlyingStatusObserver)
+        Drone.currentHomeLiveData.observe(this, homePositionObserver)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
         CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
@@ -215,6 +226,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
         Drone.currentFlyingLiveData.removeObserver(droneFlyingStatusObserver)
+        Drone.currentHomeLiveData.removeObserver(homePositionObserver)
 
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
@@ -439,22 +451,44 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /**
-     * Update [currentPositionMarker] position with a new [position].
+     * Update Drone to User distance.
      *
      * @param newLatLng new position of the vehicle
      */
-    private fun updateDronePosition(newLatLng: LatLng) {
+    private fun updateDroneUserDistance(newLatLng: LatLng) {
         CentralLocationManager.currentUserPosition.value.let {
             updateTextView(distanceToUserTextView, it?.distanceTo(newLatLng), DISTANCE_FORMAT)
         }
     }
 
     /**
-     * Updates the user position if the drawing managers are ready
+     * Update User to Drone distance
      */
-    private fun updateUserPosition(userLatLng: LatLng) {
+    private fun updateUserDroneDistance(userLatLng: LatLng) {
         Drone.currentPositionLiveData.value?.let {
             updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
+        }
+    }
+
+    /**
+     * Update Drone to Home distance.
+     *
+     * @param newLatLng new position of the vehicle
+     */
+    private fun updateDroneHomeDistance(newLatLng: LatLng) {
+        Drone.currentHomeLiveData.value?.let {
+            updateTextView(distanceToHomeTextView, LatLng(it.latitudeDeg, it.longitudeDeg).distanceTo(newLatLng), DISTANCE_FORMAT)
+        }
+    }
+
+    /**
+     * Update Home to Drone distance
+     *
+     * @param homeLatLng new home position
+     */
+    private fun updateHomeDroneDistance(homePosition: Telemetry.Position) {
+        Drone.currentPositionLiveData.value.let {
+            updateTextView(distanceToHomeTextView, it?.distanceTo(LatLng(homePosition.latitudeDeg, homePosition.longitudeDeg)), DISTANCE_FORMAT)
         }
     }
 
