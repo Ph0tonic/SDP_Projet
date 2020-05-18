@@ -185,7 +185,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             heatmapManager.getGroupHeatmaps(groupId).observe(this, measureHeatmapManager)
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
-            
+
             val locationComponent = mapboxMap.locationComponent
             locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
             locationComponent.isLocationComponentEnabled = true;

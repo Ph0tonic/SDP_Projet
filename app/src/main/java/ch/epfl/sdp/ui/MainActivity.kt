@@ -134,13 +134,20 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun checkConnexion(view : View, action : () -> Unit) {
-        if (Auth.loggedIn.value == false) { Auth.login(this) { success ->  if (success) { checkConnexion (view, action) } }
-        } else { action() }
+    private fun checkConnexion(view: View, action: () -> Unit) {
+        if (Auth.loggedIn.value == false) {
+            Auth.login(this) { success ->
+                if (success) {
+                    checkConnexion(view, action)
+                }
+            }
+        } else {
+            action()
+        }
     }
 
     fun goToSearchGroupSelect(view: View) {
-        checkConnexion(view){
+        checkConnexion(view) {
             val intent = Intent(this, SearchGroupSelectionActivity::class.java)
             startActivityForResult(intent, SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE)
         }
@@ -156,7 +163,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun workOffline(view: View) {
-        checkConnexion(view){
+        checkConnexion(view) {
             val intent = Intent(this, MapActivity::class.java)
                     .putExtra(getString(R.string.intent_key_group_id), "dummy")
                     .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
