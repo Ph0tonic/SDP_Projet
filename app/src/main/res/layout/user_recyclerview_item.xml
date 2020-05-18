@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="0px">
-    <!--android:onClick="openMapForOfflineDownload"-->
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardBackgroundColor="#FFFFFF"
+        app:cardBackgroundColor="@color/colorWhite"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true"
         app:contentPadding="1dp">
@@ -22,17 +21,17 @@
 
             <TextView
                 android:id="@+id/user_recyclerview_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView"
+                android:text="@string/text_view"
                 android:textSize="20sp" />
 
             <Button
                 android:id="@+id/remove_user_button"
                 android:layout_width="35dp"
                 android:layout_height="wrap_content"
-                android:background="#00FFFFFF"
+                android:background="@color/colorTransparent"
                 android:drawableEnd="@android:drawable/ic_delete"
                 android:textAlignment="center"
                 android:textAllCaps="false" />

@@ -8,46 +8,49 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="253dp"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
+        android:background="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="@dimen/tiny_margin">
 
-        <Button
+
+    <Button
             android:id="@+id/search_group_selection_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="7"
-            android:background="@color/colorPrimaryDark"
+            android:layout_weight="1"
             android:onClick="goToSearchGroupSelect"
             android:text="@string/select_search_group"
-            android:textColor="@color/colorBlack"
-            android:textSize="48sp" />
+            android:theme="@style/HomeButtonTheme"
+            android:background="@color/colorPrimary"
+            android:layout_margin="@dimen/tiny_margin"/>
 
 
         <Button
             android:id="@+id/start_mission_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="7"
-            android:background="@color/colorPrimaryDark"
+            android:layout_weight="1"
             android:onClick="startMission"
             android:text="@string/start_mission"
-            android:textColor="@color/colorBlack"
-            android:textSize="48sp" />
+            android:theme="@style/HomeButtonTheme"
+            android:background="@color/colorPrimary"
+            android:layout_margin="@dimen/tiny_margin"/>
 
         <Button
             android:id="@+id/work_offline_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="7"
-            android:background="@color/colorPrimaryDark"
+            android:layout_weight="1"
             android:onClick="workOffline"
             android:text="@string/work_offline"
-            android:textColor="@color/colorBlack"
-            android:textSize="48sp" />
+            android:theme="@style/HomeButtonTheme"
+            android:background="@color/colorPrimary"
+            android:layout_margin="@dimen/tiny_margin"/>
     </LinearLayout>
 
 
