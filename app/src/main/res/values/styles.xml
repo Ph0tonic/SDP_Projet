@@ -40,7 +40,7 @@
     </style>
 
     <style name="FloatingButtonTheme">
-        <item name="fab_size">normal</item>
+        <item name="fab_size">mini</item>
         <item name="fab_colorNormal">@color/colorPrimary</item>
         <item name="fab_colorPressed">@color/colorLightGray</item>
     </style>
