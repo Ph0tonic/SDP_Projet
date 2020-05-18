@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun checkConnection(view : View, action : () -> Unit) {
+    private fun checkConnexion(view : View, action : () -> Unit) {
         if (Auth.loggedIn.value == false) { Auth.login(this) { success ->  if (success) { checkConnection (view, action) } }
         } else { action() }
     }
