@@ -7,6 +7,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
+import java.security.InvalidParameterException
 import kotlin.math.*
 
 class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
@@ -33,7 +34,7 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
             }
 
             override fun onAnnotationDrag(annotation: Circle) {
-                onMoveVertex.forEach { it(previousLocation, annotation.latLng) }
+                onMoveVertex.forEach { reset = reset || !it(previousLocation, annotation.latLng) }
                 previousLocation = annotation.latLng
             }
 
@@ -55,11 +56,12 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
     }
 
     override fun paint(vertices: List<LatLng>) {
-        drawRegion(vertices)
-        if (vertices.size != nbVertices) {
+        if (vertices.size != nbVertices || reset) {
             drawPinpoint(vertices)
             nbVertices = vertices.size
         }
+        drawRegion(vertices)
+        reset = false
     }
 
     /**
@@ -75,11 +77,13 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
                         .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
                         .withFillOpacity(REGION_FILL_OPACITY)
                 fillArea = fillManager.create(fillOption)
-                reset = false
             } else {
                 fillArea.latLngs = listOf(polygonCircle)
                 fillManager.update(fillArea)
             }
+        } else {
+            fillManager.deleteAll()
+            reset = true
         }
     }
 

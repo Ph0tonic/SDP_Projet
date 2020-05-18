@@ -3,12 +3,14 @@ package ch.epfl.sdp.ui.maps
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TableLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
@@ -70,6 +72,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markerManager = MarkerDataManager()
+
+    // Needs an update of mapbox to improve that functionnality
+    val mapboxSearchAreaCancelDraggable = MutableLiveData<Boolean>(false)
 
     /* Painters */
     private lateinit var searchAreaPainter: MapboxSearchAreaPainter
@@ -185,6 +190,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             //Create builders
             missionBuilder = MissionBuilder().withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
             setStrategy(loadDefaultStrategyFromPreferences())
+
+            // Fix to be able to cancel drag
+            mapboxSearchAreaCancelDraggable.observe(this, Observer {
+                if (it == true) {
+                    searchAreaPainter.paint(searchAreaBuilder.vertices)
+                    mapboxSearchAreaCancelDraggable.value = false
+                }
+            })
 
             // Configure listeners
             markerManager.getMarkersOfSearchGroup(groupId).observe(this, victimSymbolManager)
@@ -324,12 +337,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
         searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
-        searchAreaPainter.onMoveVertex.add {
-            old, new ->
+
+        searchAreaPainter.onMoveVertex.add { old, new ->
             try {
                 searchAreaBuilder.moveVertex(old, new)
+                true
             } catch (e: IllegalArgumentException) {
                 Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                mapboxSearchAreaCancelDraggable.postValue(true)
+                false
             }
         }
     }

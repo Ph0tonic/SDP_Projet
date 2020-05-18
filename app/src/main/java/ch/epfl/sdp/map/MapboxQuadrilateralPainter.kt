@@ -31,7 +31,7 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
         }
 
         override fun onAnnotationDrag(annotation: Circle) {
-            onMoveVertex.forEach { it(previousLocation, annotation.latLng) }
+            onMoveVertex.forEach { reset = reset || !it(previousLocation, annotation.latLng) }
             previousLocation = annotation.latLng
         }
 
@@ -56,11 +56,12 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
     }
 
     override fun paint(vertices: List<LatLng>) {
-        drawRegion(vertices)
-        if (vertices.size != nbVertices) {
+        if (vertices.size != nbVertices || reset) {
             drawPinpoint(vertices)
             nbVertices = vertices.size
         }
+        drawRegion(vertices)
+        reset = false
     }
 
     /**
@@ -74,7 +75,6 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
                     .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
                     .withFillOpacity(REGION_FILL_OPACITY)
             fillArea = fillManager.create(fillOption)
-            reset = false
         } else {
             fillArea.latLngs = listOf(vertices)
             fillManager.update(fillArea)

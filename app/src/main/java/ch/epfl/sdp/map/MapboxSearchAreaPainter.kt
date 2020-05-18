@@ -4,7 +4,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 
 abstract class MapboxSearchAreaPainter : MapboxPainter {
 
-    val onMoveVertex = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
+    val onMoveVertex = mutableListOf<(old: LatLng, new: LatLng) -> Boolean>()
 
     override fun onDestroy() {
         onMoveVertex.clear()

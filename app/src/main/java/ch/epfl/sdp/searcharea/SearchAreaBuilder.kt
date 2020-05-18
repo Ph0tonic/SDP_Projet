@@ -33,7 +33,7 @@ abstract class SearchAreaBuilder {
         searchAreaChanged.clear()
         verticesChanged.clear()
     }
-    
+
     fun reset() {
         vertices.clear()
         this.vertices = this.vertices
@@ -41,7 +41,7 @@ abstract class SearchAreaBuilder {
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
         require(isStrictlyUnderUpperBound()) { "Already enough points" }
-        require(!isVertexTooFarAway(vertex)) {"Point too far away"}
+        require(!isVertexTooFarAway(vertex)) { "Point too far away" }
         vertices.add(vertex)
         reorderVertices()
         this.vertices = this.vertices
@@ -49,7 +49,7 @@ abstract class SearchAreaBuilder {
     }
 
     fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
-        require(!isVertexTooFarAway(new)) {"Point too far away"}
+        require(!isVertexTooFarAway(new)) { "Point too far away" }
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
         vertices[oldIndex!!] = new
         reorderVertices()
@@ -63,9 +63,9 @@ abstract class SearchAreaBuilder {
 
     protected open fun reorderVertices() {}
 
-    private fun isStrictlyUnderUpperBound() = sizeUpperBound?.let { vertices.size <  it } ?: true
-    private fun isUnderUpperBound() =         sizeUpperBound?.let { vertices.size <= it } ?: true
-    private fun isAboveLowerBound() =         sizeLowerBound?.let { it <= vertices.size } ?: true
+    private fun isStrictlyUnderUpperBound() = sizeUpperBound?.let { vertices.size < it } ?: true
+    private fun isUnderUpperBound() = sizeUpperBound?.let { vertices.size <= it } ?: true
+    private fun isAboveLowerBound() = sizeLowerBound?.let { it <= vertices.size } ?: true
 
     fun isComplete(): Boolean {
         return isAboveLowerBound() && isUnderUpperBound()
