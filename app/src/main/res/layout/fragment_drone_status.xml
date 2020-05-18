@@ -21,11 +21,12 @@
             android:id="@+id/battery_level_icon"
             app:srcCompat="@drawable/ic_battery1"
             android:theme="@style/InformationDisplayTheme"
+            android:layout_width="wrap_content"
             android:rotation="90" />
 
         <TextView
             android:id="@+id/battery_level"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/TextInformationDisplayTheme" />
     </TableRow>
 
     <TableRow
@@ -40,7 +41,7 @@
 
         <TextView
             android:id="@+id/altitude"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/TextInformationDisplayTheme" />
     </TableRow>
 
     <TableRow
@@ -56,7 +57,7 @@
 
         <TextView
             android:id="@+id/speed"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/TextInformationDisplayTheme" />
     </TableRow>
 
     <TableRow
@@ -66,11 +67,12 @@
         <ImageView
             android:id="@+id/imageView3"
             app:srcCompat="@drawable/ic_distancetodrone"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/InformationDisplayTheme"
+            android:layout_width="wrap_content" />
 
         <TextView
             android:id="@+id/distance_to_user"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/TextInformationDisplayTheme" />
     </TableRow>
 
     <TableRow
@@ -80,10 +82,11 @@
         <ImageView
             android:id="@+id/imageView5"
             app:srcCompat="@drawable/ic_distancetohome"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/InformationDisplayTheme"
+            android:layout_width="wrap_content"/>
 
         <TextView
             android:id="@+id/distance_to_base"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/TextInformationDisplayTheme" />
     </TableRow>
 </TableLayout>

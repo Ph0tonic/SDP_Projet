@@ -21,15 +21,19 @@
     </style>
 
     <!-- Display data in Map Activity-->
-    <style name="InformationDisplayTheme">
+    <style name="TextInformationDisplayTheme" parent="InformationDisplayTheme">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
         <item name="android:textColor">@color/colorBlack</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:text">@string/no_info</item>
+
+    </style>
+
+    <style name="InformationDisplayTheme">
+        <item name="android:layout_height">match_parent</item>
         <item name="android:padding">@dimen/tiny_padding</item>
         <item name="android:gravity">center</item>
-        <item name="android:text">@string/no_info</item>
-        <item name="android:contentDescription">@string/map_not_ready</item>
+
     </style>
 
 </resources>
