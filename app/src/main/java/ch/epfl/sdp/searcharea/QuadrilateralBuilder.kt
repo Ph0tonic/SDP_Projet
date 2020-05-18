@@ -8,7 +8,7 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
     override val sizeUpperBound: Int? = 4
     override val shapeName: String = "Quadrilateral"
 
-    protected override fun order() {
+    override fun reorderVertices() {
         if (isComplete()) {
             val data = vertices
             fun intersect() = IntersectionUtils.doIntersect(data[0], data[2], data[1], data[3])
@@ -24,5 +24,5 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
         }
     }
 
-    override fun buildIfComplete(): QuadrilateralArea = QuadrilateralArea(vertices)
+    override fun buildGivenIsComplete(): QuadrilateralArea = QuadrilateralArea(vertices)
 }

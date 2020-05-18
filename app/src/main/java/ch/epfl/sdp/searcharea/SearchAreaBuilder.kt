@@ -6,6 +6,10 @@ import kotlin.properties.Delegates
 
 abstract class SearchAreaBuilder {
 
+    companion object {
+        const val maxDist: Double = 1000.0//meters
+    }
+
     abstract val sizeLowerBound: Int?
     abstract val sizeUpperBound: Int?
     abstract val shapeName: String
@@ -36,37 +40,43 @@ abstract class SearchAreaBuilder {
     }
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
-        val isStrictlyUnderBound = sizeUpperBound?.let { vertices.size < it } ?: true
-        require(isStrictlyUnderBound) { "Already enough points" }
+        require(isStrictlyUnderUpperBound()) { "Already enough points" }
+        require(!isVertexTooFarAway(vertex)) {"Point too far away"}
         vertices.add(vertex)
-        order()
+        reorderVertices()
         this.vertices = this.vertices
         return this
     }
 
     fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
+        require(!isVertexTooFarAway(new)) {"Point too far away"}
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
         vertices[oldIndex!!] = new
-        order()
+        reorderVertices()
         this.vertices = this.vertices
         return this
     }
 
-    protected open fun order() {}
+    private fun isVertexTooFarAway(vertex: LatLng): Boolean {
+        return vertices.any { vertex.distanceTo(it) > maxDist }
+    }
 
-    private fun isUnderUpperBound() = sizeUpperBound?.let { vertices.size <= it } ?: true
-    private fun isAboveLowerBound() = sizeLowerBound?.let { it <= vertices.size } ?: true
+    protected open fun reorderVertices() {}
+
+    private fun isStrictlyUnderUpperBound() = sizeUpperBound?.let { vertices.size <  it } ?: true
+    private fun isUnderUpperBound() =         sizeUpperBound?.let { vertices.size <= it } ?: true
+    private fun isAboveLowerBound() =         sizeLowerBound?.let { it <= vertices.size } ?: true
 
     fun isComplete(): Boolean {
         return isAboveLowerBound() && isUnderUpperBound()
     }
 
-    abstract fun buildIfComplete(): SearchArea
+    abstract fun buildGivenIsComplete(): SearchArea
 
     fun build(): SearchArea {
         if (!isComplete()) {
             throw SearchAreaNotCompleteException("$shapeName not complete")
         }
-        return buildIfComplete()
+        return buildGivenIsComplete()
     }
 }

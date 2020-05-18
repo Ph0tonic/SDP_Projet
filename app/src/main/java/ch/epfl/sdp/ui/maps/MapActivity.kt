@@ -324,6 +324,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
         searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
-        searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+        searchAreaPainter.onMoveVertex.add {
+            old, new ->
+            try {
+                searchAreaBuilder.moveVertex(old, new)
+            } catch (e: IllegalArgumentException) {
+                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

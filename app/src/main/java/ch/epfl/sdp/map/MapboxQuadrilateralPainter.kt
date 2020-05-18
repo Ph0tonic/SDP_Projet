@@ -24,20 +24,22 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
 
     private var nbVertices = 0
 
+    private val dragListener = object : OnCircleDragListener {
+        lateinit var previousLocation: LatLng
+        override fun onAnnotationDragStarted(annotation: Circle) {
+            previousLocation = annotation.latLng
+        }
+
+        override fun onAnnotationDrag(annotation: Circle) {
+            onMoveVertex.forEach { it(previousLocation, annotation.latLng) }
+            previousLocation = annotation.latLng
+        }
+
+        override fun onAnnotationDragFinished(annotation: Circle?) {}
+    }
+
     init {
-        circleManager.addDragListener(object : OnCircleDragListener {
-            lateinit var previousLocation: LatLng
-            override fun onAnnotationDragStarted(annotation: Circle) {
-                previousLocation = annotation.latLng
-            }
-
-            override fun onAnnotationDrag(annotation: Circle) {
-                onMoveVertex.forEach { it(previousLocation, annotation.latLng) }
-                previousLocation = annotation.latLng
-            }
-
-            override fun onAnnotationDragFinished(annotation: Circle?) {}
-        })
+        circleManager.addDragListener(dragListener)
     }
 
     override fun getUpperLayer(): String {
