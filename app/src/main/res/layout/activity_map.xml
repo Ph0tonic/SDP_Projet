@@ -33,8 +33,7 @@
         app:fab_addButtonColorPressed="@color/colorPrimary"
         app:fab_addButtonPlusIconColor="@color/colorWhite"
         app:fab_expandDirection="left"
-        tools:context="ch.epfl.sdp.ui.maps.MapActivity"
-        >
+        tools:context="ch.epfl.sdp.ui.maps.MapActivity">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/start_or_return_button"
