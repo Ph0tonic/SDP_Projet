@@ -156,10 +156,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun workOffline(view: View) {
-        val intent = Intent(this, MapActivity::class.java)
-                .putExtra(getString(R.string.intent_key_group_id), "dummy")
-                .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
-        startActivity(intent)
+        checkConnexion(view){
+            val intent = Intent(this, MapActivity::class.java)
+                    .putExtra(getString(R.string.intent_key_group_id), "dummy")
+                    .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
+            startActivity(intent)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
