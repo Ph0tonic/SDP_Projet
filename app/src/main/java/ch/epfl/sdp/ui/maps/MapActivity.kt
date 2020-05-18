@@ -130,7 +130,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-        findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.resize_button)!!.visibility = View.GONE
+        findViewById<ConstraintLayout>(R.id.vlc_fragment)!!.visibility = View.GONE
         findViewById<TableLayout>(R.id.drone_status_fragment)!!.visibility = View.GONE
     }
 
