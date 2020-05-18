@@ -12,7 +12,9 @@ import ch.epfl.sdp.R
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.CentralLocationManager
+import com.getbase.floatingactionbutton.FloatingActionButton
 import com.mapbox.mapboxsdk.geometry.LatLng
+import io.mavsdk.telemetry.Telemetry
 
 
 /**
@@ -33,6 +35,7 @@ class DroneStatusFragment : Fragment() {
     private lateinit var distanceToUserTextView: TextView
     private lateinit var droneAltitudeTextView: TextView
     private lateinit var droneSpeedTextView: TextView
+    private lateinit var distanceToHomeTextView: TextView
 
     private val droneBatteryLevelDrawables = listOf(
             Pair(.0, R.drawable.ic_battery1),
@@ -51,10 +54,18 @@ class DroneStatusFragment : Fragment() {
         updateTextView(droneSpeedTextView, newSpeed?.toDouble(), SPEED_FORMAT)
     }
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateDronePosition(it) }
+        newLatLng?.let {
+            updateDroneUserDistance(it)
+            updateDroneHomeDistance(it)}
     }
     private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { updateUserPosition(it) }
+        newLatLng?.let { updateUserDroneDistance(it) }
+    }
+    private var homePositionObserver = Observer<Telemetry.Position> {
+        newPosition: Telemetry.Position? ->
+        newPosition?.let {
+            updateHomeDroneDistance(LatLng(it.latitudeDeg, it.longitudeDeg))
+        }
     }
     private var droneBatteryObserver = Observer<Float> { newBatteryLevel: Float? ->
         // Always update the text string
@@ -83,6 +94,7 @@ class DroneStatusFragment : Fragment() {
         droneAltitudeTextView = root.findViewById(R.id.altitude)
         distanceToUserTextView = root.findViewById(R.id.distance_to_user)
         droneSpeedTextView = root.findViewById(R.id.speed)
+        distanceToHomeTextView = root.findViewById(R.id.distance_to_home)
         return root
     }
 
@@ -93,6 +105,7 @@ class DroneStatusFragment : Fragment() {
         Drone.currentBatteryLevelLiveData.observe(this, droneBatteryObserver)
         Drone.currentAbsoluteAltitudeLiveData.observe(this, droneAltitudeObserver)
         Drone.currentSpeedLiveData.observe(this, droneSpeedObserver)
+        Drone.currentHomeLiveData.observe(this, homePositionObserver)
     }
 
     override fun onPause() {
@@ -102,6 +115,7 @@ class DroneStatusFragment : Fragment() {
         Drone.currentBatteryLevelLiveData.removeObserver(droneSpeedObserver)
         Drone.currentAbsoluteAltitudeLiveData.removeObserver(droneAltitudeObserver)
         Drone.currentSpeedLiveData.removeObserver(droneSpeedObserver)
+        Drone.currentHomeLiveData.removeObserver(homePositionObserver)
     }
 
     /**
@@ -113,22 +127,44 @@ class DroneStatusFragment : Fragment() {
     }
 
     /**
-     * Update [currentPositionMarker] position with a new [position].
+     * Update Drone to User distance.
      *
      * @param newLatLng new position of the vehicle
      */
-    private fun updateDronePosition(newLatLng: LatLng) {
+    private fun updateDroneUserDistance(newLatLng: LatLng) {
         CentralLocationManager.currentUserPosition.value.let {
             updateTextView(distanceToUserTextView, it?.distanceTo(newLatLng), DISTANCE_FORMAT)
         }
     }
 
     /**
-     * Updates the user position if the drawing managers are ready
+     * Update User to Drone distance
      */
-    private fun updateUserPosition(userLatLng: LatLng) {
+    private fun updateUserDroneDistance(userLatLng: LatLng) {
         Drone.currentPositionLiveData.value?.let {
             updateTextView(distanceToUserTextView, it.distanceTo(userLatLng), DISTANCE_FORMAT)
+        }
+    }
+
+    /**
+     * Update Drone to Home distance.
+     *
+     * @param newLatLng new position of the vehicle
+     */
+    private fun updateDroneHomeDistance(newLatLng: LatLng) {
+        Drone.currentHomeLiveData.value?.let {
+            updateTextView(distanceToHomeTextView, LatLng(it.latitudeDeg, it.longitudeDeg).distanceTo(newLatLng), DISTANCE_FORMAT)
+        }
+    }
+
+    /**
+     * Update Home to Drone distance
+     *
+     * @param homeLatLng new home position
+     */
+    private fun updateHomeDroneDistance(homePosition: LatLng) {
+        Drone.currentPositionLiveData.value?.let {
+            updateTextView(distanceToHomeTextView, it.distanceTo(homePosition), DISTANCE_FORMAT)
         }
     }
 }

@@ -26,6 +26,7 @@ import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
+import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.not
 import org.junit.Before
@@ -223,5 +224,38 @@ class DroneStatusFragmentTest {
             Drone.currentBatteryLevelLiveData.value = .98f
         }
         onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
+    }
+
+    @Test
+    fun updateDronePositionChangesDistToHome() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
+            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
+        }
+
+        onView(withId(R.id.distance_to_home)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
+
+        runOnUiThread {
+            Drone.currentPositionLiveData.value = LatLng(1.0, 0.0)
+        }
+        onView(withId(R.id.distance_to_home)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
+    }
+
+    @Test
+    fun updateHomePositionChangesDistToHome() {
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
+            Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
+        }
+
+        onView(withId(R.id.distance_to_home)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
+
+        runOnUiThread {
+            Drone.currentHomeLiveData.value = Telemetry.Position(1.0, 0.0, 0f, 0f)
+        }
+
+        onView(withId(R.id.distance_to_home)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
     }
 }

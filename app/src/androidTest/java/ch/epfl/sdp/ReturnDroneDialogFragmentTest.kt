@@ -18,7 +18,9 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.maps.ReturnDroneDialogFragment
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -42,8 +44,8 @@ class ReturnDroneDialogFragmentTest {
 
     private lateinit var mUiDevice: UiDevice
     private val intentWithGroupAndOperator = Intent()
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
+            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()

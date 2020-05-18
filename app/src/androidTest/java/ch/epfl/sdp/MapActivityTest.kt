@@ -390,37 +390,4 @@ class MapActivityTest {
         onView(withId(R.id.resize_button)).perform(click())
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
     }
-
-    @Test
-    fun updateDronePositionChangesDistToHome() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        runOnUiThread {
-            Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
-            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
-        }
-
-        onView(withId(R.id.distance_to_home)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
-
-        runOnUiThread {
-            Drone.currentPositionLiveData.value = LatLng(1.0, 0.0)
-        }
-        onView(withId(R.id.distance_to_home)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
-    }
-
-    @Test
-    fun updateHomePositionChangesDistToHome() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        runOnUiThread {
-            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
-            Drone.currentHomeLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
-        }
-
-        onView(withId(R.id.distance_to_home)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
-
-        runOnUiThread {
-            Drone.currentHomeLiveData.value = Telemetry.Position(1.0, 0.0, 0f, 0f)
-        }
-
-        onView(withId(R.id.distance_to_home)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
-    }
 }
