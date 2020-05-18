@@ -140,14 +140,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToSearchGroupSelect(view: View) {
-        if (Auth.loggedIn.value == false) {
-
-            Auth.login(this) { success ->
-                if (success) {
-                    goToSearchGroupSelect(view)
-                }
-            }
-        } else {
+        checkConnexion(view){
             val intent = Intent(this, SearchGroupSelectionActivity::class.java)
             startActivityForResult(intent, SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE)
         }
