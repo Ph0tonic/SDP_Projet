@@ -39,8 +39,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE = 7865
     }
-
-    private var selectSearchGroupAction = false
+    
 
     private val currentGroupId: MutableLiveData<String?> = MutableLiveData(null)
     private val currentRole: MutableLiveData<Role> = MutableLiveData(Role.RESCUER)
@@ -136,7 +135,7 @@ class MainActivity : AppCompatActivity() {
 
     fun goToSearchGroupSelect(view: View) {
         if (Auth.loggedIn.value == false) {
-            selectSearchGroupAction = true
+
             Auth.login(this) { success ->
                 if (success) {
                     goToSearchGroupSelect(view)
