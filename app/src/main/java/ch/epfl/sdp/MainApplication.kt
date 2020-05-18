@@ -2,6 +2,7 @@ package ch.epfl.sdp
 
 import android.app.Application
 import android.content.Context
+import androidx.preference.PreferenceManager
 import com.mapbox.mapboxsdk.Mapbox
 
 class MainApplication : Application() {
@@ -20,6 +21,8 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false)
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.

@@ -14,6 +14,7 @@ import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.Auth
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
@@ -68,7 +69,7 @@ class SearchGroupEditionActivityTest {
         SearchGroupRepository.daoProvider = { groupDao }
         PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
                 .edit().putString(
-                        MainApplication.applicationContext().getString(R.string.prefs_current_group_id), "")
+                        MainApplication.applicationContext().getString(R.string.pref_key_current_group_id), "")
                 .apply()
 
         mActivityRule.launchActivity(Intent())
@@ -76,7 +77,7 @@ class SearchGroupEditionActivityTest {
         onView(withId(R.id.search_group_selection_button)).perform(click())
         onView(withText(DUMMY_SEARCHGROUP_NAME)).perform(click())
         val actualGroupId = PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
-                .getString(mActivityRule.activity.getString(R.string.prefs_current_group_id), null)
+                .getString(mActivityRule.activity.getString(R.string.pref_key_current_group_id), null)
         assertThat(actualGroupId, equalTo(DUMMY_SEARCHGROUP_ID))
     }
 }

@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.dao
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.SearchGroupData
 import com.google.firebase.database.DataSnapshot
@@ -8,16 +9,20 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import timber.log.Timber
 
 class FirebaseGroupDao : SearchGroupDao {
+
+    companion object {
+        private const val ROOT_PATH = "search_groups"
+    }
+
     private var database: FirebaseDatabase = Firebase.database
 
     private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(mutableListOf())
     private val watchedGroupsById: MutableMap<String, MutableLiveData<SearchGroupData>> = mutableMapOf()
 
     override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
-        val myRef = database.getReference("search_groups")
+        val myRef = database.getReference(ROOT_PATH)
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 groups.value = (dataSnapshot.children.map { c ->
@@ -31,7 +36,7 @@ class FirebaseGroupDao : SearchGroupDao {
 
             override fun onCancelled(error: DatabaseError) {
                 // Failed to read value
-                Timber.w("Failed to read value.")
+                Log.w("Firebase", "Failed to read value.")
             }
         })
         return groups
@@ -39,8 +44,9 @@ class FirebaseGroupDao : SearchGroupDao {
 
     override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
         if (!watchedGroupsById.containsKey(groupId)) {
-            val myRef = database.getReference("search_groups/$groupId")
+            val myRef = database.getReference("$ROOT_PATH/$groupId")
             watchedGroupsById[groupId] = MutableLiveData()
+            //TODO change to childEventListener ?
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val group = dataSnapshot.getValue(SearchGroupData::class.java)
@@ -49,10 +55,26 @@ class FirebaseGroupDao : SearchGroupDao {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Timber.w("Failed to read group from firebase.")
+                    Log.w("Firebase", "Failed to read group from firebase.")
                 }
             })
         }
         return watchedGroupsById[groupId]!!
+    }
+
+    /**
+     * Creates a group with the given data.
+     * The uuid of the searchgroup data will be overridden by an automatically generated one.
+     */
+    override fun createGroup(searchGroupData: SearchGroupData) {
+        database.getReference(ROOT_PATH).push().setValue(searchGroupData)
+    }
+
+    override fun updateGroup(searchGroupData: SearchGroupData) {
+        database.getReference("$ROOT_PATH/${searchGroupData.uuid}").setValue(searchGroupData)
+    }
+
+    override fun removeSearchGroup(searchGroupId: String) {
+        database.getReference("$ROOT_PATH/${searchGroupId}").removeValue()
     }
 }

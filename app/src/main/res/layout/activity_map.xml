@@ -22,7 +22,7 @@
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1">
     </com.mapbox.mapboxsdk.maps.MapView>
-  
+
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/floating_menu_button"
         android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
         app:fab_addButtonColorPressed="@color/colorPrimary"
         app:fab_addButtonPlusIconColor="@color/colorWhite"
         app:fab_expandDirection="left"
-        tools:context="ch.epfl.sdp.MapActivity"
+        tools:context="ch.epfl.sdp.ui.maps.MapActivity"
         >
 
         <com.getbase.floatingactionbutton.FloatingActionButton
@@ -78,7 +78,6 @@
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
-
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/strategy_picker_button"
         android:layout_width="wrap_content"
@@ -93,7 +92,7 @@
 
     <fragment
         android:id="@+id/vlc_fragment"
-        android:name="ch.epfl.sdp.ui.vlc.VlcFragment"
+        android:name="ch.epfl.sdp.ui.camera.VlcFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/tiny_margin"
@@ -102,97 +101,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"/>
 
-    <TableLayout
-        android:id="@+id/drone_status"
+    <fragment
+        android:id="@+id/drone_status_fragment"
+        android:name="ch.epfl.sdp.ui.drone.DroneStatusFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryTransparent"
         android:layout_margin="@dimen/tiny_margin"
-        android:padding="@dimen/tiny_padding"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintLeft_creator="1">
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/battery_level_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/map_not_ready"
-                android:padding="@dimen/tiny_padding"
-                android:rotation="90"
-                app:srcCompat="@drawable/ic_battery1" />
-            <TextView
-                android:id="@+id/battery_level"
-                android:theme="@style/InformationDisplayTheme"
-                android:text="@string/no_info"/>
-        </TableRow>
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="21dp"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/map_not_ready"
-                android:padding="@dimen/tiny_padding"
-                app:srcCompat="@drawable/ic_altitude" />
-            <TextView
-                android:id="@+id/altitude"
-                android:theme="@style/InformationDisplayTheme"
-                android:text="@string/no_info"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="18dp"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/map_not_ready"
-                android:padding="@dimen/tiny_padding"
-                app:srcCompat="@drawable/ic_speed" />
-            <TextView
-                android:id="@+id/speed"
-                android:theme="@style/InformationDisplayTheme"
-                android:text="@string/no_info"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/map_not_ready"
-                android:paddingVertical="@dimen/tiny_padding"
-                app:srcCompat="@drawable/ic_distancetodrone" />
-            <TextView
-                android:id="@+id/distance_to_user"
-                android:theme="@style/InformationDisplayTheme"
-                android:text="@string/no_info"/>
-        </TableRow>
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/imageView5"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/map_not_ready"
-                android:paddingVertical="@dimen/tiny_padding"
-                app:srcCompat="@drawable/ic_distancetohome" />
-            <TextView
-                android:id="@+id/distance_to_base"
-                android:theme="@style/InformationDisplayTheme"
-                android:text="@string/no_info"/>
-        </TableRow>
-    </TableLayout>
-
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/resize_button"

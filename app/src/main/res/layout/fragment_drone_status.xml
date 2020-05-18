@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drone_status"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/tiny_margin"
+    android:background="@color/colorPrimaryTransparent"
+    android:padding="@dimen/tiny_padding"
+    tools:context=".ui.drone.DroneStatusFragment"
+    tools:layout_constraintLeft_creator="1"
+    tools:layout_constraintTop_creator="1">
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/battery_level_icon"
+            app:srcCompat="@drawable/ic_battery1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/map_not_ready"
+            android:padding="@dimen/tiny_padding"
+            android:rotation="90" />
+
+        <TextView
+            android:id="@+id/battery_level"
+            android:text="@string/no_info"
+            android:theme="@style/InformationDisplayTheme" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView4"
+            app:srcCompat="@drawable/ic_altitude"
+            android:layout_width="21dp"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/map_not_ready"
+            android:padding="@dimen/tiny_padding" />
+
+        <TextView
+            android:id="@+id/altitude"
+            android:text="@string/no_info"
+            android:theme="@style/InformationDisplayTheme" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            app:srcCompat="@drawable/ic_speed"
+            android:layout_width="18dp"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/map_not_ready"
+            android:padding="@dimen/tiny_padding" />
+
+        <TextView
+            android:id="@+id/speed"
+            android:text="@string/no_info"
+            android:theme="@style/InformationDisplayTheme" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            app:srcCompat="@drawable/ic_distancetodrone"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/map_not_ready"
+            android:paddingVertical="@dimen/tiny_padding" />
+
+        <TextView
+            android:id="@+id/distance_to_user"
+            android:text="@string/no_info"
+            android:theme="@style/InformationDisplayTheme" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView5"
+            app:srcCompat="@drawable/ic_distancetohome"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/map_not_ready"
+            android:paddingVertical="@dimen/tiny_padding" />
+
+        <TextView
+            android:id="@+id/distance_to_base"
+            android:text="@string/no_info"
+            android:theme="@style/InformationDisplayTheme" />
+    </TableRow>
+</TableLayout>

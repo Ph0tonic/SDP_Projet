@@ -22,8 +22,8 @@
     </string-array>
 
     <string-array name="overflight_strategy_values">
-        <item>zigzag</item>
-        <item>spiral</item>
+        <item>@string/pref_value_strategy_zigzag</item>
+        <item>@string/pref_value_strategy_spiral</item>
     </string-array>
 
     <string-array name="drone_altitude_entries">

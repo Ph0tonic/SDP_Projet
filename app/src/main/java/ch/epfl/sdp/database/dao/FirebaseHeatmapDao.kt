@@ -10,9 +10,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import timber.log.Timber
 
 class FirebaseHeatmapDao : HeatmapDao {
+
+    companion object {
+        private const val ROOT_PATH = "heatmaps"
+    }
 
     private var database: FirebaseDatabase = Firebase.database
 
@@ -20,18 +23,22 @@ class FirebaseHeatmapDao : HeatmapDao {
     val groupHeatmaps: MutableMap<String, MutableLiveData<MutableMap<String, MutableLiveData<HeatmapData>>>> = mutableMapOf()
 
     override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
-        database.getReference("heatmaps/$groupId/${heatmapData.uuid}")
+        database.getReference("$ROOT_PATH/$groupId/${heatmapData.uuid}")
                 .setValue(heatmapData)
+    }
+
+    override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
+        database.getReference("$ROOT_PATH/${searchGroupId}").removeValue()
     }
 
     override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
         if (!groupHeatmaps.containsKey(groupId)) {
-            val myRef = database.getReference("heatmaps/$groupId")
+            val myRef = database.getReference("$ROOT_PATH/$groupId")
             groupHeatmaps[groupId] = MutableLiveData(mutableMapOf())
 
             myRef.addChildEventListener(object : ChildEventListener {
                 override fun onCancelled(error: DatabaseError) {
-                    Timber.w("Failed to read heatmaps of search group from firebase.")
+                    Log.w("Firebase", "Failed to read heatmaps of search group from firebase.")
                 }
 
                 override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {}

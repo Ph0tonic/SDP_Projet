@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.vlc.VlcFragment">
+    tools:context=".ui.camera.VlcFragment">
 
         <org.videolan.libvlc.util.VLCVideoLayout
             android:id="@+id/video_layout"

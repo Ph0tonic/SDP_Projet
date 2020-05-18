@@ -13,7 +13,6 @@ object DroneUtils {
     }
 
     fun generateMissionItem(latitudeDeg: Double, longitudeDeg: Double, altitude: Float): MissionItem {
-        ch.epfl.sdp.MapActivity.ID_ICON_VICTIM
         return MissionItem(
                 latitudeDeg,
                 longitudeDeg,

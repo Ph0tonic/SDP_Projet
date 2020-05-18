@@ -44,7 +44,7 @@ class FirebaseHeatmapDaoTest {
                 HeatmapPointData(LatLng(41.0, 10.0), 10.0),
                 HeatmapPointData(LatLng(41.0, 10.0), 8.5)
         ), DUMMY_HEATMAP_ID)
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
 
         //Populate database
         Firebase.database.getReference("heatmaps/$DUMMY_GROUP_ID/$DUMMY_HEATMAP_ID")
@@ -58,12 +58,12 @@ class FirebaseHeatmapDaoTest {
                 val actualHeatmap = it[DUMMY_HEATMAP_ID]!!.value!!
 
                 MatcherAssert.assertThat(actualHeatmap, equalTo(heatmap))
-                tested.countDown()
+                called.countDown()
             }
         }
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        MatcherAssert.assertThat(called.count, equalTo(0L))
     }
 
     @Test
@@ -76,7 +76,7 @@ class FirebaseHeatmapDaoTest {
         val expectedHeatmap = HeatmapData(mutableListOf(
                 HeatmapPointData(LatLng(43.0, 10.0), 10.0)
         ), DUMMY_HEATMAP_ID)
-        val tested = CountDownLatch(1)
+        val called = CountDownLatch(1)
         var initialData = true
 
         //Populate database
@@ -93,7 +93,7 @@ class FirebaseHeatmapDaoTest {
                     actualHeatmap.uuid = dataSnapshot.key
 
                     MatcherAssert.assertThat(actualHeatmap, equalTo(expectedHeatmap))
-                    tested.countDown()
+                    called.countDown()
                 } else {
                     initialData = false
                 }
@@ -104,8 +104,8 @@ class FirebaseHeatmapDaoTest {
         //Update value
         dao.updateHeatmap(DUMMY_GROUP_ID, expectedHeatmap)
 
-        tested.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(tested.count, equalTo(0L))
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        MatcherAssert.assertThat(called.count, equalTo(0L))
         ref.removeEventListener(listener)
     }
 }

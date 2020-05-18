@@ -5,7 +5,7 @@ import ch.epfl.sdp.database.dao.FirebaseGroupDao
 import ch.epfl.sdp.database.dao.SearchGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
 
-class SearchGroupRepository {
+class SearchGroupRepository : ISearchGroupRepository {
     companion object {
         val DEFAULT_DAO = { FirebaseGroupDao() }
 
@@ -15,11 +15,23 @@ class SearchGroupRepository {
 
     val dao: SearchGroupDao = daoProvider()
 
-    fun getGroups(): MutableLiveData<List<SearchGroupData>> {
+    override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
         return dao.getGroups()
     }
 
-    fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
+    override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
         return dao.getGroupById(groupId)
+    }
+
+    override fun createGroup(searchGroupData: SearchGroupData) {
+        return dao.createGroup(searchGroupData)
+    }
+
+    override fun updateGroup(searchGroupData: SearchGroupData) {
+        return dao.updateGroup(searchGroupData)
+    }
+
+    override fun removeSearchGroup(searchGroupId: String) {
+        dao.removeSearchGroup(searchGroupId)
     }
 }

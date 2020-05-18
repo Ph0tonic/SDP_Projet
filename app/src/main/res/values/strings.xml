@@ -1,36 +1,54 @@
 <resources>
+    <!-- Licence keys -->
     <string name="mapbox_access_token">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
     <string name="google_signin_key">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
 
+    <!-- App name -->
     <string name="app_name">Fly2Find</string>
 
-    <string name="title_activity_settings">Settings</string>
-
-    <!-- Sign in/out Stuff -->
+    <!-- Auth system -->
     <string name="auth_signin">Sign in</string>
     <string name="auth_signout">Sign out</string>
     <string name="sign_in_error">Could not sign in</string>
+    <string name="sign_out_success">Sign out successful</string>
 
-    <!-- Preference Titles -->
+    <!-- Preferences keys -->
+    <string name="pref_key_latitude" translatable="false">latitude</string>
+    <string name="pref_key_longitude" translatable="false">longitude</string>
+    <string name="pref_key_zoom" translatable="false">zoom</string>
+    <string name="pref_key_gps_refresh_rate" translatable="false">gps_refresh</string>
+    <string name="pref_key_current_group_id" translatable="false">current_group_id</string>
+    <string name="pref_key_drone_altitude" translatable="false">drone_altitude</string>
+    <string name="pref_key_overflight_strategy" translatable="false">overflight_strategy</string>
 
-    <string name="title_activity_main">Fly2Find</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <!-- Mapbox State -->
+    <string name="map_ready" translatable="false">MAP READY</string>
+    <string name="map_not_ready" translatable="false">MAP NOT READY</string>
+    <string name="map_downloading" translatable="false">MAP DOWNLOADING</string>
+    <string name="map_deleting" translatable="false">MAP DELETING</string>
+
+    <!-- Map Activity -->
+    <string name="intent_key_group_id" translatable="false">group_id</string>
+    <string name="intent_key_role" translatable="false">role</string>
+
+    <!-- Settings -->
     <string name="action_settings">Settings</string>
-
-    <string name="menu_home">Home</string>
-    <string name="menu_maps_managing">Maps managing</string>
-    <string name="not_connected_message">You are currently not connected to the drone</string>
-    <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
-
+    <string name="title_activity_settings">Settings</string>
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
+    <string name="pref_value_strategy_zigzag">Zigzag</string>
+    <string name="pref_value_strategy_spiral">Spiral</string>
 
+    <!-- Main Activity -->
+    <string name="select_search_group">Select search group</string>
+    <string name="start_mission">Start mission</string>
+    <string name="work_offline">Work offline</string>
+
+    <!-- Offline map -->
     <string name="end_progress_success">Region successfully downloaded.</string>
     <string name="dialog_title">Name new Region</string>
     <string name="dialog_message">Download the map region you currently are viewing</string>
     <string name="set_region_name_hint">Enter name</string>
     <string name="dialog_positive_button">Download</string>
-
     <string name="dialog_negative_button">Cancel</string>
     <string name="navigate_title">List</string>
     <string name="navigate_positive_button">Navigate To</string>
@@ -39,31 +57,42 @@
     <string name="toast_no_regions_yet">No regions yet</string>
     <string name="dialog_toast">Name cannot be empty</string>
     <string name="region_name_error">Unknown Region name</string>
+    <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
+
+    <!-- Navigation -->
+    <string name="menu_home">Home</string>
+    <string name="menu_maps_managing">Maps managing</string>
+
+    <!-- Search group edition -->
+    <string name="default_group_name">Group Name</string>
+    <string name="base_location_label">Base Location</string>
+    <string name="group_edition_rescuers_label">Rescuers</string>
+    <string name="group_edition_operators_label">Operators</string>
+    <string name="group_edition_create_button">Create</string>
+    <string name="save_group_changes">Save</string>
+    <string name="search_group_edition_group_name_cannot_be_empty">The group name cannot be empty</string>
+    <string name="group_edit_add_operator"><u>Add operator</u></string>
+    <string name="group_edit_add_rescuer"><u>Add rescuer</u></string>
+    <string name="danger_zone">Danger zone</string>
+    <string name="delete_this_group">Delete this group</string>
+    <string name="enter_a_gmail_address">Enter a gmail address</string>
+    <string name="add_a_user">Add a user</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- TODO reorganize strings -->
+    <!-- Preference Titles -->
+
+    <string name="not_connected_message">You are currently not connected to the drone</string>
+    <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
+
     <string name="switch_video">Switch video</string>
 
     <string name="no_info">No data</string>
-    <string name="map_ready">MAP READY</string>
-    <string name="map_not_ready">MAP NOT READY</string>
-    <string name="map_downloading">MAP DOWNLOADING</string>
-    <string name="map_deleting">MAP DELETING</string>
 
-    <string name="prefs_latitude">latitude</string>
-    <string name="prefs_longitude">longitude</string>
-    <string name="prefs_zoom">zoom</string>
-    <string name="prefs_current_group_id">current_group_id</string>
-    <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
-    <string name="sign_out_success">Sign out successful</string>
-    <string name="prefs_drone_altitude">Drone altitude</string>
     <string name="drone_altitude_header">Default drone altitude</string>
-    <string name="prefs_gps_refresh">gps_refresh</string>
-    <string name="prefs_overflight_strategy">overflight_strategy</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
-    <string name="zigzag_strategy">zigzag</string>
-    <string name="spiral_strategy">spiral</string>
 
-    <string name="select_search_group">Select search group</string>
-    <string name="start_mission">Start mission</string>
-    <string name="work_offline">Work offline</string>
-    <string name="INTENT_KEY_GROUP_ID">groupId</string>
-    <string name="INTENT_KEY_ROLE">Role</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

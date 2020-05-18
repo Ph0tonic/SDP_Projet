@@ -4,16 +4,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfl.sdp.database.dao.HeatmapDao
-import ch.epfl.sdp.database.dao.MockHeatmapDao
+import ch.epfl.sdp.database.dao.EmptyMockHeatmapDao
 import ch.epfl.sdp.database.data.HeatmapData
-import ch.epfl.sdp.database.data.HeatmapPointData
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class HeatmapRepositoryTest {
@@ -22,65 +22,88 @@ class HeatmapRepositoryTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     companion object {
-        val DUMMY_LOCATION_1 = LatLng(13.0, 42.0)
+        private val DUMMY_LOCATION_1 = LatLng(13.0, 42.0)
         val DUMMY_LOCATION_2 = LatLng(12.0, 42.0)
-        const val DUMMY_INTENSITY_1 = 666.0
-        const val DUMMY_INTENSITY_2 = 333.0
-        const val DUMMY_HEATMAP_ID = "dummy heatmap id"
-        const val DUMMY_GROUP_ID = "dummy_group_id"
+        private const val DUMMY_INTENSITY_1 = 666.0
+        private const val DUMMY_INTENSITY_2 = 333.0
+        private const val DUMMY_HEATMAP_ID = "dummy heatmap id"
+        private const val DUMMY_GROUP_ID = "dummy_group_id"
+        private const val ASYNC_CALL_TIMEOUT = 5L
     }
 
     @Test
     fun getGroupHeatmapsCallsGetGroupHeatmapsFromDao() {
+        val called = CountDownLatch(1)
         val expectedData: LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> = MutableLiveData(mutableMapOf())
 
-        val dao = object : HeatmapDao {
-            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
+        val dao = object : EmptyMockHeatmapDao() {
             override fun getHeatmapsOfSearchGroup(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
+                called.countDown()
                 return expectedData
             }
         }
-        HeatmapRepository.daoProvider = { dao }
-        val repo = HeatmapRepository()
 
-        assertThat(repo.getGroupHeatmaps(DUMMY_GROUP_ID), equalTo(expectedData))
+        HeatmapRepository.daoProvider = { dao }
+
+        val repo = HeatmapRepository()
+        val actualData = repo.getGroupHeatmaps(DUMMY_GROUP_ID)
+
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
+
+        assertThat(actualData, equalTo(expectedData))
     }
 
     @Test
-    fun addMeasureToHeatmapForNewHeatmapCreateNewHeatmap() {
-        val dao = MockHeatmapDao()
-        HeatmapRepository.daoProvider = { dao }
-        val repo = HeatmapRepository()
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_1, DUMMY_INTENSITY_1)
+    fun updateHeatmapCallsUpdateHeatmapWitCorrectGroupIdAndHeatmapData() {
+        val called = CountDownLatch(1)
 
-        assertThat(dao.data[DUMMY_GROUP_ID]!!.value!!.containsKey(DUMMY_HEATMAP_ID), equalTo(true))
+        val expectedGroupId = DUMMY_GROUP_ID
+        val expectedHeatmapData = HeatmapData(uuid = DUMMY_HEATMAP_ID)
+
+        lateinit var actualGroupId: String
+        lateinit var actualHeatmapData: HeatmapData
+
+        val dao = object : EmptyMockHeatmapDao() {
+            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
+                called.countDown()
+                actualGroupId = groupId
+                actualHeatmapData = heatmapData
+            }
+        }
+
+        HeatmapRepository.daoProvider = { dao }
+
+        HeatmapRepository().updateHeatmap(expectedGroupId, expectedHeatmapData)
+
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
+
+        assertThat(actualGroupId, equalTo(expectedGroupId))
+        assertThat(actualHeatmapData, equalTo(expectedHeatmapData))
     }
 
     @Test
-    fun addMeasureToHeatmapForNewHeatmapCreateValidHeatmapData() {
-        val dao = MockHeatmapDao()
+    fun removeAllHeatmapsOfSearchGroupCallsRemoveAllHeatmapsOfSearchGroupDao() {
+        val called = CountDownLatch(1)
+        val expectedGroupId = DUMMY_GROUP_ID
+
+        lateinit var actualGroupId: String
+
+        val dao = object : EmptyMockHeatmapDao() {
+            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
+                called.countDown()
+                actualGroupId = searchGroupId
+            }
+        }
+
         HeatmapRepository.daoProvider = { dao }
-        val repo = HeatmapRepository()
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_1, DUMMY_INTENSITY_1)
 
-        val expectedHeatmapData = HeatmapData(mutableListOf(HeatmapPointData(DUMMY_LOCATION_1, DUMMY_INTENSITY_1)), DUMMY_HEATMAP_ID)
-        val heatmapData = dao.data[DUMMY_GROUP_ID]!!.value!![DUMMY_HEATMAP_ID]!!.value
-        assertThat(heatmapData, equalTo(expectedHeatmapData))
-    }
+        HeatmapRepository().removeAllHeatmapsOfSearchGroup(expectedGroupId)
 
-    @Test
-    fun addMeasureToHeatmapForExistingHeatmapUpdateExistingHeatmap() {
-        val dao = MockHeatmapDao()
-        HeatmapRepository.daoProvider = { dao }
-        val repo = HeatmapRepository()
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_1, DUMMY_INTENSITY_1)
-        repo.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION_2, DUMMY_INTENSITY_2)
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
 
-        val expectedHeatmapData = HeatmapData(mutableListOf(
-                HeatmapPointData(DUMMY_LOCATION_1, DUMMY_INTENSITY_1),
-                HeatmapPointData(DUMMY_LOCATION_2, DUMMY_INTENSITY_2)
-        ), DUMMY_HEATMAP_ID)
-        val heatmapData = dao.data[DUMMY_GROUP_ID]!!.value!![DUMMY_HEATMAP_ID]!!.value
-        assertThat(heatmapData, equalTo(expectedHeatmapData))
+        assertThat(actualGroupId, equalTo(expectedGroupId))
     }
 }

@@ -28,13 +28,15 @@ import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.data.HeatmapPointData
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
-import ch.epfl.sdp.ui.offlineMapsManaging.OfflineManagerActivity
+import ch.epfl.sdp.ui.maps.MapActivity
+import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -43,7 +45,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-
 
 @RunWith(AndroidJUnit4::class)
 class MapActivityTest {
@@ -56,7 +57,6 @@ class MapActivityTest {
         private const val MAP_LOADING_TIMEOUT = 1000L
         private const val EPSILON = 1e-9
         private const val DRONE_ALTITUDE = 20.0F
-        private const val DEFAULT_ALTITUDE_DISPLAY = " 0.0 m"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
     }
@@ -64,8 +64,8 @@ class MapActivityTest {
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
     private val intentWithGroupAndOperator = Intent()
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
+            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -91,8 +91,11 @@ class MapActivityTest {
 
         // Do not use the real database, only use the offline version on the device
         //Firebase.database.goOffline()
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        val heatmapDao = MockHeatmapDao()
+        val markerDao = MockMarkerDao()
+
+        HeatmapRepository.daoProvider = { heatmapDao }
+        MarkerRepository.daoProvider = { markerDao }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
 
         val targetContext: Context = getInstrumentation().targetContext
@@ -102,7 +105,7 @@ class MapActivityTest {
     @Test
     fun clickingOnLaunchMissionStartAndGenerateAMission() {
         preferencesEditor
-                .putString(applicationContext().getString(R.string.prefs_drone_altitude), DRONE_ALTITUDE.toString())
+                .putString(applicationContext().getString(R.string.pref_key_drone_altitude), DRONE_ALTITUDE.toString())
                 .apply()
 
         // Launch activity
@@ -142,9 +145,9 @@ class MapActivityTest {
     @Test
     fun mapboxUsesOurPreferences() {
         preferencesEditor
-                .putString(applicationContext().getString(R.string.prefs_latitude), FAKE_LOCATION_TEST.latitude.toString())
-                .putString(applicationContext().getString(R.string.prefs_longitude), FAKE_LOCATION_TEST.longitude.toString())
-                .putString(applicationContext().getString(R.string.prefs_zoom), ZOOM_TEST.toString())
+                .putString(applicationContext().getString(R.string.pref_key_latitude), FAKE_LOCATION_TEST.latitude.toString())
+                .putString(applicationContext().getString(R.string.pref_key_longitude), FAKE_LOCATION_TEST.longitude.toString())
+                .putString(applicationContext().getString(R.string.pref_key_zoom), ZOOM_TEST.toString())
                 .apply()
 
         // Launch activity after setting preferences
@@ -166,12 +169,12 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
+        assertThat(mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(0))
 
         runOnUiThread {
             mActivityRule.activity.addPointToHeatMap(FAKE_LOCATION_TEST, FAKE_HEATMAP_POINT_INTENSITY)
         }
-        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        val heatmaps = mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
 
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
@@ -194,9 +197,9 @@ class MapActivityTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
-        assertThat(mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(1))
+        assertThat(mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID).value?.size, equalTo(1))
 
-        val heatmaps = mActivityRule.activity.heatmapRepository.getGroupHeatmaps(DUMMY_GROUP_ID)
+        val heatmaps = mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
 
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
@@ -204,7 +207,7 @@ class MapActivityTest {
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
         assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(2))
 
-        assertThat(mActivityRule.activity.heatmapPainters.size, equalTo(1))
+        assertThat(mActivityRule.activity.measureHeatmapManager.heatmapPainters.size, equalTo(1))
         //Reset default repo
         HeatmapRepository.daoProvider = { MockHeatmapDao() }
     }
@@ -230,9 +233,9 @@ class MapActivityTest {
     }
 
     @Test
-    fun droneStatusIsVisibleForoperator() {
+    fun droneStatusIsVisibleForOperator() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        onView(withId(R.id.drone_status)).check(matches(isDisplayed()))
+        onView(withId(R.id.drone_status_fragment)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -243,12 +246,12 @@ class MapActivityTest {
 
         onView(withId(R.id.mapView)).perform(longClick())
         runOnUiThread {
-            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(1))
+            assertThat(mActivityRule.activity.victimSymbolManager.markers.size, equalTo(1))
         }
         onView(withId(R.id.mapView)).perform(longClick())
         Thread.sleep(2000)
         runOnUiThread {
-            assertThat(mActivityRule.activity.victimMarkers.size, equalTo(0))
+            assertThat(mActivityRule.activity.victimSymbolManager.markers.size, equalTo(0))
         }
     }
 
@@ -265,8 +268,8 @@ class MapActivityTest {
 
         // Add a point
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(1.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(1.0, 0.0))
         }
 
         assertThat(searchAreaBuilder.vertices.size, equalTo(2))
@@ -289,8 +292,8 @@ class MapActivityTest {
 
         // Add a point
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(0.0001, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0001, 0.0))
         }
 
         assertThat(searchAreaBuilder.vertices.size, equalTo(2))
@@ -308,11 +311,11 @@ class MapActivityTest {
 
         // Add 5 points
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
-            mActivityRule.activity.onMapClicked(LatLng(0.00001, 0.00001))
-            mActivityRule.activity.onMapClicked(LatLng(0.00002, 0.00002))
-            mActivityRule.activity.onMapClicked(LatLng(0.00003, 0.00003))
-            mActivityRule.activity.onMapClicked(LatLng(0.00004, 0.00004))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.00001, 0.00001))
+            mActivityRule.activity.onMapClick(LatLng(0.00002, 0.00002))
+            mActivityRule.activity.onMapClick(LatLng(0.00003, 0.00003))
+            mActivityRule.activity.onMapClick(LatLng(0.00004, 0.00004))
         }
 
         onView(withText("Already enough points"))
@@ -328,7 +331,7 @@ class MapActivityTest {
 
         val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
         runOnUiThread {
-            mActivityRule.activity.onMapClicked(LatLng(0.0, 0.0))
+            mActivityRule.activity.onMapClick(LatLng(0.0, 0.0))
         }
         assertThat(searchAreaBuilder.vertices.size, equalTo(1))
 
@@ -371,152 +374,6 @@ class MapActivityTest {
                 assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST), closeTo(0.0, EPSILON))
             }
         }
-    }
-
-    @Test
-    fun updateDroneBatteryChangesDroneStatus() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = null
-        }
-        onView(withId(R.id.battery_level)).check(matches(withText(R.string.no_info)))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = 1F
-        }
-        onView(withId(R.id.battery_level)).check(matches(withText(" 100%")))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = 0F
-        }
-        onView(withId(R.id.battery_level)).check(matches(withText(" 0%")))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = 0.5F
-        }
-        onView(withId(R.id.battery_level)).check(matches(withText(" 50%")))
-    }
-
-    @Test
-    fun updateDroneAltitudeChangesDroneStatus() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-
-        runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.value = null
-        }
-
-        onView(withId(R.id.altitude)).check(matches(withText(R.string.no_info)))
-
-        runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.value = 0F
-        }
-        onView(withId(R.id.altitude)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
-
-        runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.value = 1.123F
-        }
-        onView(withId(R.id.altitude)).check(matches(withText(" 1.1 m")))
-
-        runOnUiThread {
-            Drone.currentAbsoluteAltitudeLiveData.value = 10F
-        }
-        onView(withId(R.id.altitude)).check(matches(withText(" 10.0 m")))
-    }
-
-    @Test
-    fun updateDroneSpeedChangesDroneStatus() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-
-        runOnUiThread {
-            Drone.currentSpeedLiveData.value = null
-        }
-
-        onView(withId(R.id.speed)).check(matches(withText(R.string.no_info)))
-
-        runOnUiThread {
-            Drone.currentSpeedLiveData.value = 0F
-        }
-        onView(withId(R.id.speed)).check(matches(withText(" 0.0 m/s")))
-
-        runOnUiThread {
-            Drone.currentSpeedLiveData.value = 1.123F
-        }
-        onView(withId(R.id.speed)).check(matches(withText(" 1.1 m/s")))
-
-        runOnUiThread {
-            Drone.currentSpeedLiveData.value = 5.2F
-        }
-        onView(withId(R.id.speed)).check(matches(withText(" 5.2 m/s")))
-    }
-
-    @Test
-    fun updateDronePositionChangesDistToUser() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        runOnUiThread {
-            CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
-            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
-        }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
-
-        runOnUiThread {
-            Drone.currentPositionLiveData.value = LatLng(1.0, 0.0)
-        }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
-    }
-
-    @Test
-    fun updateUserPositionChangesDistToUser() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        runOnUiThread {
-            Drone.currentPositionLiveData.value = LatLng(0.0, 0.0)
-            CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
-        }
-        onView(withId(R.id.distance_to_user)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
-
-        runOnUiThread {
-            CentralLocationManager.currentUserPosition.value = LatLng(1.0, 0.0)
-        }
-        onView(withId(R.id.distance_to_user)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
-    }
-
-    @Test
-    fun updateBatteryLevelChangesBatteryLevelIcon() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = .00f
-        }
-        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery1))))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = .10f
-        }
-        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery2))))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = .30f
-        }
-        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery3))))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = .50f
-        }
-        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery4))))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = .70f
-        }
-        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery5))))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = .90f
-        }
-        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery6))))
-
-        runOnUiThread {
-            Drone.currentBatteryLevelLiveData.value = .98f
-        }
-        onView(withId(R.id.battery_level_icon)).check(matches(withTagValue(equalTo(R.drawable.ic_battery7))))
     }
 
     @Test

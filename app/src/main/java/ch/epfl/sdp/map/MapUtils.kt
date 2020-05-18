@@ -17,11 +17,11 @@ object MapUtils {
         val context = MainApplication.applicationContext()
         val defaultSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         val latitude: Double = defaultSharedPrefs
-                .getString(context.getString(R.string.prefs_latitude), null)
+                .getString(context.getString(R.string.pref_key_latitude), null)
                 ?.toDoubleOrNull()
                 ?: DEFAULT_LATITUDE
         val longitude: Double = defaultSharedPrefs
-                .getString(context.getString(R.string.prefs_longitude), null)
+                .getString(context.getString(R.string.pref_key_longitude), null)
                 ?.toDoubleOrNull()
                 ?: DEFAULT_LONGITUDE
         return LatLng(latitude, longitude)
@@ -33,18 +33,18 @@ object MapUtils {
     fun saveCameraPositionAndZoomToPrefs(cameraPosition: CameraPosition) {
         val context = MainApplication.applicationContext()
         PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext()).edit()
-                .putString(context.getString(R.string.prefs_latitude),
+                .putString(context.getString(R.string.pref_key_latitude),
                         cameraPosition.target?.latitude.toString())
-                .putString(context.getString(R.string.prefs_longitude),
+                .putString(context.getString(R.string.pref_key_longitude),
                         cameraPosition.target?.longitude.toString())
-                .putString(context.getString(R.string.prefs_zoom),
+                .putString(context.getString(R.string.pref_key_zoom),
                         cameraPosition.zoom.toString())
                 .apply()
     }
 
     private fun loadLastMapZoomFromPrefs(): Double {
         return PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
-                .getString(MainApplication.applicationContext().getString(R.string.prefs_zoom), null)
+                .getString(MainApplication.applicationContext().getString(R.string.pref_key_zoom), null)
                 ?.toDoubleOrNull()
                 ?: DEFAULT_ZOOM
     }

@@ -4,9 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseMarkersDao
 import ch.epfl.sdp.database.dao.MarkerDao
 import ch.epfl.sdp.database.data.MarkerData
-import com.mapbox.mapboxsdk.geometry.LatLng
 
-class MarkerRepository {
+class MarkerRepository : IMarkerRepository {
 
     companion object {
         val DEFAULT_DAO = { FirebaseMarkersDao() }
@@ -17,15 +16,19 @@ class MarkerRepository {
 
     private val dao: MarkerDao = daoProvider()
 
-    fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
+    override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
         return dao.getMarkersOfSearchGroup(groupId)
     }
 
-    fun addMarkerForSearchGroup(groupId: String, position: LatLng) {
-        dao.addMarker(groupId, MarkerData(position))
+    override fun addMarkerForSearchGroup(groupId: String, marker: MarkerData) {
+        dao.addMarker(groupId, marker)
     }
 
-    fun removeMarkerForSearchGroup(groupId: String, markerId: String) {
+    override fun removeMarkerOfSearchGroup(groupId: String, markerId: String) {
         dao.removeMarker(groupId, markerId)
+    }
+
+    override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {
+        dao.removeAllMarkersOfSearchGroup(searchGroupId)
     }
 }

@@ -14,4 +14,16 @@ class MockGroupDao(data: List<SearchGroupData> = emptyList()) : SearchGroupDao {
     override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
         TODO("Not yet implemented")
     }
+
+    override fun createGroup(searchGroupData: SearchGroupData) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateGroup(searchGroupData: SearchGroupData) {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeSearchGroup(searchGroupId: String) {
+        TODO("Not yet implemented")
+    }
 }

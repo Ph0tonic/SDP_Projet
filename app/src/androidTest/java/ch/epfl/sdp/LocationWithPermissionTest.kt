@@ -14,10 +14,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import org.hamcrest.CoreMatchers.equalTo
@@ -37,6 +39,8 @@ class LocationWithPermissionTest {
     companion object {
         private const val DUMMY_GROUP_ID = "DummyGroupId"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
+        private const val REFRESH_RATE = 500L
+        private const val MIN_DIST = 10f
     }
 
     @Rule
@@ -44,8 +48,8 @@ class LocationWithPermissionTest {
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private val intentWithGroupAndOperator = Intent()
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_GROUP_ID), DUMMY_GROUP_ID)
-            .putExtra(applicationContext().getString(R.string.INTENT_KEY_ROLE), Role.OPERATOR)
+            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
 
     @get:Rule
     val mActivityRule = IntentsTestRule(MapActivity::class.java, true, false)
@@ -73,7 +77,7 @@ class LocationWithPermissionTest {
         Mockito.`when`(context.getSystemService(Context.LOCATION_SERVICE)).thenReturn(manager)
         Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
         CentralLocationManager.configure(activity, context)
-        Mockito.verify(manager).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(500L), Mockito.eq(10f), Mockito.any<LocationListener>())
+        Mockito.verify(manager).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(MIN_DIST), Mockito.any<LocationListener>())
     }
 
     @UiThreadTest
@@ -93,6 +97,6 @@ class LocationWithPermissionTest {
         Mockito.`when`(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)).thenReturn(true)
         CentralLocationManager.configure(activity, context)
         CentralLocationManager.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
-        Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(500L), Mockito.eq(10f), Mockito.any<LocationListener>())
+        Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(MIN_DIST), Mockito.any<LocationListener>())
     }
 }

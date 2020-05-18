@@ -21,6 +21,8 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.ui.MainActivity
+import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
@@ -92,9 +94,9 @@ class MainActivityTest {
             Auth.loggedIn.value = true
         }
 
-        var longitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
-        var latitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
-        var zoom: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
+        var longitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.pref_key_longitude), null)
+        var latitude: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.pref_key_latitude), null)
+        var zoom: String? = sharedPreferences.getString(mActivityRule.activity.getString(R.string.pref_key_zoom), null)
         assertThat(latitude, `is`(nullValue()))
         assertThat(longitude, `is`(nullValue()))
         assertThat(zoom, `is`(nullValue()))
@@ -103,9 +105,9 @@ class MainActivityTest {
         onView(withId(R.id.work_offline_button)).perform(click())
         mUiDevice.pressBack()
 
-        longitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_longitude), null)
-        latitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_latitude), null)
-        zoom = sharedPreferences.getString(mActivityRule.activity.getString(R.string.prefs_zoom), null)
+        longitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.pref_key_longitude), null)
+        latitude = sharedPreferences.getString(mActivityRule.activity.getString(R.string.pref_key_latitude), null)
+        zoom = sharedPreferences.getString(mActivityRule.activity.getString(R.string.pref_key_zoom), null)
         assertThat(latitude, `is`(notNullValue()))
         assertThat(longitude, `is`(notNullValue()))
         assertThat(zoom, `is`(notNullValue()))
