@@ -133,6 +133,12 @@ class MainActivity : AppCompatActivity() {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+
+    private fun checkConnection(view : View, action : () -> Unit) {
+        if (Auth.loggedIn.value == false) { Auth.login(this) { success ->  if (success) { checkConnection (view, action) } }
+        } else { action() }
+    }
+
     fun goToSearchGroupSelect(view: View) {
         if (Auth.loggedIn.value == false) {
 
