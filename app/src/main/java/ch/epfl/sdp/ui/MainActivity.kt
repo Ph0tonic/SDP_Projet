@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         private const val SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE = 7865
     }
 
-    private var selectSearchGroupAction = false
 
     private val currentGroupId: MutableLiveData<String?> = MutableLiveData(null)
     private val currentRole: MutableLiveData<Role> = MutableLiveData(Role.RESCUER)
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun loadActiveGroupFromPrefs() {
+    private fun loadActiveGroupFromPrefs() {
         currentGroupId.value = PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getString(getString(R.string.pref_key_current_group_id), null)
@@ -134,32 +133,42 @@ class MainActivity : AppCompatActivity() {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    fun goToSearchGroupSelect(view: View) {
+
+    private fun checkConnexion(view: View, action: () -> Unit) {
         if (Auth.loggedIn.value == false) {
-            selectSearchGroupAction = true
             Auth.login(this) { success ->
                 if (success) {
-                    goToSearchGroupSelect(view)
+                    checkConnexion(view, action)
                 }
             }
         } else {
+            action()
+        }
+    }
+
+    fun goToSearchGroupSelect(view: View) {
+        checkConnexion(view) {
             val intent = Intent(this, SearchGroupSelectionActivity::class.java)
             startActivityForResult(intent, SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE)
         }
     }
 
     fun startMission(view: View) {
-        val intent = Intent(this, MapActivity::class.java)
-                .putExtra(getString(R.string.intent_key_group_id), currentGroupId.value)
-                .putExtra(getString(R.string.intent_key_role), Role.OPERATOR)
-        startActivity(intent)
+        checkConnexion(view) {
+            val intent = Intent(this, MapActivity::class.java)
+                    .putExtra(getString(R.string.intent_key_group_id), currentGroupId.value)
+                    .putExtra(getString(R.string.intent_key_role), Role.OPERATOR)
+            startActivity(intent)
+        }
     }
 
     fun workOffline(view: View) {
-        val intent = Intent(this, MapActivity::class.java)
-                .putExtra(getString(R.string.intent_key_group_id), "dummy")
-                .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
-        startActivity(intent)
+        checkConnexion(view) {
+            val intent = Intent(this, MapActivity::class.java)
+                    .putExtra(getString(R.string.intent_key_group_id), "dummy")
+                    .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
+            startActivity(intent)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
