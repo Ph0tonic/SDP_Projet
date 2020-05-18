@@ -41,34 +41,25 @@
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimaryDark"
-        android:elevation="8dp"
-        android:orientation="horizontal"
-        android:paddingTop="8dp">
+
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/download_button"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/OfflineDownloadButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:textColor="@color/colorBlack"
             android:text="@string/dialog_positive_button"
-            android:textAllCaps="false"
-            android:textSize="12sp"
             android:onClick="downloadRegionDialog"/>
 
         <Button
             android:id="@+id/list_button"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/OfflineDownloadButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textColor="@color/colorBlack"
             android:text="@string/navigate_title"
-            android:textAllCaps="false"
-            android:textSize="12sp"
             android:onClick="downloadedRegionList"/>
 
     </LinearLayout>
