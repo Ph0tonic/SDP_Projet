@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE = 7865
     }
-    
+
 
     private val currentGroupId: MutableLiveData<String?> = MutableLiveData(null)
     private val currentRole: MutableLiveData<Role> = MutableLiveData(Role.RESCUER)
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun loadActiveGroupFromPrefs() {
+    private fun loadActiveGroupFromPrefs() {
         currentGroupId.value = PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getString(getString(R.string.pref_key_current_group_id), null)
