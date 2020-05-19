@@ -76,7 +76,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     val mapboxSearchAreaCancelDraggable = MutableLiveData<Boolean>(false)
 
     /* Painters */
-    private lateinit var searchAreaPainter: MapboxSearchAreaPainter
+    private lateinit var searchAreaPainter: SearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var userPainter: MapboxUserPainter
@@ -321,12 +321,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         currentStrategy = strategy
         when (strategy) {
             is SimpleQuadStrategy -> {
-                searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaPainter = QuadrilateralAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = QuadrilateralBuilder()
                 findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_quadstrat)
             }
             is SpiralStrategy -> {
-                searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaPainter = CircleAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = CircleBuilder()
                 findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_spiralstrat)
             }
