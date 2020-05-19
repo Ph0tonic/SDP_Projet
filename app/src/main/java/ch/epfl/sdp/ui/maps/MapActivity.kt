@@ -337,15 +337,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         searchAreaBuilder.onSearchAreaChanged.add { missionBuilder.withSearchArea(it) }
         searchAreaBuilder.onVerticesChanged.add { searchAreaPainter.paint(it) }
 
-        searchAreaPainter.onVertexMoved.add { old, new ->
-            try {
-                searchAreaBuilder.moveVertex(old, new)
-                true
-            } catch (e: IllegalArgumentException) {
-                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-                mapboxSearchAreaCancelDraggable.postValue(true)
-                false
-            }
-        }
+        searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
 }

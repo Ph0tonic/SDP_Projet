@@ -33,7 +33,7 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
             }
 
             override fun onAnnotationDrag(annotation: Circle) {
-                onVertexMoved.forEach { reset = reset || !it(previousLocation, annotation.latLng) }
+                onVertexMoved.forEach { it(previousLocation, annotation.latLng) }
                 previousLocation = annotation.latLng
             }
 
