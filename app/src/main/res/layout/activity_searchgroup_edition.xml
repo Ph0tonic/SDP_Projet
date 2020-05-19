@@ -31,7 +31,7 @@
                 android:importantForAutofill="no"
                 android:inputType="textPersonName"
                 android:textAlignment="center"
-                android:textSize="40sp"
+                android:textSize="36sp"
                 android:textStyle="bold" />
 
             <TableLayout
@@ -55,7 +55,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/base_location_label"
                         android:textAlignment="viewEnd"
-                        android:textSize="20sp" />
+                        android:textSize="24sp" />
 
                 </TableRow>
 
@@ -71,16 +71,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/group_edition_operators_label"
                     android:textAlignment="viewEnd"
-                    android:textSize="20sp"
+                    android:textSize="24sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
                     android:id="@+id/group_edit_add_operator_button"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@android:drawable/ic_menu_add"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addOperator"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -111,16 +111,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/group_edition_rescuers_label"
                     android:textAlignment="viewEnd"
-                    android:textSize="20sp"
+                    android:textSize="24sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
                     android:id="@+id/group_edit_add_rescuer_button"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@android:drawable/ic_menu_add"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addRescuer"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -145,7 +145,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/danger_zone"
                 android:textAlignment="viewEnd"
-                android:textSize="20sp"
+                android:textSize="24sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
