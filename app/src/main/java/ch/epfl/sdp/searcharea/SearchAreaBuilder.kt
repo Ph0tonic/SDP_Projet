@@ -86,4 +86,12 @@ abstract class SearchAreaBuilder {
         }
         return buildGivenIsComplete()
     }
+
+    fun toControlDisplayPair(): Pair<List<LatLng>,List<LatLng>?> {
+        val controlPoints = if(isComplete())    displayPoints()
+                            else                null
+        return Pair(vertices, controlPoints)
+    }
+
+    abstract fun displayPoints(): List<LatLng>
 }

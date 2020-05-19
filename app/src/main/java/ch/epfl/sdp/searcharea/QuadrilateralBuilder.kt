@@ -1,6 +1,7 @@
 package ch.epfl.sdp.searcharea
 
 import ch.epfl.sdp.utils.IntersectionUtils
+import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 
 class QuadrilateralBuilder : SearchAreaBuilder() {
@@ -25,4 +26,5 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
     }
 
     override fun buildGivenIsComplete(): QuadrilateralArea = QuadrilateralArea(vertices)
+    override fun displayPoints(): List<LatLng> = vertices
 }
