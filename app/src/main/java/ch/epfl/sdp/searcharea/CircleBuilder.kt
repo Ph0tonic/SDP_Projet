@@ -21,7 +21,7 @@ class CircleBuilder : SearchAreaBuilder() {
         val sides = 45
         val numberOfPoints = sides
         return List<LatLng>(sides) {
-            val percent = it/numberOfPoints.toDouble()
+            val percent = it / numberOfPoints.toDouble()
             SphericalUtil.computeOffset(center, radius, percent * 360)
         }
     }

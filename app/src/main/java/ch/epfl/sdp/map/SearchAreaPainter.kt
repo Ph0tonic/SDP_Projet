@@ -73,7 +73,7 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
     }
 
     private fun unDrawRegion() {
-        if(isDisplayDrawn) {
+        if (isDisplayDrawn) {
             drawRegion(listOf())
             isDisplayDrawn = false
         }

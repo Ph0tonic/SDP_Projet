@@ -5,7 +5,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlin.properties.Delegates
 
 class MissionBuilder {
-    companion object{
+    companion object {
         const val maxDist = 1000
     }
 
@@ -43,11 +43,11 @@ class MissionBuilder {
         require(searchArea != null) { "Search area cannot be null" }
         require(startingLocation != null) { "Starting location cannot be null" }
         require(overflightStrategy.acceptArea(searchArea!!)) { "This strategy doesn't accept this search area" }
-        require(!areVerticesTooDistant(searchArea!!.vertices)) {"Points are too far from one another"}
+        require(!areVerticesTooDistant(searchArea!!.vertices)) { "Points are too far from one another" }
         return overflightStrategy.createFlightPath(startingLocation!!, searchArea!!)
     }
 
     private fun areVerticesTooDistant(vertices: List<LatLng>): Boolean {
-        return vertices.any { v1 -> vertices.any {v1.distanceTo(it) > maxDist} }
+        return vertices.any { v1 -> vertices.any { v1.distanceTo(it) > maxDist } }
     }
 }

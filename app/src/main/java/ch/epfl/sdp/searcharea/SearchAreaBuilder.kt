@@ -23,7 +23,7 @@ abstract class SearchAreaBuilder {
         val searchArea = try {
             this.build()
         } catch (ex: Exception) {
-            when(ex){
+            when (ex) {
                 is SearchAreaNotCompleteException -> null
                 is IllegalArgumentException -> {
                     val message = ex.message
@@ -49,7 +49,6 @@ abstract class SearchAreaBuilder {
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
         require(isStrictlyUnderUpperBound()) { "Already enough points" }
-        //require(!isVertexTooFarAway(vertex)) { "Point too far away" }
         vertices.add(vertex)
         reorderVertices()
         this.vertices = this.vertices
@@ -62,10 +61,6 @@ abstract class SearchAreaBuilder {
         reorderVertices()
         this.vertices = this.vertices
         return this
-    }
-
-    private fun isVertexTooFarAway(vertex: LatLng): Boolean {
-        return vertices.any { vertex.distanceTo(it) > maxDist }
     }
 
     protected open fun reorderVertices() {}
@@ -87,9 +82,9 @@ abstract class SearchAreaBuilder {
         return buildGivenIsComplete()
     }
 
-    fun toControlDisplayPair(): Pair<List<LatLng>,List<LatLng>?> {
-        val controlPoints = if(isComplete())    displayPoints()
-                            else                null
+    fun toControlDisplayPair(): Pair<List<LatLng>, List<LatLng>?> {
+        val controlPoints = if (isComplete()) displayPoints()
+        else null
         return Pair(vertices, controlPoints)
     }
 
