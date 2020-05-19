@@ -1,16 +1,13 @@
 package ch.epfl.sdp.map
 
-import android.graphics.Color
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.*
-import com.mapbox.mapboxsdk.utils.ColorUtils
 import kotlin.math.*
-
+/*
 class CircleAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
-        PolygonAreaPainter(mapView, mapboxMap, style) {
+        OldSearchAreaPainter(mapView, mapboxMap, style) {
 
     override fun paint(vertices: List<LatLng>) {
         require(vertices.size <= 2) {"Circle has more than two points"}
@@ -20,6 +17,10 @@ class CircleAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
         }else{
             controlPaint(vertices,vertices)
         }
+    }
+
+    override fun getUpperLayer(): String {
+        TODO("Not yet implemented")
     }
 
     private fun polygonCircleForCoordinate(location: LatLng, radius: Double): ArrayList<LatLng> {
@@ -43,3 +44,5 @@ class CircleAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
         return vertices
     }
 }
+
+ */

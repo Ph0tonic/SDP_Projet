@@ -193,7 +193,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             // Fix to be able to cancel drag
             mapboxSearchAreaCancelDraggable.observe(this, Observer {
                 if (it) {
-                    searchAreaPainter.paint(searchAreaBuilder.vertices)
+                    searchAreaPainter.paint(searchAreaBuilder)
                     mapboxSearchAreaCancelDraggable.value = false
                 }
             })
@@ -321,12 +321,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         currentStrategy = strategy
         when (strategy) {
             is SimpleQuadStrategy -> {
-                searchAreaPainter = QuadrilateralAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = QuadrilateralBuilder()
                 findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_quadstrat)
             }
             is SpiralStrategy -> {
-                searchAreaPainter = CircleAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
+                searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = CircleBuilder()
                 findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_spiralstrat)
             }
@@ -335,7 +335,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         missionBuilder.withStrategy(currentStrategy)
 
         searchAreaBuilder.onSearchAreaChanged.add { missionBuilder.withSearchArea(it) }
-        searchAreaBuilder.onVerticesChanged.add { searchAreaPainter.paint(it) }
+        searchAreaBuilder.onVerticesChanged.add { searchAreaPainter.paint(searchAreaBuilder) }
 
         searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
