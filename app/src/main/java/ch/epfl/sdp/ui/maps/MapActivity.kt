@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.TableLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
@@ -35,6 +34,9 @@ import ch.epfl.sdp.utils.StrategyUtils.loadDefaultStrategyFromPreferences
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -79,7 +81,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     private lateinit var searchAreaPainter: SearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
-    private lateinit var userPainter: MapboxUserPainter
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var victimSymbolManager: VictimSymbolManager
@@ -89,9 +90,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     private var dronePositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
         newLatLng?.let { if (::dronePainter.isInitialized) dronePainter.paint(it) }
-    }
-    private var userPositionObserver = Observer<LatLng> { newLatLng: LatLng? ->
-        newLatLng?.let { if (::userPainter.isInitialized) userPainter.paint(it) }
     }
 
     companion object {
@@ -134,13 +132,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-        findViewById<Button>(R.id.switch_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.resize_button)!!.visibility = View.GONE
+        findViewById<ConstraintLayout>(R.id.vlc_fragment)!!.visibility = View.GONE
         findViewById<TableLayout>(R.id.drone_status_fragment)!!.visibility = View.GONE
     }
 
     override fun onResume() {
         super.onResume()
-        CentralLocationManager.currentUserPosition.observe(this, userPositionObserver)
         Drone.currentPositionLiveData.observe(this, dronePositionObserver)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
@@ -148,7 +147,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     override fun onPause() {
         super.onPause()
-        CentralLocationManager.currentUserPosition.removeObserver(userPositionObserver)
         Drone.currentPositionLiveData.removeObserver(dronePositionObserver)
 
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
@@ -157,7 +155,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     override fun onDestroy() {
         super.onDestroy()
         if (isMapReady) {
-            userPainter.onDestroy()
             dronePainter.onDestroy()
             missionPainter.onDestroy()
             victimSymbolManager.onDestroy()
@@ -172,11 +169,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            userPainter = MapboxUserPainter(mapView, mapboxMap, style)
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
-            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId ->
-                markerManager.removeMarkerForSearchGroup(groupId, markerId)
-            }
+            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
 
@@ -203,6 +197,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             heatmapManager.getGroupHeatmaps(groupId).observe(this, measureHeatmapManager)
             Drone.currentPositionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
+
+            val locationComponent = mapboxMap.locationComponent
+            locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
+            locationComponent.isLocationComponentEnabled = true;
+            locationComponent.cameraMode = CameraMode.TRACKING
+            locationComponent.renderMode = RenderMode.COMPASS
 
             isMapReady = true
 
