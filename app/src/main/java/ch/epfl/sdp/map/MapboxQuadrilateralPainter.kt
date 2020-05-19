@@ -21,6 +21,7 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
     private lateinit var fillArea: Fill
 
     private var reset: Boolean = false
+    private var displayStrategy: Boolean = true
 
     private var nbVertices = 0
 
@@ -31,7 +32,7 @@ class MapboxQuadrilateralPainter(mapView: MapView, mapboxMap: MapboxMap, style: 
         }
 
         override fun onAnnotationDrag(annotation: Circle) {
-            onMoveVertex.forEach { reset = reset || !it(previousLocation, annotation.latLng) }
+            onVertexMoved.forEach { reset = (reset || !it(previousLocation, annotation.latLng)) }
             previousLocation = annotation.latLng
         }
 

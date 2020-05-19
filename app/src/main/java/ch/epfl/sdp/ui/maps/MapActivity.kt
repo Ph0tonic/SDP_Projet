@@ -3,7 +3,6 @@ package ch.epfl.sdp.ui.maps
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TableLayout
@@ -193,7 +192,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
             // Fix to be able to cancel drag
             mapboxSearchAreaCancelDraggable.observe(this, Observer {
-                if (it == true) {
+                if (it) {
                     searchAreaPainter.paint(searchAreaBuilder.vertices)
                     mapboxSearchAreaCancelDraggable.value = false
                 }
@@ -335,10 +334,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         missionBuilder.withStrategy(currentStrategy)
 
-        searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
-        searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
+        searchAreaBuilder.onSearchAreaChanged.add { missionBuilder.withSearchArea(it) }
+        searchAreaBuilder.onVerticesChanged.add { searchAreaPainter.paint(it) }
 
-        searchAreaPainter.onMoveVertex.add { old, new ->
+        searchAreaPainter.onVertexMoved.add { old, new ->
             try {
                 searchAreaBuilder.moveVertex(old, new)
                 true

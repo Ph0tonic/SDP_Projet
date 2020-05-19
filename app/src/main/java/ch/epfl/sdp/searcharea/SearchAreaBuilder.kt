@@ -2,6 +2,7 @@ package ch.epfl.sdp.searcharea
 
 import androidx.annotation.VisibleForTesting
 import com.mapbox.mapboxsdk.geometry.LatLng
+import java.lang.IllegalArgumentException
 import kotlin.properties.Delegates
 
 abstract class SearchAreaBuilder {
@@ -14,24 +15,31 @@ abstract class SearchAreaBuilder {
     abstract val sizeUpperBound: Int?
     abstract val shapeName: String
 
-    val searchAreaChanged = mutableListOf<(SearchArea?) -> Unit>()
-    val verticesChanged = mutableListOf<(MutableList<LatLng>) -> Unit>()
+    val onSearchAreaChanged = mutableListOf<(SearchArea?) -> Unit>()
+    val onVerticesChanged = mutableListOf<(MutableList<LatLng>) -> Unit>()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     var vertices: MutableList<LatLng> by Delegates.observable(mutableListOf()) { _, _, _ ->
         val searchArea = try {
             this.build()
-        } catch (e: SearchAreaNotCompleteException) {
-            null
+        } catch (ex: Exception) {
+            when(ex){
+                is SearchAreaNotCompleteException -> null
+                is IllegalArgumentException -> {
+                    val message = ex.message
+                    null
+                }
+                else -> throw ex
+            }
         }
-        verticesChanged.forEach { it(vertices) }
-        searchAreaChanged.forEach { it(searchArea) }
+        onVerticesChanged.forEach { it(vertices) }
+        onSearchAreaChanged.forEach { it(searchArea) }
     }
 
     fun onDestroy() {
         reset()
-        searchAreaChanged.clear()
-        verticesChanged.clear()
+        onSearchAreaChanged.clear()
+        onVerticesChanged.clear()
     }
 
     fun reset() {
@@ -41,7 +49,7 @@ abstract class SearchAreaBuilder {
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
         require(isStrictlyUnderUpperBound()) { "Already enough points" }
-        require(!isVertexTooFarAway(vertex)) { "Point too far away" }
+        //require(!isVertexTooFarAway(vertex)) { "Point too far away" }
         vertices.add(vertex)
         reorderVertices()
         this.vertices = this.vertices
@@ -49,7 +57,6 @@ abstract class SearchAreaBuilder {
     }
 
     fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
-        require(!isVertexTooFarAway(new)) { "Point too far away" }
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
         vertices[oldIndex!!] = new
         reorderVertices()

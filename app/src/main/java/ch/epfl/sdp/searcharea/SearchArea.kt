@@ -1,3 +1,7 @@
 package ch.epfl.sdp.searcharea
 
-interface SearchArea
+import com.mapbox.mapboxsdk.geometry.LatLng
+
+interface SearchArea{
+    val vertices: List<LatLng>
+}

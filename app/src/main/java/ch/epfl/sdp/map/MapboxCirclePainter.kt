@@ -7,7 +7,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
-import java.security.InvalidParameterException
 import kotlin.math.*
 
 class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
@@ -34,7 +33,7 @@ class MapboxCirclePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) 
             }
 
             override fun onAnnotationDrag(annotation: Circle) {
-                onMoveVertex.forEach { reset = reset || !it(previousLocation, annotation.latLng) }
+                onVertexMoved.forEach { reset = reset || !it(previousLocation, annotation.latLng) }
                 previousLocation = annotation.latLng
             }
 
