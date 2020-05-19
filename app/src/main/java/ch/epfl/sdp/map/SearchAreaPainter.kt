@@ -23,7 +23,6 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
     private lateinit var fillArea: Fill
 
     private var reset: Boolean = false
-    private var isDisplayDrawn = false
 
     private var nbVertices = 0
 
@@ -72,15 +71,8 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
             drawPinpoint(controlPoints)
             nbVertices = controlPoints.size
         }
-        displayPoints?.let { drawRegion(it) } ?: unDrawRegion()
+        drawRegion(displayPoints ?: listOf())
         reset = false
-    }
-
-    private fun unDrawRegion() {
-        if (isDisplayDrawn) {
-            drawRegion(listOf())
-            isDisplayDrawn = false
-        }
     }
 
     /**
@@ -98,7 +90,6 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
             fillArea.latLngs = listOf(vertices)
             fillManager.update(fillArea)
         }
-        isDisplayDrawn = true
     }
 
     /**

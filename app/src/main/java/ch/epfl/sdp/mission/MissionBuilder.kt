@@ -6,7 +6,7 @@ import kotlin.properties.Delegates
 
 class MissionBuilder {
     companion object {
-        const val maxDist = 1000
+        const val MAX_DIST = 1000 //meters
     }
 
     val generatedMissionChanged = mutableListOf<(List<LatLng>?) -> Unit>()
@@ -48,6 +48,6 @@ class MissionBuilder {
     }
 
     private fun areVerticesTooDistant(vertices: List<LatLng>): Boolean {
-        return vertices.any { v1 -> vertices.any { v1.distanceTo(it) > maxDist } }
+        return vertices.any { v1 -> vertices.any { v1.distanceTo(it) > MAX_DIST } }
     }
 }

@@ -7,10 +7,6 @@ import kotlin.properties.Delegates
 
 abstract class SearchAreaBuilder {
 
-    companion object {
-        const val maxDist: Double = 1000.0//meters
-    }
-
     abstract val sizeLowerBound: Int?
     abstract val sizeUpperBound: Int?
     abstract val shapeName: String
@@ -50,7 +46,7 @@ abstract class SearchAreaBuilder {
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
         require(isStrictlyUnderUpperBound()) { "Already enough points" }
         vertices.add(vertex)
-        reorderVertices()
+        orderVertices()
         this.vertices = this.vertices
         return this
     }
@@ -58,12 +54,12 @@ abstract class SearchAreaBuilder {
     fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
         vertices[oldIndex!!] = new
-        reorderVertices()
+        orderVertices()
         this.vertices = this.vertices
         return this
     }
 
-    protected open fun reorderVertices() {}
+    protected open fun orderVertices() {}
 
     private fun isStrictlyUnderUpperBound() = sizeUpperBound?.let { vertices.size < it } ?: true
     private fun isUnderUpperBound() = sizeUpperBound?.let { vertices.size <= it } ?: true
