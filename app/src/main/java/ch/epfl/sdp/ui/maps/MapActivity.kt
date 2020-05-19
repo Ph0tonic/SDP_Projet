@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.HeatmapDataManager
@@ -40,6 +41,8 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import timber.log.Timber
+import java.lang.Error
 
 /**
  * Main Activity to display map and create missions.
@@ -73,9 +76,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markerManager = MarkerDataManager()
-
-    // Needs an update of mapbox to improve that functionnality
-    val mapboxSearchAreaCancelDraggable = MutableLiveData<Boolean>(false)
 
     /* Painters */
     private lateinit var searchAreaPainter: SearchAreaPainter
@@ -184,14 +184,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             missionBuilder = MissionBuilder().withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
             setStrategy(loadDefaultStrategyFromPreferences())
 
-            // Fix to be able to cancel drag
-            mapboxSearchAreaCancelDraggable.observe(this, Observer {
-                if (it) {
-                    searchAreaPainter.paint(searchAreaBuilder)
-                    mapboxSearchAreaCancelDraggable.value = false
-                }
-            })
-
             // Configure listeners
             markerManager.getMarkersOfSearchGroup(groupId).observe(this, victimSymbolManager)
             heatmapManager.getGroupHeatmaps(groupId).observe(this, measureHeatmapManager)
@@ -200,7 +192,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
             val locationComponent = mapboxMap.locationComponent
             locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
-            locationComponent.isLocationComponentEnabled = true;
+            locationComponent.isLocationComponentEnabled = true
             locationComponent.cameraMode = CameraMode.TRACKING
             locationComponent.renderMode = RenderMode.COMPASS
 
@@ -332,11 +324,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             }
         }
 
+        searchAreaPainter.searchAreaBuilder = searchAreaBuilder
+
         missionBuilder.withStrategy(currentStrategy)
 
         searchAreaBuilder.onSearchAreaChanged.add { missionBuilder.withSearchArea(it) }
         searchAreaBuilder.onVerticesChanged.add { searchAreaPainter.paint(searchAreaBuilder) }
+        //searchAreaBuilder.onVerticesChanged.add { Toast.makeText(MainApplication.applicationContext(), "Vertices Changed", Toast.LENGTH_SHORT).show() }
 
-        searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+        //searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
 }
