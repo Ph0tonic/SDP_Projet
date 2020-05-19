@@ -33,9 +33,11 @@ class SearchGroupDataManager {
     }
 
     fun getAllGroups(): LiveData<List<SearchGroupData>> {
-        return Transformations.map(searchGroupRepository.getAllGroups()) { groups ->
-            groups.filter { group ->
-                groupIdsOfUser.value?.contains(group.uuid) ?: false
+        return Transformations.switchMap(groupIdsOfUser) { ids ->
+            Transformations.map(searchGroupRepository.getAllGroups()) { groups ->
+                groups.filter { group ->
+                    ids.contains(group.uuid)
+                }
             }
         }
     }
