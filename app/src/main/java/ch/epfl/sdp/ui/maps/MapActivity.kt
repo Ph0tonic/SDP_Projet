@@ -306,7 +306,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     fun pickStrategy(view: View) {
         if (currentStrategy is SimpleQuadStrategy) {
-            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
         } else {
             setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
