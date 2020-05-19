@@ -68,12 +68,15 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
             drawPinpoint(controlPoints)
             nbVertices = controlPoints.size
         }
-        displayPoints?.let { drawRegion(it) } ?: if(isDisplayDrawn) {unDrawRegion(); isDisplayDrawn = false}
+        displayPoints?.let { drawRegion(it) } ?: unDrawRegion()
         reset = false
     }
 
     private fun unDrawRegion() {
-        fillManager.deleteAll()
+        if(isDisplayDrawn) {
+            drawRegion(listOf())
+            isDisplayDrawn = false
+        }
     }
 
     /**
