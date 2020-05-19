@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.repository
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseGroupDao
 import ch.epfl.sdp.database.dao.SearchGroupDao
@@ -15,11 +16,11 @@ class SearchGroupRepository : ISearchGroupRepository {
 
     val dao: SearchGroupDao = daoProvider()
 
-    override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
+    override fun getAllGroups(): LiveData<List<SearchGroupData>> {
         return dao.getGroups()
     }
 
-    override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
+    override fun getGroupById(groupId: String): LiveData<SearchGroupData> {
         return dao.getGroupById(groupId)
     }
 

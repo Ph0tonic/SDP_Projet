@@ -50,7 +50,7 @@ class FirebaseGroupDaoTest {
                 .setValue(expectedGroup)
 
         //Validate g1 data
-        val data = dao.getGroups()
+        val data = dao.getGroupsOfUser()
         data.observeForever { groups ->
             // Test once database has been populated
             if (groups != null && groups.find { it.uuid == DUMMY_GROUP_ID } != null) {

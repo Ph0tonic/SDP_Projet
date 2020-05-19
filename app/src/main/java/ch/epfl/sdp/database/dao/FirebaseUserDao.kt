@@ -1,6 +1,7 @@
 package ch.epfl.sdp.database.dao
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.UserData
@@ -21,6 +22,49 @@ class FirebaseUserDao : UserDao {
 
     private val groupOperators: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
     private val groupRescuers: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
+    private val userIdGroups: MutableMap<String, MutableLiveData<Set<String>>> = mutableMapOf()
+
+    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
+        if (!userIdGroups.containsKey(email)) {
+            //Initialise data
+            val myRef = database.getReference(ROOT_PATH)
+            userIdGroups[email] = MutableLiveData(setOf())
+
+            myRef.addChildEventListener(object : ChildEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    Log.w("Firebase", "Failed to read value.")
+                }
+
+                override fun onChildMoved(dataSnapshot: DataSnapshot, p1: String?) {}
+                override fun onChildChanged(dataSnapshot: DataSnapshot, p1: String?) {
+                    val user = dataSnapshot.children.map {
+                        it.getValue(UserData::class.java)!!
+                    }.find { it.email == email }
+
+                    if (user != null) {
+                        userIdGroups[email]?.value = userIdGroups[email]?.value!!.plus(dataSnapshot.key!!)
+                    } else {
+                        userIdGroups[email]?.value = userIdGroups[email]?.value!!.minus(dataSnapshot.key!!)
+                    }
+                }
+
+                override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+                    val user = dataSnapshot.children.map {
+                        it.getValue(UserData::class.java)!!
+                    }.find { it.email == email }
+
+                    if (user != null) {
+                        userIdGroups[email]?.value = userIdGroups[email]?.value!!.plus(dataSnapshot.key!!)
+                    }
+                }
+
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                    userIdGroups[email]?.value = userIdGroups[email]?.value?.minus(dataSnapshot.key!!)
+                }
+            })
+        }
+        return userIdGroups[email]!!
+    }
 
     override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
         val mapData = if (role == Role.OPERATOR) groupOperators else groupRescuers
@@ -69,4 +113,6 @@ class FirebaseUserDao : UserDao {
     override fun addUserToSearchGroup(searchGroupId: String, user: UserData) {
         database.getReference("$ROOT_PATH/${searchGroupId}").push().setValue(user)
     }
+
 }
+

@@ -7,7 +7,7 @@ class MockGroupDao(data: List<SearchGroupData> = emptyList()) : SearchGroupDao {
 
     private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(data)
 
-    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
+    override fun getGroupsOfUser(): MutableLiveData<List<SearchGroupData>> {
         return groups
     }
 

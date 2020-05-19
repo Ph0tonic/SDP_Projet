@@ -35,7 +35,7 @@ class SearchGroupRepositoryTest {
         ))
 
         val dao = object : EmptyMockSearchGroupDao() {
-            override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
+            override fun getGroupsOfUser(): MutableLiveData<List<SearchGroupData>> {
                 called.countDown()
                 return expectedData
             }

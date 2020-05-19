@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.SearchGroupData
 
 open class EmptyMockSearchGroupDao : SearchGroupDao {
-    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
+    override fun getGroupsOfUser(): MutableLiveData<List<SearchGroupData>> {
         return MutableLiveData()
     }
 
