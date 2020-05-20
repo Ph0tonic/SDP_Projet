@@ -26,19 +26,10 @@ class MapsManagingFragment : Fragment() {
     ): View? {
         mapsManagingViewModel = ViewModelProvider(this).get(MapsManagingViewModel::class.java)
         offlineManager = OfflineManager.getInstance(MainApplication.applicationContext())
-        val root = inflater.inflate(R.layout.fragment_maps_managing, container, false)
-        /*val textView: TextView = root.findViewById(R.id.text_slideshow)
-        mapsManagingViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = getString(R.string.maps_managing)
-        })
-            textView.text = "Maps managing fragment\n(get offline maps here)"
-        })*/
-        return root
+        return inflater.inflate(R.layout.fragment_maps_managing, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Build a region list when the user clicks the list button
-        // Query the DB asynchronously
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
                 // RecyclerView node initialized here
@@ -55,7 +46,6 @@ class MapsManagingFragment : Fragment() {
                 OfflineRegionUtils.showErrorAndToast("Error : $error")
             }
         })
-
         super.onViewCreated(view, savedInstanceState)
     }
 }
