@@ -170,6 +170,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
 
             mapboxMap.addOnMapClickListener(this)
             mapboxMap.addOnMapLongClickListener(this)
@@ -304,18 +305,15 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun setStrategy(strategy: OverflightStrategy) {
         if (isMapReady) {
             searchAreaBuilder.onDestroy()
-            searchAreaPainter.onDestroy()
         }
 
         currentStrategy = strategy
         when (strategy) {
             is SimpleQuadStrategy -> {
-                searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = QuadrilateralBuilder()
                 findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_quadstrat)
             }
             is SpiralStrategy -> {
-                searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = CircleBuilder()
                 findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_spiralstrat)
             }
