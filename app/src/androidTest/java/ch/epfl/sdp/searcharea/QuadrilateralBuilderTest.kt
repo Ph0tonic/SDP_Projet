@@ -10,7 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import kotlin.random.Random
 
-class QuadrilaterAreaBuilderTest {
+class QuadrilateralBuilderTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
