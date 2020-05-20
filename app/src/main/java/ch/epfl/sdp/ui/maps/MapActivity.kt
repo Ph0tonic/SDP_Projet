@@ -8,7 +8,6 @@ import android.widget.TableLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
@@ -306,18 +305,21 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         if (isMapReady) {
             searchAreaBuilder.onDestroy()
         }
-
+        val strategyIcon: Int
         currentStrategy = strategy
         when (strategy) {
             is SimpleQuadStrategy -> {
                 searchAreaBuilder = QuadrilateralBuilder()
-                findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_quadstrat)
+                strategyIcon = R.drawable.ic_quadstrat
             }
             is SpiralStrategy -> {
                 searchAreaBuilder = CircleBuilder()
-                findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_spiralstrat)
+                strategyIcon = R.drawable.ic_spiralstrat
             }
+            else -> throw java.lang.IllegalArgumentException("setStrategy doesn't support the strategy type of: $strategy")
         }
+        findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(strategyIcon)
+
 
         missionBuilder.withStrategy(currentStrategy)
 
