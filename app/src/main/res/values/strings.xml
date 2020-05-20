@@ -58,6 +58,8 @@
     <string name="dialog_toast">Name cannot be empty</string>
     <string name="region_name_error">Unknown Region name</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
+    <string name="download_region_dialog_fragment">Download Region Dialog Fragment</string>
+    <string name="list_offline_region_dialog_fragment">List Offline Region Dialog Fragment</string>
 
     <!-- Navigation -->
     <string name="menu_home">Home</string>
@@ -71,8 +73,6 @@
     <string name="group_edition_create_button">Create</string>
     <string name="save_group_changes">Save</string>
     <string name="search_group_edition_group_name_cannot_be_empty">The group name cannot be empty</string>
-    <string name="group_edit_add_operator"><u>Add operator</u></string>
-    <string name="group_edit_add_rescuer"><u>Add rescuer</u></string>
     <string name="danger_zone">Danger zone</string>
     <string name="delete_this_group">Delete this group</string>
     <string name="enter_a_gmail_address">Enter a gmail address</string>
@@ -99,10 +99,5 @@
 
     <string name="drone_altitude_header">Default drone altitude</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
-
-    <string name="text_view">TextView</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
