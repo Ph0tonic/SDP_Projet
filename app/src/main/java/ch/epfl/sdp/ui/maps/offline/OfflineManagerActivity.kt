@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
