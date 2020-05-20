@@ -58,15 +58,13 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
     }
 
     fun paint(pa: PaintableArea) {
-        controlPaint(pa.getControlVertices(), pa.getShapeVertices())
-    }
-
-    private fun controlPaint(controlPoints: List<LatLng>, displayPoints: List<LatLng>?) {
-        if (controlPoints.size != nbVertices || reset) {
-            drawPinpoint(controlPoints)
-            nbVertices = controlPoints.size
+        val controlVertices = pa.getControlVertices()
+        val shapeVertices = pa.getShapeVertices()
+        if (controlVertices.size != nbVertices || reset) {
+            drawPinpoint(controlVertices)
+            nbVertices = controlVertices.size
         }
-        drawRegion(displayPoints ?: listOf())
+        drawRegion(shapeVertices ?: listOf())
         reset = false
     }
 
