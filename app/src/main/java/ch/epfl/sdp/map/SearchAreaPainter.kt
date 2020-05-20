@@ -15,7 +15,7 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
         private const val REGION_FILL_OPACITY: Float = 0.5F
     }
 
-    //val onVertexMoved = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
+    val onVertexMoved = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
 
     private var fillManager: FillManager = FillManager(mapView, mapboxMap, style)
     private var circleManager: CircleManager = CircleManager(mapView, mapboxMap, style)
@@ -26,8 +26,6 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
 
     private var nbVertices = 0
 
-    lateinit var searchAreaBuilder: SearchAreaBuilder
-
     private val dragListener = object : OnCircleDragListener {
         lateinit var previousLocation: LatLng
         override fun onAnnotationDragStarted(annotation: Circle) {
@@ -35,10 +33,8 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
         }
 
         override fun onAnnotationDrag(annotation: Circle) {
-            val currentLocation = annotation.latLng
-            //onVertexMoved.forEach { it(previousLocation, annotation.latLng) }
-            searchAreaBuilder.moveVertex(previousLocation, currentLocation)
-            previousLocation = currentLocation
+            onVertexMoved.forEach { it(previousLocation, annotation.latLng) }
+            previousLocation = annotation.latLng
         }
 
         override fun onAnnotationDragFinished(annotation: Circle?) {}
@@ -53,7 +49,7 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
     }
 
     override fun onDestroy() {
-        //onVertexMoved.clear()
+        onVertexMoved.clear()
         nbVertices = 0
         fillManager.deleteAll()
         circleManager.deleteAll()
