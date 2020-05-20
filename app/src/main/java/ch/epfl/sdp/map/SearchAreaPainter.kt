@@ -1,7 +1,6 @@
 package ch.epfl.sdp.map
 
 import android.graphics.Color
-import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -61,26 +60,26 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
         val controlVertices = pa.getControlVertices()
         val shapeVertices = pa.getShapeVertices()
         if (controlVertices.size != nbVertices || reset) {
-            drawPinpoint(controlVertices)
+            drawControlVertices(controlVertices)
             nbVertices = controlVertices.size
         }
-        drawRegion(shapeVertices ?: listOf())
+        drawShape(shapeVertices ?: listOf())
         reset = false
     }
 
     /**
      * Fills the regions described by the list of positions
      */
-    private fun drawRegion(vertices: List<LatLng>) {
+    private fun drawShape(shapeOutline: List<LatLng>) {
         if (!::fillArea.isInitialized || reset) {
             fillManager.deleteAll()
             val fillOption = FillOptions()
-                    .withLatLngs(listOf(vertices))
+                    .withLatLngs(listOf(shapeOutline))
                     .withFillColor(ColorUtils.colorToRgbaString(Color.WHITE))
                     .withFillOpacity(REGION_FILL_OPACITY)
             fillArea = fillManager.create(fillOption)
         } else {
-            fillArea.latLngs = listOf(vertices)
+            fillArea.latLngs = listOf(shapeOutline)
             fillManager.update(fillArea)
         }
     }
@@ -88,7 +87,7 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
     /**
      * Draws a pinpoint on the map at the given position
      */
-    private fun drawPinpoint(vertices: List<LatLng>) {
+    private fun drawControlVertices(vertices: List<LatLng>) {
         circleManager.deleteAll()
 
         vertices.forEach {
