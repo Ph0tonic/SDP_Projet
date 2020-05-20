@@ -1,9 +1,7 @@
 package ch.epfl.sdp.searcharea
 
-import ch.epfl.sdp.utils.IntersectionUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import net.mastrgamr.mbmapboxutils.SphericalUtil
-import java.util.*
 
 class QuadrilateralBuilder : SearchAreaBuilder() {
     override val sizeLowerBound: Int? = 4
