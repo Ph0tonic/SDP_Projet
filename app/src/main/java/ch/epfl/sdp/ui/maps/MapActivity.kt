@@ -74,9 +74,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markerManager = MarkerDataManager()
 
-    // Needs an update of mapbox to improve that functionnality
-    val mapboxSearchAreaCancelDraggable = MutableLiveData<Boolean>(false)
-
     /* Painters */
     private lateinit var searchAreaPainter: SearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
@@ -184,14 +181,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             missionBuilder = MissionBuilder().withStartingLocation(LatLng(MapUtils.DEFAULT_LATITUDE, MapUtils.DEFAULT_LONGITUDE))
             setStrategy(loadDefaultStrategyFromPreferences())
 
-            // Fix to be able to cancel drag
-            mapboxSearchAreaCancelDraggable.observe(this, Observer {
-                if (it) {
-                    searchAreaPainter.paint(searchAreaBuilder)
-                    mapboxSearchAreaCancelDraggable.value = false
-                }
-            })
-
             // Configure listeners
             markerManager.getMarkersOfSearchGroup(groupId).observe(this, victimSymbolManager)
             heatmapManager.getGroupHeatmaps(groupId).observe(this, measureHeatmapManager)
@@ -200,7 +189,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
             val locationComponent = mapboxMap.locationComponent
             locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
-            locationComponent.isLocationComponentEnabled = true;
+            locationComponent.isLocationComponentEnabled = true
             locationComponent.cameraMode = CameraMode.TRACKING
             locationComponent.renderMode = RenderMode.COMPASS
 
