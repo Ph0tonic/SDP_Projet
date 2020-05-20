@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
-import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
@@ -37,8 +36,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var listButton: Button
     private lateinit var offlineManager: OfflineManager
     private lateinit var progressBar: ProgressBar
-
-    private var regionSelected = 0
 
     companion object {
         // JSON encoding/decoding
@@ -153,8 +150,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     fun downloadedRegionList(v: View) { // Build a region list when the user clicks the list button
-        // Reset the region selected int to 0
-        regionSelected = 0
         // Query the DB asynchronously
         offlineManager.listOfflineRegions(object : ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
