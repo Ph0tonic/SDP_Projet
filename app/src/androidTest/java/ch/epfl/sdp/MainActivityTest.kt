@@ -78,12 +78,6 @@ class MainActivityTest {
     }
 
     @Test
-    fun canNavigateToMapsManaging() {
-        openDrawer()
-        onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
-    }
-    @Test
     fun canDisplayAMapAndReloadLocation() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext())
 

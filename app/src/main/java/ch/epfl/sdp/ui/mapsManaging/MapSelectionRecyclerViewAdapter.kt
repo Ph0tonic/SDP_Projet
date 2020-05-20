@@ -9,15 +9,12 @@ class MapSelectionRecyclerViewAdapter(private val regions: Array<OfflineRegion>)
     : RecyclerView.Adapter<OfflineMapViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OfflineMapViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return OfflineMapViewHolder(inflater, parent)
+        return OfflineMapViewHolder(LayoutInflater.from(parent.context), parent)
     }
 
     override fun onBindViewHolder(holder: OfflineMapViewHolder, position: Int) {
-        val offlineRegion: OfflineRegion = regions[position]
-        holder.bind(offlineRegion)
+        holder.bind(regions[position])
     }
 
     override fun getItemCount(): Int = regions.size
-
 }
