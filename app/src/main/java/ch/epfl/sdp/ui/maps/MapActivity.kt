@@ -170,7 +170,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
-            searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, mapboxMap.style!!)
+            searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener(this)
             mapboxMap.addOnMapLongClickListener(this)
