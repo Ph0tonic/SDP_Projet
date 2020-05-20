@@ -1,7 +1,7 @@
 package ch.epfl.sdp.searcharea
 
 import com.mapbox.mapboxsdk.geometry.LatLng
-import net.mastrgamr.mbmapboxutils.SphericalUtil
+import net.mastrgamr.mbmapboxutils.SphericalUtil.*
 
 class QuadrilateralBuilder : SearchAreaBuilder() {
     override val sizeLowerBound: Int? = 4
@@ -10,11 +10,13 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
 
     override fun orderVertices() {
         if (isComplete()) {
-            val data = vertices
-            val first = data[0]
-            data.sortBy { SphericalUtil.computeHeading(first, it) }
+            val center = middle(vertices[0], vertices[1], vertices[2], vertices[3])
+            vertices.sortBy { computeHeading(center, it) }
         }
     }
+
+    private fun middle(a: LatLng, b: LatLng): LatLng = interpolate(a,b, 0.5)
+    private fun middle(a: LatLng, b: LatLng, c: LatLng, d: LatLng) = middle(middle(a,b),middle(c,d))
 
     override fun buildGivenIsComplete(): QuadrilateralArea = QuadrilateralArea(vertices)
     override fun getShapeVerticesGivenComplete(): List<LatLng> = vertices
