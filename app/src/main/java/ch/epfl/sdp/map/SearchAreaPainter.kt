@@ -57,9 +57,8 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
         circleManager.onDestroy()
     }
 
-    fun paint(searchArea: SearchAreaBuilder) {
-        val (controlPoints, displayPoints) = searchArea.toControlDisplayPair()
-        controlPaint(controlPoints, displayPoints)
+    fun paint(pa: PaintableArea) {
+        controlPaint(pa.getControlVertices(), pa.getShapeVertices())
     }
 
     private fun controlPaint(controlPoints: List<LatLng>, displayPoints: List<LatLng>?) {

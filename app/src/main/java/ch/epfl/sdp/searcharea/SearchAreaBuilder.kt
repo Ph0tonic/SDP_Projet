@@ -1,11 +1,12 @@
 package ch.epfl.sdp.searcharea
 
 import androidx.annotation.VisibleForTesting
+import ch.epfl.sdp.map.PaintableArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.lang.IllegalArgumentException
 import kotlin.properties.Delegates
 
-abstract class SearchAreaBuilder {
+abstract class SearchAreaBuilder : PaintableArea {
 
     abstract val sizeLowerBound: Int?
     abstract val sizeUpperBound: Int?
@@ -78,11 +79,9 @@ abstract class SearchAreaBuilder {
         return buildGivenIsComplete()
     }
 
-    fun toControlDisplayPair(): Pair<List<LatLng>, List<LatLng>?> {
-        val controlPoints = if (isComplete()) displayPoints()
-        else null
-        return Pair(vertices, controlPoints)
-    }
+    override fun getControlVertices() = vertices
+    override fun getShapeVertices() = if (isComplete()) getShapeVerticesGivenComplete()
+    else null
 
-    abstract fun displayPoints(): List<LatLng>
+    protected abstract fun getShapeVerticesGivenComplete(): List<LatLng>
 }

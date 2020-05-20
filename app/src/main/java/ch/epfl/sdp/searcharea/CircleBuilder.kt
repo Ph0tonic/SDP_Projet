@@ -17,7 +17,7 @@ class CircleBuilder : SearchAreaBuilder() {
     val radius
         get() = center.distanceTo(outer)
 
-    override fun displayPoints(): List<LatLng> {
+    override fun getShapeVerticesGivenComplete(): List<LatLng> {
         val sides = 45
         val numberOfPoints = sides
         return List<LatLng>(sides) {

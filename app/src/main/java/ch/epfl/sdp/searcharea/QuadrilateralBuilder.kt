@@ -26,5 +26,5 @@ class QuadrilateralBuilder : SearchAreaBuilder() {
     }
 
     override fun buildGivenIsComplete(): QuadrilateralArea = QuadrilateralArea(vertices)
-    override fun displayPoints(): List<LatLng> = vertices
+    override fun getShapeVerticesGivenComplete(): List<LatLng> = vertices
 }

@@ -7,5 +7,5 @@ class PolygonBuilder : SearchAreaBuilder() {
     override val sizeUpperBound: Int? = null
     override val shapeName: String = "Polygon"
     override fun buildGivenIsComplete(): PolygonArea = PolygonArea(vertices)
-    override fun displayPoints(): List<LatLng> = vertices
+    override fun getShapeVerticesGivenComplete(): List<LatLng> = vertices
 }
