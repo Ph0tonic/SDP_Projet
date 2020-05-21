@@ -9,9 +9,9 @@ import androidx.fragment.app.DialogFragment
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 
-class DownloadRegionDialogFragment() : DialogFragment() {
+class DownloadRegionDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return  activity.let{
+        return activity.let {
             // Use the Builder class for convenient dialog construction
             // Set up download interaction. Display a dialog
             // when the user clicks download button and require
@@ -34,7 +34,7 @@ class DownloadRegionDialogFragment() : DialogFragment() {
                         if (regionName.isEmpty()) {
                             Toast.makeText(MainApplication.applicationContext(), getString(R.string.dialog_toast), Toast.LENGTH_SHORT).show()
                         } else { // Begin download process
-                            (activity as OfflineManagerActivity).downloadRegion(regionName)
+                            (activity as OfflineManagerActivity).prepareAndLaunchDownload(regionName)
                         }
                     }
                     .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }

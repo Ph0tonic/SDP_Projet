@@ -1,22 +1,18 @@
 package ch.epfl.sdp.ui.maps.offline
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
-import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
-import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.deletingInProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.endProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.startProgress
-import ch.epfl.sdp.map.offline.OfflineRegionUtils.deleteOfflineRegion
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.showErrorAndToast
+import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -86,10 +82,14 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     }
 
     /**
-     * Define offline region parameters, including bounds,
-     * min/max zoom, and metadata
+     * @param regionName : String
+     * From the current map area style and bundaries,
+     * this function creates an OfflineTilePyramidRegionDefinition and
+     * a metadata variable.
+     * Both are then used to create an OfflineRegion
+     * and launch the download
      */
-    fun downloadRegion(regionName: String) {
+    fun prepareAndLaunchDownload(regionName: String) {
         startProgress(downloadButton, listButton, progressBar)
         // Create offline definition using the current
         // style and boundaries of visible map area
