@@ -20,7 +20,8 @@
             app:srcCompat="@drawable/ic_battery1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:rotation="90" />
+            android:rotation="90"
+            android:contentDescription="@string/battery_description_tag"/>
 
         <TextView
             android:id="@+id/battery_level"
@@ -33,7 +34,8 @@
             android:id="@+id/imageView4"
             app:srcCompat="@drawable/ic_altitude"
             android:layout_width="21dp"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:contentDescription="@string/altitude_description_tag"/>
 
         <TextView
             android:id="@+id/altitude"
@@ -46,7 +48,8 @@
             android:id="@+id/imageView2"
             android:layout_width="18dp"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_speed" />
+            app:srcCompat="@drawable/ic_speed"
+            android:contentDescription="@string/speed_description_tag"/>
 
 
         <TextView
@@ -60,7 +63,8 @@
             android:id="@+id/imageView3"
             app:srcCompat="@drawable/ic_distancetodrone"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:contentDescription="@string/distance_to_user_description_tag"/>
 
         <TextView
             android:id="@+id/distance_to_user"
@@ -73,7 +77,8 @@
             android:id="@+id/imageView5"
             app:srcCompat="@drawable/ic_distancetohome"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:contentDescription="@string/distance_to_home_description_tag"/>
 
         <TextView
             android:id="@+id/distance_to_base"
