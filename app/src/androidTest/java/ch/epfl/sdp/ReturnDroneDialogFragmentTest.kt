@@ -12,6 +12,7 @@ import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
@@ -24,8 +25,11 @@ import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.maps.ReturnDroneDialogFragment
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
+import com.mapbox.mapboxsdk.geometry.LatLng
+import io.mavsdk.telemetry.Telemetry.Position
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.closeTo
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,6 +42,7 @@ class ReturnDroneDialogFragmentTest {
         private const val MAP_LOADING_TIMEOUT = 1000L
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
+        private const val EPSILON = 1e-9
     }
 
     private lateinit var mUiDevice: UiDevice
@@ -125,7 +130,7 @@ class ReturnDroneDialogFragmentTest {
     }
 
     @Test
-    fun testClickOnNeutralButtonShowsToast() {
+    fun testClickOnNeutralButtonShowsToastWhenUserPositionIsNull() {
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -134,6 +139,9 @@ class ReturnDroneDialogFragmentTest {
         // Show Dialog
         ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
 
+        runOnUiThread {
+            Drone.homeLocationLiveData.value = Position(0.0, 0.0, 0.0f, 0.0f)
+        }
         CentralLocationManager.currentUserPosition.value = null
 
         // Click on return user
@@ -145,5 +153,41 @@ class ReturnDroneDialogFragmentTest {
         onView(withText(applicationContext().getString(R.string.drone_user_error)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
+
+        Drone.homeLocationLiveData.value = null
+    }
+
+    @Test
+    fun testClickOnNeutralButtonUpdatesMission() {
+        val expectedLatLng = LatLng(47.397428, 8.545369) //Position of the drone before take off
+        // Launch activity
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), Matchers.equalTo(true))
+
+        // Show Dialog
+        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
+
+        runOnUiThread {
+            CentralLocationManager.currentUserPosition.value = expectedLatLng
+        }
+
+        // Click on return user
+        onView(withText(MainApplication.applicationContext()
+                .getString(R.string.ReturnDroneDialogUser)))
+                .perform(click())
+
+        assertThat(Drone.missionLiveData.value?.isEmpty(), Matchers.`is`(false))
+        val returnToUserMission = Drone.missionLiveData.value?.get(0)
+        val currentLat = returnToUserMission?.latitudeDeg
+        val currentLong = returnToUserMission?.longitudeDeg
+
+        assertThat(currentLat, Matchers.`is`(Matchers.notNullValue()))
+        assertThat(currentLong, Matchers.`is`(Matchers.notNullValue()))
+
+        //compare both position
+        assertThat(currentLat, closeTo(expectedLatLng.latitude, EPSILON))
+        assertThat(currentLong, closeTo(expectedLatLng.longitude, EPSILON))
+        CentralLocationManager.currentUserPosition.value = null
     }
 }
