@@ -4,13 +4,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -58,7 +54,6 @@ class MainActivity : AppCompatActivity() {
 
         configureNavigationView()
         loadActiveGroupFromPrefs()
-        setTextGroup()
     }
 
     private fun configureNavigationView() {
@@ -183,11 +178,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)
-    }
-    private fun setTextGroup(){
-        val v = LayoutInflater.from(this).inflate(R.layout.fragment_home, null)
-        val groupText = v.findViewById<TextView>(R.id.current_group_text)
-        //groupText.text="You current group is..."
-        Toast.makeText(this, groupText.text, Toast.LENGTH_SHORT).show()
     }
 }

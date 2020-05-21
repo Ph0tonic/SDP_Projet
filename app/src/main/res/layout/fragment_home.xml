@@ -30,8 +30,8 @@
 
         <Button
             android:id="@+id/start_mission_button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_weight="7"
             android:background="@color/colorPrimaryDark"
             android:onClick="startMission"
@@ -50,23 +50,17 @@
             android:textColor="@color/colorBlack"
             android:textSize="48sp" />
 
+        <TextView
+            android:id="@+id/current_group_text"
+            android:layout_width="137dp"
+            android:layout_height="90dp"
+            android:layout_gravity="center"
+            android:textColor="@color/colorBlack"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/start_mission_button" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/current_group_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="330dp"
-        android:layout_marginTop="27dp"
-        android:layout_marginEnd="330dp"
-        android:layout_marginBottom="10dp"
-        android:text="test"
-        android:textAlignment="center"
-        android:textSize="36sp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
