@@ -177,11 +177,10 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 currentGroupId.value = data!!.getStringExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG)
-
+                HomeFragment().updateCurrentGroup(currentGroupId.value.toString())
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)
-        HomeFragment().updateCurrentGroup(currentGroupId.value.toString())
     }
 
 }

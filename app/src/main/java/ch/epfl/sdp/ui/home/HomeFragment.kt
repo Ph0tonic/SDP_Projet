@@ -25,7 +25,6 @@ class HomeFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
-    
     fun updateCurrentGroup(groupID: String){
         var groupText = requireView().findViewById<TextView>(R.id.current_group_text)
         groupText?.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, groupID)
