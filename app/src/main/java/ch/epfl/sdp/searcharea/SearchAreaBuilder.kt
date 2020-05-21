@@ -80,12 +80,14 @@ abstract class SearchAreaBuilder : PaintableArea {
     }
 
     override fun getControlVertices() = vertices
-    override fun getShapeVertices() =
-            if (isComplete()) {
-                getShapeVerticesGivenComplete()
-            } else {
-                null
-            }
+
+    override fun getShapeVertices(): List<LatLng>? {
+        return if (isComplete()) {
+            getShapeVerticesGivenComplete()
+        } else {
+            null
+        }
+    }
 
     protected abstract fun getShapeVerticesGivenComplete(): List<LatLng>
 }
