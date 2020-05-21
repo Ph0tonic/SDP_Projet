@@ -1,13 +1,11 @@
 package ch.epfl.sdp.mission
 
+import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlin.properties.Delegates
 
 class MissionBuilder {
-    companion object {
-        const val MAX_DIST = 1000 //meters
-    }
 
     val generatedMissionChanged = mutableListOf<(List<LatLng>?) -> Unit>()
 
@@ -48,6 +46,6 @@ class MissionBuilder {
     }
 
     private fun areVerticesTooDistant(vertices: List<LatLng>): Boolean {
-        return vertices.any { v1 -> vertices.any { v1.distanceTo(it) > MAX_DIST } }
+        return vertices.any { v1 -> vertices.any { v1.distanceTo(it) > Drone.MAX_DISTANCE_BETWEEN_POINTS_IN_AREA } }
     }
 }
