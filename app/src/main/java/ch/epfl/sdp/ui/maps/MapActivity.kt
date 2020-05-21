@@ -98,11 +98,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneFlyingStatusObserver = Observer<Boolean> {
-        updateDroneFlyingStatus(it)
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.setIcon(if (it) R.drawable.ic_return else R.drawable.ic_start)
     }
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
-        updateDroneConnectionStatus(it)
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.colorNormal = if (it) Color.WHITE else Color.GRAY
     }
 
     companion object {
@@ -361,19 +361,4 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
 
-    /**
-     * @param isFlying the drone's flying state
-     * Changes the start_or_return_button icon in function of isFlying
-     */
-    private fun updateDroneFlyingStatus(isFlying: Boolean) {
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.setIcon(if (isFlying) R.drawable.ic_return else R.drawable.ic_start)
-    }
-
-    /**
-     * @param isConnected the drone's connection status
-     * Changes the start_or_return button color in function of isConnected
-     */
-    private fun updateDroneConnectionStatus(isConnected: Boolean) {
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.colorNormal = if (!isConnected) Color.GRAY else Color.WHITE
-    }
 }
