@@ -66,7 +66,7 @@ class FirebaseUserDao : UserDao {
         return userIdGroups[email]!!
     }
 
-    override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
+    override fun getUsersOfGroupWithRole(groupId: String, role: Role): LiveData<Set<UserData>> {
         val mapData = if (role == Role.OPERATOR) groupOperators else groupRescuers
 
         if (!mapData.containsKey(groupId)) {

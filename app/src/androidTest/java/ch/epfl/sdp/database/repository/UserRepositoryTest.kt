@@ -1,6 +1,7 @@
 package ch.epfl.sdp.database.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.dao.EmptyMockUserDao
@@ -46,7 +47,7 @@ class UserRepositoryTest {
         UserRepository.daoProvider = { dao }
 
         val repo = UserRepository()
-        assertThat(repo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData))
+        assertThat(repo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData as LiveData<Set<UserData>>))
 
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(called.count, equalTo(0L))
@@ -74,7 +75,7 @@ class UserRepositoryTest {
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
-        assertThat(repo.getRescuersOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData))
+        assertThat(repo.getRescuersOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData as LiveData<Set<UserData>>))
 
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(called.count, equalTo(0L))
