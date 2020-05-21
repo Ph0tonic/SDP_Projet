@@ -24,24 +24,12 @@ class HomeFragment : Fragment() {
     ): View? {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         v = inflater.inflate(R.layout.fragment_home, container, false)
-        //updateCurrentGroup(v)
+        updateCurrentGroup(v)
         return v
     }
 
     override fun onResume() {
         super.onResume()
-        v= requireView()
-        updateCurrentGroup(requireView())
-    }
-
-    override fun onStart() {
-        super.onStart()
-        v=requireView()
-        updateCurrentGroup(requireView())
-    }
-    override fun onStop(){
-        super.onStop()
-        v=requireView()
         updateCurrentGroup(requireView())
     }
 
