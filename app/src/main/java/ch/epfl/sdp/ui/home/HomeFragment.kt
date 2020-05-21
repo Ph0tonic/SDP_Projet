@@ -15,21 +15,16 @@ import ch.epfl.sdp.ui.MainActivity
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var v : View
 
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-         v = inflater.inflate(R.layout.fragment_home, container, false)
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        updateCurrentGroup("10")
-
-        return v
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
-    fun updateCurrentGroup(groupID: String){
-        var groupText = v.findViewById<TextView>(R.id.current_group_text)
-        groupText?.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, groupID)
+    fun updateCurrentGroup(groupID:String){
+
     }
 }
