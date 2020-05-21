@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var snackbar: Snackbar
+    private lateinit var textGroup: EditText
 
     companion object {
         private const val SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE = 7865
@@ -94,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                     .putString(getString(R.string.pref_key_current_group_id), it)
                     .apply()
         })
-
+        textGroup.setText("test")
         //TODO Get role of current search group
     }
 
