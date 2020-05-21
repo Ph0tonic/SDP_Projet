@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -176,10 +177,11 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 currentGroupId.value = data!!.getStringExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG)
-                //HomeFragment().updateCurrentGroup(currentGroupId.value.toString())
+
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)
+        HomeFragment().updateCurrentGroup(currentGroupId.value.toString())
     }
 
 }
