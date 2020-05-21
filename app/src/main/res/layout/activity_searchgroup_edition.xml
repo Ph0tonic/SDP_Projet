@@ -78,8 +78,7 @@
 
                 <Button
                     android:id="@+id/group_edit_add_operator_button"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    style="@style/SearchGroupEditionAddIcon"
                     android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addOperator"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -118,8 +117,7 @@
 
                 <Button
                     android:id="@+id/group_edit_add_rescuer_button"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    style="@style/SearchGroupEditionAddIcon"
                     android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addRescuer"
                     app:layout_constraintBottom_toBottomOf="parent"
