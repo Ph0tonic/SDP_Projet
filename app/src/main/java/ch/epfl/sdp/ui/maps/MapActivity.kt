@@ -74,7 +74,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     val markerManager = MarkerDataManager()
 
     /* Painters */
-    private lateinit var searchAreaPainter: MapboxSearchAreaPainter
+    private lateinit var searchAreaPainter: SearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
 
@@ -169,6 +169,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, style)
 
             mapboxMap.addOnMapClickListener(this)
             mapboxMap.addOnMapLongClickListener(this)
@@ -188,7 +189,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
             val locationComponent = mapboxMap.locationComponent
             locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
-            locationComponent.isLocationComponentEnabled = true;
+            locationComponent.isLocationComponentEnabled = true
             locationComponent.cameraMode = CameraMode.TRACKING
             locationComponent.renderMode = RenderMode.COMPASS
 
@@ -294,7 +295,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     fun pickStrategy(view: View) {
         if (currentStrategy is SimpleQuadStrategy) {
-            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
         } else {
             setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
@@ -303,27 +304,28 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun setStrategy(strategy: OverflightStrategy) {
         if (isMapReady) {
             searchAreaBuilder.onDestroy()
-            searchAreaPainter.onDestroy()
         }
-
+        val strategyIcon: Int
         currentStrategy = strategy
         when (strategy) {
             is SimpleQuadStrategy -> {
-                searchAreaPainter = MapboxQuadrilateralPainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = QuadrilateralBuilder()
-                findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_quadstrat)
+                strategyIcon = R.drawable.ic_quadstrat
             }
             is SpiralStrategy -> {
-                searchAreaPainter = MapboxCirclePainter(mapView, mapboxMap, mapboxMap.style!!)
                 searchAreaBuilder = CircleBuilder()
-                findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(R.drawable.ic_spiralstrat)
+                strategyIcon = R.drawable.ic_spiralstrat
             }
+            else -> throw java.lang.IllegalArgumentException("setStrategy doesn't support the strategy type of: $strategy")
         }
+        findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(strategyIcon)
+
 
         missionBuilder.withStrategy(currentStrategy)
 
-        searchAreaBuilder.searchAreaChanged.add { missionBuilder.withSearchArea(it) }
-        searchAreaBuilder.verticesChanged.add { searchAreaPainter.paint(it) }
-        searchAreaPainter.onMoveVertex.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
+        searchAreaBuilder.onSearchAreaChanged.add { missionBuilder.withSearchArea(it) }
+        searchAreaBuilder.onVerticesChanged.add { searchAreaPainter.paint(searchAreaBuilder) }
+
+        searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
 }

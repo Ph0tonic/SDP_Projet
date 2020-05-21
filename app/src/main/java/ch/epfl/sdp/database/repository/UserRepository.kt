@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.repository
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseUserDao
 import ch.epfl.sdp.database.dao.UserDao
@@ -16,12 +17,16 @@ class UserRepository : IUserRepository {
 
     val dao: UserDao = daoProvider()
 
-    override fun getOperatorsOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
+    override fun getOperatorsOfSearchGroup(searchGroupId: String): LiveData<Set<UserData>> {
         return dao.getUsersOfGroupWithRole(searchGroupId, Role.OPERATOR)
     }
 
-    override fun getRescuersOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
+    override fun getRescuersOfSearchGroup(searchGroupId: String): LiveData<Set<UserData>> {
         return dao.getUsersOfGroupWithRole(searchGroupId, Role.RESCUER)
+    }
+
+    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
+        return dao.getGroupIdsOfUserByEmail(email)
     }
 
     override fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
