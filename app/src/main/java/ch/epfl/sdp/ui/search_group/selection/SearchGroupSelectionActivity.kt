@@ -3,6 +3,7 @@ package ch.epfl.sdp.ui.search_group.selection
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,7 +18,9 @@ import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGroupData>> {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private val searchGroupManager = SearchGroupDataManager()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val searchGroupManager = SearchGroupDataManager()
 
     companion object {
         const val SEARH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"

@@ -1,6 +1,7 @@
 package ch.epfl.sdp.database.data_manager
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
@@ -8,6 +9,7 @@ import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
 import ch.epfl.sdp.database.providers.UserRepositoryProvider
+import ch.epfl.sdp.utils.Auth
 
 class SearchGroupDataManager {
 
@@ -15,6 +17,7 @@ class SearchGroupDataManager {
     private val userRepository = UserRepositoryProvider.provide()
     private val markerRepository = MarkerRepositoryProvider.provide()
     private val heatmapRepository = HeatmapRepositoryProvider.provide()
+    private val groupIdsOfUser = userRepository.getGroupIdsOfUserByEmail(Auth.email.value!!)
 
     fun deleteSearchGroup(searchGroupId: String) {
         searchGroupRepository.removeSearchGroup(searchGroupId)
@@ -29,11 +32,17 @@ class SearchGroupDataManager {
 //        return groupId
     }
 
-    fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
-        return searchGroupRepository.getAllGroups()
+    fun getAllGroups(): LiveData<List<SearchGroupData>> {
+        return Transformations.switchMap(groupIdsOfUser) { ids ->
+            Transformations.map(searchGroupRepository.getAllGroups()) { groups ->
+                groups.filter { group ->
+                    ids.contains(group.uuid)
+                }
+            }
+        }
     }
 
-    fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
+    fun getGroupById(groupId: String): LiveData<SearchGroupData> {
         return searchGroupRepository.getGroupById(groupId)
     }
 
@@ -41,11 +50,11 @@ class SearchGroupDataManager {
         return searchGroupRepository.updateGroup(searchGroupData)
     }
 
-    fun getOperatorsOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
+    fun getOperatorsOfSearchGroup(searchGroupId: String): LiveData<Set<UserData>> {
         return userRepository.getOperatorsOfSearchGroup(searchGroupId)
     }
 
-    fun getRescuersOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
+    fun getRescuersOfSearchGroup(searchGroupId: String): LiveData<Set<UserData>> {
         return userRepository.getRescuersOfSearchGroup(searchGroupId)
     }
 

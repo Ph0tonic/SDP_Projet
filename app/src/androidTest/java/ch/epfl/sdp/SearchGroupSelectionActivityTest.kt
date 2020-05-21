@@ -1,6 +1,8 @@
 package ch.epfl.sdp
 
 import android.content.Intent
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -9,11 +11,14 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.database.dao.EmptyMockUserDao
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.Auth
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -44,16 +49,28 @@ class SearchGroupEditionActivityTest {
     companion object {
         private const val DUMMY_SEARCHGROUP_ID = "DummySearchGroupId"
         private const val DUMMY_SEARCHGROUP_NAME = "DummySearchGroupName"
+        private const val DUMMY_USER_EMAIL = "dummy@gmail.com"
         private val DUMMY_LOCATION = LatLng(0.0, 0.0)
         private const val FAKE_ACCOUNT_ID = "FakeAccountId"
     }
 
     @Test
     fun groupNamesAreDisplayed() {
+        runOnUiThread {
+            Auth.loggedIn.value = true
+            Auth.email.value = DUMMY_USER_EMAIL
+        }
+
         val groupDao = MockGroupDao(
                 listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION))
         )
+        val userDao = object : EmptyMockUserDao() {
+            override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
+                return MutableLiveData(setOf(DUMMY_SEARCHGROUP_ID))
+            }
+        }
         SearchGroupRepository.daoProvider = { groupDao }
+        UserRepository.daoProvider = { userDao }
 
         mActivityRule.launchActivity(Intent())
 

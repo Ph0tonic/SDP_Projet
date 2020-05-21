@@ -1,6 +1,7 @@
 package ch.epfl.sdp.database.dao
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.SearchGroupData
 import com.google.firebase.database.DataSnapshot
@@ -18,10 +19,10 @@ class FirebaseGroupDao : SearchGroupDao {
 
     private var database: FirebaseDatabase = Firebase.database
 
-    private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(mutableListOf())
-    private val watchedGroupsById: MutableMap<String, MutableLiveData<SearchGroupData>> = mutableMapOf()
+    private val groups: MutableLiveData<List<SearchGroupData>> = MutableLiveData(listOf())
+    private val watchedGroupsByGroupId: MutableMap<String, MutableLiveData<SearchGroupData>> = mutableMapOf()
 
-    override fun getGroups(): MutableLiveData<List<SearchGroupData>> {
+    override fun getGroups(): LiveData<List<SearchGroupData>> {
         val myRef = database.getReference(ROOT_PATH)
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -42,16 +43,16 @@ class FirebaseGroupDao : SearchGroupDao {
         return groups
     }
 
-    override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
-        if (!watchedGroupsById.containsKey(groupId)) {
+    override fun getGroupById(groupId: String): LiveData<SearchGroupData> {
+        if (!watchedGroupsByGroupId.containsKey(groupId)) {
             val myRef = database.getReference("$ROOT_PATH/$groupId")
-            watchedGroupsById[groupId] = MutableLiveData()
+            watchedGroupsByGroupId[groupId] = MutableLiveData()
             //TODO change to childEventListener ?
             myRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val group = dataSnapshot.getValue(SearchGroupData::class.java)
                     group?.uuid = dataSnapshot.key
-                    watchedGroupsById[groupId]!!.value = group
+                    watchedGroupsByGroupId[groupId]!!.value = group
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -59,7 +60,7 @@ class FirebaseGroupDao : SearchGroupDao {
                 }
             })
         }
-        return watchedGroupsById[groupId]!!
+        return watchedGroupsByGroupId[groupId]!!
     }
 
     /**

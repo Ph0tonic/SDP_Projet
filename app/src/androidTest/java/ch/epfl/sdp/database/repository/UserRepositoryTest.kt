@@ -1,6 +1,7 @@
 package ch.epfl.sdp.database.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.dao.EmptyMockUserDao
@@ -46,7 +47,7 @@ class UserRepositoryTest {
         UserRepository.daoProvider = { dao }
 
         val repo = UserRepository()
-        assertThat(repo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData))
+        assertThat(repo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData as LiveData<Set<UserData>>))
 
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(called.count, equalTo(0L))
@@ -74,7 +75,7 @@ class UserRepositoryTest {
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
-        assertThat(repo.getRescuersOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData))
+        assertThat(repo.getRescuersOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData as LiveData<Set<UserData>>))
 
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(called.count, equalTo(0L))
@@ -130,8 +131,6 @@ class UserRepositoryTest {
         assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
     }
 
-//    override fun addUserToSearchGroup(searchGroupId: String, user: UserData)
-
     @Test
     fun addUserToSearchGroupCallsAddUserToSearchGroupWithCorrectParameters() {
         val called = CountDownLatch(1)
@@ -156,5 +155,30 @@ class UserRepositoryTest {
 
         assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
         assertThat(actualUser, equalTo(expectedUserData))
+    }
+
+    @Test
+    fun getGroupIdsOfUserByEmailCallsGetGroupIdsOfUserByEmailWithCorrectParameters() {
+        val called = CountDownLatch(1)
+        val expectedIds = setOf(DUMMY_GROUP_ID)
+        lateinit var actualEmail: String
+
+        val dao = object : EmptyMockUserDao() {
+            override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
+                called.countDown()
+                actualEmail = email
+                return MutableLiveData(expectedIds)
+            }
+        }
+        UserRepository.daoProvider = { dao }
+        val repo = UserRepository()
+
+        val ids = repo.getGroupIdsOfUserByEmail(DUMMY_EMAIL)
+
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
+
+        assertThat(actualEmail, equalTo(DUMMY_EMAIL))
+        assertThat(ids.value, equalTo(expectedIds))
     }
 }
