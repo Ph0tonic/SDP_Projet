@@ -41,6 +41,7 @@ import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
+import io.reactivex.internal.functions.Functions.isInstanceOf
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
 import org.junit.Before
@@ -298,6 +299,38 @@ class MapActivityTest {
             searchAreaBuilder.reset()
         }
         assertThat(searchAreaBuilder.vertices.size, equalTo(0))
+    }
+
+    @Test
+    fun clickOnStrategyPickerButtonChangeSpiralStrategyStrategyToSimpleQuadStrategy(){
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            mActivityRule.activity.setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+        }
+
+        onView(withId(R.id.strategy_picker_button)).perform(click())
+
+        val currentStrat = mActivityRule.activity.getStrategy()
+        assertThat(currentStrat is SimpleQuadStrategy, `is`(true))
+    }
+
+    @Test
+    fun clickOnStrategyPickerButtonChangeSimpleQuadStrategyToSpiralStrategy(){
+        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            mActivityRule.activity.setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
+        }
+
+        onView(withId(R.id.strategy_picker_button)).perform(click())
+
+        val currentStrat = mActivityRule.activity.getStrategy()
+        assertThat(currentStrat is SpiralStrategy, `is`(true))
     }
 
     @Test

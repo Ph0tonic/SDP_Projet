@@ -324,8 +324,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         if (currentStrategy is SimpleQuadStrategy) {
             setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
         } else {
-            setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+            setStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
         }
+    }
+
+    fun getStrategy() : OverflightStrategy{
+        return currentStrategy
     }
 
     fun setStrategy(strategy: OverflightStrategy) {
