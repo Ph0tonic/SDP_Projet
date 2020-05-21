@@ -250,7 +250,6 @@ class FirebaseUserDaoTest {
         val user_1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
         val user_2 = UserData(DUMMY_USER_EMAIL_2, role = Role.RESCUER)
 
-        lateinit var actualAddedUser: UserData
         val listener = object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
@@ -299,4 +298,133 @@ class FirebaseUserDaoTest {
 
         ref.removeEventListener(listener)
     }
+
+    @Test
+    fun groupsUpdateWhenUserIsAddedToExistingGroup() {
+        val called = CountDownLatch(1)
+        val loaded = CountDownLatch(1)
+
+        val user1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
+        val user2 = UserData(DUMMY_USER_EMAIL_2, role = Role.RESCUER)
+
+        val listener = object : ChildEventListener {
+            override fun onCancelled(p0: DatabaseError) {}
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
+
+            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+                called.countDown()
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
+        }
+        val ref = Firebase.database.getReference("users")
+        ref.addChildEventListener(listener)
+
+        val expectedIds = setOf(DUMMY_GROUP_ID_1)
+        val ref1 = Firebase.database.getReference("users/${DUMMY_GROUP_ID_1}")
+
+        ref1.push().setValue(user1)
+
+        val dao = FirebaseUserDao()
+        val groupIdsOfUser1 = dao.getGroupIdsOfUserByEmail(user1.email)
+        val groupIdsOfUser2 = dao.getGroupIdsOfUserByEmail(user2.email)
+
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
+
+        groupIdsOfUser1.observeForever {
+            if (it.size == 1) {
+                loaded.countDown()
+            }
+        }
+
+        loaded.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(loaded.count, equalTo(0L))
+        // Population of database finished
+
+        ref1.push().setValue(user2)
+
+        val loadedGroupsOfUser2 = CountDownLatch(1)
+
+        groupIdsOfUser2.observeForever {
+            if (it.size == 1) {
+                loadedGroupsOfUser2.countDown()
+            }
+        }
+
+        loadedGroupsOfUser2.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(loadedGroupsOfUser2.count, equalTo(0L))
+
+        assertThat(groupIdsOfUser2.value, equalTo(expectedIds))
+
+        ref.removeEventListener(listener)
+    }
+
+    @Test
+    fun groupsUpdateWhenUserIsRemovedFromExistingGroup() {
+        val called = CountDownLatch(1)
+        val loaded = CountDownLatch(1)
+
+        val user1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
+        val user2 = UserData(DUMMY_USER_EMAIL_2, role = Role.RESCUER)
+
+        val listener = object : ChildEventListener {
+            override fun onCancelled(p0: DatabaseError) {}
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
+
+            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+                val user = dataSnapshot.children.map {
+                    val user = it.getValue(UserData::class.java)!!
+                    user.uuid = it.key
+                    user
+                }.find { user -> user.email == DUMMY_USER_EMAIL_1 }
+                user1.uuid = user!!.uuid
+                called.countDown()
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
+        }
+        val ref = Firebase.database.getReference("users")
+        ref.addChildEventListener(listener)
+
+        val expectedIds = setOf(DUMMY_GROUP_ID_1)
+        val ref1 = Firebase.database.getReference("users/${DUMMY_GROUP_ID_1}")
+
+        ref1.push().setValue(user1)
+        ref1.push().setValue(user2)
+
+        val dao = FirebaseUserDao()
+        val groupIdsOfUser1 = dao.getGroupIdsOfUserByEmail(user1.email)
+
+        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(called.count, equalTo(0L))
+
+        groupIdsOfUser1.observeForever {
+            if (it.size == 1) {
+                loaded.countDown()
+            }
+        }
+
+        loaded.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(loaded.count, equalTo(0L))
+        // Population of database finished
+
+        Firebase.database.getReference("users/${DUMMY_GROUP_ID_1}/${user1.uuid}").removeValue()
+
+        val deletedUser1FromGroup = CountDownLatch(1)
+
+        groupIdsOfUser1.observeForever {
+            if (it.isEmpty()) {
+                deletedUser1FromGroup.countDown()
+            }
+        }
+
+        deletedUser1FromGroup.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(deletedUser1FromGroup.count, equalTo(0L))
+
+        ref.removeEventListener(listener)
+    }
 }
+
