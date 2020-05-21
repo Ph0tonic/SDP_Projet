@@ -1,45 +1,53 @@
 package ch.epfl.sdp.searcharea
 
 import androidx.annotation.VisibleForTesting
+import ch.epfl.sdp.map.PaintableArea
 import com.mapbox.mapboxsdk.geometry.LatLng
+import java.lang.IllegalArgumentException
 import kotlin.properties.Delegates
 
-abstract class SearchAreaBuilder {
+abstract class SearchAreaBuilder : PaintableArea {
 
     abstract val sizeLowerBound: Int?
     abstract val sizeUpperBound: Int?
     abstract val shapeName: String
 
-    val searchAreaChanged = mutableListOf<(SearchArea?) -> Unit>()
-    val verticesChanged = mutableListOf<(MutableList<LatLng>) -> Unit>()
+    val onSearchAreaChanged = mutableListOf<(SearchArea?) -> Unit>()
+    val onVerticesChanged = mutableListOf<(MutableList<LatLng>) -> Unit>()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     var vertices: MutableList<LatLng> by Delegates.observable(mutableListOf()) { _, _, _ ->
         val searchArea = try {
             this.build()
-        } catch (e: SearchAreaNotCompleteException) {
-            null
+        } catch (ex: Exception) {
+            when (ex) {
+                is SearchAreaNotCompleteException -> null
+                is IllegalArgumentException -> {
+                    val message = ex.message
+                    null
+                }
+                else -> throw ex
+            }
         }
-        verticesChanged.forEach { it(vertices) }
-        searchAreaChanged.forEach { it(searchArea) }
+        onVerticesChanged.forEach { it(vertices) }
+        onSearchAreaChanged.forEach { it(searchArea) }
     }
 
     fun onDestroy() {
         reset()
-        searchAreaChanged.clear()
-        verticesChanged.clear()
+        onSearchAreaChanged.clear()
+        onVerticesChanged.clear()
     }
-    
+
     fun reset() {
         vertices.clear()
         this.vertices = this.vertices
     }
 
     fun addVertex(vertex: LatLng): SearchAreaBuilder {
-        val isStrictlyUnderBound = sizeUpperBound?.let { vertices.size < it } ?: true
-        require(isStrictlyUnderBound) { "Already enough points" }
+        require(isStrictlyUnderUpperBound()) { "Already enough points" }
         vertices.add(vertex)
-        order()
+        orderVertices()
         this.vertices = this.vertices
         return this
     }
@@ -47,13 +55,14 @@ abstract class SearchAreaBuilder {
     fun moveVertex(old: LatLng, new: LatLng): SearchAreaBuilder {
         val oldIndex = vertices.withIndex().minBy { it.value.distanceTo(old) }?.index
         vertices[oldIndex!!] = new
-        order()
+        orderVertices()
         this.vertices = this.vertices
         return this
     }
 
-    protected open fun order() {}
+    protected open fun orderVertices() {}
 
+    private fun isStrictlyUnderUpperBound() = sizeUpperBound?.let { vertices.size < it } ?: true
     private fun isUnderUpperBound() = sizeUpperBound?.let { vertices.size <= it } ?: true
     private fun isAboveLowerBound() = sizeLowerBound?.let { it <= vertices.size } ?: true
 
@@ -61,12 +70,24 @@ abstract class SearchAreaBuilder {
         return isAboveLowerBound() && isUnderUpperBound()
     }
 
-    abstract fun buildIfComplete(): SearchArea
+    abstract fun buildGivenIsComplete(): SearchArea
 
     fun build(): SearchArea {
         if (!isComplete()) {
             throw SearchAreaNotCompleteException("$shapeName not complete")
         }
-        return buildIfComplete()
+        return buildGivenIsComplete()
     }
+
+    override fun getControlVertices() = vertices
+
+    override fun getShapeVertices(): List<LatLng>? {
+        return if (isComplete()) {
+            getShapeVerticesGivenComplete()
+        } else {
+            null
+        }
+    }
+
+    protected abstract fun getShapeVerticesGivenComplete(): List<LatLng>
 }
