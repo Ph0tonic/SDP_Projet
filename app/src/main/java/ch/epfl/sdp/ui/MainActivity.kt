@@ -24,7 +24,7 @@ import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
-import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
+import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARCH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                currentGroupId.value = data!!.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
+                currentGroupId.value = data!!.getStringExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG)
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)

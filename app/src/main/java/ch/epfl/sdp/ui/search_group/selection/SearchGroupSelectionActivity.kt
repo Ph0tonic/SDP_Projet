@@ -20,7 +20,7 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGr
     private val searchGroupManager = SearchGroupDataManager()
 
     companion object {
-        const val SEARH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
+        const val SEARCH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +54,7 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGr
 
     private fun joinGroup(searchGroupData: SearchGroupData) {
         val returnDataIntent = Intent()
-        returnDataIntent.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
+        returnDataIntent.putExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
         setResult(RESULT_OK, returnDataIntent)
         finish()
     }
