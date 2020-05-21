@@ -101,6 +101,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         updateDroneFlyingStatus(it)
     }
 
+    private var droneConnectionStatusObserver = Observer<Boolean> {
+        updateDroneConnectionStatus(it)
+    }
+
     companion object {
         private const val SCALE_FACTOR = 4
     }
@@ -129,11 +133,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         if (role == Role.RESCUER) {
             hideOperatorUiComponents()
         }
-
-        //Change button color if the drone is not connected
-        if (!Drone.isConnectedLiveData.value!!) {
-            findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.colorNormal = Color.GRAY
-        }
     }
 
     private fun hideOperatorUiComponents() {
@@ -152,6 +151,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         Drone.positionLiveData.observe(this, dronePositionObserver)
         Drone.homeLocationLiveData.observe(this, homePositionObserver)
         Drone.isFlyingLiveData.observe(this, droneFlyingStatusObserver)
+        Drone.isConnectedLiveData.observe(this, droneConnectionStatusObserver)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
     }
@@ -161,6 +161,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         Drone.positionLiveData.removeObserver(dronePositionObserver)
         Drone.homeLocationLiveData.removeObserver(homePositionObserver)
         Drone.isFlyingLiveData.removeObserver(droneFlyingStatusObserver)
+        Drone.isConnectedLiveData.removeObserver(droneConnectionStatusObserver)
 
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
@@ -360,7 +361,19 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
 
+    /**
+     * @param isFlying the drone's flying state
+     * Changes the start_or_return_button icon in function of isFlying
+     */
     private fun updateDroneFlyingStatus(isFlying: Boolean) {
         findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.setIcon(if (isFlying) R.drawable.ic_return else R.drawable.ic_start)
+    }
+
+    /**
+     * @param isConnected the drone's connection status
+     * Changes the start_or_return button color in function of isConnected
+     */
+    private fun updateDroneConnectionStatus(isConnected: Boolean) {
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.colorNormal = if (!isConnected) Color.GRAY else Color.WHITE
     }
 }

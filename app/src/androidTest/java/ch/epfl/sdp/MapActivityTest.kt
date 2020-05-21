@@ -4,7 +4,6 @@ import android.Manifest.permission
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
@@ -41,7 +40,6 @@ import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
-import io.reactivex.internal.functions.Functions.isInstanceOf
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
 import org.junit.Before
@@ -412,23 +410,6 @@ class MapActivityTest {
     }
 
     @Test
-    fun startMissionButtonBecomesReturnWhenDroneFlying(){
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
-        onView(withId(R.id.floating_menu_button)).perform(click())
-        runOnUiThread{
-            Drone.isFlyingLiveData.value = false
-        }
-        //TODO : Find a way to know what icon a button displays
-        //check that the icon is ic_start
-        //fake the drone flying
-        //check that the icon is ic_return
-        //return to normal
-    }
-
-    @Test
     fun returnHomeOrUserButtonShowsDialogWhenClicked(){
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -475,11 +456,6 @@ class MapActivityTest {
 
         runOnUiThread {
             mActivityRule.activity.mapView.getMapAsync { mapboxMap ->
-                Log.d("DEBUG", "CameraLat : " + mapboxMap.cameraPosition.target.latitude)
-                Log.d("DEBUG", "FakeLat   : " + FAKE_LOCATION_TEST_2.latitude)
-                Log.d("DEBUG", "CameraLon : " + mapboxMap.cameraPosition.target.longitude)
-                Log.d("DEBUG", "FakeLon   : " + FAKE_LOCATION_TEST_2.longitude)
-                Log.d("DEBUG", "Distance  : " + (mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST_2)))
                 assertThat(mapboxMap.cameraPosition.target.distanceTo(FAKE_LOCATION_TEST_2), closeTo(0.0, EPSILON))
             }
         }
