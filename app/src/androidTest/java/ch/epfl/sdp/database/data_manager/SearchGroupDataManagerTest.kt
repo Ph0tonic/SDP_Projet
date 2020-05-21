@@ -1,6 +1,9 @@
 package ch.epfl.sdp.database.data_manager
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
@@ -12,9 +15,11 @@ import ch.epfl.sdp.database.repository.EmptyMockHeatmapRepo
 import ch.epfl.sdp.database.repository.EmptyMockMarkerRepo
 import ch.epfl.sdp.database.repository.EmptyMockSearchGroupRepo
 import ch.epfl.sdp.database.repository.EmptyMockUserRepo
+import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -23,11 +28,15 @@ class SearchGroupDataManagerTest {
 
     companion object {
         private const val DUMMY_GROUP_ID = "Dummy_group_id"
+        private const val DUMMY_GROUP_NAME = "Dummy_group_name"
         private const val DUMMY_USER_ID = "Dummy_user_id"
         private const val ASYNC_CALL_TIMEOUT = 5L
         private const val DUMMY_EMAIL = "test@test.com"
         private val DUMMY_ROLE = Role.RESCUER
     }
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun setup() {
@@ -130,22 +139,48 @@ class SearchGroupDataManagerTest {
     }
 
     @Test
-    fun getAllGroupsCallsGetAllGroups() {
-        val called = CountDownLatch(1)
+    fun getAllGroupsCallsGetGroupsIdsOfUserByEmailAndGetAllGroups() {
+        val userRepoCalled = CountDownLatch(1)
+        val searchGroupRepoCalled = CountDownLatch(2)
+        runOnUiThread {
+            Auth.email.value = DUMMY_EMAIL
+            Auth.loggedIn.value = true
+        }
 
-        val searchGroupRepo = object : EmptyMockSearchGroupRepo() {
-            override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
-                called.countDown()
-                return MutableLiveData()
+        val expectedGroupIds = setOf(DUMMY_GROUP_ID)
+        val expectedGroups = listOf(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, null, null))
+
+        val userRepo = object : EmptyMockUserRepo() {
+            override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
+                userRepoCalled.countDown()
+                return MutableLiveData(expectedGroupIds)
             }
         }
 
+        val searchGroupRepo = object : EmptyMockSearchGroupRepo() {
+            override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
+                searchGroupRepoCalled.countDown()
+                return MutableLiveData(expectedGroups)
+            }
+        }
         SearchGroupRepositoryProvider.provide = { searchGroupRepo }
+        UserRepositoryProvider.provide = { userRepo }
 
-        SearchGroupDataManager().getAllGroups()
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        val groups = SearchGroupDataManager().getAllGroups()
 
-        assertThat(called.count, equalTo(0L))
+        userRepoCalled.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(userRepoCalled.count, equalTo(0L))
+
+        groups.observeForever {
+            if (it != null) {
+                searchGroupRepoCalled.countDown()
+            }
+        }
+
+        searchGroupRepoCalled.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        assertThat(searchGroupRepoCalled.count, equalTo(0L))
+
+        assertThat(groups.value, equalTo(expectedGroups))
     }
 
     @Test
