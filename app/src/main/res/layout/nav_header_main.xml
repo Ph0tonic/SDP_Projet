@@ -17,4 +17,5 @@
             android:name="ch.epfl.sdp.ui.home.LoginNavFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
 </LinearLayout>
