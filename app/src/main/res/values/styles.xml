@@ -29,4 +29,9 @@
         <item name="android:padding">2dp</item>
         <item name="android:gravity">center</item>
     </style>
+
+    <style name="SearchGroupEditionAddIcon">
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+    </style>
 </resources>
