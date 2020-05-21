@@ -7,6 +7,7 @@
     tools:context=".ui.home.HomeFragment">
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="253dp"
         android:orientation="horizontal"
@@ -48,7 +49,24 @@
             android:text="@string/work_offline"
             android:textColor="@color/colorBlack"
             android:textSize="48sp" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/current_group_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="330dp"
+        android:layout_marginTop="27dp"
+        android:layout_marginEnd="330dp"
+        android:layout_marginBottom="10dp"
+        android:text="test"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
