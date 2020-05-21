@@ -68,7 +68,9 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
     }
 
     /**
-     * Fills the regions described by the list of positions
+     * Draws a filled polygon described by the list of vertices
+     * Those are the vertices that the user can not drag, and do not show up on the map,
+     * Only the edges connecting them do
      */
     private fun drawShape(shapeOutline: List<LatLng>) {
         if (!::fillArea.isInitialized || reset) {
@@ -85,7 +87,8 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
     }
 
     /**
-     * Draws a pinpoint on the map at the given position
+     * Draws the control vertices
+     * Those are the vertices that the user can drag to modify the shape
      */
     private fun drawControlVertices(vertices: List<LatLng>) {
         circleManager.deleteAll()
