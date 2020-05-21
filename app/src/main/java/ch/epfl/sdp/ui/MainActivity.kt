@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -184,6 +185,6 @@ class MainActivity : AppCompatActivity() {
     }
     private fun setTextGroup(){
         val groupText = findViewById<TextView>(R.id.current_group_text)
-        groupText.text = "test"
+        groupText.text="You current group is..."
     }
 }
