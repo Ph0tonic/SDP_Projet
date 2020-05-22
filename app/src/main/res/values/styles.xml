@@ -34,10 +34,18 @@
         <item name="android:textSize">24sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:background">@color/colorPrimaryTransparent</item>
-        <item name="android:layout_width">@dimen/fragment_home_button_size</item>
-        <item name="android:layout_height">@dimen/fragment_home_button_size</item>
-        <item name="android:layout_gravity">center</item>
         <item name="android:paddingTop">15dp</item>
+    </style>
+
+    <style name="HomeButtonTheme.landscape">
+        <item name="android:layout_width">@dimen/fragment_home_button_size_landscape</item>
+        <item name="android:layout_height">@dimen/fragment_home_button_size_landscape</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
+    <style name="HomeButtonTheme.portrait">
+        <item name="android:layout_width">@dimen/fragment_home_button_size_portrait</item>
+        <item name="android:layout_height">@dimen/fragment_home_button_size_portrait</item>
     </style>
 
     <style name="OfflineDownloadButtonTheme" parent ="@android:style/Widget.DeviceDefault.Button.Borderless">

@@ -7,5 +7,6 @@
     <dimen name="tiny_margin">5dp</dimen>
     <dimen name="tiny_padding">2dp</dimen>
 
-    <dimen name="fragment_home_button_size">200dp</dimen>
+    <dimen name="fragment_home_button_size_portrait">150dp</dimen>
+    <dimen name="fragment_home_button_size_landscape">200dp</dimen>
 </resources>
