@@ -64,8 +64,7 @@ class MainActivityTest {
 
     @Test
     fun canOpenSettings() {
-        openActionBarOverflowOrOptionsMenu(getContext())
-        onView(withText("Settings")).perform(click())
+        onView(withId(R.id.mainSettingsButton)).perform(click())
         intended(hasComponent(SettingsActivity::class.qualifiedName))
     }
 
@@ -115,9 +114,7 @@ class MainActivityTest {
 
     @Test
     fun clickingTheHamburgerOpensTheDrawer() {
-        runOnUiThread {
-            mActivityRule.activity.onSupportNavigateUp()
-        }
+        onView(withId(R.id.mainDrawerButton)).perform(click())
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
         mUiDevice.pressBack()
     }
