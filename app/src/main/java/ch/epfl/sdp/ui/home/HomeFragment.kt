@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.MainActivity
@@ -15,7 +16,7 @@ import ch.epfl.sdp.ui.MainActivity
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var v : View
+    private lateinit var groupText: TextView
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -23,25 +24,20 @@ class HomeFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        v = inflater.inflate(R.layout.fragment_home, container, false)
-        updateCurrentGroup(v)
-        return v
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        groupText = view.findViewById(R.id.current_group_text)
+        val groupID = PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
+                .getString(getString(R.string.pref_key_current_group_id), "No group")
+        groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, groupID)
+        return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        updateCurrentGroup(requireView())
-    }
-
-    private fun updateCurrentGroup(v : View){
-        var groupText = v.findViewById<TextView>(R.id.current_group_text)
-        this.v=v
-        groupText?.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, MainActivity().getGroup())
-
-    }
+    /*
     fun updateCurrentGroup(group : String){
         var groupText = v.findViewById<TextView>(R.id.current_group_text)
         groupText?.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, group)
 
     }
+
+     */
 }

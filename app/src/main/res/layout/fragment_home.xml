@@ -54,8 +54,8 @@
 
     <TextView
         android:id="@+id/current_group_text"
-        android:layout_width="137dp"
-        android:layout_height="90dp"
+        android:layout_width="731dp"
+        android:layout_height="79dp"
         android:layout_gravity="center"
         android:textColor="@color/colorBlack"
         android:textSize="32sp" />
