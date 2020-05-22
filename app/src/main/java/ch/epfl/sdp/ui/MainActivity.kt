@@ -180,4 +180,7 @@ class MainActivity : AppCompatActivity() {
         Auth.onActivityResult(requestCode, resultCode, data)
     }
 
+    fun getCurrentGroupID() : String{
+        return currentGroupId.value.toString()
+    }
 }
