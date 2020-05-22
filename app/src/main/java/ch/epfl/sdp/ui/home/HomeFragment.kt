@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.dao.FirebaseGroupDao
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.MainActivity
 
@@ -31,7 +32,7 @@ class HomeFragment : Fragment() {
         val groupID = PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
                 .getString(getString(R.string.pref_key_current_group_id), "No group")
         //groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity,SearchGroupDataManager().getGroupById(MainActivity().getCurrentGroupID()).value?.name)
-        groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, groupID?.let { SearchGroupDataManager().getGroupById(it).value?.name })
+        groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity,FirebaseGroupDao().getGroupById(groupID.toString()).value?.name )
         return view
     }
 
@@ -40,7 +41,7 @@ class HomeFragment : Fragment() {
         val groupID = PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
                 .getString(getString(R.string.pref_key_current_group_id), "No group")
         //groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity,SearchGroupDataManager().getGroupById(MainActivity().getCurrentGroupID()).value?.name)
-        groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, groupID?.let { SearchGroupDataManager().getGroupById(it).value?.name })
+        groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity,FirebaseGroupDao().getGroupById(groupID.toString()).value?.name )
     }
 
 }
