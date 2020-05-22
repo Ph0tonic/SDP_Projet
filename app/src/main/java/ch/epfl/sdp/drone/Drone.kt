@@ -27,6 +27,8 @@ object Drone {
 
     private const val WAIT_TIME_S: Long = 1
 
+    val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
+
     private val disposables: MutableList<Disposable> = ArrayList()
     val positionLiveData: MutableLiveData<LatLng> = MutableLiveData()
     val batteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
@@ -38,14 +40,14 @@ object Drone {
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMissionPausedLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
 
-    lateinit var getSignalStrength: () -> Double
-
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
         positionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
     }
 
     private val instance: System = DroneInstanceProvider.provide()
+    var getSignalStrength: () -> Double = debugGetSignalStrength
+
 
     init {
         disposables.add(instance.telemetry.flightMode.distinctUntilChanged()
@@ -128,6 +130,35 @@ object Drone {
                                 }
                         )
         )
+        this.missionLiveData.value = missionPlan.missionItems
+        val isConnectedCompletable = instance.core.connectionState
+                .filter { state -> state.isConnected }
+                .firstOrError()
+                .toCompletable()
+
+        disposables.add(isConnectedCompletable
+                .andThen(instance.mission.setReturnToLaunchAfterMission(true))
+                .andThen(instance.mission.uploadMission(missionPlan))
+                .andThen(instance.action.arm())
+                .andThen(instance.mission.startMission())
+                .subscribe(
+                        { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                        { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) })
+        )
+
+        disposables.add(instance.mission.missionProgress.subscribe {
+            val missionItem = missionLiveData.value?.get(it.current)!!
+            val location = LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)
+            val signal = getSignalStrength()
+            onMeasureTaken(location, signal)
+        })
+        //TODO See what to do with disposables added
+    }
+
+    private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
+        onMeasureTakenCallbacks.forEach {
+            it(location, signalStrength)
+        }
     }
 
     /**
