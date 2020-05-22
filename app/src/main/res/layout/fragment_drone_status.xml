@@ -13,94 +13,75 @@
     tools:layout_constraintLeft_creator="1"
     tools:layout_constraintTop_creator="1">
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+    <TableRow>
 
         <ImageView
             android:id="@+id/battery_level_icon"
             app:srcCompat="@drawable/ic_battery1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:contentDescription="@string/map_not_ready"
-            android:padding="@dimen/tiny_padding"
-            android:rotation="90" />
+            android:rotation="90"
+            android:contentDescription="@string/battery_description_tag"/>
 
         <TextView
             android:id="@+id/battery_level"
-            android:text="@string/no_info"
             android:theme="@style/InformationDisplayTheme" />
     </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+    <TableRow>
 
         <ImageView
             android:id="@+id/imageView4"
             app:srcCompat="@drawable/ic_altitude"
             android:layout_width="21dp"
             android:layout_height="match_parent"
-            android:contentDescription="@string/map_not_ready"
-            android:padding="@dimen/tiny_padding" />
+            android:contentDescription="@string/altitude_description_tag"/>
 
         <TextView
             android:id="@+id/altitude"
-            android:text="@string/no_info"
             android:theme="@style/InformationDisplayTheme" />
     </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+    <TableRow>
 
         <ImageView
             android:id="@+id/imageView2"
-            app:srcCompat="@drawable/ic_speed"
             android:layout_width="18dp"
             android:layout_height="match_parent"
-            android:contentDescription="@string/map_not_ready"
-            android:padding="@dimen/tiny_padding" />
+            app:srcCompat="@drawable/ic_speed"
+            android:contentDescription="@string/speed_description_tag"/>
+
 
         <TextView
             android:id="@+id/speed"
-            android:text="@string/no_info"
             android:theme="@style/InformationDisplayTheme" />
     </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+    <TableRow>
 
         <ImageView
             android:id="@+id/imageView3"
             app:srcCompat="@drawable/ic_distancetodrone"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:contentDescription="@string/map_not_ready"
-            android:paddingVertical="@dimen/tiny_padding" />
+            android:contentDescription="@string/distance_to_user_description_tag"/>
 
         <TextView
             android:id="@+id/distance_to_user"
-            android:text="@string/no_info"
             android:theme="@style/InformationDisplayTheme" />
     </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+    <TableRow>
 
         <ImageView
             android:id="@+id/imageView5"
             app:srcCompat="@drawable/ic_distancetohome"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:contentDescription="@string/map_not_ready"
-            android:paddingVertical="@dimen/tiny_padding" />
+            android:contentDescription="@string/distance_to_home_description_tag"/>
 
         <TextView
             android:id="@+id/distance_to_base"
-            android:text="@string/no_info"
             android:theme="@style/InformationDisplayTheme" />
     </TableRow>
 </TableLayout>

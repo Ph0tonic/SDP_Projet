@@ -36,8 +36,10 @@ class MapboxHeatmapPainter(val style: Style,
                                     Expression.stop(10.0, RED)
                             )
                     ),
-                    PropertyFactory.circleRadius(40f),
-                    PropertyFactory.circleBlur(1.5f))
+                    PropertyFactory.circleRadius(25f),
+                    PropertyFactory.circleBlur(2f),
+                    PropertyFactory.circleOpacity(0.7f)
+            )
             unclustered.setFilter(Expression.neq(Expression.get("cluster"), Expression.literal(true)))
             style.addLayerBelow(unclustered, belowLayerId)
         }

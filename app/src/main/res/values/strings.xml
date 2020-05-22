@@ -79,6 +79,14 @@
     <string name="add_a_user">Add a user</string>
     <string name="cancel">Cancel</string>
 
+
+    <!-- Dronew status display -->
+    <string name="battery_description_tag">Battery icon</string>
+    <string name="altitude_description_tag">Altitude icon</string>
+    <string name="speed_description_tag">Speed icon</string>
+    <string name="distance_to_user_description_tag">Distance to user icon</string>
+    <string name="distance_to_home_description_tag">Distance to home icon</string>
+
     <!-- TODO reorganize strings -->
     <!-- Preference Titles -->
 
@@ -91,6 +99,8 @@
 
     <string name="drone_altitude_header">Default drone altitude</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
+
+    <string name="text_view">TextView</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
