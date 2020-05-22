@@ -14,8 +14,6 @@ import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -33,6 +31,8 @@ object Drone {
 
     private const val WAIT_TIME: Long = 200
 
+    val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
+
     private val disposables: MutableList<Disposable> = ArrayList()
     val positionLiveData: MutableLiveData<LatLng> = MutableLiveData()
     val batteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
@@ -43,12 +43,12 @@ object Drone {
     val homeLocationLiveData: MutableLiveData<Telemetry.Position> = MutableLiveData()
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    lateinit var getSignalStrength: () -> Double
-
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
         positionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
     }
+
+    var getSignalStrength: () -> Double = debugGetSignalStrength
 
     private val instance: System
 
@@ -104,8 +104,8 @@ object Drone {
                 ))
         disposables.add(instance.core.connectionState
                 .subscribe(
-                        {state -> isConnectedLiveData.postValue(state.isConnected)},
-                        { error -> Timber.e("Error home : $error")}
+                        { state -> isConnectedLiveData.postValue(state.isConnected) },
+                        { error -> Timber.e("Error home : $error") }
                 ))
     }
 
@@ -116,15 +116,29 @@ object Drone {
                 .firstOrError()
                 .toCompletable()
 
-        disposables.add(
-                isConnectedCompletable
-                        .andThen(instance.mission.setReturnToLaunchAfterMission(true))
-                        .andThen(instance.mission.uploadMission(missionPlan))
-                        .andThen(instance.action.arm())
-                        .andThen(instance.mission.startMission())
-                        .subscribe(
-                                { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
-                                { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }))
+        disposables.add(isConnectedCompletable
+                .andThen(instance.mission.setReturnToLaunchAfterMission(true))
+                .andThen(instance.mission.uploadMission(missionPlan))
+                .andThen(instance.action.arm())
+                .andThen(instance.mission.startMission())
+                .subscribe(
+                        { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                        { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) })
+        )
+
+        disposables.add(instance.mission.missionProgress.subscribe {
+            val missionItem = missionLiveData.value?.get(it.current)!!
+            val location = LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)
+            val signal = getSignalStrength()
+            onMeasureTaken(location, signal)
+        })
+        //TODO See what to do with disposables added
+    }
+
+    private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
+        onMeasureTakenCallbacks.forEach {
+            it(location, signalStrength)
+        }
     }
 
     /**
