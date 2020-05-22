@@ -54,10 +54,15 @@
 
     <TextView
         android:id="@+id/current_group_text"
-        android:layout_width="731dp"
-        android:layout_height="79dp"
+        android:layout_width="match_parent"
+        android:layout_height="77dp"
         android:layout_gravity="center"
         android:textColor="@color/colorBlack"
-        android:textSize="32sp" />
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
