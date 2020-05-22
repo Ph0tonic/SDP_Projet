@@ -39,6 +39,7 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import timber.log.Timber
 
 /**
  * Main Activity to display map and create missions.
@@ -225,7 +226,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapManager.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
+            heatmapManager.addMeasureToHeatmap(groupId, location, intensity)
         }
     }
 
@@ -254,7 +255,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId)
 
         findViewById<FloatingActionButton>(R.id.start_or_return_button)
                 .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
