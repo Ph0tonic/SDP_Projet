@@ -6,4 +6,6 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="tiny_margin">5dp</dimen>
     <dimen name="tiny_padding">2dp</dimen>
+
+    <dimen name="fragment_home_button_size">200dp</dimen>
 </resources>
