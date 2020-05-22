@@ -7,7 +7,6 @@ import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
-import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.math.pow
@@ -25,6 +24,8 @@ object Drone {
 
     private const val WAIT_TIME: Long = 200
 
+    val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
+
     private val disposables: MutableList<Disposable> = ArrayList()
     val currentPositionLiveData: MutableLiveData<LatLng> = MutableLiveData()
     val currentBatteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
@@ -32,12 +33,12 @@ object Drone {
     val currentSpeedLiveData: MutableLiveData<Float> = MutableLiveData()
     val currentMissionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
 
-    lateinit var getSignalStrength: () -> Double
-
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
-        currentPositionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
+        currentPositionLiveData.value!!.distanceTo(LatLng(47.3975, 8.5445))
     }
+
+    var getSignalStrength: () -> Double = debugGetSignalStrength
 
     private val instance: System
 
@@ -96,6 +97,19 @@ object Drone {
                 .andThen(instance.action.arm())
                 .andThen(instance.mission.startMission())
                 .subscribe()
+
+        instance.mission.missionProgress.subscribe {
+            val missionItem = currentMissionLiveData.value?.get(it.current)!!
+            val location = LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)
+            val signal = getSignalStrength()
+            onMeasureTaken(location, signal)
+        }
+    }
+
+    private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
+        onMeasureTakenCallbacks.forEach {
+            it(location, signalStrength)
+        }
     }
 
     fun isConnected(): Boolean {
