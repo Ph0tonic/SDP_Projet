@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
-import ch.epfl.sdp.ui.MainActivity
 
 
 class HomeFragment : Fragment() {
@@ -32,12 +31,11 @@ class HomeFragment : Fragment() {
         return view
     }
 
-    /*
-    fun updateCurrentGroup(group : String){
-        var groupText = v.findViewById<TextView>(R.id.current_group_text)
-        groupText?.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, group)
-
+    override fun onResume() {
+        super.onResume()
+        val groupID = PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
+                .getString(getString(R.string.pref_key_current_group_id), "No group")
+        groupText.text = MainApplication.applicationContext().getString(R.string.group_name_main_activity, groupID)
     }
 
-     */
 }

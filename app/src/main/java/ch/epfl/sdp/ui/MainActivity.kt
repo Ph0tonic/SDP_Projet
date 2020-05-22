@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -23,7 +22,6 @@ import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.ui.home.HomeFragment
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARCH_GROUP_ID_SELECTION_RESULT_TAG
@@ -177,15 +175,9 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 currentGroupId.value = data!!.getStringExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG)
-                //HomeFragment().updateCurrentGroup(currentGroupId.value.toString())
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)
     }
-    /*
-    fun getGroup() : String{
-        return currentGroupId.value.toString()
-    }
 
-     */
 }
