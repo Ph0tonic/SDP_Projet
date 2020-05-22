@@ -1,12 +1,8 @@
-package ch.epfl.sdp.ui.drone
+package ch.epfl.sdp.drone
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.database.data_manager.MainDataManager
-import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
@@ -35,13 +31,6 @@ class DroneTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    @get:Rule
-    var mActivityRule = ActivityTestRule(
-            MapActivity::class.java,
-            true,
-            false) // Activity is not launched immediately
-
 
     @Before
     fun before() {

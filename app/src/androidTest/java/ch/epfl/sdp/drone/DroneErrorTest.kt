@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.drone
+package ch.epfl.sdp.drone
 
 import android.content.Intent
 import androidx.test.espresso.Espresso

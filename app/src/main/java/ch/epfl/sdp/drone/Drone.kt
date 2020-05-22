@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.data_manager.HeatmapDataManager
 import ch.epfl.sdp.ui.toast.ToastHandler
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -18,16 +19,10 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-
 object Drone {
-    // Maximum distance between passes in the strategy
-    const val GROUND_SENSOR_SCOPE: Double = 15.0
-    const val DEFAULT_ALTITUDE: Float = 10.0F
-    const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
-
     private const val WAIT_TIME_S: Long = 1
 
-    val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
+    private val heatmapDataManager = HeatmapDataManager()
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val positionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -40,9 +35,11 @@ object Drone {
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMissionPausedLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
 
+    private val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
+
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
-        positionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
+        positionLiveData.value!!.distanceTo(LatLng(47.3975, 8.5445))
     }
 
     private val instance: System = DroneInstanceProvider.provide()
@@ -112,47 +109,30 @@ object Drone {
     /**
      * @param missionPlan : the MissionPlan the drone will follow
      */
-    fun startMission(missionPlan: Mission.MissionPlan) {
-        disposables.add(
-                getConnectedInstance()
-                        .andThen(instance.mission.setReturnToLaunchAfterMission(true))
-                        .andThen(instance.mission.uploadMission(missionPlan))
-                        .andThen(instance.action.arm())
-                        .andThen(instance.mission.startMission())
-                        .subscribe(
-                                {
-                                    this.missionLiveData.value = missionPlan.missionItems
-                                    this.isMissionPausedLiveData.postValue(false)
-                                    ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT)
-                                },
-                                {
-                                    ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
-                                }
-                        )
-        )
+    fun startMission(missionPlan: Mission.MissionPlan, groupId: String) {
+        Timber.w("startMission Drone")
         this.missionLiveData.value = missionPlan.missionItems
+
         val isConnectedCompletable = instance.core.connectionState
                 .filter { state -> state.isConnected }
                 .firstOrError()
                 .toCompletable()
 
+        val missionCallBack = { location: LatLng, signalStrength: Double ->
+            heatmapDataManager.addMeasureToHeatmap(groupId, location, signalStrength)
+        }
+
         disposables.add(isConnectedCompletable
                 .andThen(instance.mission.setReturnToLaunchAfterMission(true))
                 .andThen(instance.mission.uploadMission(missionPlan))
                 .andThen(instance.action.arm())
+                .andThen {
+                    onMeasureTakenCallbacks.add(missionCallBack)
+                    Timber.w("Add callback for measure !")
+                }
                 .andThen(instance.mission.startMission())
-                .subscribe(
-                        { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
-                        { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) })
-        )
+                .subscribe())
 
-        disposables.add(instance.mission.missionProgress.subscribe {
-            val missionItem = missionLiveData.value?.get(it.current)!!
-            val location = LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)
-            val signal = getSignalStrength()
-            onMeasureTaken(location, signal)
-        })
-        //TODO See what to do with disposables added
     }
 
     private fun onMeasureTaken(location: LatLng, signalStrength: Double) {

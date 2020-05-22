@@ -45,6 +45,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.mavsdk.telemetry.Telemetry
 import kotlin.math.abs
+import timber.log.Timber
 
 /**
  * Main Activity to display map and create missions.
@@ -271,7 +272,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapManager.addMeasureToHeatmap(MainDataManager.groupId.value!!, Auth.accountId.value!!, location, intensity)
+            heatmapManager.addMeasureToHeatmap(groupId, location, intensity)
         }
     }
 
@@ -316,7 +317,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId)
         searchAreaBuilder.reset()
     }
 
