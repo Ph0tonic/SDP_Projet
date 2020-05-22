@@ -20,7 +20,8 @@
             android:id="@+id/imageView6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/logo2" />
+            android:src="@drawable/logo"
+            android:contentDescription="@string/fly2find_logo_desc" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

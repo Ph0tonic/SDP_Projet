@@ -13,11 +13,12 @@
         android:layout_height="wrap_content"
         android:scaleType="centerCrop"
         android:src="@drawable/menu_background_vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/linearLayout3" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/home_background" />
 
     <ImageButton
         android:id="@+id/mainSettingsButton"
@@ -27,7 +28,8 @@
         android:onClick="openSettings"
         android:src="@drawable/ic_settings_black_32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/button_settings_desc" />
 
     <ImageButton
         android:id="@+id/mainDrawerButton"
@@ -37,7 +39,8 @@
         android:onClick="openDrawer"
         android:src="@drawable/ic_drawer_black_32dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/button_menu_desc" />
 
     <include
         android:id="@+id/include"
