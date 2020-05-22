@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.data_manager.HeatmapDataManager
 import ch.epfl.sdp.ui.toast.ToastHandler
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -31,7 +32,7 @@ object Drone {
 
     private const val WAIT_TIME: Long = 200
 
-    val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
+    private val heatmapDataManager = HeatmapDataManager()
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val positionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -42,6 +43,8 @@ object Drone {
     val isFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData()
     val homeLocationLiveData: MutableLiveData<Telemetry.Position> = MutableLiveData()
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    private val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
 
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
@@ -109,24 +112,40 @@ object Drone {
                 ))
     }
 
-    fun startMission(missionPlan: Mission.MissionPlan) {
+    fun startMission(missionPlan: Mission.MissionPlan, groupId: String) {
+        Timber.w("startMission Drone")
         this.missionLiveData.value = missionPlan.missionItems
+
         val isConnectedCompletable = instance.core.connectionState
                 .filter { state -> state.isConnected }
                 .firstOrError()
                 .toCompletable()
 
+        val missionCallBack = { location: LatLng, signalStrength: Double ->
+            heatmapDataManager.addMeasureToHeatmap(groupId, location, signalStrength)
+        }
+
         disposables.add(isConnectedCompletable
                 .andThen(instance.mission.setReturnToLaunchAfterMission(true))
                 .andThen(instance.mission.uploadMission(missionPlan))
                 .andThen(instance.action.arm())
+                .andThen {
+                    onMeasureTakenCallbacks.add(missionCallBack)
+                    Timber.w("Add callback for measure !")
+                }
                 .andThen(instance.mission.startMission())
+                .doOnTerminate {
+                    onMeasureTakenCallbacks.remove(missionCallBack)
+                    Timber.w("On terminate !")
+                }
                 .subscribe(
                         { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
-                        { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) })
+                        { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }
+                )
         )
 
         disposables.add(instance.mission.missionProgress.subscribe {
+            Timber.w("Mission progress  YEAH !")
             val missionItem = missionLiveData.value?.get(it.current)!!
             val location = LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)
             val signal = getSignalStrength()

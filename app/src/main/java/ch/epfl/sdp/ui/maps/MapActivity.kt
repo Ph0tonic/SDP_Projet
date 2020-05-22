@@ -90,8 +90,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         newLatLng?.let { if (::dronePainter.isInitialized) dronePainter.paint(it) }
     }
 
-    private var homePositionObserver = Observer<Telemetry.Position> {
-        newPosition: Telemetry.Position? ->
+    private var homePositionObserver = Observer<Telemetry.Position> { newPosition: Telemetry.Position? ->
         newPosition?.let {
             if (::homePainter.isInitialized) homePainter.paint(LatLng(it.latitudeDeg, it.longitudeDeg))
         }
@@ -251,7 +250,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapManager.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
+            heatmapManager.addMeasureToHeatmap(groupId, location, intensity)
         }
     }
 
@@ -288,7 +287,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId)
     }
 
     /**
@@ -329,7 +328,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         }
     }
 
-    fun getStrategy() : OverflightStrategy{
+    fun getStrategy(): OverflightStrategy {
         return currentStrategy
     }
 
