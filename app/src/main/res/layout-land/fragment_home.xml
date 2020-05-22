@@ -6,17 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/menu_background_horizontal"
-        app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/linearLayout3" />
-
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
@@ -31,7 +20,7 @@
             android:id="@+id/imageView6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/logo" />
+            android:src="@drawable/logo2" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
