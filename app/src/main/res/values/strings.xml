@@ -58,6 +58,8 @@
     <string name="dialog_toast">Name cannot be empty</string>
     <string name="region_name_error">Unknown Region name</string>
     <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
+    <string name="download_region_dialog_fragment">Download Region Dialog Fragment</string>
+    <string name="list_offline_region_dialog_fragment">List Offline Region Dialog Fragment</string>
 
     <!-- Navigation -->
     <string name="menu_home">Home</string>
