@@ -1,22 +1,18 @@
 package ch.epfl.sdp.ui.maps.offline
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
-import ch.epfl.sdp.ui.maps.MapViewBaseActivity
-import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.deletingInProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.endProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.startProgress
-import ch.epfl.sdp.map.offline.OfflineRegionUtils.deleteOfflineRegion
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.showErrorAndToast
+import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
@@ -81,41 +77,19 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
 
-    fun downloadRegionDialog(v: View) { // Set up download interaction. Display a dialog
-        // when the user clicks download button and require
-        // a user-provided region name
-        val builder = AlertDialog.Builder(this@OfflineManagerActivity)
-
-        val regionNameEdit = EditText(this@OfflineManagerActivity)
-        regionNameEdit.hint = getString(R.string.set_region_name_hint)
-        regionNameEdit.id = R.id.dialog_textfield_id
-
-        //TODO: Use DialogueFragment
-        // Build the dialog box
-        builder.setTitle(getString(R.string.dialog_title))
-                .setView(regionNameEdit)
-                .setMessage(getString(R.string.dialog_message))
-                .setPositiveButton(getString(R.string.dialog_positive_button)) { _, _ ->
-                    val regionName = regionNameEdit.text.toString()
-                    // Require a region name to begin the download.
-                    // If the user-provided string is empty, display
-                    // a toast message and do not begin download.
-                    if (regionName.isEmpty()) {
-                        Toast.makeText(applicationContext, getString(R.string.dialog_toast), Toast.LENGTH_SHORT).show()
-                    } else { // Begin download process
-                        downloadRegion(regionName)
-                    }
-                }
-                .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
-        // Display the dialog
-        builder.show()
+    fun downloadRegionDialog(v: View) {
+        DownloadRegionDialogFragment().show(supportFragmentManager, this.getString(R.string.download_region_dialog_fragment))
     }
 
     /**
-     * Define offline region parameters, including bounds,
-     * min/max zoom, and metadata
+     * @param regionName : String
+     * From the current map area style and bundaries,
+     * this function creates an OfflineTilePyramidRegionDefinition and
+     * a metadata variable.
+     * Both are then used to create an OfflineRegion
+     * and launch the download
      */
-    private fun downloadRegion(regionName: String) {
+    fun prepareAndLaunchDownload(regionName: String) {
         startProgress(downloadButton, listButton, progressBar)
         // Create offline definition using the current
         // style and boundaries of visible map area
@@ -199,37 +173,13 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                         }
                         .toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
-                showDialog(items, offlineRegions)
+                ListOfflineRegionDialogFragment(items, offlineRegions, mapboxMap, progressBar, mapView)
+                        .show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
             }
 
             override fun onError(error: String) {
                 showErrorAndToast("Error : $error")
             }
         })
-    }
-
-    private fun showDialog(items: Array<CharSequence>, offlineRegions: Array<OfflineRegion>) {
-        return AlertDialog.Builder(this@OfflineManagerActivity)
-                .setTitle(getString(R.string.navigate_title)).setSingleChoiceItems(items, 0) { _, which -> regionSelected = which }
-                .setPositiveButton(getString(R.string.navigate_positive_button)) { _, _ ->
-                    Toast.makeText(this@OfflineManagerActivity, items[regionSelected], Toast.LENGTH_LONG).show()
-                    // Create new camera position
-                    val definition = offlineRegions[regionSelected].definition
-                    mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(
-                            definition.bounds.center,
-                            definition.minZoom)
-                }
-                .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
-                    // Make progressBar indeterminate and
-                    // set it to visible to signal that
-                    // the deletion process has begun
-                    deletingInProgress(progressBar)
-                    // Begin the deletion process
-                    deleteOfflineRegion(offlineRegions[regionSelected], progressBar, mapView)
-                }
-                // When the user cancels, don't do anything.
-                // The dialog will automatically close
-                .setNegativeButton(getString(R.string.dialog_negative_button)
-                ) { _, _ -> }.create().show()
     }
 }
