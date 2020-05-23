@@ -81,7 +81,8 @@
             app:srcCompat="@drawable/ic_distancetohome" />
 
         <TextView
-            android:id="@+id/distance_to_base"
+            android:id="@+id/distance_to_home"
+            android:text="@string/no_info"
             android:theme="@style/InformationDisplayTheme" />
     </TableRow>
 </TableLayout>

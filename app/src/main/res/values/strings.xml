@@ -31,6 +31,14 @@
     <string name="intent_key_group_id" translatable="false">group_id</string>
     <string name="intent_key_role" translatable="false">role</string>
 
+    <string name="drone_home_error">No Home Available</string>
+
+    <string name="drone_user_error">User position not available</string>
+    <string name="drone_user_success">Returning to user</string>
+    <string name="drone_home_success">Returning home</string>
+    <string name="drone_mission_success">Mission started successfully</string>
+    <string name="drone_mission_error">Failed to start Mission</string>
+
     <!-- Settings -->
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
@@ -99,6 +107,11 @@
 
     <string name="drone_altitude_header">Default drone altitude</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
+    
+    <string name="ReturnDroneDialogFragment">Return Home Drone</string>
+    <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ? </string>
+    <string name="ReturnDroneDialogHome">Home</string>
+    <string name="ReturnDroneDialogUser">User</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="button_settings_desc">Settings button</string>

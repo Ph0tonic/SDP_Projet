@@ -40,6 +40,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="startMissionOrReturnHome"
+            app:fab_colorNormal="@color/colorWhite"
+            app:fab_colorPressed="@color/colorLightGray"
             app:fab_icon="@drawable/ic_start"
             style="@style/FloatingButtonTheme"/>
 
