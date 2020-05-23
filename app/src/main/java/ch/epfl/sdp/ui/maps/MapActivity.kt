@@ -39,7 +39,6 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import io.mavsdk.telemetry.Telemetry
 
 /**
  * Main Activity to display map and create missions.
@@ -91,7 +90,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var homePositionObserver = Observer<Telemetry.Position> { newPosition: Telemetry.Position? ->
-        newPosition?.let {
+        newPosition.let {
             if (::homePainter.isInitialized) homePainter.paint(LatLng(it.latitudeDeg, it.longitudeDeg))
         }
     }
@@ -288,6 +287,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
         Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId)
+        <<<<<<< HEAD
+        ====== =
+
+        findViewById<FloatingActionButton>(R.id.start_or_return_button)
+                .setIcon(if (Drone.isFlying()) R.drawable.ic_return else R.drawable.ic_start)
+        >>>>>>> 49921c2a6e06db600744bc0bf9132de300bb4642
     }
 
     /**

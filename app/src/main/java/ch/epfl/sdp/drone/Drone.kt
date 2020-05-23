@@ -2,11 +2,15 @@ package ch.epfl.sdp.drone
 
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+<<<<<<< HEAD
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data_manager.HeatmapDataManager
 import ch.epfl.sdp.ui.toast.ToastHandler
 import ch.epfl.sdp.utils.CentralLocationManager
+=======
+import ch.epfl.sdp.database.data_manager.HeatmapDataManager
+>>>>>>> 49921c2a6e06db600744bc0bf9132de300bb4642
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
 import io.mavsdk.mavsdkserver.MavsdkServer
@@ -15,14 +19,24 @@ import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
+<<<<<<< HEAD
+=======
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+>>>>>>> 49921c2a6e06db600744bc0bf9132de300bb4642
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 
 object Drone {
+<<<<<<< HEAD
     private const val USE_REMOTE_BACKEND = true // False for running MavsdkServer locally, True to connect to a remote instance
     private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" //IP of the remote instance
+=======
+    private const val USE_REMOTE_BACKEND = false // False for running MavsdkServer locally, True to connect to a remote instance
+    private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" // IP of the remote instance
+>>>>>>> 49921c2a6e06db600744bc0bf9132de300bb4642
     private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
 
     // Maximum distance between passes in the strategy
@@ -48,7 +62,11 @@ object Drone {
 
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
+<<<<<<< HEAD
         positionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
+=======
+        currentPositionLiveData.value!!.distanceTo(LatLng(47.3975, 8.5445))
+>>>>>>> 49921c2a6e06db600744bc0bf9132de300bb4642
     }
 
     var getSignalStrength: () -> Double = debugGetSignalStrength
