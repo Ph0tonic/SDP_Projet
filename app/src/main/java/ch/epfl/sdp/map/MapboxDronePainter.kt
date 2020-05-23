@@ -22,7 +22,7 @@ class MapboxDronePainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) :
         } else if (!::marker.isInitialized || reset) {
             val circleOptions = CircleOptions()
                     .withLatLng(location)
-                    .withCircleColor(ColorUtils.colorToRgbaString(Color.RED))
+                    .withCircleColor(ColorUtils.colorToRgbaString(Color.YELLOW))
             marker = circleManager.create(circleOptions)
             reset = false
         } else {

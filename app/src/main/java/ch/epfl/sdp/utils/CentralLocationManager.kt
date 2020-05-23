@@ -36,7 +36,6 @@ object CentralLocationManager {
     fun configure(activity: Activity, context: Context) {
         locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         this.activity = activity
-
         if (checkAndRequestPermission(context)) {
             requestLocationUpdates()
         }
