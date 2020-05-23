@@ -47,7 +47,7 @@
     <string name="pref_value_strategy_spiral">Spiral</string>
 
     <!-- Main Activity -->
-    <string name="select_search_group">Select search group</string>
+    <string name="select_search_group">Search group</string>
     <string name="start_mission">Start mission</string>
     <string name="work_offline">Work offline</string>
 
@@ -112,5 +112,11 @@
     <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ? </string>
     <string name="ReturnDroneDialogHome">Home</string>
     <string name="ReturnDroneDialogUser">User</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="button_settings_desc">Settings button</string>
+    <string name="button_menu_desc">Open side menu</string>
+    <string name="home_background">home background</string>
+    <string name="fly2find_logo_desc">Fly2Find logo</string>
 
 </resources>

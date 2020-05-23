@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#3498db</color>
+    <color name="clouds">#ecf0f1</color>
+    <color name="transparentClouds">#ccecf0f1</color>
+
+
     <color name="colorBlack">#000000</color>
     <color name="colorLightGray">#A0A0A0</color>
     <color name="colorWhite">#FFFFFF</color>
-    <color name="colorPrimary">#DCEFFF</color>
     <color name="colorPrimaryDark">#9AADE1</color>
     <color name="colorAccent">#000560</color>
-    <color name="colorPrimaryTransparent">#A0DCEFFF</color>
     <color name="colorTransparent">#00000000</color>
 </resources>

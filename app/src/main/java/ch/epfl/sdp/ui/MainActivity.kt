@@ -50,8 +50,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(findViewById(R.id.toolbar))
-
         configureNavigationView()
         loadActiveGroupFromPrefs()
     }
@@ -62,13 +60,7 @@ class MainActivity : AppCompatActivity() {
         snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(
-                setOf(R.id.nav_home, R.id.nav_maps_managing, R.id.nav_signout_button),
-                drawerLayout)
         val navController = findNavController(R.id.nav_host_fragment)
-        setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         Auth.loggedIn.observe(this, Observer {
@@ -123,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    fun openSettings(menuItem: MenuItem?) {
+    fun openSettings(view: View) {
         startActivity(Intent(this, SettingsActivity::class.java))
     }
 
@@ -179,5 +171,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun openDrawer(view: View) {
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        drawerLayout.openDrawer(GravityCompat.START)
     }
 }
