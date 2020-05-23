@@ -490,8 +490,8 @@ class MapActivityTest {
 
         onView(withId(R.id.floating_menu_button)).perform(click())
 
-        onView(withId(R.id.start_or_return_button)).perform(click())
-        onView(withId(R.id.start_or_return_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
 
         // Test that the toast is displayed
         onView(withText(applicationContext().getString(R.string.not_connected_message)))
@@ -528,8 +528,8 @@ class MapActivityTest {
 
         }
 
-        onView(withId(R.id.start_or_return_button)).perform(click())
-        onView(withId(R.id.start_or_return_button)).perform(click())
+        onView(withId(R.id.return_home_or_user)).perform(click())
+        onView(withId(R.id.return_home_or_user)).perform(click())
 
         onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
                 .check(matches(isDisplayed()))

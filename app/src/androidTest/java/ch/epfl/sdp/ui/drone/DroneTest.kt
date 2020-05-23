@@ -109,4 +109,25 @@ class DroneTest {
         assertThat(currentLat, closeTo(expectedLatLng.latitude, EPSILON))
         assertThat(currentLong, closeTo(expectedLatLng.longitude, EPSILON))
     }
+
+    @Test
+    fun canPauseMission(){
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+
+        assertThat(Drone.isMissionPausedLiveData.value , `is`(true))
+    }
+
+    @Test
+    fun canRestartMissionAfterPause(){
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+
+        assertThat(Drone.isMissionPausedLiveData.value , `is`(false))
+    }
 }

@@ -100,11 +100,17 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneFlyingStatusObserver = Observer<Boolean> {
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.setIcon(if (it) R.drawable.ic_return else R.drawable.ic_start)
+        findViewById<FloatingActionButton>(R.id.return_home_or_user)!!.visibility = if(it) View.VISIBLE else View.GONE
     }
 
+    private lateinit var startOrPauseButton : FloatingActionButton
+    private var defaultColor : Int = 0
     private var droneConnectionStatusObserver = Observer<Boolean> {
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.colorNormal = if (it) Color.WHITE else Color.GRAY
+        startOrPauseButton.colorNormal = if (it) defaultColor else startOrPauseButton.colorDisabled
+    }
+
+    private var missionStatusObserver = Observer<Boolean> {
+        startOrPauseButton.setIcon(if (it) R.drawable.ic_play_arrow_black_24dp else R.drawable.ic_pause_black_24dp)
     }
 
     companion object {
@@ -127,6 +133,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
+        startOrPauseButton = findViewById(R.id.start_or_pause_button)
+        defaultColor = startOrPauseButton.colorNormal
 
         if (MainDataManager.role.value == Role.RESCUER) {
             hideOperatorUiComponents()
@@ -134,7 +142,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private fun hideOperatorUiComponents() {
-        findViewById<FloatingActionButton>(R.id.start_or_return_button)!!.visibility = View.GONE
+        findViewById<FloatingActionButton>(R.id.start_or_pause_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
@@ -149,6 +157,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         Drone.homeLocationLiveData.observe(this, homePositionObserver)
         Drone.isFlyingLiveData.observe(this, droneFlyingStatusObserver)
         Drone.isConnectedLiveData.observe(this, droneConnectionStatusObserver)
+        Drone.isMissionPausedLiveData.observe(this, missionStatusObserver)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
     }
@@ -159,6 +168,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         Drone.homeLocationLiveData.removeObserver(homePositionObserver)
         Drone.isFlyingLiveData.removeObserver(droneFlyingStatusObserver)
         Drone.isConnectedLiveData.removeObserver(droneConnectionStatusObserver)
+        Drone.isMissionPausedLiveData.removeObserver(missionStatusObserver)
 
         if (isMapReady) MapUtils.saveCameraPositionAndZoomToPrefs(mapboxMap.cameraPosition)
     }
@@ -269,23 +279,25 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      * If the drone is on ground -> starts mission
      * If the drone is flying -> shows return dialog
      */
-    fun startMissionOrReturnHome(v: View) {
+    fun startOrPauseMissionButton(v: View) {
         if (!Drone.isConnectedLiveData.value!!) {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
-        } else if (!Drone.isFlyingLiveData.value!!) {
-            launchMission()
         } else {
-            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
+            launchMission()
         }
+    }
+
+    fun returnHomeOrUser(v : View){
+        ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
     }
 
     /**

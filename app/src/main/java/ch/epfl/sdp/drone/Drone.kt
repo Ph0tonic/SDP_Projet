@@ -15,7 +15,6 @@ import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -31,7 +30,7 @@ object Drone {
     const val DEFAULT_ALTITUDE: Float = 10.0F
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
-    private const val WAIT_TIME: Long = 200
+    private const val WAIT_TIME: Long = 1
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val positionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -42,6 +41,7 @@ object Drone {
     val isFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData()
     val homeLocationLiveData: MutableLiveData<Telemetry.Position> = MutableLiveData()
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isMissionPausedLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
 
     lateinit var getSignalStrength: () -> Double
 
@@ -62,14 +62,17 @@ object Drone {
             System("localhost", mavsdkServerPort)
         }
 
-        disposables.add(instance.telemetry.flightMode.distinct()
+        disposables.add(instance.telemetry.flightMode.distinctUntilChanged()
                 .subscribe(
-                        { flightMode -> Timber.d("flight mode: $flightMode") },
+                        { flightMode ->
+                            if (flightMode == Telemetry.FlightMode.HOLD) isMissionPausedLiveData.postValue(true)
+                            if (flightMode == Telemetry.FlightMode.MISSION) isMissionPausedLiveData.postValue(false)
+                        },
                         { error -> Timber.e("Error Flight Mode: $error") }
                 ))
-        disposables.add(instance.telemetry.armed.distinct()
+        disposables.add(instance.telemetry.armed.distinctUntilChanged()
                 .subscribe(
-                        { armed -> Timber.d("armed: $armed") },
+                        { armed -> if (!armed) isMissionPausedLiveData.postValue(true) },
                         { error -> Timber.e("Error Armed : $error") }
                 ))
         disposables.add(instance.telemetry.position
@@ -91,8 +94,9 @@ object Drone {
         disposables.add(instance.telemetry.positionVelocityNed
                 .subscribe(
                         { vector_speed -> speedLiveData.postValue(sqrt(vector_speed.velocity.eastMS.pow(2) + vector_speed.velocity.northMS.pow(2))) },
-                        { error -> Timber.e("Error GroundSpeedNed : $error") }))
-        disposables.add(instance.telemetry.inAir
+                        { error -> Timber.e("Error GroundSpeedNed : $error") }
+                ))
+        disposables.add(instance.telemetry.inAir.distinctUntilChanged()
                 .subscribe(
                         { isFlying -> isFlyingLiveData.postValue(isFlying) },
                         { error -> Timber.e("Error inAir : $error") }
@@ -102,22 +106,22 @@ object Drone {
                         { home -> homeLocationLiveData.postValue(home) },
                         { error -> Timber.e("Error home : $error") }
                 ))
-        disposables.add(instance.core.connectionState
+        disposables.add(instance.core.connectionState.distinctUntilChanged()
                 .subscribe(
-                        {state -> isConnectedLiveData.postValue(state.isConnected)},
-                        { error -> Timber.e("Error home : $error")}
+                        { state -> isConnectedLiveData.postValue(state.isConnected) },
+                        { error -> Timber.e("Error connectionState : $error") }
                 ))
     }
 
+    /**
+     * @param missionPlan : the MissionPlan the drone will follow
+     */
     fun startMission(missionPlan: Mission.MissionPlan) {
         this.missionLiveData.value = missionPlan.missionItems
-        val isConnectedCompletable = instance.core.connectionState
-                .filter { state -> state.isConnected }
-                .firstOrError()
-                .toCompletable()
+        this.isMissionPausedLiveData.postValue(false)
 
         disposables.add(
-                isConnectedCompletable
+                getConnectedInstance()
                         .andThen(instance.mission.setReturnToLaunchAfterMission(true))
                         .andThen(instance.mission.uploadMission(missionPlan))
                         .andThen(instance.action.arm())
@@ -125,6 +129,51 @@ object Drone {
                         .subscribe(
                                 { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
                                 { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }))
+    }
+
+    /**
+     * Pauses the current Mission
+     */
+    private fun pauseMission(): Disposable {
+        this.isMissionPausedLiveData.postValue(true)
+        return getConnectedInstance()
+                .andThen(instance.mission.pauseMission())
+                .subscribe(
+                        { ToastHandler().showToast(R.string.drone_pause_success, Toast.LENGTH_SHORT) },
+                        {
+                            this.isMissionPausedLiveData.postValue(false)
+                            ToastHandler().showToast(R.string.drone_pause_error, Toast.LENGTH_SHORT)
+                        })
+    }
+
+    /**
+     * Restarts the current Mission
+     */
+    private fun restartMission(): Disposable {
+        this.isMissionPausedLiveData.postValue(false)
+        return getConnectedInstance()
+                .andThen(instance.mission.startMission())
+                .subscribe(
+                        { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                        {
+                            this.isMissionPausedLiveData.postValue(true)
+                            ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
+                        })
+    }
+
+    /**
+     * If the drone is not flying, it starts a mission with
+     * @param missionPlan
+     *
+     * If the drone is already flying, but paused, it restarts it
+     * If the drone is already flying and doing a mission, it pauses the mission
+     */
+    fun startOrPauseMission(missionPlan: Mission.MissionPlan) {
+        if (this.isFlyingLiveData.value!!) {
+            disposables.add(if (this.isMissionPausedLiveData.value!!) restartMission() else pauseMission())
+        } else {
+            startMission(missionPlan)
+        }
     }
 
     /**
@@ -151,7 +200,10 @@ object Drone {
                         .andThen(instance.action.returnToLaunch())
                         .subscribe(
                                 { ToastHandler().showToast(R.string.drone_home_success, Toast.LENGTH_SHORT) },
-                                { ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT) }))
+                                {
+                                    ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT)
+                                    this.missionLiveData.value = null
+                                }))
     }
 
     /**
@@ -176,7 +228,8 @@ object Drone {
                         { pos ->
                             val isRightPos = LatLng(pos.latitudeDeg, pos.longitudeDeg).distanceTo(returnLocation).roundToInt() == 0
                             val isStopped = speedLiveData.value?.roundToInt() == 0
-                            if (isRightPos.and(isStopped)) instance.action.land().blockingAwait()
+                            if (isRightPos.and(isStopped)) instance.action.land().blockingAwait(WAIT_TIME, TimeUnit.SECONDS)
+                            this.isMissionPausedLiveData.postValue(true)
                         },
                         { e -> Timber.e("ERROR LANDING : $e") }))
     }
