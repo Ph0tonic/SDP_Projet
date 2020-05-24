@@ -16,11 +16,15 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.Auth
@@ -73,6 +77,8 @@ class DroneStatusFragmentTest {
         //Firebase.database.goOffline()
         HeatmapRepository.daoProvider = { MockHeatmapDao() }
         MarkerRepository.daoProvider = { MockMarkerDao() }
+        UserRepository.daoProvider = { MockUserDao() }
+        SearchGroupRepository.daoProvider = { MockGroupDao() }
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         val targetContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
