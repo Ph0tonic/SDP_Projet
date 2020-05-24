@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.UserData
 
-class MockUserDao() : UserDao {
+class MockUserDao : UserDao {
 
     override fun getUsersOfGroupWithRole(groupId: String, role: Role): LiveData<Set<UserData>> {
         return MutableLiveData(setOf())
@@ -24,6 +24,6 @@ class MockUserDao() : UserDao {
     }
 
     override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
-        TODO("Not yet implemented")
+        return MutableLiveData(setOf())
     }
 }

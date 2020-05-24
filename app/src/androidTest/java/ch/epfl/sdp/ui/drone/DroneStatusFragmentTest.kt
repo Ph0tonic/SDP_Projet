@@ -29,6 +29,8 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.Matchers.equalTo
@@ -74,7 +76,7 @@ class DroneStatusFragmentTest {
         }
 
         // Do not use the real database, only use the offline version on the device
-        //Firebase.database.goOffline()
+        // Firebase.database.goOffline()
         HeatmapRepository.daoProvider = { MockHeatmapDao() }
         MarkerRepository.daoProvider = { MockMarkerDao() }
         UserRepository.daoProvider = { MockUserDao() }
@@ -84,7 +86,6 @@ class DroneStatusFragmentTest {
         val targetContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
     }
-
 
     @Test
     fun updateDroneBatteryChangesDroneStatus() {

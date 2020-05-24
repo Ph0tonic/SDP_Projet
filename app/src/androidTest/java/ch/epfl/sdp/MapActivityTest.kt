@@ -24,13 +24,17 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.data.HeatmapPointData
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
@@ -92,12 +96,12 @@ class MapActivityTest {
         }
 
         // Do not use the real database, only use the offline version on the device
-        //Firebase.database.goOffline()
-        val heatmapDao = MockHeatmapDao()
-        val markerDao = MockMarkerDao()
+        // Firebase.database.goOffline()
+        HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        MarkerRepository.daoProvider = { MockMarkerDao() }
+        UserRepository.daoProvider = { MockUserDao() }
+        SearchGroupRepository.daoProvider = { MockGroupDao() }
 
-        HeatmapRepository.daoProvider = { heatmapDao }
-        MarkerRepository.daoProvider = { markerDao }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
 
         val targetContext: Context = getInstrumentation().targetContext
