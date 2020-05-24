@@ -12,8 +12,7 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import org.mockito.Mockito
 
 class HeatmapDataManagerTest {
 
@@ -22,7 +21,6 @@ class HeatmapDataManagerTest {
         private const val DUMMY_GROUP_ID = "Dummy_group_id"
         private const val DUMMY_INTENSITY = 8.75
         private val DUMMY_LOCATION = LatLng(0.123, 23.1234)
-        private const val ASYNC_CALL_TIMEOUT = 5L
     }
 
 
@@ -31,116 +29,65 @@ class HeatmapDataManagerTest {
 
     @Test
     fun addMeasureToHeatmapForNewHeatmapCallsUpdateHeatmap() {
-        val called = CountDownLatch(1)
         val expectedHeatMapData = HeatmapData(mutableListOf(
                 HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
         ), DUMMY_HEATMAP_ID)
-        lateinit var actualHeatmapData: HeatmapData
+        val expectedGroupId = DUMMY_GROUP_ID
 
-        val repo = object : IHeatmapRepository {
-            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
-                actualHeatmapData = heatmapData
-                called.countDown()
-            }
-
-            override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
-                return MutableLiveData(mutableMapOf())
-            }
-
-            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
-        }
+        val repo = Mockito.mock(IHeatmapRepository::class.java)
+        Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(MutableLiveData(mutableMapOf()))
 
         HeatmapRepositoryProvider.provide = { repo }
-        val manager = HeatmapDataManager()
-        manager.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
+        HeatmapDataManager().addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
 
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualHeatmapData, equalTo(expectedHeatMapData))
+        Mockito.verify(repo, Mockito.times(1)).getGroupHeatmaps(expectedGroupId)
+        Mockito.verify(repo, Mockito.times(1)).updateHeatmap(expectedGroupId, expectedHeatMapData)
     }
 
     @Test
     fun addMeasureToHeatmapForExistingHeatmapCallsUpdateHeatmap() {
-        val called = CountDownLatch(1)
         val expectedHeatMapData = HeatmapData(mutableListOf(
                 HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
         ), DUMMY_HEATMAP_ID)
+        val expectedGroupId = DUMMY_GROUP_ID
         val previousHeatMapData = HeatmapData(mutableListOf(), DUMMY_HEATMAP_ID)
-        lateinit var actualHeatmapData: HeatmapData
 
-        val repo = object : IHeatmapRepository {
-            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {
-                actualHeatmapData = heatmapData
-                called.countDown()
-            }
-
-            override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
-                return MutableLiveData(mutableMapOf(Pair(DUMMY_HEATMAP_ID, MutableLiveData(previousHeatMapData))))
-            }
-
-            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
-        }
+        val repo = Mockito.mock(IHeatmapRepository::class.java)
+        Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(MutableLiveData(mutableMapOf(Pair(DUMMY_HEATMAP_ID, MutableLiveData(previousHeatMapData)))))
 
         HeatmapRepositoryProvider.provide = { repo }
-        val manager = HeatmapDataManager()
-        manager.addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
+        HeatmapDataManager().addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
 
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualHeatmapData, equalTo(expectedHeatMapData))
+        Mockito.verify(repo, Mockito.times(1)).getGroupHeatmaps(expectedGroupId)
+        Mockito.verify(repo, Mockito.times(1)).updateHeatmap(expectedGroupId, expectedHeatMapData)
     }
 
     @Test
     fun removeAllHeatmapsOfSearchCallsGroupRemoveAllHeatmapsOfSearch() {
-        val called = CountDownLatch(1)
+        val expectedGroupId = DUMMY_GROUP_ID
 
-        val repo = object : IHeatmapRepository {
-            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
-            override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
-                TODO("should not be used")
-            }
-
-            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
-                called.countDown()
-            }
-        }
+        val repo = Mockito.mock(IHeatmapRepository::class.java)
 
         HeatmapRepositoryProvider.provide = { repo }
-        val manager = HeatmapDataManager()
-        manager.removeAllHeatmapsOfSearchGroup(DUMMY_GROUP_ID)
+        HeatmapDataManager().removeAllHeatmapsOfSearchGroup(DUMMY_GROUP_ID)
 
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
+        Mockito.verify(repo, Mockito.times(1)).removeAllHeatmapsOfSearchGroup(expectedGroupId)
     }
 
     @Test
     fun getGroupHeatmpasCallsgetGroupsHeatmaps() {
-        val called = CountDownLatch(1)
+        val expectedGroupId = DUMMY_GROUP_ID
         val expectedHeatMapData =
                 MutableLiveData(mutableMapOf(Pair(DUMMY_HEATMAP_ID, MutableLiveData(HeatmapData(mutableListOf(
                         HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
                 ), DUMMY_HEATMAP_ID)))))
 
-        val repo = object : IHeatmapRepository {
-            override fun updateHeatmap(groupId: String, heatmapData: HeatmapData) {}
-
-            override fun getGroupHeatmaps(groupId: String): LiveData<MutableMap<String, MutableLiveData<HeatmapData>>> {
-                called.countDown()
-                return expectedHeatMapData
-            }
-
-            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {}
-        }
+        val repo = Mockito.mock(IHeatmapRepository::class.java)
+        Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(expectedHeatMapData)
 
         HeatmapRepositoryProvider.provide = { repo }
-        val manager = HeatmapDataManager()
-        val actualHeatmapData = manager.getGroupHeatmaps(DUMMY_GROUP_ID)
 
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualHeatmapData.value, equalTo(expectedHeatMapData.value))
+        assertThat(HeatmapDataManager().getGroupHeatmaps(expectedGroupId), equalTo(expectedHeatMapData as LiveData<MutableMap<String, MutableLiveData<HeatmapData>>>))
+        Mockito.verify(repo, Mockito.times(1)).getGroupHeatmaps(expectedGroupId)
     }
 }

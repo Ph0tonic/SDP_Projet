@@ -1,6 +1,7 @@
 package ch.epfl.sdp.database.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.dao.MarkerDao
@@ -35,7 +36,7 @@ class MarkerRepositoryTest {
         MarkerRepository.daoProvider = { dao }
         val repo = MarkerRepository()
 
-        assertThat(repo.getMarkersOfSearchGroup(expectedGroupId), equalTo(expectedData))
+        assertThat(repo.getMarkersOfSearchGroup(expectedGroupId), equalTo(expectedData as LiveData<Set<MarkerData>>))
         Mockito.verify(dao, Mockito.times(1)).getMarkersOfSearchGroup(expectedGroupId)
     }
 
