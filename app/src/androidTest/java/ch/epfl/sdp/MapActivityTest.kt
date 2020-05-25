@@ -73,6 +73,10 @@ class MapActivityTest {
             .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
             .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
 
+    private val intentWithGroupAndRescuer = Intent()
+            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
+            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.RESCUER)
+
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -433,7 +437,7 @@ class MapActivityTest {
         }
 
         onView(withId(R.id.start_or_return_button)).perform(click())
-        onView(withId(R.id.start_or_return_button)).perform(click())
+        //onView(withId(R.id.start_or_return_button)).perform(click())
 
         onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
                 .check(matches(isDisplayed()))
@@ -442,6 +446,7 @@ class MapActivityTest {
             Drone.isFlyingLiveData.value = false
             Drone.isConnectedLiveData.value = false
         }
+        mUiDevice.pressBack()
     }
 
     @Test
@@ -476,5 +481,47 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))
         onView(withId(R.id.resize_button)).perform(click())
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeDroneStatus(){
+        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+        onView(withId(R.id.drone_status_fragment)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeStartOrReturnButton(){
+        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+        onView(withId(R.id.start_or_return_button)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeClearButton(){
+        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+        onView(withId(R.id.clear_button)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeLocateButton(){
+        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+        onView(withId(R.id.locate_button)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeStrategyPickerButton(){
+        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+        onView(withId(R.id.strategy_picker_button)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeResizeButton(){
+        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+        onView(withId(R.id.resize_button)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeCameraFragment(){
+        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+        onView(withId(R.id.vlc_fragment)).check(matches(not(isDisplayed())))
     }
 }
