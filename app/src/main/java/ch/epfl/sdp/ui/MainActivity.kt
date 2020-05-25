@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -40,8 +42,8 @@ class MainActivity : AppCompatActivity() {
         private const val SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE = 7865
     }
 
-
-    private val currentGroupId: MutableLiveData<String?> = MutableLiveData(null)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val currentGroupId: MutableLiveData<String?> = MutableLiveData(null)
     private val currentRole: MutableLiveData<Role> = MutableLiveData(Role.RESCUER)
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -146,6 +148,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startMission(view: View) {
+        if(currentGroupId.value.isNullOrEmpty()){
+            Toast.makeText(this,getString(R.string.warning_no_group_selected),Toast.LENGTH_LONG).show();
+            return
+        }
         checkConnexion(view) {
             val intent = Intent(this, MapActivity::class.java)
                     .putExtra(getString(R.string.intent_key_group_id), currentGroupId.value)
