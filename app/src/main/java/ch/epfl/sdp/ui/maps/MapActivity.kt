@@ -56,6 +56,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     var isCameraFragmentFullScreen = true
 
     private lateinit var mapboxMap: MapboxMap
+    // Allow to no trigger long click when the event has already been consumed by a painter
+    // Mapbox annotation plugin PR has been merged but no released yet
+    private var longClickConsumed = false
 
     private lateinit var role: Role
     private lateinit var currentStrategy: OverflightStrategy
@@ -75,7 +78,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     val markerManager = MarkerDataManager()
 
     /* Painters */
-    private lateinit var searchAreaPainter: SearchAreaPainter
+    private lateinit var searchAreaPainter: MapboxSearchAreaPainter
     private lateinit var missionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var homePainter: MapboxHomePainter
@@ -184,11 +187,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
-            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style) { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }
+            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }) { longClickConsumed = true }
             homePainter = MapboxHomePainter(mapView, mapboxMap, style)
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
-            searchAreaPainter = SearchAreaPainter(mapView, mapboxMap, style)
+            searchAreaPainter = MapboxSearchAreaPainter(mapView, mapboxMap, style) { longClickConsumed = true }
 
             mapboxMap.addOnMapClickListener(this)
             mapboxMap.addOnMapLongClickListener(this)
@@ -232,10 +235,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     override fun onMapLongClick(position: LatLng): Boolean {
         // Need mapbox update to remove this test
-        if (!victimSymbolManager.victimSymbolLongClickConsumed) {
+        if (!longClickConsumed) {
             markerManager.addMarkerForSearchGroup(groupId, position)
         }
-        victimSymbolManager.victimSymbolLongClickConsumed = false
+        longClickConsumed = false
         return true
     }
 
