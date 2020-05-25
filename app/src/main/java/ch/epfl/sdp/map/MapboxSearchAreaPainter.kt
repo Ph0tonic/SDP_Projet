@@ -8,7 +8,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.utils.ColorUtils
 
-class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : MapboxPainter {
+class MapboxSearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style, onLongClickConsumed: () -> Unit) : MapboxPainter {
 
     companion object {
         private const val REGION_FILL_OPACITY: Float = 0.5F
@@ -29,6 +29,7 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
         lateinit var previousLocation: LatLng
         override fun onAnnotationDragStarted(annotation: Circle) {
             previousLocation = annotation.latLng
+            onLongClickConsumed()
         }
 
         override fun onAnnotationDrag(annotation: Circle) {
@@ -41,6 +42,7 @@ class SearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style) : 
 
     init {
         circleManager.addDragListener(dragListener)
+        circleManager.addLongClickListener { onLongClickConsumed() }
     }
 
     fun getUpperLayer(): String {

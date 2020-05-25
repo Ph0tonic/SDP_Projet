@@ -15,12 +15,9 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property
 
-class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, onMarkerRemove: (String) -> Unit) : Observer<Set<MarkerData>> {
+class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, onMarkerRemove: (String) -> Unit, onLongClickConsumed: () -> Unit) : Observer<Set<MarkerData>> {
 
     private var symbolManager: SymbolManager = SymbolManager(mapView, mapboxMap, style)
-
-    // Temporary trick until update of mapbox
-    var victimSymbolLongClickConsumed = false
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val markers = mutableMapOf<String, Symbol>()
@@ -37,7 +34,7 @@ class VictimSymbolManager(mapView: MapView, mapboxMap: MapboxMap, style: Style, 
         symbolManager.iconRotationAlignment = Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 
         symbolManager.addLongClickListener {
-            victimSymbolLongClickConsumed = true
+            onLongClickConsumed()
             val markerId = it.data!!.asJsonObject.get(VICTIM_MARKER_ID_PROPERTY_NAME).asString
             onMarkerRemove(markerId)
         }
