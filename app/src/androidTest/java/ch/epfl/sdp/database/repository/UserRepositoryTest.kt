@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ch.epfl.sdp.database.dao.EmptyMockUserDao
+import ch.epfl.sdp.database.dao.UserDao
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.UserData
 import org.hamcrest.CoreMatchers.equalTo
@@ -12,8 +12,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import org.mockito.Mockito
 
 @RunWith(AndroidJUnit4::class)
 class UserRepositoryTest {
@@ -30,155 +29,89 @@ class UserRepositoryTest {
 
     @Test
     fun getOperatorsOfSearchGroupCallsGetUsersOfGroupWithRoleFromDao() {
-        val called = CountDownLatch(1)
         val expectedData = MutableLiveData(setOf(UserData(uuid = DUMMY_USER_ID)))
+        val expectedGroupId = DUMMY_GROUP_ID
         val expectedRole = Role.OPERATOR
-        lateinit var actualRole: Role
-        lateinit var actualGroupId: String
 
-        val dao = object : EmptyMockUserDao() {
-            override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
-                called.countDown()
-                actualRole = role
-                actualGroupId = groupId
-                return expectedData
-            }
-        }
+        val dao = Mockito.mock(UserDao::class.java)
+        Mockito.`when`(dao.getUsersOfGroupWithRole(expectedGroupId, expectedRole)).thenReturn(expectedData)
+
         UserRepository.daoProvider = { dao }
-
         val repo = UserRepository()
         assertThat(repo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData as LiveData<Set<UserData>>))
 
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualRole, equalTo(expectedRole))
-        assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
+        Mockito.verify(dao, Mockito.times(1)).getUsersOfGroupWithRole(expectedGroupId, expectedRole)
     }
 
     @Test
     fun getRescuersOfSearchGroupCallsGetUsersOfGroupWithRoleFromDao() {
-        val called = CountDownLatch(1)
         val expectedData = MutableLiveData(setOf(UserData(uuid = DUMMY_USER_ID)))
+        val expectedGroupId = DUMMY_GROUP_ID
         val expectedRole = Role.RESCUER
-        lateinit var actualRole: Role
-        lateinit var actualGroupId: String
 
-        val dao = object : EmptyMockUserDao() {
-            override fun getUsersOfGroupWithRole(groupId: String, role: Role): MutableLiveData<Set<UserData>> {
-                called.countDown()
-                actualGroupId = groupId
-                actualRole = role
-                return expectedData
-            }
-        }
+        val dao = Mockito.mock(UserDao::class.java)
+        Mockito.`when`(dao.getUsersOfGroupWithRole(expectedGroupId, expectedRole)).thenReturn(expectedData)
+
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
         assertThat(repo.getRescuersOfSearchGroup(DUMMY_GROUP_ID), equalTo(expectedData as LiveData<Set<UserData>>))
-
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualRole, equalTo(expectedRole))
-        assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
+        Mockito.verify(dao, Mockito.times(1)).getUsersOfGroupWithRole(expectedGroupId, expectedRole)
     }
 
     @Test
     fun removeUserFromSearchGroupCallsRemoveUserFromSearchGroupWithCorrectParameters() {
-        val called = CountDownLatch(1)
-        lateinit var actualGroupId: String
-        lateinit var actualUserId: String
+        val expectedGroupId = DUMMY_GROUP_ID
+        val expectedUserId = DUMMY_USER_ID
 
-        val dao = object : EmptyMockUserDao() {
-            override fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
-                called.countDown()
-                actualGroupId = searchGroupId
-                actualUserId = userId
-            }
-        }
+        val dao = Mockito.mock(UserDao::class.java)
+
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
-        repo.removeUserFromSearchGroup(DUMMY_GROUP_ID, DUMMY_USER_ID)
-
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualUserId, equalTo(DUMMY_USER_ID))
-        assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
+        repo.removeUserFromSearchGroup(expectedGroupId, expectedUserId)
+        Mockito.verify(dao, Mockito.times(1)).removeUserFromSearchGroup(expectedGroupId, expectedUserId)
     }
 
     @Test
     fun removeAllUserFromSearchGroupCallsRemoveAllUserFromSearchGroupWithCorrectParameters() {
-        val called = CountDownLatch(1)
-        lateinit var actualGroupId: String
+        val expectedGroupId = DUMMY_GROUP_ID
 
-        val dao = object : EmptyMockUserDao() {
-            override fun removeAllUserOfSearchGroup(searchGroupId: String) {
-                called.countDown()
-                actualGroupId = searchGroupId
-            }
-        }
+        val dao = Mockito.mock(UserDao::class.java)
+
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
-        repo.removeAllUserOfSearchGroup(DUMMY_GROUP_ID)
-
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
+        repo.removeAllUserOfSearchGroup(expectedGroupId)
+        Mockito.verify(dao, Mockito.times(1)).removeAllUserOfSearchGroup(expectedGroupId)
     }
 
     @Test
     fun addUserToSearchGroupCallsAddUserToSearchGroupWithCorrectParameters() {
-        val called = CountDownLatch(1)
         val expectedUserData = UserData(DUMMY_EMAIL, DUMMY_USER_ID, Role.RESCUER)
-        lateinit var actualGroupId: String
-        lateinit var actualUser: UserData
+        val expectedGroupId = DUMMY_GROUP_ID
 
-        val dao = object : EmptyMockUserDao() {
-            override fun addUserToSearchGroup(searchGroupId: String, user: UserData) {
-                called.countDown()
-                actualGroupId = searchGroupId
-                actualUser = user
-            }
-        }
+        val dao = Mockito.mock(UserDao::class.java)
+
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
-        repo.addUserToSearchGroup(DUMMY_GROUP_ID, expectedUserData)
-
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualGroupId, equalTo(DUMMY_GROUP_ID))
-        assertThat(actualUser, equalTo(expectedUserData))
+        repo.addUserToSearchGroup(expectedGroupId, expectedUserData)
+        Mockito.verify(dao, Mockito.times(1)).addUserToSearchGroup(expectedGroupId, expectedUserData)
     }
 
     @Test
     fun getGroupIdsOfUserByEmailCallsGetGroupIdsOfUserByEmailWithCorrectParameters() {
-        val called = CountDownLatch(1)
-        val expectedIds = setOf(DUMMY_GROUP_ID)
-        lateinit var actualEmail: String
+        val expectedData = MutableLiveData(setOf(DUMMY_GROUP_ID))
+        val expectedEmail = DUMMY_EMAIL
 
-        val dao = object : EmptyMockUserDao() {
-            override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
-                called.countDown()
-                actualEmail = email
-                return MutableLiveData(expectedIds)
-            }
-        }
+        val dao = Mockito.mock(UserDao::class.java)
+        Mockito.`when`(dao.getGroupIdsOfUserByEmail(expectedEmail)).thenReturn(expectedData)
+
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
-        val ids = repo.getGroupIdsOfUserByEmail(DUMMY_EMAIL)
-
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(called.count, equalTo(0L))
-
-        assertThat(actualEmail, equalTo(DUMMY_EMAIL))
-        assertThat(ids.value, equalTo(expectedIds))
+        assertThat(repo.getGroupIdsOfUserByEmail(expectedEmail), equalTo(expectedData as LiveData<Set<String>>))
+        Mockito.verify(dao, Mockito.times(1)).getGroupIdsOfUserByEmail(expectedEmail)
     }
 }
