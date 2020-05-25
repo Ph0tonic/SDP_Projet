@@ -14,6 +14,7 @@ import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
@@ -25,6 +26,7 @@ import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
+import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -117,5 +119,16 @@ class MainActivityTest {
         onView(withId(R.id.mainDrawerButton)).perform(click())
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
         mUiDevice.pressBack()
+    }
+
+    @Test
+    fun startMissionWithNoGroupShowsToast(){
+        runOnUiThread{
+            mActivityRule.activity.currentGroupId.value = null
+        }
+        onView(withId(R.id.start_mission_button)).perform(click())
+        onView(withText(mActivityRule.activity.getString(R.string.warning_no_group_selected)))
+                .inRoot(RootMatchers.withDecorView(Matchers.not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
     }
 }
