@@ -20,7 +20,7 @@ class HeatmapRepositoryTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     companion object {
-        private const val DUMMY_HEATMAP_ID = "dummy heatmap id"
+        private const val DUMMY_HEATMAP_ID = "dummy_heatmap_id"
         private const val DUMMY_GROUP_ID = "dummy_group_id"
     }
 

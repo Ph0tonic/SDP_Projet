@@ -105,8 +105,6 @@ class DroneStatusFragmentTest {
     @Test
     fun updateDroneBatteryChangesDroneStatus() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(mActivityRule.activity.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == mActivityRule.activity.getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.batteryLevelLiveData.value = null
@@ -132,8 +130,6 @@ class DroneStatusFragmentTest {
     @Test
     fun updateDroneAltitudeChangesDroneStatus() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(mActivityRule.activity.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == mActivityRule.activity.getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.absoluteAltitudeLiveData.value = null
@@ -160,8 +156,6 @@ class DroneStatusFragmentTest {
     @Test
     fun updateDroneSpeedChangesDroneStatus() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(mActivityRule.activity.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == mActivityRule.activity.getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.speedLiveData.value = null
@@ -188,8 +182,6 @@ class DroneStatusFragmentTest {
     @Test
     fun updateDronePositionChangesDistToUser() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(mActivityRule.activity.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == mActivityRule.activity.getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
@@ -206,8 +198,6 @@ class DroneStatusFragmentTest {
     @Test
     fun updateUserPositionChangesDistToUser() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == MainApplication.applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.positionLiveData.value = LatLng(0.0, 0.0)
@@ -224,8 +214,6 @@ class DroneStatusFragmentTest {
     @Test
     fun updateBatteryLevelChangesBatteryLevelIcon() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(mActivityRule.activity.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == mActivityRule.activity.getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.batteryLevelLiveData.value = .00f
@@ -266,8 +254,6 @@ class DroneStatusFragmentTest {
     @Test
     fun updateDronePositionChangesDistToHome() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(mActivityRule.activity.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == mActivityRule.activity.getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.homeLocationLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
@@ -284,30 +270,19 @@ class DroneStatusFragmentTest {
 
     @Test
     fun updateHomePositionChangesDistToHome() {
-        runOnUiThread { Timber.w("Step 1") }
         mActivityRule.launchActivity(intentWithGroupAndOperator)
-        runOnUiThread { Timber.w("Step 2") }
-        mUiDevice.wait(Until.hasObject(By.desc(mActivityRule.activity.getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        runOnUiThread { Timber.w("Step 3") }
-        assertThat(mActivityRule.activity.mapView.contentDescription == mActivityRule.activity.getString(R.string.map_ready), equalTo(true))
-        runOnUiThread { Timber.w("Step 4") }
 
         runOnUiThread {
             Drone.positionLiveData.value = LatLng(0.0, 0.0)
-            runOnUiThread { Timber.w("Step 5") }
             Drone.homeLocationLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
-            runOnUiThread { Timber.w("Step 6") }
         }
 
         onView(withId(R.id.distance_to_home)).check(matches(withText(DEFAULT_ALTITUDE_DISPLAY)))
-        runOnUiThread { Timber.w("Step 7") }
 
         runOnUiThread {
             Drone.homeLocationLiveData.value = Telemetry.Position(1.0, 0.0, 0f, 0f)
-            runOnUiThread { Timber.w("Step 8") }
         }
 
         onView(withId(R.id.distance_to_home)).check(matches(not(withText(DEFAULT_ALTITUDE_DISPLAY))))
-        runOnUiThread { Timber.w("Step 9") }
     }
 }
