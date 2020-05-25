@@ -1,6 +1,6 @@
 package ch.epfl.sdp.database.repository
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
 import ch.epfl.sdp.database.dao.FirebaseMarkersDao
 import ch.epfl.sdp.database.dao.MarkerDao
 import ch.epfl.sdp.database.data.MarkerData
@@ -16,7 +16,7 @@ class MarkerRepository : IMarkerRepository {
 
     private val dao: MarkerDao = daoProvider()
 
-    override fun getMarkersOfSearchGroup(groupId: String): MutableLiveData<Set<MarkerData>> {
+    override fun getMarkersOfSearchGroup(groupId: String): LiveData<Set<MarkerData>> {
         return dao.getMarkersOfSearchGroup(groupId)
     }
 

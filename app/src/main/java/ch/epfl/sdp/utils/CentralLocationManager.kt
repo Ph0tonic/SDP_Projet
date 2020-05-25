@@ -42,7 +42,7 @@ object CentralLocationManager {
     }
 
     fun configure(activity: Activity) {
-        this.configure(activity, MainApplication.applicationContext())
+        this.configure(activity, activity.applicationContext)
     }
 
     fun onDestroy() {

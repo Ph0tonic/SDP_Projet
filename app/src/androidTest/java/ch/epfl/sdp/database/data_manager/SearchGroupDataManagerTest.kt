@@ -11,16 +11,17 @@ import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
 import ch.epfl.sdp.database.providers.UserRepositoryProvider
-import ch.epfl.sdp.database.repository.EmptyMockHeatmapRepo
-import ch.epfl.sdp.database.repository.EmptyMockMarkerRepo
-import ch.epfl.sdp.database.repository.EmptyMockSearchGroupRepo
-import ch.epfl.sdp.database.repository.EmptyMockUserRepo
+import ch.epfl.sdp.database.repository.IHeatmapRepository
+import ch.epfl.sdp.database.repository.IMarkerRepository
+import ch.epfl.sdp.database.repository.ISearchGroupRepository
+import ch.epfl.sdp.database.repository.IUserRepository
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -30,7 +31,7 @@ class SearchGroupDataManagerTest {
         private const val DUMMY_GROUP_ID = "Dummy_group_id"
         private const val DUMMY_GROUP_NAME = "Dummy_group_name"
         private const val DUMMY_USER_ID = "Dummy_user_id"
-        private const val ASYNC_CALL_TIMEOUT = 5L
+        private const val ASYNC_CALL_TIMEOUT_MS = 500L
         private const val DUMMY_EMAIL = "test@test.com"
         private val DUMMY_ROLE = Role.RESCUER
     }
@@ -38,301 +39,131 @@ class SearchGroupDataManagerTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    private lateinit var mockSearchGroupRepo: ISearchGroupRepository
+    private lateinit var mockHeatmapRepo: IHeatmapRepository
+    private lateinit var mockMarkerRepo: IMarkerRepository
+    private lateinit var mockUserRepo: IUserRepository
+
     @Before
     fun setup() {
-        SearchGroupRepositoryProvider.provide = { EmptyMockSearchGroupRepo() }
-        UserRepositoryProvider.provide = { EmptyMockUserRepo() }
-        MarkerRepositoryProvider.provide = { EmptyMockMarkerRepo() }
-        HeatmapRepositoryProvider.provide = { EmptyMockHeatmapRepo() }
+        mockSearchGroupRepo = Mockito.mock(ISearchGroupRepository::class.java)
+        mockHeatmapRepo = Mockito.mock(IHeatmapRepository::class.java)
+        mockMarkerRepo = Mockito.mock(IMarkerRepository::class.java)
+        mockUserRepo = Mockito.mock(IUserRepository::class.java)
+
+        SearchGroupRepositoryProvider.provide = { mockSearchGroupRepo }
+        UserRepositoryProvider.provide = { mockUserRepo }
+        MarkerRepositoryProvider.provide = { mockMarkerRepo }
+        HeatmapRepositoryProvider.provide = { mockHeatmapRepo }
     }
 
     @Test
-    fun deleteSearchGroupCallsRemoveOfSearchGroupWithCorrectGroupId() {
-        val calledSearchGroupRepository = CountDownLatch(1)
-
-        lateinit var actualGroupIdInSearchGroup: String
-
-        val searchGroupRepo = object : EmptyMockSearchGroupRepo() {
-            override fun removeSearchGroup(searchGroupId: String) {
-                actualGroupIdInSearchGroup = searchGroupId
-                calledSearchGroupRepository.countDown()
-            }
-        }
-
-        SearchGroupRepositoryProvider.provide = { searchGroupRepo }
+    fun deleteSearchGroupRemovesEverythingLinked() {
+        val expectedGroupId = DUMMY_GROUP_ID
 
         SearchGroupDataManager().deleteSearchGroup(DUMMY_GROUP_ID)
 
-        calledSearchGroupRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-
-        assertThat(calledSearchGroupRepository.count, equalTo(0L))
-        assertThat(actualGroupIdInSearchGroup, equalTo(DUMMY_GROUP_ID))
-    }
-
-    @Test
-    fun deleteSearchGroupCallsRemoveOfUserWithCorrectGroupId() {
-        val calledUserRepository = CountDownLatch(1)
-
-        lateinit var actualGroupIdInUser: String
-
-        val userRepo = object : EmptyMockUserRepo() {
-            override fun removeAllUserOfSearchGroup(searchGroupId: String) {
-                actualGroupIdInUser = searchGroupId
-                calledUserRepository.countDown()
-            }
-        }
-
-        UserRepositoryProvider.provide = { userRepo }
-
-        SearchGroupDataManager().deleteSearchGroup(DUMMY_GROUP_ID)
-
-        calledUserRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-
-        assertThat(calledUserRepository.count, equalTo(0L))
-        assertThat(actualGroupIdInUser, equalTo(DUMMY_GROUP_ID))
-    }
-
-    @Test
-    fun deleteSearchGroupCallsRemoveOfMarkerWithCorrectGroupId() {
-        val calledMarkerRepository = CountDownLatch(1)
-
-        lateinit var actualGroupIdInMarker: String
-
-        val markerRepo = object : EmptyMockMarkerRepo() {
-            override fun removeAllMarkersOfSearchGroup(searchGroupId: String) {
-                actualGroupIdInMarker = searchGroupId
-                calledMarkerRepository.countDown()
-            }
-        }
-
-        MarkerRepositoryProvider.provide = { markerRepo }
-
-        SearchGroupDataManager().deleteSearchGroup(DUMMY_GROUP_ID)
-
-        calledMarkerRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-
-        assertThat(calledMarkerRepository.count, equalTo(0L))
-        assertThat(actualGroupIdInMarker, equalTo(DUMMY_GROUP_ID))
-    }
-
-    @Test
-    fun deleteSearchGroupCallsRemoveOfHeatmapWithCorrectGroupId() {
-        val calledHeatmapRepository = CountDownLatch(1)
-
-        lateinit var actualGroupIdInHeatmap: String
-
-        val heatmapRepo = object : EmptyMockHeatmapRepo() {
-            override fun removeAllHeatmapsOfSearchGroup(searchGroupId: String) {
-                actualGroupIdInHeatmap = searchGroupId
-                calledHeatmapRepository.countDown()
-            }
-        }
-
-        HeatmapRepositoryProvider.provide = { heatmapRepo }
-
-        SearchGroupDataManager().deleteSearchGroup(DUMMY_GROUP_ID)
-
-        calledHeatmapRepository.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-
-        assertThat(calledHeatmapRepository.count, equalTo(0L))
-        assertThat(actualGroupIdInHeatmap, equalTo(DUMMY_GROUP_ID))
+        Mockito.verify(mockSearchGroupRepo, Mockito.times(1)).removeSearchGroup(expectedGroupId)
+        Mockito.verify(mockUserRepo, Mockito.times(1)).removeAllUserOfSearchGroup(expectedGroupId)
+        Mockito.verify(mockHeatmapRepo, Mockito.times(1)).removeAllHeatmapsOfSearchGroup(expectedGroupId)
+        Mockito.verify(mockMarkerRepo, Mockito.times(1)).removeAllMarkersOfSearchGroup(expectedGroupId)
     }
 
     @Test
     fun getAllGroupsCallsGetGroupsIdsOfUserByEmailAndGetAllGroups() {
-        val userRepoCalled = CountDownLatch(1)
-        val searchGroupRepoCalled = CountDownLatch(2)
+        val dataAvailable = CountDownLatch(1)
+
         runOnUiThread {
             Auth.email.value = DUMMY_EMAIL
             Auth.loggedIn.value = true
         }
 
+        val expectedGroupId = DUMMY_GROUP_ID
+        val expectedEmail = DUMMY_EMAIL
         val expectedGroupIds = setOf(DUMMY_GROUP_ID)
-        val expectedGroups = listOf(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, null, null))
+        val expectedGroups = listOf(SearchGroupData(expectedGroupId, DUMMY_GROUP_NAME, null, null))
 
-        val userRepo = object : EmptyMockUserRepo() {
-            override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
-                userRepoCalled.countDown()
-                return MutableLiveData(expectedGroupIds)
-            }
-        }
-
-        val searchGroupRepo = object : EmptyMockSearchGroupRepo() {
-            override fun getAllGroups(): MutableLiveData<List<SearchGroupData>> {
-                searchGroupRepoCalled.countDown()
-                return MutableLiveData(expectedGroups)
-            }
-        }
-        SearchGroupRepositoryProvider.provide = { searchGroupRepo }
-        UserRepositoryProvider.provide = { userRepo }
+        Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(expectedEmail)).thenReturn(MutableLiveData(expectedGroupIds))
+        Mockito.`when`(mockSearchGroupRepo.getAllGroups()).thenReturn(MutableLiveData(expectedGroups))
 
         val groups = SearchGroupDataManager().getAllGroups()
 
-        userRepoCalled.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(userRepoCalled.count, equalTo(0L))
+        Mockito.verify(mockUserRepo, Mockito.timeout(ASYNC_CALL_TIMEOUT_MS).times(1)).getGroupIdsOfUserByEmail(expectedEmail)
 
         groups.observeForever {
             if (it != null) {
-                searchGroupRepoCalled.countDown()
+                dataAvailable.countDown()
             }
         }
 
-        searchGroupRepoCalled.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        assertThat(searchGroupRepoCalled.count, equalTo(0L))
+        dataAvailable.await(ASYNC_CALL_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+        assertThat(dataAvailable.count, equalTo(0L))
+
+        Mockito.verify(mockSearchGroupRepo, Mockito.timeout(ASYNC_CALL_TIMEOUT_MS).times(1)).getAllGroups()
 
         assertThat(groups.value, equalTo(expectedGroups))
     }
 
     @Test
     fun getGroupByIdCallsGetGroupByIdWithCorrectSearchGroupData() {
-        val called = CountDownLatch(1)
-
         val expectedGroupId = DUMMY_GROUP_ID
+        val expectedData = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME))
 
-        lateinit var actualGroupId: String
+        Mockito.`when`(mockSearchGroupRepo.getGroupById(expectedGroupId)).thenReturn(expectedData)
 
-        val searchGroupRepo = object : EmptyMockSearchGroupRepo() {
-            override fun getGroupById(groupId: String): MutableLiveData<SearchGroupData> {
-                called.countDown()
-                actualGroupId = groupId
-                return MutableLiveData()
-            }
-        }
-
-        SearchGroupRepositoryProvider.provide = { searchGroupRepo }
-
-        SearchGroupDataManager().getGroupById(expectedGroupId)
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-
-        assertThat(called.count, equalTo(0L))
-        assertThat(actualGroupId, equalTo(expectedGroupId))
+        assertThat(SearchGroupDataManager().getGroupById(expectedGroupId), equalTo(expectedData as LiveData<SearchGroupData>))
+        Mockito.verify(mockSearchGroupRepo, Mockito.times(1)).getGroupById(expectedGroupId)
     }
 
     @Test
     fun editGroupCallsUpdateGroup() {
-        val called = CountDownLatch(1)
-
         val expectedGroupData = SearchGroupData(DUMMY_GROUP_ID)
 
-        lateinit var actualGroupData: SearchGroupData
-
-        val searchGroupRepo = object : EmptyMockSearchGroupRepo() {
-            override fun updateGroup(searchGroupData: SearchGroupData) {
-                called.countDown()
-                actualGroupData = searchGroupData
-            }
-        }
-
-        SearchGroupRepositoryProvider.provide = { searchGroupRepo }
-
         SearchGroupDataManager().editGroup(expectedGroupData)
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
-        assertThat(called.count, equalTo(0L))
-        assertThat(actualGroupData, equalTo(expectedGroupData))
+        Mockito.verify(mockSearchGroupRepo, Mockito.times(1)).updateGroup(expectedGroupData)
     }
 
     @Test
     fun getOperatorsOfSearchGroupCallsGetOperatorsOfSearchGroupWithCorrectSearchGroupId() {
-        val called = CountDownLatch(1)
-
         val expectedGroupId = DUMMY_GROUP_ID
-        lateinit var actualGroupId: String
+        val expectedData = MutableLiveData(setOf<UserData>())
 
-        val userRepo = object : EmptyMockUserRepo() {
-            override fun getOperatorsOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
-                called.countDown()
-                actualGroupId = searchGroupId
-                return MutableLiveData()
-            }
-        }
+        Mockito.`when`(mockUserRepo.getOperatorsOfSearchGroup(expectedGroupId)).thenReturn(expectedData)
 
-        UserRepositoryProvider.provide = { userRepo }
-
-        SearchGroupDataManager().getOperatorsOfSearchGroup(expectedGroupId)
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-
-        assertThat(called.count, equalTo(0L))
-        assertThat(actualGroupId, equalTo(expectedGroupId))
+        assertThat(SearchGroupDataManager().getOperatorsOfSearchGroup(expectedGroupId), equalTo(expectedData as LiveData<Set<UserData>>))
+        Mockito.verify(mockUserRepo, Mockito.times(1)).getOperatorsOfSearchGroup(expectedGroupId)
     }
 
     @Test
     fun getRescuersOfSearchGroupCallsGetRescuersOfSearchGroupWithCorrectSearchGroupId() {
-        val called = CountDownLatch(1)
-
         val expectedGroupId = DUMMY_GROUP_ID
-        lateinit var actualGroupId: String
+        val expectedData = MutableLiveData(setOf<UserData>())
 
-        val userRepo = object : EmptyMockUserRepo() {
-            override fun getRescuersOfSearchGroup(searchGroupId: String): MutableLiveData<Set<UserData>> {
-                called.countDown()
-                actualGroupId = searchGroupId
-                return MutableLiveData()
-            }
-        }
+        Mockito.`when`(mockUserRepo.getRescuersOfSearchGroup(expectedGroupId)).thenReturn(expectedData)
 
-        UserRepositoryProvider.provide = { userRepo }
-
-        SearchGroupDataManager().getRescuersOfSearchGroup(expectedGroupId)
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-
-        assertThat(called.count, equalTo(0L))
-        assertThat(actualGroupId, equalTo(expectedGroupId))
+        assertThat(SearchGroupDataManager().getRescuersOfSearchGroup(expectedGroupId), equalTo(expectedData as LiveData<Set<UserData>>))
+        Mockito.verify(mockUserRepo, Mockito.times(1)).getRescuersOfSearchGroup(expectedGroupId)
     }
 
     @Test
     fun removeUserOfSearchGroupCallsRemoveUserFromSearchGroupWithCorrectGroupIdAndUserId() {
-        val called = CountDownLatch(1)
-
         val expectedGroupId = DUMMY_GROUP_ID
         val expectedUserId = DUMMY_USER_ID
 
-        lateinit var actualGroupId: String
-        lateinit var actualUserId: String
-
-        val userRepo = object : EmptyMockUserRepo() {
-            override fun removeUserFromSearchGroup(searchGroupId: String, userId: String) {
-                called.countDown()
-                actualGroupId = searchGroupId
-                actualUserId = userId
-            }
-        }
-
-        UserRepositoryProvider.provide = { userRepo }
-
         SearchGroupDataManager().removeUserOfSearchGroup(expectedGroupId, expectedUserId)
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
-        assertThat(called.count, equalTo(0L))
-        assertThat(actualGroupId, equalTo(expectedGroupId))
+        Mockito.verify(mockUserRepo, Mockito.times(1)).removeUserFromSearchGroup(expectedGroupId, expectedUserId)
     }
 
     @Test
     fun addUserToSearchgroupCallsAddUserToSearchGroupWithCorrectSearchGroupIdAndUser() {
-        val called = CountDownLatch(1)
-
         val expectedGroupId = DUMMY_GROUP_ID
         val expectedUser = UserData(email = DUMMY_EMAIL, role = DUMMY_ROLE)
 
-        lateinit var actualGroupId: String
-        lateinit var actualUser: UserData
-
-        val userRepo = object : EmptyMockUserRepo() {
-            override fun addUserToSearchGroup(searchGroupId: String, user: UserData) {
-                called.countDown()
-                actualGroupId = searchGroupId
-                actualUser = user
-            }
-        }
-
-        UserRepositoryProvider.provide = { userRepo }
-
         SearchGroupDataManager().addUserToSearchgroup(expectedGroupId, DUMMY_EMAIL, DUMMY_ROLE)
-        called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
 
-        assertThat(called.count, equalTo(0L))
-        assertThat(actualGroupId, equalTo(expectedGroupId))
-        assertThat(actualUser, equalTo(expectedUser))
+        Mockito.verify(mockUserRepo, Mockito.times(1)).addUserToSearchGroup(expectedGroupId, expectedUser)
     }
 
 //    @Test

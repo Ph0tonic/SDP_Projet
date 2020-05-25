@@ -10,17 +10,28 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.MockHeatmapDao
 import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.data.Role
+import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
+import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
+import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
+import ch.epfl.sdp.database.providers.UserRepositoryProvider
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.Auth
@@ -32,13 +43,17 @@ import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import timber.log.Timber
 
+@RunWith(AndroidJUnit4::class)
 class DroneStatusFragmentTest {
 
     companion object {
         private const val DEFAULT_ALTITUDE_DISPLAY = " 0.0 m"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
+        private const val MAP_LOADING_TIMEOUT = 1000L
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
@@ -70,15 +85,22 @@ class DroneStatusFragmentTest {
         }
 
         // Do not use the real database, only use the offline version on the device
-        //Firebase.database.goOffline()
+        // Firebase.database.goOffline()
+        SearchGroupRepository.daoProvider = { MockGroupDao() }
         HeatmapRepository.daoProvider = { MockHeatmapDao() }
         MarkerRepository.daoProvider = { MockMarkerDao() }
+        UserRepository.daoProvider = { MockUserDao() }
+
+        SearchGroupRepositoryProvider.provide = { SearchGroupRepository() }
+        HeatmapRepositoryProvider.provide = { HeatmapRepository() }
+        MarkerRepositoryProvider.provide = { MarkerRepository() }
+        UserRepositoryProvider.provide = { UserRepository() }
+
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         val targetContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
     }
-
 
     @Test
     fun updateDroneBatteryChangesDroneStatus() {
@@ -160,6 +182,7 @@ class DroneStatusFragmentTest {
     @Test
     fun updateDronePositionChangesDistToUser() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
+
         runOnUiThread {
             CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
             Drone.positionLiveData.value = LatLng(0.0, 0.0)
@@ -175,6 +198,7 @@ class DroneStatusFragmentTest {
     @Test
     fun updateUserPositionChangesDistToUser() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
+
         runOnUiThread {
             Drone.positionLiveData.value = LatLng(0.0, 0.0)
             CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
@@ -190,6 +214,7 @@ class DroneStatusFragmentTest {
     @Test
     fun updateBatteryLevelChangesBatteryLevelIcon() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
+
         runOnUiThread {
             Drone.batteryLevelLiveData.value = .00f
         }
@@ -229,6 +254,7 @@ class DroneStatusFragmentTest {
     @Test
     fun updateDronePositionChangesDistToHome() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
+
         runOnUiThread {
             Drone.homeLocationLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
             Drone.positionLiveData.value = LatLng(0.0, 0.0)
@@ -245,6 +271,7 @@ class DroneStatusFragmentTest {
     @Test
     fun updateHomePositionChangesDistToHome() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
+
         runOnUiThread {
             Drone.positionLiveData.value = LatLng(0.0, 0.0)
             Drone.homeLocationLiveData.value = Telemetry.Position(0.0, 0.0, 0f, 0f)
