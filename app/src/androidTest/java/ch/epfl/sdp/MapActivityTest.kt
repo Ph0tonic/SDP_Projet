@@ -340,7 +340,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun whenExceptionAppendInSearchAreaBuilderAToastIsDisplayed() {
+    fun whenExceptionHappenInSearchAreaBuilderAToastIsDisplayed() {
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
@@ -437,7 +437,7 @@ class MapActivityTest {
         }
 
         onView(withId(R.id.start_or_return_button)).perform(click())
-        //onView(withId(R.id.start_or_return_button)).perform(click())
+        onView(withId(R.id.start_or_return_button)).perform(click())
 
         onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
                 .check(matches(isDisplayed()))
