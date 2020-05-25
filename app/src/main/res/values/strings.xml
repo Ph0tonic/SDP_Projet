@@ -74,6 +74,9 @@
     <string name="menu_home">Home</string>
     <string name="menu_maps_managing">Maps managing</string>
 
+    <!-- search group selection-->
+    <string name="group_selection_activity_title">Select group</string>
+
     <!-- Search group edition -->
     <string name="default_group_name">Group Name</string>
     <string name="base_location_label">Base Location</string>
@@ -87,6 +90,7 @@
     <string name="enter_a_gmail_address">Enter a gmail address</string>
     <string name="add_a_user">Add a user</string>
     <string name="cancel">Cancel</string>
+    <string name="group_edition_activity_title">Edit group</string>
 
 
     <!-- Dronew status display -->
