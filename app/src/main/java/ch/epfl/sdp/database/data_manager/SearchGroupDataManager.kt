@@ -63,9 +63,7 @@ class SearchGroupDataManager {
         userRepository.removeUserFromSearchGroup(searchGroupId, userId)
     }
 
-    fun addUserToSearchgroup(searchGroupId: String, email: String, role: Role) {
-        val user = UserData(email)
-        user.role = role
-        userRepository.addUserToSearchGroup(searchGroupId, user)
+    fun addUserToSearchGroup(searchGroupId: String, email: String, role: Role) {
+        userRepository.addUserToSearchGroup(searchGroupId, UserData(email, role = role))
     }
 }
