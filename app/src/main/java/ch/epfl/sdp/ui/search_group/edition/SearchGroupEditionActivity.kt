@@ -51,7 +51,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         }
     }
 
-    fun loadInitialData() {
+    private fun loadInitialData() {
         findViewById<Button>(R.id.search_group_edition_create_or_save_button).text = getString(R.string.save_group_changes)
         searchGroupManager.getGroupById(groupId!!).observe(this, Observer {
             if (it != null) {
@@ -83,7 +83,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         //TODO: Ask for confirmation
         searchGroupManager.deleteSearchGroup(groupId!!)
         finish()
-        Toast.makeText(this, "Search group deleted successfully", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.search_group_deleted), Toast.LENGTH_SHORT).show()
     }
 
     fun onGroupEditCanceled(view: View) {
@@ -108,18 +108,19 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         finish()
     }
 
-    fun addUser(role: Role) {
+    private fun addUser(role: Role) {
         val dialog = AddUserDialogFragment(role, object : UserAddListener {
-            override fun addUser(name: String, role: Role) {
-                searchGroupManager.addUserToSearchgroup(groupId!!, name, role)
+            override fun addUser(email: String, role: Role) {
+                searchGroupManager.addUserToSearchGroup(groupId!!, email, role)
             }
         })
-        dialog.show(supportFragmentManager, "Add user")
+        dialog.show(supportFragmentManager, getString(R.string.add_a_user))
     }
 
     fun addOperator(view: View) {
         addUser(Role.OPERATOR)
     }
+
     fun addRescuer(view: View) {
         addUser(Role.RESCUER)
     }

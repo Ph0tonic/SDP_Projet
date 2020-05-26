@@ -161,7 +161,7 @@ class SearchGroupDataManagerTest {
         val expectedGroupId = DUMMY_GROUP_ID
         val expectedUser = UserData(email = DUMMY_EMAIL, role = DUMMY_ROLE)
 
-        SearchGroupDataManager().addUserToSearchgroup(expectedGroupId, DUMMY_EMAIL, DUMMY_ROLE)
+        SearchGroupDataManager().addUserToSearchGroup(expectedGroupId, DUMMY_EMAIL, DUMMY_ROLE)
 
         Mockito.verify(mockUserRepo, Mockito.times(1)).addUserToSearchGroup(expectedGroupId, expectedUser)
     }

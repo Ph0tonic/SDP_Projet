@@ -118,5 +118,7 @@
     <string name="button_menu_desc">Open side menu</string>
     <string name="home_background">home background</string>
     <string name="fly2find_logo_desc">Fly2Find logo</string>
+    <string name="invalid_email_address">Invalid email address</string>
+    <string name="search_group_deleted">Search group deleted successfully</string>
 
 </resources>
