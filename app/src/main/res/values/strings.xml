@@ -48,8 +48,10 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
-    <string name="pref_value_strategy_zigzag">Zigzag</string>
-    <string name="pref_value_strategy_spiral">Spiral</string>
+    <string name="pref_value_strategy_zigzag" translatable="false">Zigzag</string>
+    <string name="pref_value_strategy_spiral" translatable="false">Spiral</string>
+    <string name="display_strategy_zigzag">Zigzag</string>
+    <string name="display_strategy_spiral">Spiral</string>
     <string name="altitude_6m">6 meters</string>
     <string name="altitude_8m">8 meters</string>
     <string name="altitude_10m">10 meters</string>

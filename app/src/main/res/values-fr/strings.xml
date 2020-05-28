@@ -20,8 +20,6 @@
     <string name="action_settings">Paramètres</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="gps_refresh_rate_header">Fréquence GPS</string>
-    <string name="pref_value_strategy_zigzag">Zig-zag</string>
-    <string name="pref_value_strategy_spiral">Spirale</string>
     <string name="select_search_group">Groupe de recherche</string>
     <string name="start_mission">Démarrer la mission</string>
     <string name="work_offline">Travailler hors-ligne</string>
@@ -92,4 +90,6 @@
     <string name="enter_your_desired_group_name">Entrez le nom de votre groupe</string>
     <string name="create_a_search_group">Créer un groupe de recherche</string>
     <string name="search_group_name_cannot_be_empty">Le nom du groupe de recherche ne peut être vide</string>
+    <string name="display_strategy_zigzag">Zig-zag</string>
+    <string name="display_strategy_spiral">Spirale</string>
 </resources>
