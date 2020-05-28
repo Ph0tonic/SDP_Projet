@@ -89,4 +89,7 @@
     <string name="rate_500ms">500 ms</string>
     <string name="rate_750ms">750 ms</string>
     <string name="rate_1000ms">1000 ms</string>
+    <string name="enter_your_desired_group_name">Entrez le nom de votre groupe</string>
+    <string name="create_a_search_group">Créer un groupe de recherche</string>
+    <string name="search_group_name_cannot_be_empty">Le nom du groupe de recherche ne peut être vide</string>
 </resources>
