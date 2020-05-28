@@ -93,7 +93,7 @@
     <string name="group_edition_activity_title">Edit group</string>
 
 
-    <!-- Dronew status display -->
+    <!-- Drone status display -->
     <string name="battery_description_tag">Battery icon</string>
     <string name="altitude_description_tag">Altitude icon</string>
     <string name="speed_description_tag">Speed icon</string>
@@ -125,5 +125,8 @@
     <string name="fly2find_logo_desc">Fly2Find logo</string>
     <string name="invalid_email_address">Invalid email address</string>
     <string name="search_group_deleted">Search group deleted successfully</string>
+
+    <!-- Settings menu selection -->
+    <string name="altitude_6m">6 meters</string>
 
 </resources>
