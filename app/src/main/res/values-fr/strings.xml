@@ -84,4 +84,9 @@
     <string name="altitude_10m">10 mètres</string>
     <string name="altitude_12m">12 mètres</string>
     <string name="altitude_14m">14 mètres</string>
+    <string name="rate_100ms">100 ms</string>
+    <string name="rate_200ms">200 ms</string>
+    <string name="rate_500ms">500 ms</string>
+    <string name="rate_750ms">750 ms</string>
+    <string name="rate_1000ms">1000 ms</string>
 </resources>
