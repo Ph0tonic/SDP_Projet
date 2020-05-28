@@ -102,7 +102,6 @@ class FirebaseGroupDaoTest {
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
             override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
-                Log.w("FIREBASE", "user added")
                 actualAddedGroup = dataSnapshot.getValue(SearchGroupData::class.java)!!
                 actualAddedGroup.uuid = dataSnapshot.key!!
                 called.countDown()
@@ -114,12 +113,13 @@ class FirebaseGroupDaoTest {
 
         val dao = FirebaseGroupDao()
 
-        dao.createGroup(expectedAddedGroup)
+        val groupId = dao.createGroup(expectedAddedGroup)
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(called.count, equalTo(0L))
 
         // Uuid is generated automatically so we don't test
         expectedAddedGroup.uuid = actualAddedGroup.uuid
+        assertThat(groupId, equalTo(expectedAddedGroup.uuid))
         assertThat(actualAddedGroup, equalTo(expectedAddedGroup))
         ref.removeEventListener(listener)
     }
