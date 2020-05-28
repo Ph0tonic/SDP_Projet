@@ -4,13 +4,6 @@
     <string name="auth_signout">Déconnexion</string>
     <string name="sign_in_error">Échec de la connexion</string>
     <string name="sign_out_success">Déconnecté</string>
-    <string name="pref_key_latitude">Latitude</string>
-    <string name="pref_key_longitude">Longitude</string>
-    <string name="pref_key_zoom">Zoom</string>
-    <string name="pref_key_gps_refresh_rate">Freq. GPS</string>
-    <string name="pref_key_current_group_id">ID du groupe</string>
-    <string name="pref_key_drone_altitude">Altitude du drone</string>
-    <string name="pref_key_overflight_strategy">Stratégie de survol</string>
     <string name="drone_user_error">Position de l\'utilisateur non disponible</string>
     <string name="drone_home_error">Position de la base introuvable</string>
     <string name="drone_user_success">Retour à l\'utilisateur</string>
