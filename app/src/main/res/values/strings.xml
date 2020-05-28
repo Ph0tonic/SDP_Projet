@@ -1,10 +1,10 @@
 <resources>
     <!-- Licence keys -->
-    <string name="mapbox_access_token">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
-    <string name="google_signin_key">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
+    <string name="google_signin_key" translatable="false">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
 
     <!-- App name -->
-    <string name="app_name">Fly2Find</string>
+    <string name="app_name" translatable="false">Fly2Find</string>
 
     <!-- Auth system -->
     <string name="auth_signin">Sign in</string>
@@ -13,13 +13,13 @@
     <string name="sign_out_success">Sign out successful</string>
 
     <!-- Preferences keys -->
-    <string name="pref_key_latitude" translatable="false">latitude</string>
-    <string name="pref_key_longitude" translatable="false">longitude</string>
-    <string name="pref_key_zoom" translatable="false">zoom</string>
-    <string name="pref_key_gps_refresh_rate" translatable="false">gps_refresh</string>
-    <string name="pref_key_current_group_id" translatable="false">current_group_id</string>
-    <string name="pref_key_drone_altitude" translatable="false">drone_altitude</string>
-    <string name="pref_key_overflight_strategy" translatable="false">overflight_strategy</string>
+    <string name="pref_key_latitude">latitude</string>
+    <string name="pref_key_longitude">longitude</string>
+    <string name="pref_key_zoom">zoom</string>
+    <string name="pref_key_gps_refresh_rate">gps_refresh</string>
+    <string name="pref_key_current_group_id">current_group_id</string>
+    <string name="pref_key_drone_altitude">drone_altitude</string>
+    <string name="pref_key_overflight_strategy">overflight_strategy</string>
 
     <!-- Mapbox State -->
     <string name="map_ready" translatable="false">MAP READY</string>
