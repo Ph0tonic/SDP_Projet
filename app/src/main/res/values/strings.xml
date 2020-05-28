@@ -11,6 +11,7 @@
     <string name="auth_signout">Sign out</string>
     <string name="sign_in_error">Could not sign in</string>
     <string name="sign_out_success">Sign out successful</string>
+    <string name="invalid_email_address">Invalid email address</string>
 
     <!-- Preferences keys -->
     <string name="pref_key_latitude">latitude</string>
@@ -30,14 +31,18 @@
     <!-- Map Activity -->
     <string name="intent_key_group_id" translatable="false">group_id</string>
     <string name="intent_key_role" translatable="false">role</string>
-
     <string name="drone_home_error">No Home Available</string>
-
     <string name="drone_user_error">User position not available</string>
     <string name="drone_user_success">Returning to user</string>
     <string name="drone_home_success">Returning home</string>
     <string name="drone_mission_success">Mission started successfully</string>
     <string name="drone_mission_error">Failed to start Mission</string>
+    <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
+    <string name="switch_video">Switch video</string>
+    <string name="ReturnDroneDialogFragment">Return Drone Home</string>
+    <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ?</string>
+    <string name="ReturnDroneDialogHome">Home</string>
+    <string name="ReturnDroneDialogUser">User</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
@@ -45,12 +50,26 @@
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
     <string name="pref_value_strategy_zigzag">Zigzag</string>
     <string name="pref_value_strategy_spiral">Spiral</string>
+    <string name="altitude_6m">6 meters</string>
+    <string name="altitude_8m">8 meters</string>
+    <string name="altitude_10m">10 meters</string>
+    <string name="altitude_12m">12 meters</string>
+    <string name="altitude_14m">14 meters</string>
+    <string name="drone_altitude_header">Default drone altitude</string>
+    <string name="overflight_strategy_header">Default Overflight Strategy</string>
 
     <!-- Main Activity -->
     <string name="select_search_group">Search group</string>
     <string name="start_mission">Start mission</string>
     <string name="work_offline">Work offline</string>
     <string name="warning_no_group_selected">You must select a group to start a mission</string>
+    <string name="no_info">No data</string>
+    <string name="not_connected_message">You are currently not connected to the drone</string>
+    <string name="button_settings_desc">Settings button</string>
+    <string name="button_menu_desc">Open side menu</string>
+    <string name="home_background">home background</string>
+    <string name="fly2find_logo_desc">Fly2Find logo</string>
+    <string name="search_group_deleted">Search group deleted successfully</string>
 
     <!-- Offline map -->
     <string name="end_progress_success">Region successfully downloaded.</string>
@@ -74,10 +93,8 @@
     <string name="menu_home">Home</string>
     <string name="menu_maps_managing">Maps managing</string>
 
-    <!-- search group selection-->
+    <!-- Search Group -->
     <string name="group_selection_activity_title">Select group</string>
-
-    <!-- Search group edition -->
     <string name="default_group_name">Group Name</string>
     <string name="base_location_label">Base Location</string>
     <string name="group_edition_rescuers_label">Rescuers</string>
@@ -92,45 +109,11 @@
     <string name="cancel">Cancel</string>
     <string name="group_edition_activity_title">Edit group</string>
 
-
     <!-- Drone status display -->
     <string name="battery_description_tag">Battery icon</string>
     <string name="altitude_description_tag">Altitude icon</string>
     <string name="speed_description_tag">Speed icon</string>
     <string name="distance_to_user_description_tag">Distance to user icon</string>
     <string name="distance_to_home_description_tag">Distance to home icon</string>
-
-    <!-- TODO reorganize strings -->
-    <!-- Preference Titles -->
-
-    <string name="not_connected_message">You are currently not connected to the drone</string>
-    <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
-
-    <string name="switch_video">Switch video</string>
-
-    <string name="no_info">No data</string>
-
-    <string name="drone_altitude_header">Default drone altitude</string>
-    <string name="overflight_strategy_header">Default Overflight Strategy</string>
-    
-    <string name="ReturnDroneDialogFragment">Return Drone Home</string>
-    <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ? </string>
-    <string name="ReturnDroneDialogHome">Home</string>
-    <string name="ReturnDroneDialogUser">User</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="button_settings_desc">Settings button</string>
-    <string name="button_menu_desc">Open side menu</string>
-    <string name="home_background">home background</string>
-    <string name="fly2find_logo_desc">Fly2Find logo</string>
-    <string name="invalid_email_address">Invalid email address</string>
-    <string name="search_group_deleted">Search group deleted successfully</string>
-
-    <!-- Settings menu selection -->
-    <string name="altitude_6m">6 meters</string>
-    <string name="altitude_8m">8 meters</string>
-    <string name="altitude_10m">10 meters</string>
-    <string name="altitude_12m">12 meters</string>
-    <string name="altitude_14m">14 meters</string>
 
 </resources>
