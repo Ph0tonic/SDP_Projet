@@ -78,4 +78,5 @@
     <string name="menu_home">Accueil</string>
     <string name="download_region_dialog_fragment">Fragment de téléchargement de région</string>
     <string name="list_offline_region_dialog_fragment">Fragment de liste des régions hors-ligne</string>
+    <string name="ReturnDroneDialogFragment">Renvoyer le drone à la base</string>
 </resources>

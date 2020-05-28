@@ -113,7 +113,7 @@
     <string name="drone_altitude_header">Default drone altitude</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
     
-    <string name="ReturnDroneDialogFragment">Return Home Drone</string>
+    <string name="ReturnDroneDialogFragment">Return Drone Home</string>
     <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ? </string>
     <string name="ReturnDroneDialogHome">Home</string>
     <string name="ReturnDroneDialogUser">User</string>
