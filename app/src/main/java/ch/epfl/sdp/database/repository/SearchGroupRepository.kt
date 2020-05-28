@@ -1,7 +1,6 @@
 package ch.epfl.sdp.database.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.database.dao.FirebaseGroupDao
 import ch.epfl.sdp.database.dao.SearchGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
@@ -24,7 +23,7 @@ class SearchGroupRepository : ISearchGroupRepository {
         return dao.getGroupById(groupId)
     }
 
-    override fun createGroup(searchGroupData: SearchGroupData) {
+    override fun createGroup(searchGroupData: SearchGroupData): String {
         return dao.createGroup(searchGroupData)
     }
 

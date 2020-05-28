@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +34,8 @@ class SearchGroupEditionActivity : AppCompatActivity() {
         }
     }
 
-    private var groupId: String? = null
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var groupId: String? = null
     private var createGroup = true
 
     private val searchGroupManager = SearchGroupDataManager()
