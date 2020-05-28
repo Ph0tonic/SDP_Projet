@@ -125,5 +125,8 @@
     <string name="fly2find_logo_desc">Fly2Find logo</string>
     <string name="invalid_email_address">Invalid email address</string>
     <string name="search_group_deleted">Search group deleted successfully</string>
+    <string name="enter_your_desired_group_name">Enter your desired group name</string>
+    <string name="create_a_search_group">Create a search group</string>
+    <string name="search_group_name_cannot_be_empty">Search group name cannot be empty.</string>
 
 </resources>

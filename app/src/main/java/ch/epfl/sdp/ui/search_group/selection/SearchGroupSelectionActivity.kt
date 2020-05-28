@@ -69,7 +69,12 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGr
     }
 
     fun addGroup(view: View) {
-        val intent = Intent(this, SearchGroupEditionActivity::class.java)
-        startActivity(intent)
+        val dialog = CreateSearchGroupDialogFragment(object : CreateSearchGroupListener {
+            override fun createGroup(name: String) {
+                val groupId = searchGroupManager.createSearchGroup(name)
+                editGroup(SearchGroupData(uuid = groupId))
+            }
+        })
+        dialog.show(supportFragmentManager, getString(R.string.create_a_search_group))
     }
 }

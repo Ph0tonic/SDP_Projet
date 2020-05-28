@@ -27,9 +27,9 @@ class SearchGroupDataManager {
     }
 
     fun createSearchGroup(name: String): String {
-        val groupId = searchGroupRepository.createGroup(SearchGroupData(null, name))
-        TODO("Not implemented yet need to add new user to search group")
-//        return groupId
+        val groupId = searchGroupRepository.createGroup(SearchGroupData(name = name))
+        userRepository.addUserToSearchGroup(groupId, UserData(Auth.email.value!!, role = Role.OPERATOR))
+        return groupId
     }
 
     fun getAllGroups(): LiveData<List<SearchGroupData>> {

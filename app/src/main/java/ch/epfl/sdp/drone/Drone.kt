@@ -28,7 +28,7 @@ object Drone {
 
     // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
-    const val DEFAULT_ALTITUDE: Float = 20.0F
+    const val DEFAULT_ALTITUDE: Float = 10.0F
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
     private const val WAIT_TIME: Long = 200

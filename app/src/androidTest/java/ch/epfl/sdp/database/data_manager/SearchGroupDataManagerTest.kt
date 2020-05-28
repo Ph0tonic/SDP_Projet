@@ -166,13 +166,22 @@ class SearchGroupDataManagerTest {
         Mockito.verify(mockUserRepo, Mockito.times(1)).addUserToSearchGroup(expectedGroupId, expectedUser)
     }
 
-//    @Test
-//    fun createSearchGroupCallsCreateSearchGroup() {
-//        TODO("Not implemented yet")
-//    }
-//
-//    @Test
-//    fun createSearchGroupCallsCreateUser() {
-//        TODO("Not implemented yet")
-//    }
+    @Test
+    fun createSearchGroupCallsCreateSearchGroupAndAddUser() {
+        val expectedName = DUMMY_GROUP_NAME
+        val expectedGroupId = DUMMY_GROUP_ID
+        val expectedGroup = SearchGroupData(name = expectedName)
+        val expectedUser = UserData(email = DUMMY_EMAIL, role = Role.OPERATOR)
+
+        runOnUiThread {
+            Auth.email.value = expectedUser.email
+            Auth.loggedIn.value = true
+        }
+
+        Mockito.`when`(mockSearchGroupRepo.createGroup(expectedGroup)).thenReturn(expectedGroupId)
+        assertThat(SearchGroupDataManager().createSearchGroup(expectedName), equalTo(expectedGroupId))
+
+        Mockito.verify(mockSearchGroupRepo, Mockito.times(1)).createGroup(expectedGroup)
+        Mockito.verify(mockUserRepo, Mockito.times(1)).addUserToSearchGroup(expectedGroupId, expectedUser)
+    }
 }

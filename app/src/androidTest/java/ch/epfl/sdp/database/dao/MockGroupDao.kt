@@ -15,7 +15,7 @@ class MockGroupDao(data: List<SearchGroupData> = emptyList()) : SearchGroupDao {
         TODO("Not yet implemented")
     }
 
-    override fun createGroup(searchGroupData: SearchGroupData) {
+    override fun createGroup(searchGroupData: SearchGroupData): String {
         TODO("Not yet implemented")
     }
 

@@ -61,11 +61,13 @@ class SearchGroupRepositoryTest {
     @Test
     fun createGroupCallsCreateGroupDao() {
         val expectedData = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedGroupId = DUMMY_GROUP_ID
 
         val dao = Mockito.mock(SearchGroupDao::class.java)
+        Mockito.`when`(dao.createGroup(expectedData)).thenReturn(expectedGroupId)
 
         SearchGroupRepository.daoProvider = { dao }
-        SearchGroupRepository().createGroup(expectedData)
+        assertThat(SearchGroupRepository().createGroup(expectedData), equalTo(expectedGroupId))
 
         Mockito.verify(dao, Mockito.times(1)).createGroup(expectedData)
     }
