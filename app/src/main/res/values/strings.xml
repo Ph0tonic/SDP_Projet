@@ -128,5 +128,9 @@
 
     <!-- Settings menu selection -->
     <string name="altitude_6m">6 meters</string>
+    <string name="altitude_8m">8 meters</string>
+    <string name="altitude_10m">10 meters</string>
+    <string name="altitude_12m">12 meters</string>
+    <string name="altitude_14m">14 meters</string>
 
 </resources>
