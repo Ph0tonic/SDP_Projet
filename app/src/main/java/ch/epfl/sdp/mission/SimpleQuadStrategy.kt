@@ -71,9 +71,9 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
     private fun numPointsFromDist(dist: Double) = ceil(dist / maxDistBetweenLines).toInt()
 
     private fun computeMaxDist(waypoints: List<LatLng>, orientation: Orientation): Double {
-        return if(orientation.isHorizontal()){
+        return if (orientation.isHorizontal()) {
             maxDistWithIndex(waypoints, 0, 1, 3, 2)
-        }else{
+        } else {
             maxDistWithIndex(waypoints, 0, 3, 1, 2)
         }
     }
