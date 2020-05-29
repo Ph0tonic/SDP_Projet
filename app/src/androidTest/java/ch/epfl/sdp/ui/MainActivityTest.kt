@@ -23,6 +23,7 @@ import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
@@ -54,6 +55,7 @@ class MainActivityTest {
         runOnUiThread {
             MainDataManager.goOffline()
         }
+        DroneInstanceMock.setupDefaultMocks()
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 

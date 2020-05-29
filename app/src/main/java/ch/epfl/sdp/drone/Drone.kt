@@ -122,12 +122,14 @@ object Drone {
      * Pauses the current Mission
      */
     private fun pauseMission(): Disposable {
+        Log.d("DEBUG1", "PAUSE MISSION CALL")
         this.isMissionPausedLiveData.postValue(true)
         return getConnectedInstance()
                 .andThen(instance.mission.pauseMission())
                 .subscribe(
-                        { ToastHandler().showToast(R.string.drone_pause_success, Toast.LENGTH_SHORT) },
-                        {
+                        { Log.d("DEBUG1", "PAUSE COMPLETE")
+                            ToastHandler().showToast(R.string.drone_pause_success, Toast.LENGTH_SHORT) },
+                        {Log.d("DEBUG1", "PAUSE ERROR")
                             this.isMissionPausedLiveData.postValue(false)
                             ToastHandler().showToast(R.string.drone_pause_error, Toast.LENGTH_SHORT)
                         })

@@ -38,6 +38,7 @@ import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
@@ -88,6 +89,7 @@ class MapActivityTest {
     @Throws(Exception::class)
     fun before() {
         MainDataManager.goOffline()
+        DroneInstanceMock.setupDefaultMocks()
         //Fake login
         runOnUiThread {
             Auth.accountId.value = FAKE_ACCOUNT_ID

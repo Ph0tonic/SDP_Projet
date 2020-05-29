@@ -1,13 +1,19 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.drone
 
-import ch.epfl.sdp.drone.DroneUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import kotlin.random.Random.Default.nextDouble
 
 class DroneUtilsTest {
+
+    @Before
+    fun before() {
+        DroneInstanceMock.setupDefaultMocks()
+    }
+
 
     @Test
     fun generateMissionItemTest() {
