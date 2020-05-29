@@ -43,7 +43,6 @@ class VlcFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_vlc, container, false)
-//        root.findViewById<Button>(R.id.switch_button).setOnClickListener { v -> switchVideo(v) }
         return root
     }
 
