@@ -34,13 +34,13 @@
 
     <string name="drone_home_error">No Home Available</string>
 
-    <string name="drone_user_error" translatable="true">User position not available</string>
-    <string name="drone_user_success" translatable="true">Returning to user</string>
-    <string name="drone_home_success" translatable="true">Returning home</string>
-    <string name="drone_mission_success" translatable="true">Mission started successfully</string>
-    <string name="drone_mission_error" translatable="true">Failed to start Mission</string>
-    <string name="drone_pause_success" translatable="true">Mission Paused</string>
-    <string name="drone_pause_error" translatable="true">Failed to pause Mission</string>
+    <string name="drone_user_error">User position not available</string>
+    <string name="drone_user_success">Returning to user</string>
+    <string name="drone_home_success">Returning home</string>
+    <string name="drone_mission_success">Mission started successfully</string>
+    <string name="drone_mission_error">Failed to start Mission</string>
+    <string name="drone_pause_success">Mission Paused</string>
+    <string name="drone_pause_error">Failed to pause Mission</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>

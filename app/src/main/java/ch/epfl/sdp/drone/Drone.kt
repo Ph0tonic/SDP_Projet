@@ -1,5 +1,6 @@
 package ch.epfl.sdp.drone
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
@@ -8,7 +9,6 @@ import ch.epfl.sdp.ui.toast.ToastHandler
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
-import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
@@ -21,10 +21,6 @@ import kotlin.math.sqrt
 
 
 object Drone {
-    private const val USE_REMOTE_BACKEND = true // False for running MavsdkServer locally, True to connect to a remote instance
-    private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" //IP of the remote instance
-    private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
-
     // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
     const val DEFAULT_ALTITUDE: Float = 10.0F
@@ -50,21 +46,13 @@ object Drone {
         positionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
     }
 
-    private val instance: System
+    private val instance: System = DroneInstanceProvider.provide()
 
     init {
-        instance = if (USE_REMOTE_BACKEND) {
-            System(REMOTE_BACKEND_IP_ADDRESS, REMOTE_BACKEND_PORT)
-        } else {
-            // Works for armeabi-v7a and arm64-v8a (not x86 or x86_64)
-            val mavsdkServer = MavsdkServer()
-            val mavsdkServerPort = mavsdkServer.run()
-            System("localhost", mavsdkServerPort)
-        }
-
-        disposables.add(instance.telemetry.flightMode.distinctUntilChanged()
+        disposables.add(instance.telemetry.flightMode
                 .subscribe(
                         { flightMode ->
+                            Log.d("DEBUG22", "---------------FLIGHTMODE : " + flightMode)
                             if (flightMode == Telemetry.FlightMode.HOLD) isMissionPausedLiveData.postValue(true)
                             if (flightMode == Telemetry.FlightMode.MISSION) isMissionPausedLiveData.postValue(false)
                         },

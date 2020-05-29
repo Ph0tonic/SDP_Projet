@@ -486,6 +486,7 @@ class MapActivityTest {
 
         runOnUiThread {
             Drone.isFlyingLiveData.value = true
+            Drone.isConnectedLiveData.value = false
         }
 
         onView(withId(R.id.floating_menu_button)).perform(click())

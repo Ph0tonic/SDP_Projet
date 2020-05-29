@@ -154,7 +154,7 @@ class ReturnDroneDialogFragmentTest {
                 .perform(click())
 
         // Test that the toast is displayed
-        onView(withText(applicationContext().getString(R.string.drone_user_error)))
+        onView(withText(applicationContext().getString(R.string.drone_home_success)))
                 .inRoot(withDecorView(not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
 
