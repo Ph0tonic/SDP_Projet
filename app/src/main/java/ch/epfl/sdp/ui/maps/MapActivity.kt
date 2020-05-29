@@ -264,7 +264,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val currentZoom = mapboxMap.cameraPosition.zoom
         if (Drone.positionLiveData.value != null) {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Drone.positionLiveData.value!!,
-                    if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
+                    if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else 19.00))
         }
     }
 
@@ -291,6 +291,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
         Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        missionBuilder = MissionBuilder()
+        missionPainter.color(Color.BLUE)
+        missionPainter = MapboxMissionPainter(mapView, mapboxMap, mapboxMap.style!!)
+        missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
     }
 
     /**

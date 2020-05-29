@@ -37,6 +37,11 @@ class MapboxMissionPainter(mapView: MapView, mapboxMap: MapboxMap, style: Style)
         }
     }
 
+    fun color(color : Int){
+        lineArea.lineColor = ColorUtils.colorToRgbaString(color)
+        lineManager.update(lineArea)
+    }
+
     override fun onDestroy() {
         lineManager.deleteAll()
         lineManager.onDestroy()
