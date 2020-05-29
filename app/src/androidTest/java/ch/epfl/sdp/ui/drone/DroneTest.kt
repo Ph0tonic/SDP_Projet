@@ -10,11 +10,14 @@ import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
+import io.reactivex.Flowable
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 
 
 @RunWith(AndroidJUnit4::class)
@@ -115,6 +118,14 @@ class DroneTest {
         Drone.isFlyingLiveData.value = true
         Drone.isMissionPausedLiveData.value = false
 
+        val telemetryMocker = mock(Telemetry::class.java)
+        `when`(telemetryMocker.flightMode)
+                .thenReturn(Flowable.fromArray(
+                        Telemetry.FlightMode.LAND,
+                        Telemetry.FlightMode.MISSION,
+                        Telemetry.FlightMode.HOLD
+                ))
+
         Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
 
         assertThat(Drone.isMissionPausedLiveData.value , `is`(true))
@@ -124,6 +135,14 @@ class DroneTest {
     fun canRestartMissionAfterPause(){
         Drone.isFlyingLiveData.value = true
         Drone.isMissionPausedLiveData.value = false
+
+        val telemetryMocker = mock(Telemetry::class.java)
+        `when`(telemetryMocker.flightMode)
+                .thenReturn(Flowable.fromArray(
+                        Telemetry.FlightMode.LAND,
+                        Telemetry.FlightMode.MISSION,
+                        Telemetry.FlightMode.HOLD
+                ))
 
         Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
         Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))

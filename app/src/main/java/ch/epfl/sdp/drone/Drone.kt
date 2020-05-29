@@ -30,7 +30,7 @@ object Drone {
     const val DEFAULT_ALTITUDE: Float = 10.0F
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
-    private const val WAIT_TIME: Long = 1
+    private const val WAIT_TIME_S: Long = 1
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val positionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -228,7 +228,7 @@ object Drone {
                         { pos ->
                             val isRightPos = LatLng(pos.latitudeDeg, pos.longitudeDeg).distanceTo(returnLocation).roundToInt() == 0
                             val isStopped = speedLiveData.value?.roundToInt() == 0
-                            if (isRightPos.and(isStopped)) instance.action.land().blockingAwait(WAIT_TIME, TimeUnit.SECONDS)
+                            if (isRightPos.and(isStopped)) instance.action.land().blockingAwait(WAIT_TIME_S, TimeUnit.SECONDS)
                             this.isMissionPausedLiveData.postValue(true)
                         },
                         { e -> Timber.e("ERROR LANDING : $e") }))

@@ -589,7 +589,7 @@ class MapActivityTest {
         }
         mActivityRule.launchActivity(Intent())
 
-        onView(withId(R.id.start_or_return_button)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.start_or_pause_button)).check(matches(not(isDisplayed())))
     }
 
     @Test
