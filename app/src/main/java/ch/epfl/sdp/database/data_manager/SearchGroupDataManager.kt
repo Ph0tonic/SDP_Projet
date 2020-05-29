@@ -32,11 +32,13 @@ class SearchGroupDataManager {
         return groupId
     }
 
-    fun getAllGroups(): LiveData<List<SearchGroupData>> {
+    fun getAllGroups(): LiveData<List<Pair<SearchGroupData, Role>>> {
         return Transformations.switchMap(groupIdsOfUser) { ids ->
             Transformations.map(searchGroupRepository.getAllGroups()) { groups ->
                 groups.filter { group ->
-                    ids.contains(group.uuid)
+                    ids.containsKey(group.uuid)
+                }.map { group ->
+                    Pair(group, ids[group.uuid]!!)
                 }
             }
         }

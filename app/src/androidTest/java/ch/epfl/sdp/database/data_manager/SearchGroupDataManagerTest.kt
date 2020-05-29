@@ -80,8 +80,9 @@ class SearchGroupDataManagerTest {
 
         val expectedGroupId = DUMMY_GROUP_ID
         val expectedEmail = DUMMY_EMAIL
-        val expectedGroupIds = setOf(DUMMY_GROUP_ID)
+        val expectedGroupIds = mapOf(Pair(DUMMY_GROUP_ID, Role.OPERATOR))
         val expectedGroups = listOf(SearchGroupData(expectedGroupId, DUMMY_GROUP_NAME, null, null))
+        val expectedResults = listOf(Pair(expectedGroups[0], Role.OPERATOR))
 
         Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(expectedEmail)).thenReturn(MutableLiveData(expectedGroupIds))
         Mockito.`when`(mockSearchGroupRepo.getAllGroups()).thenReturn(MutableLiveData(expectedGroups))
@@ -91,7 +92,7 @@ class SearchGroupDataManagerTest {
         Mockito.verify(mockUserRepo, Mockito.timeout(ASYNC_CALL_TIMEOUT_MS).times(1)).getGroupIdsOfUserByEmail(expectedEmail)
 
         groups.observeForever {
-            if (it != null) {
+            if (!it.isNullOrEmpty()) {
                 dataAvailable.countDown()
             }
         }
@@ -101,7 +102,7 @@ class SearchGroupDataManagerTest {
 
         Mockito.verify(mockSearchGroupRepo, Mockito.timeout(ASYNC_CALL_TIMEOUT_MS).times(1)).getAllGroups()
 
-        assertThat(groups.value, equalTo(expectedGroups))
+        assertThat(groups.value!!, equalTo(expectedResults))
     }
 
     @Test

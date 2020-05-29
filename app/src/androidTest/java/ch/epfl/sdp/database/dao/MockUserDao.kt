@@ -23,7 +23,7 @@ class MockUserDao : UserDao {
         TODO("Not yet implemented")
     }
 
-    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
-        return MutableLiveData(setOf())
+    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Map<String, Role>> {
+        return MutableLiveData(mapOf())
     }
 }
