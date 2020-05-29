@@ -170,7 +170,7 @@ class FirebaseUserDaoTest {
         val expectedRemovedUser1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
         val expectedRemovedUser2 = UserData(DUMMY_USER_EMAIL_2, role = Role.OPERATOR)
 
-        var actualRemovedUsers = mutableListOf<UserData>()
+        val actualRemovedUsers = mutableListOf<UserData>()
 
         val listener = object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
@@ -247,8 +247,9 @@ class FirebaseUserDaoTest {
         val called = CountDownLatch(4)
         val loaded = CountDownLatch(1)
 
-        val user_1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
-        val user_2 = UserData(DUMMY_USER_EMAIL_2, role = Role.RESCUER)
+        val operator1 = UserData(DUMMY_USER_EMAIL_1, role = Role.OPERATOR)
+        val rescuer1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
+        val user2 = UserData(DUMMY_USER_EMAIL_2, role = Role.OPERATOR)
 
         val listener = object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
@@ -266,20 +267,20 @@ class FirebaseUserDaoTest {
         val ref = Firebase.database.getReference("users")
         ref.addChildEventListener(listener)
 
-        val expectedIds = setOf(DUMMY_GROUP_ID_1, DUMMY_GROUP_ID_3)
+        val expectedIds = mapOf(Pair(DUMMY_GROUP_ID_1, Role.OPERATOR), Pair(DUMMY_GROUP_ID_3, Role.RESCUER))
         val ref1 = Firebase.database.getReference("users/${DUMMY_GROUP_ID_1}")
-        ref1.push().setValue(user_1)
-        ref1.push().setValue(user_2)
+        ref1.push().setValue(operator1)
+        ref1.push().setValue(user2)
 
         val ref2 = Firebase.database.getReference("users/${DUMMY_GROUP_ID_2}")
-        ref2.push().setValue(user_2)
+        ref2.push().setValue(user2)
 
         val ref3 = Firebase.database.getReference("users/${DUMMY_GROUP_ID_3}")
-        ref3.push().setValue(user_1)
+        ref3.push().setValue(rescuer1)
 
         val dao = FirebaseUserDao()
 
-        val ids = dao.getGroupIdsOfUserByEmail(user_1.email)
+        val ids = dao.getGroupIdsOfUserByEmail(rescuer1.email)
 
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(called.count, equalTo(0L))
@@ -304,8 +305,8 @@ class FirebaseUserDaoTest {
         val called = CountDownLatch(1)
         val loaded = CountDownLatch(1)
 
-        val user1 = UserData(DUMMY_USER_EMAIL_1, role = Role.RESCUER)
-        val user2 = UserData(DUMMY_USER_EMAIL_2, role = Role.RESCUER)
+        val user1 = UserData(DUMMY_USER_EMAIL_1, role = Role.OPERATOR)
+        val user2 = UserData(DUMMY_USER_EMAIL_2, role = Role.OPERATOR)
 
         val listener = object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
@@ -321,7 +322,7 @@ class FirebaseUserDaoTest {
         val ref = Firebase.database.getReference("users")
         ref.addChildEventListener(listener)
 
-        val expectedIds = setOf(DUMMY_GROUP_ID_1)
+        val expectedIds = mapOf(Pair(DUMMY_GROUP_ID_1, Role.OPERATOR))
         val ref1 = Firebase.database.getReference("users/${DUMMY_GROUP_ID_1}")
 
         ref1.push().setValue(user1)

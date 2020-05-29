@@ -9,12 +9,12 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.UserDao
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
@@ -39,7 +39,7 @@ class SearchGroupEditionActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
-        UiThreadStatement.runOnUiThread {
+        runOnUiThread {
             Auth.accountId.value = FAKE_ACCOUNT_ID
             Auth.loggedIn.value = true
         }
@@ -66,7 +66,7 @@ class SearchGroupEditionActivityTest {
         )
 
         val userDao = Mockito.mock(UserDao::class.java)
-        Mockito.`when`(userDao.getGroupIdsOfUserByEmail(DUMMY_USER_EMAIL)).thenReturn(MutableLiveData(setOf(DUMMY_SEARCHGROUP_ID)))
+        Mockito.`when`(userDao.getGroupIdsOfUserByEmail(DUMMY_USER_EMAIL)).thenReturn(MutableLiveData(mapOf(Pair(DUMMY_SEARCHGROUP_ID, Role.OPERATOR))))
 
         SearchGroupRepository.daoProvider = { groupDao }
         UserRepository.daoProvider = { userDao }

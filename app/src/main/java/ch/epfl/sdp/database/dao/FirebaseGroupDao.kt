@@ -67,8 +67,10 @@ class FirebaseGroupDao : SearchGroupDao {
      * Creates a group with the given data.
      * The uuid of the searchgroup data will be overridden by an automatically generated one.
      */
-    override fun createGroup(searchGroupData: SearchGroupData) {
-        database.getReference(ROOT_PATH).push().setValue(searchGroupData)
+    override fun createGroup(searchGroupData: SearchGroupData): String {
+        val key = database.getReference(ROOT_PATH).push().key
+        database.getReference("$ROOT_PATH/$key").setValue(searchGroupData)
+        return key!!
     }
 
     override fun updateGroup(searchGroupData: SearchGroupData) {
