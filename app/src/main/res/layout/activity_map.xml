@@ -83,7 +83,7 @@
         app:layout_constraintBottom_toTopOf="@+id/floating_menu_button"
         app:layout_constraintEnd_toEndOf="@+id/mapView" />
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/vlc_fragment"
         android:name="ch.epfl.sdp.ui.camera.VlcFragment"
         android:layout_width="0dp"
@@ -94,7 +94,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"/>
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/drone_status_fragment"
         android:name="ch.epfl.sdp.ui.drone.DroneStatusFragment"
         android:layout_width="wrap_content"

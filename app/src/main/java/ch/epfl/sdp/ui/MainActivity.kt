@@ -4,8 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -16,9 +14,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
@@ -57,12 +55,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureNavigationView() {
+
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
         snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
 
-        val navController = findNavController(R.id.nav_host_fragment)
+        val navHostFragment = supportFragmentManager
+                .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
         navView.setupWithNavController(navController)
 
         Auth.loggedIn.observe(this, Observer {
@@ -105,12 +106,6 @@ class MainActivity : AppCompatActivity() {
         CentralLocationManager.onDestroy()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.activity_main_settings, menu)
-        return true
-    }
-
     // Opens the drawer instead of navigating up
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
@@ -148,8 +143,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startMission(view: View) {
-        if(currentGroupId.value.isNullOrEmpty()){
-            Toast.makeText(this,getString(R.string.warning_no_group_selected),Toast.LENGTH_LONG).show();
+        if (currentGroupId.value.isNullOrEmpty()) {
+            Toast.makeText(this, getString(R.string.warning_no_group_selected), Toast.LENGTH_LONG).show()
             return
         }
         checkConnexion(view) {
