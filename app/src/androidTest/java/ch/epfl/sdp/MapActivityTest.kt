@@ -471,19 +471,6 @@ class MapActivityTest {
     }
 
     @Test
-    fun resizeButtonIsWorking() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
-        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
-        onView(withId(R.id.vlc_fragment)).perform(click())
-        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))
-        onView(withId(R.id.vlc_fragment)).perform(click())
-        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
-    }
-
-    @Test
     fun rescuerDoesNotSeeDroneStatus(){
         mActivityRule.launchActivity(intentWithGroupAndRescuer)
         onView(withId(R.id.drone_status_fragment)).check(matches(not(isDisplayed())))
