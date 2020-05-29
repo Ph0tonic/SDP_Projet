@@ -51,7 +51,7 @@
     <string name="speed_description_tag">Icône vitesse</string>
     <string name="distance_to_user_description_tag">Icône distance utilisateur</string>
     <string name="distance_to_home_description_tag">Icône distance base</string>
-    <string name="not_connected_message">Vous n\'êtes actuellement pas conencté au drone</string>
+    <string name="not_connected_message">Vous n\'êtes actuellement pas connecté au drone</string>
     <string name="not_enough_waypoints_message">Vous n\'avez pas assez de points pour lancer une mission</string>
     <string name="switch_video">Changer la vidéo</string>
     <string name="no_info">Aucune donnée</string>
