@@ -25,7 +25,7 @@ class UserRepository : IUserRepository {
         return dao.getUsersOfGroupWithRole(searchGroupId, Role.RESCUER)
     }
 
-    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
+    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Map<String, Role>> {
         return dao.getGroupIdsOfUserByEmail(email)
     }
 
