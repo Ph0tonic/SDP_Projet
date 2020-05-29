@@ -87,6 +87,7 @@ dependencies {
     implementation 'com.mikhaellopez:circularimageview:4.2.0'
     implementation 'com.github.mastrgamr:mapbox-android-utils:v0.3'
     implementation 'com.getbase:floatingactionbutton:1.10.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
     testImplementation 'junit:junit:4.13'
     debugImplementation 'androidx.fragment:fragment-testing:1.2.4'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'

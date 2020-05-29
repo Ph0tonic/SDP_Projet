@@ -8,6 +8,7 @@ import android.widget.TableLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
@@ -317,7 +318,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val margin = 2 * resources.getDimension(R.dimen.tiny_margin).toInt()
 
         //findViewById<Button>(R.id.switch_button).visibility = if(isFragmentBig) View.VISIBLE else View.GONE
-        val vlcFragment = findViewById<ConstraintLayout>(R.id.vlc_fragment)
+        val vlcFragment = findViewById<FragmentContainerView>(R.id.vlc_fragment)
         vlcFragment.layoutParams.width = (if (isCameraFragmentFullScreen) size.x else size.x / SCALE_FACTOR) - margin
         vlcFragment.layoutParams.height = (if (isCameraFragmentFullScreen) size.y else size.y / SCALE_FACTOR) - margin
         vlcFragment.requestLayout()
