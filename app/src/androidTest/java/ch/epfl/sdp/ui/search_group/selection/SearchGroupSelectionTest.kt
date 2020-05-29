@@ -18,6 +18,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
@@ -77,7 +78,7 @@ class SearchGroupSelectionTest {
         mockUserRepo = Mockito.mock(IUserRepository::class.java)
 
         Mockito.`when`(mockSearchGroupRepo.getAllGroups()).thenReturn(MutableLiveData(listOf()))
-        Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(DUMMY_EMAIL)).thenReturn(MutableLiveData(setOf()))
+        Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(DUMMY_EMAIL)).thenReturn(MutableLiveData(mapOf()))
         Mockito.`when`(mockSearchGroupRepo.getGroupById(DUMMY_GROUP_ID)).thenReturn(MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)))
         Mockito.`when`(mockUserRepo.getRescuersOfSearchGroup(DUMMY_GROUP_ID)).thenReturn(MutableLiveData(setOf()))
         Mockito.`when`(mockUserRepo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID)).thenReturn(MutableLiveData(setOf()))
@@ -100,7 +101,7 @@ class SearchGroupSelectionTest {
         val isManagerReady = CountDownLatch(1)
 
         val userRepoMock = Mockito.mock(IUserRepository::class.java)
-        Mockito.`when`(userRepoMock.getGroupIdsOfUserByEmail(DUMMY_USER_EMAIL)).thenReturn(MutableLiveData(setOf(DUMMY_GROUP_ID)))
+        Mockito.`when`(userRepoMock.getGroupIdsOfUserByEmail(DUMMY_USER_EMAIL)).thenReturn(MutableLiveData(mapOf(Pair(DUMMY_GROUP_ID, Role.OPERATOR))))
         UserRepositoryProvider.provide = { userRepoMock }
 
         val searchGroupRepoMock = Mockito.mock(ISearchGroupRepository::class.java)
