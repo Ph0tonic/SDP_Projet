@@ -9,11 +9,12 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -25,7 +26,6 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
-import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView
@@ -52,10 +52,11 @@ class MainActivity : AppCompatActivity() {
 
         configureNavigationView()
         loadActiveGroupFromPrefs()
+
+        findViewById<AppCompatImageButton>(R.id.mainSettingsButton).setOnClickListener(Navigation.createNavigateOnClickListener(R.id.nav_settings, null))
     }
 
     private fun configureNavigationView() {
-
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
         snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
@@ -108,12 +109,10 @@ class MainActivity : AppCompatActivity() {
 
     // Opens the drawer instead of navigating up
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
+        val navHostFragment = supportFragmentManager
+                .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    fun openSettings(view: View) {
-        startActivity(Intent(this, SettingsActivity::class.java))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,

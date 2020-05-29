@@ -3,6 +3,7 @@
     <color name="colorPrimary">#3498db</color>
     <color name="clouds">#ecf0f1</color>
     <color name="transparentClouds">#ccecf0f1</color>
+    <color name="darkGrey">#252525</color>
 
 
     <color name="colorBlack">#000000</color>

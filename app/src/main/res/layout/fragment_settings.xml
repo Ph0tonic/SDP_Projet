@@ -1,0 +1,77 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparentClouds"
+    tools:context=".ui.settings.SettingsFragment">
+
+    <TextView
+        android:id="@+id/settings_title"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="@string/title_activity_settings"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@color/darkGrey"
+        android:background="@color/colorWhite"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/mainDrawerButton"
+        style="@style/HomeButtonSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/button_menu_desc"
+        android:src="@drawable/ic_drawer_black_32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/line_sep_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#af252525"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_title"/>
+
+    <View
+        android:id="@+id/line_sep_2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#cfffffff"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/line_sep_1"/>
+
+    <View
+        android:id="@+id/line_sep_3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorWhite"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/line_sep_2"/>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/settings"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_marginTop="25dp"
+        android:background="#afffffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/line_sep_3">
+
+    </androidx.fragment.app.FragmentContainerView>
+</androidx.constraintlayout.widget.ConstraintLayout>

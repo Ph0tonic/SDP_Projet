@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.Gravity
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -23,7 +22,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.ui.MainActivity
-import ch.epfl.sdp.ui.settings.SettingsActivity
+import ch.epfl.sdp.ui.settings.SettingsFragment
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matchers
@@ -67,7 +66,7 @@ class MainActivityTest {
     @Test
     fun canOpenSettings() {
         onView(withId(R.id.mainSettingsButton)).perform(click())
-        intended(hasComponent(SettingsActivity::class.qualifiedName))
+        intended(hasComponent(SettingsFragment::class.qualifiedName))
     }
 
     @Test
