@@ -477,9 +477,9 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
-        onView(withId(R.id.resize_button)).perform(click())
+        onView(withId(R.id.vlc_fragment)).perform(click())
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))
-        onView(withId(R.id.resize_button)).perform(click())
+        onView(withId(R.id.vlc_fragment)).perform(click())
         assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
     }
 
@@ -511,12 +511,6 @@ class MapActivityTest {
     fun rescuerDoesNotSeeStrategyPickerButton(){
         mActivityRule.launchActivity(intentWithGroupAndRescuer)
         onView(withId(R.id.strategy_picker_button)).check(matches(not(isDisplayed())))
-    }
-
-    @Test
-    fun rescuerDoesNotSeeResizeButton(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
-        onView(withId(R.id.resize_button)).check(matches(not(isDisplayed())))
     }
 
     @Test

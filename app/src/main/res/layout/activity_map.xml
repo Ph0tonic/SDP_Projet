@@ -33,7 +33,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1" />
+        tools:layout_constraintLeft_creator="1">
+
+    </androidx.fragment.app.FragmentContainerView>
+
+    <TextView
+        android:id="@+id/cameraTextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/Camera"
+        android:textColor="@color/clouds"
+        app:layout_constraintBottom_toBottomOf="@+id/vlc_fragment"
+        app:layout_constraintLeft_toLeftOf="@+id/vlc_fragment"
+        app:layout_constraintRight_toRightOf="@id/vlc_fragment" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/strat_and_menu_container"
