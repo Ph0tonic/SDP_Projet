@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_alignParentEnd="false"
     app:layoutDescription="@xml/activity_map_scene">
 
     <com.mapbox.mapboxsdk.maps.MapView
@@ -23,76 +24,84 @@
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintTop_creator="1" />
 
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/floating_menu_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:fab_addButtonColorNormal="@color/colorPrimaryDark"
-        app:fab_addButtonColorPressed="@color/colorPrimary"
-        app:fab_addButtonPlusIconColor="@color/colorWhite"
-        app:fab_expandDirection="left"
-        mapbox:layout_constraintBottom_toBottomOf="parent"
-        mapbox:layout_constraintEnd_toEndOf="parent"
-        tools:context="ch.epfl.sdp.ui.maps.MapActivity">
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/start_or_return_button"
-            style="@style/FloatingButtonTheme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="startMissionOrReturnHome"
-            app:fab_colorNormal="@color/colorWhite"
-            app:fab_colorPressed="@color/colorLightGray"
-            app:fab_icon="@drawable/ic_start" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/clear_button"
-            style="@style/FloatingButtonTheme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="clearWaypoints"
-            app:fab_icon="@drawable/ic_clear" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/locate_button"
-            style="@style/FloatingButtonTheme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="centerCameraOnDrone"
-            app:fab_icon="@drawable/ic_locate" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/store_button"
-            style="@style/FloatingButtonTheme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="storeMap"
-            app:fab_icon="@drawable/ic_store" />
-
-    </com.getbase.floatingactionbutton.FloatingActionsMenu>
-
-    <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/strategy_picker_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="pickStrategy"
-        app:fab_colorNormal="@color/colorPrimary"
-        app:fab_colorPressed="@color/colorLightGray"
-        app:fab_icon="@drawable/ic_spiralstrat"
-        app:fab_size="normal"
-        app:layout_constraintBottom_toTopOf="@+id/floating_menu_button"
-        app:layout_constraintEnd_toEndOf="@+id/mapView" />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/vlc_fragment"
         android:name="ch.epfl.sdp.ui.camera.VlcFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_margin="@dimen/tiny_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_constraintBottom_creator="1"
         tools:layout_constraintLeft_creator="1" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/strat_and_menu_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/strategy_picker_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="pickStrategy"
+            app:fab_colorNormal="@color/colorPrimary"
+            app:fab_colorPressed="@color/colorLightGray"
+            app:fab_icon="@drawable/ic_spiralstrat"
+            app:fab_size="normal" />
+
+        <com.getbase.floatingactionbutton.FloatingActionsMenu
+            android:id="@+id/floating_menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_addButtonColorNormal="@color/colorPrimaryDark"
+            app:fab_addButtonColorPressed="@color/colorPrimary"
+            app:fab_addButtonPlusIconColor="@color/colorWhite"
+            app:fab_expandDirection="left"
+            app:layout_constraintBottom_toBottomOf="parent"
+            mapbox:layout_constraintEnd_toEndOf="parent">
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/start_or_return_button"
+                style="@style/FloatingButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="startMissionOrReturnHome"
+                app:fab_colorNormal="@color/colorWhite"
+                app:fab_colorPressed="@color/colorLightGray"
+                app:fab_icon="@drawable/ic_start" />
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/clear_button"
+                style="@style/FloatingButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="clearWaypoints"
+                app:fab_icon="@drawable/ic_clear" />
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/locate_button"
+                style="@style/FloatingButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="centerCameraOnDrone"
+                app:fab_icon="@drawable/ic_locate" />
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/store_button"
+                style="@style/FloatingButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="storeMap"
+                app:fab_icon="@drawable/ic_store" />
+
+        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/drone_status_fragment"
@@ -103,7 +112,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.getbase.floatingactionbutton.FloatingActionButton
+    <!--<com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/resize_button"
         style="@style/FloatingButtonTheme"
         android:layout_width="wrap_content"
@@ -111,6 +120,6 @@
         android:onClick="resizeCameraFragment"
         app:fab_icon="@drawable/ic_camera"
         mapbox:layout_constraintBottom_toBottomOf="parent"
-        mapbox:layout_constraintStart_toStartOf="parent" />
+        mapbox:layout_constraintStart_toStartOf="parent" />-->
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

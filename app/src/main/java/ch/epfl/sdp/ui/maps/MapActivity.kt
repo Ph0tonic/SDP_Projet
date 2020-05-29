@@ -144,7 +144,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.strategy_picker_button)!!.visibility = View.GONE
-        findViewById<FloatingActionButton>(R.id.resize_button)!!.visibility = View.GONE
+//        findViewById<FloatingActionButton>(R.id.resize_button)!!.visibility = View.GONE
         findViewById<ConstraintLayout>(R.id.vlc_fragment)!!.visibility = View.GONE
         findViewById<TableLayout>(R.id.drone_status_fragment)!!.visibility = View.GONE
     }
@@ -311,7 +311,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     fun resizeCameraFragment(v: View) {
-        isCameraFragmentFullScreen = !isCameraFragmentFullScreen
+        /*isCameraFragmentFullScreen = !isCameraFragmentFullScreen
 
         val size = android.graphics.Point()
         windowManager.defaultDisplay.getSize(size)
@@ -321,7 +321,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val vlcFragment = findViewById<FragmentContainerView>(R.id.vlc_fragment)
         vlcFragment.layoutParams.width = (if (isCameraFragmentFullScreen) size.x else size.x / SCALE_FACTOR) - margin
         vlcFragment.layoutParams.height = (if (isCameraFragmentFullScreen) size.y else size.y / SCALE_FACTOR) - margin
-        vlcFragment.requestLayout()
+        vlcFragment.requestLayout()*/
     }
 
     fun pickStrategy(view: View) {
