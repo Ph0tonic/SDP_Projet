@@ -52,7 +52,6 @@ object Drone {
         disposables.add(instance.telemetry.flightMode
                 .subscribe(
                         { flightMode ->
-                            Log.d("DEBUG22", "---------------FLIGHTMODE : " + flightMode)
                             if (flightMode == Telemetry.FlightMode.HOLD) isMissionPausedLiveData.postValue(true)
                             if (flightMode == Telemetry.FlightMode.MISSION) isMissionPausedLiveData.postValue(false)
                         },

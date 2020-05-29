@@ -134,7 +134,7 @@ class ReturnDroneDialogFragmentTest {
     }
 
     @Test
-    fun testClickOnNeutralButtonShowsToastWhenUserPositionIsNull() {
+    fun testClickOnNeutralButtonShowsHomeSuccessToastWhenUserPositionIsNullButHomeIsNot() {
         // Launch activity
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)

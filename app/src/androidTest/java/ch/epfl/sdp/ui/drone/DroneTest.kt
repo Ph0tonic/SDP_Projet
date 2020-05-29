@@ -13,16 +13,14 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
 import io.mavsdk.action.Action
 import io.mavsdk.core.Core
+import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Single
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
@@ -57,8 +55,7 @@ class DroneTest {
     private val droneCore = mock(Core::class.java)
     private val droneMission = mock(Mission::class.java)
     private val droneAction = mock(Action::class.java)
-
-
+        
     @Before
     fun before() {
         DroneInstanceProvider.provide = { droneSystem }
@@ -228,4 +225,47 @@ class DroneTest {
 
         assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }
+
+    @Test
+    fun canResetMissionIfFailToReturnHome(){
+        val expectedLatLng = LatLng(47.397428, 8.545369) //Position of the drone before take off
+
+        Drone.positionLiveData.value = expectedLatLng
+        Drone.homeLocationLiveData.value =
+                Telemetry.Position(expectedLatLng.latitude, expectedLatLng.longitude, 400f, 50f)
+
+        `when`(droneAction.returnToLaunch())
+                .thenReturn(Completable.error(Throwable("Random Error Message")))
+
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+
+        assertThat(Drone.missionLiveData.value, `is`(nullValue()))
+    }
+
+    @Test
+    fun canResetMissionStatusIfFailToRestartMission(){
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = true
+
+        `when`(droneMission.startMission())
+                .thenReturn(Completable.error(Throwable("Random Error Message")))
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
+    }
+
+    @Test
+    fun canResetMissionStatusIfFailToPauseMission(){
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        `when`(droneMission.startMission())
+                .thenReturn(Completable.error(Throwable("Random Error Message")))
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
+    }
+
 }
