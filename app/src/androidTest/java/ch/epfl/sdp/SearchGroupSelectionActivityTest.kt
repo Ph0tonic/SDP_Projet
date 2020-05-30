@@ -14,6 +14,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.UserDao
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
@@ -49,7 +50,6 @@ class SearchGroupEditionActivityTest {
         private const val DUMMY_SEARCHGROUP_ID = "DummySearchGroupId"
         private const val DUMMY_SEARCHGROUP_NAME = "DummySearchGroupName"
         private const val DUMMY_USER_EMAIL = "dummy@gmail.com"
-        private val DUMMY_LOCATION = LatLng(0.0, 0.0)
         private const val FAKE_ACCOUNT_ID = "FakeAccountId"
     }
 
@@ -61,11 +61,11 @@ class SearchGroupEditionActivityTest {
         }
 
         val groupDao = MockGroupDao(
-                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION))
+                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME))
         )
 
         val userDao = Mockito.mock(UserDao::class.java)
-        Mockito.`when`(userDao.getGroupIdsOfUserByEmail(DUMMY_USER_EMAIL)).thenReturn(MutableLiveData(setOf(DUMMY_SEARCHGROUP_ID)))
+        Mockito.`when`(userDao.getGroupIdsOfUserByEmail(DUMMY_USER_EMAIL)).thenReturn(MutableLiveData(mapOf(Pair(DUMMY_SEARCHGROUP_ID, Role.OPERATOR))))
 
         SearchGroupRepository.daoProvider = { groupDao }
         UserRepository.daoProvider = { userDao }
@@ -79,7 +79,7 @@ class SearchGroupEditionActivityTest {
     @Test
     fun changingGroupChangesGroupInPreferences() {
         val groupDao = MockGroupDao(
-                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION))
+                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME))
         )
         SearchGroupRepository.daoProvider = { groupDao }
         PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())

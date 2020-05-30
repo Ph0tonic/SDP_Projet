@@ -79,7 +79,7 @@ class AddUserDialogFragmentTest {
         mockMarkerRepo = Mockito.mock(IMarkerRepository::class.java)
         mockUserRepo = Mockito.mock(IUserRepository::class.java)
 
-        Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(DUMMY_ACTUAL_USER_EMAIL)).thenReturn(MutableLiveData(setOf()))
+        Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(DUMMY_ACTUAL_USER_EMAIL)).thenReturn(MutableLiveData(mapOf()))
         Mockito.`when`(mockSearchGroupRepo.getGroupById(DUMMY_GROUP_ID)).thenReturn(MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)))
         Mockito.`when`(mockUserRepo.getRescuersOfSearchGroup(DUMMY_GROUP_ID)).thenReturn(MutableLiveData(setOf()))
         Mockito.`when`(mockUserRepo.getOperatorsOfSearchGroup(DUMMY_GROUP_ID)).thenReturn(MutableLiveData(setOf()))

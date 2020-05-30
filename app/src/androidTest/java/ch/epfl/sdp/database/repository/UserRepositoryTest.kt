@@ -102,7 +102,7 @@ class UserRepositoryTest {
 
     @Test
     fun getGroupIdsOfUserByEmailCallsGetGroupIdsOfUserByEmailWithCorrectParameters() {
-        val expectedData = MutableLiveData(setOf(DUMMY_GROUP_ID))
+        val expectedData = MutableLiveData(mapOf(Pair(DUMMY_GROUP_ID, Role.OPERATOR)))
         val expectedEmail = DUMMY_EMAIL
 
         val dao = Mockito.mock(UserDao::class.java)
@@ -111,7 +111,7 @@ class UserRepositoryTest {
         UserRepository.daoProvider = { dao }
         val repo = UserRepository()
 
-        assertThat(repo.getGroupIdsOfUserByEmail(expectedEmail), equalTo(expectedData as LiveData<Set<String>>))
+        assertThat(repo.getGroupIdsOfUserByEmail(expectedEmail), equalTo(expectedData as LiveData<Map<String, Role>>))
         Mockito.verify(dao, Mockito.times(1)).getGroupIdsOfUserByEmail(expectedEmail)
     }
 }
