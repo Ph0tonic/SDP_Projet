@@ -62,7 +62,7 @@ class MapActivityTest {
 
         private const val ZOOM_TEST = 0.9
         private const val MAP_LOADING_TIMEOUT = 1000L
-        private const val EPSILON = 1e-9
+        private const val EPSILON = 1e-8
         private const val DRONE_ALTITUDE = 20.0F
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"

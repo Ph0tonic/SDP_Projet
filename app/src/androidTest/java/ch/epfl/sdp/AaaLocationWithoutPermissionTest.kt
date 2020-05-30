@@ -1,6 +1,7 @@
 package ch.epfl.sdp
 
 import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
@@ -23,9 +24,12 @@ class AaaLocationWithoutPermissionTest {
     @Before
     @Throws(Exception::class)
     fun before() {
-        MainDataManager.goOffline()
+        runOnUiThread {
+            MainDataManager.goOffline()
+        }
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
+
     /*
     @Test
     fun centralLocationManagerDoesNotRequestLocationUpdatesIfItDoesNotHavePermission() {
