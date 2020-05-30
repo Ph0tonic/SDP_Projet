@@ -18,6 +18,7 @@ import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider

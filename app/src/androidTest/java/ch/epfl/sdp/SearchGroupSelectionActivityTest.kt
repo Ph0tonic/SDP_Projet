@@ -16,6 +16,7 @@ import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.UserDao
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.ui.MainActivity

@@ -22,6 +22,7 @@ import ch.epfl.sdp.database.dao.OfflineHeatmapDao
 import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.data.Role
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
@@ -75,6 +76,8 @@ class DroneStatusFragmentTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        MainDataManager.goOffline()
+
         //Fake login
         runOnUiThread {
             Auth.accountId.value = FAKE_ACCOUNT_ID

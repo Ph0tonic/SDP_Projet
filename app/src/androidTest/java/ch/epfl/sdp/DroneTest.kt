@@ -3,6 +3,7 @@ package ch.epfl.sdp
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.ui.maps.MapActivity
@@ -42,6 +43,7 @@ class DroneTest {
 
     @Test
     fun testSignal() {
+        MainDataManager.goOffline()
         Drone.getSignalStrength = { SIGNAL_STRENGTH }
         assertThat(Drone.getSignalStrength(), closeTo(SIGNAL_STRENGTH, EPSILON))
         print(Drone.debugGetSignalStrength)

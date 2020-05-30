@@ -1,5 +1,6 @@
 package ch.epfl.sdp.database.data_manager
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
@@ -12,7 +13,9 @@ import ch.epfl.sdp.database.repository.MarkerRepository
 
 object MainDataManager {
 
-    private const val OFFLINE_MODE_USER_ID = "offline_user_id"
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    const val OFFLINE_MODE_USER_ID = "offline_user_id"
+
     private var cachedUserIdWhileOffline: String? = null
     private var cachedUserRoleWhileOffline: Role = Role.RESCUER
 
@@ -46,10 +49,10 @@ object MainDataManager {
             MarkerRepository.daoProvider = { offlineMarkerDao }
             cachedUserIdWhileOffline = groupId.value
             cachedUserRoleWhileOffline = role.value!!
-            groupId.value = OFFLINE_MODE_USER_ID
-            role.value = Role.OPERATOR
-            offlineMode = true
         }
+        groupId.value = OFFLINE_MODE_USER_ID
+        role.value = Role.OPERATOR
+        offlineMode = true
     }
 
     fun goOnline() {
@@ -58,7 +61,7 @@ object MainDataManager {
             MarkerRepository.daoProvider = MarkerRepository.DEFAULT_DAO
             groupId.value = cachedUserIdWhileOffline
             role.value = cachedUserRoleWhileOffline
-            offlineMode = false
         }
+        offlineMode = false
     }
 }

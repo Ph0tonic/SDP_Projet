@@ -9,14 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.test.annotation.UiThreadTest
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
-import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.dao.OfflineHeatmapDao
 import ch.epfl.sdp.database.dao.OfflineMarkerDao
+import ch.epfl.sdp.database.data.Role
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.ui.maps.MapActivity
@@ -58,7 +59,8 @@ class LocationWithPermissionTest {
     @Throws(Exception::class)
     fun before() {
         //Fake logged in
-        UiThreadStatement.runOnUiThread {
+        runOnUiThread {
+            MainDataManager.goOffline()
             Auth.accountId.value = FAKE_ACCOUNT_ID
             Auth.loggedIn.value = true
         }

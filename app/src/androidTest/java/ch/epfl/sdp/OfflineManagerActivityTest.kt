@@ -14,6 +14,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.map.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
