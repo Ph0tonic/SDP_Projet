@@ -71,7 +71,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'org.videolan.android:libvlc-all:3.1.12'
-    implementation 'com.google.firebase:firebase-analytics:17.4.1'
+    implementation 'com.google.firebase:firebase-analytics:17.4.2'
     implementation 'com.google.firebase:firebase-database:19.3.0'
     implementation 'com.google.firebase:firebase-database-ktx:19.3.0'
     implementation 'com.google.android.gms:play-services-auth:18.0.0'
@@ -88,6 +88,8 @@ dependencies {
     implementation 'com.github.mastrgamr:mapbox-android-utils:v0.3'
     implementation 'com.getbase:floatingactionbutton:1.10.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
+    implementation "androidx.room:room-ktx:2.2.5"
+    annotationProcessor "androidx.room:room-compiler:2.2.5"
     testImplementation 'junit:junit:4.13'
     debugImplementation 'androidx.fragment:fragment-testing:1.2.4'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'

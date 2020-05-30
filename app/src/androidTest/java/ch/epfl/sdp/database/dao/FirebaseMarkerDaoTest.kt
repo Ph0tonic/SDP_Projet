@@ -130,4 +130,9 @@ class FirebaseMarkerDaoTest {
         assertThat(actualRemovedMarker, equalTo(expectedRemovedMarker))
         ref.removeEventListener(listener)
     }
+
+    @Test
+    fun removeAllMarkersOfSearchGroupRemovesAllMarkersOfSearchGroup() {
+        //TODO:
+    }
 }
