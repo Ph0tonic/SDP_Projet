@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -18,7 +17,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
@@ -26,7 +24,8 @@ import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
-import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
+import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARCH_GROUP_ID_SELECTION_RESULT_TAG
+import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARCH_GROUP_ROLE_SELECTION_RESULT_TAG
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -127,7 +126,6 @@ class MainActivity : AppCompatActivity() {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-
     private fun checkConnexion(view: View, action: () -> Unit) {
         if (Auth.loggedIn.value == false) {
             Auth.login(this) { success ->
@@ -148,32 +146,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startMission(view: View) {
-        if(currentGroupId.value.isNullOrEmpty()){
-            Toast.makeText(this,getString(R.string.warning_no_group_selected),Toast.LENGTH_LONG).show();
+        if (currentGroupId.value.isNullOrEmpty()) {
+            Toast.makeText(this, getString(R.string.warning_no_group_selected), Toast.LENGTH_LONG).show()
             return
         }
         checkConnexion(view) {
             val intent = Intent(this, MapActivity::class.java)
                     .putExtra(getString(R.string.intent_key_group_id), currentGroupId.value)
-                    .putExtra(getString(R.string.intent_key_role), Role.OPERATOR)
+                    .putExtra(getString(R.string.intent_key_role), currentRole.value)
             startActivity(intent)
         }
     }
 
     fun workOffline(view: View) {
-        checkConnexion(view) {
-            val intent = Intent(this, MapActivity::class.java)
-                    .putExtra(getString(R.string.intent_key_group_id), "dummy")
-                    .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
-            startActivity(intent)
-        }
+        val intent = Intent(this, MapActivity::class.java)
+                .putExtra(getString(R.string.intent_key_offline_mode), true)
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                currentGroupId.value = data!!.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
+                currentGroupId.value = data!!.getStringExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG)
+                currentRole.value = data.getSerializableExtra(SEARCH_GROUP_ROLE_SELECTION_RESULT_TAG) as Role?
             }
         }
         Auth.onActivityResult(requestCode, resultCode, data)

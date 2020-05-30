@@ -15,6 +15,7 @@ import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
+import ch.epfl.sdp.utils.enumStringLowerCase
 
 class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<SearchGroupData, Role>>> {
 
@@ -24,7 +25,8 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
     val searchGroupManager = SearchGroupDataManager()
 
     companion object {
-        const val SEARH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
+        const val SEARCH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
+        const val SEARCH_GROUP_ROLE_SELECTION_RESULT_TAG = "role"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,12 +43,12 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
         searchGroupManager.getAllGroups().observe(this, this)
     }
 
-    override fun onChanged(searchGroups: List<Pair<SearchGroupData,Role>>) {
+    override fun onChanged(searchGroups: List<Pair<SearchGroupData, Role>>) {
         val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
         recyclerView.adapter = SearchGroupRecyclerAdapter(searchGroups,
                 object : OnItemClickListener<SearchGroupData> {
                     override fun onItemClicked(searchGroupData: SearchGroupData) {
-                        joinGroup(searchGroupData)
+                        joinGroup(searchGroupData, searchGroups.find { it.first == searchGroupData }!!.second)
                     }
                 },
                 object : OnItemClickListener<SearchGroupData> {
@@ -56,9 +58,10 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
                 })
     }
 
-    private fun joinGroup(searchGroupData: SearchGroupData) {
+    private fun joinGroup(searchGroupData: SearchGroupData, role: Role) {
         val returnDataIntent = Intent()
-        returnDataIntent.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
+        returnDataIntent.putExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
+        returnDataIntent.putExtra(SEARCH_GROUP_ROLE_SELECTION_RESULT_TAG, role)
         setResult(RESULT_OK, returnDataIntent)
         finish()
     }
