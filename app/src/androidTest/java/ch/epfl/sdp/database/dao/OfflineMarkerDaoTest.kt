@@ -66,6 +66,16 @@ class OfflineMarkerDaoTest {
     }
 
     @Test
+    fun removeMarkerEffectiveEvenIfNoData() {
+        val dao = OfflineMarkerDao()
+        
+        dao.removeMarker(DUMMY_GROUP_ID, DUMMY_MARKER_ID)
+        val data = dao.getMarkersOfSearchGroup(DUMMY_GROUP_ID)
+
+        assertThat(data.value!!.size, equalTo(0))
+    }
+
+    @Test
     fun removeMarkerRemovesMarker() {
         val dao = OfflineMarkerDao()
         val expectedRemovedMarker = MarkerData(LatLng(41.0, 10.0), DUMMY_MARKER_ID)
