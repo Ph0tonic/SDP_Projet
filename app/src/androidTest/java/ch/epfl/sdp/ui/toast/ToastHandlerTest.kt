@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.toast
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.widget.Toast
@@ -13,9 +13,9 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
-import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.MainApplication
+import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.MainActivity
-import ch.epfl.sdp.ui.toast.ToastHandler
 import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.Rule

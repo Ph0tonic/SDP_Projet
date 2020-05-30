@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.home
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.view.Gravity
@@ -18,6 +18,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.MainApplication
+import ch.epfl.sdp.R
 import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn

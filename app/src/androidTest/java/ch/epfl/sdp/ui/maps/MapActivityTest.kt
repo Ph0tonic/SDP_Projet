@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.maps
 
 import android.Manifest.permission
 import android.content.Context
@@ -24,6 +24,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.R
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.dao.OfflineHeatmapDao
@@ -40,7 +41,6 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
-import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager

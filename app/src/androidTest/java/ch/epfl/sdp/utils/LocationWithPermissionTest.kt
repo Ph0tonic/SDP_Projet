@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.utils
 
 import android.content.Context
 import android.content.Intent
@@ -14,6 +14,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.R
 import ch.epfl.sdp.database.dao.OfflineHeatmapDao
 import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.data.Role
@@ -21,8 +22,6 @@ import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.ui.maps.MapActivity
-import ch.epfl.sdp.utils.Auth
-import ch.epfl.sdp.utils.CentralLocationManager
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before

@@ -23,11 +23,9 @@ import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
 import ch.epfl.sdp.database.providers.UserRepositoryProvider
-import ch.epfl.sdp.database.repository.IHeatmapRepository
-import ch.epfl.sdp.database.repository.IMarkerRepository
-import ch.epfl.sdp.database.repository.ISearchGroupRepository
-import ch.epfl.sdp.database.repository.IUserRepository
+import ch.epfl.sdp.database.repository.*
 import ch.epfl.sdp.utils.Auth
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -91,6 +89,14 @@ class AddUserDialogFragmentTest {
         HeatmapRepositoryProvider.provide = { mockHeatmapRepo }
 
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    }
+
+    @After
+    fun cleanup() {
+        SearchGroupRepositoryProvider.provide = { SearchGroupRepository() }
+        UserRepositoryProvider.provide = { UserRepository() }
+        MarkerRepositoryProvider.provide = { MarkerRepository() }
+        HeatmapRepositoryProvider.provide = { HeatmapRepository() }
     }
 
     @Test
