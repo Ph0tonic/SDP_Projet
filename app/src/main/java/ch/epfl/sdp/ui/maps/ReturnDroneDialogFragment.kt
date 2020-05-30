@@ -15,11 +15,11 @@ class ReturnDroneDialogFragment : DialogFragment() {
             // Use the Builder class for convenient dialog construction
             val builder = AlertDialog.Builder(it)
             // Build the dialog box
-            builder.setTitle(getString(R.string.ReturnDroneDialogTitle))
-                    .setPositiveButton(getString(R.string.ReturnDroneDialogHome)) { _, _ ->
+            builder.setTitle(getString(R.string.return_drone_dialog_title))
+                    .setPositiveButton(getString(R.string.return_drone_dialog_option_home)) { _, _ ->
                         tryReturnHome(it)
                     }
-                    .setNeutralButton(R.string.ReturnDroneDialogUser) { _, _ ->
+                    .setNeutralButton(R.string.return_drone_dialog_option_user) { _, _ ->
                         try {
                             Drone.returnToUserLocationAndLand()
                             // If the user position is not available, we show it to user and return home instead
@@ -28,7 +28,7 @@ class ReturnDroneDialogFragment : DialogFragment() {
                             tryReturnHome(it)
                         }
                     }
-                    .setNegativeButton(getString(R.string.dialog_negative_button)) { dialog, _ -> dialog.cancel() }
+                    .setNegativeButton(getString(R.string.dialog_cancel)) { dialog, _ -> dialog.cancel() }
             // Display the dialog
             // Create the AlertDialog object and return it
             builder.create()
