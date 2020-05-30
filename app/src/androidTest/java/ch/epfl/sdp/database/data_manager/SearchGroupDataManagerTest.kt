@@ -81,7 +81,7 @@ class SearchGroupDataManagerTest {
         val expectedGroupId = DUMMY_GROUP_ID
         val expectedEmail = DUMMY_EMAIL
         val expectedGroupIds = mapOf(Pair(DUMMY_GROUP_ID, Role.OPERATOR))
-        val expectedGroups = listOf(SearchGroupData(expectedGroupId, DUMMY_GROUP_NAME, null, null))
+        val expectedGroups = listOf(SearchGroupData(expectedGroupId, DUMMY_GROUP_NAME))
         val expectedResults = listOf(Pair(expectedGroups[0], Role.OPERATOR))
 
         Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(expectedEmail)).thenReturn(MutableLiveData(expectedGroupIds))

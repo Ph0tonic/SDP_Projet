@@ -50,7 +50,6 @@ class SearchGroupEditionActivityTest {
         private const val DUMMY_SEARCHGROUP_ID = "DummySearchGroupId"
         private const val DUMMY_SEARCHGROUP_NAME = "DummySearchGroupName"
         private const val DUMMY_USER_EMAIL = "dummy@gmail.com"
-        private val DUMMY_LOCATION = LatLng(0.0, 0.0)
         private const val FAKE_ACCOUNT_ID = "FakeAccountId"
     }
 
@@ -62,7 +61,7 @@ class SearchGroupEditionActivityTest {
         }
 
         val groupDao = MockGroupDao(
-                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION))
+                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME))
         )
 
         val userDao = Mockito.mock(UserDao::class.java)
@@ -80,7 +79,7 @@ class SearchGroupEditionActivityTest {
     @Test
     fun changingGroupChangesGroupInPreferences() {
         val groupDao = MockGroupDao(
-                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION))
+                listOf(SearchGroupData(DUMMY_SEARCHGROUP_ID, DUMMY_SEARCHGROUP_NAME))
         )
         SearchGroupRepository.daoProvider = { groupDao }
         PreferenceManager.getDefaultSharedPreferences(MainApplication.applicationContext())
