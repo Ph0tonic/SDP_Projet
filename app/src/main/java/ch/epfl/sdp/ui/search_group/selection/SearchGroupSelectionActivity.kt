@@ -12,10 +12,10 @@ import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
-import ch.epfl.sdp.utils.enumStringLowerCase
 
 class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<SearchGroupData, Role>>> {
 
@@ -23,11 +23,6 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val searchGroupManager = SearchGroupDataManager()
-
-    companion object {
-        const val SEARCH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
-        const val SEARCH_GROUP_ROLE_SELECTION_RESULT_TAG = "role"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -59,10 +54,7 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
     }
 
     private fun joinGroup(searchGroupData: SearchGroupData, role: Role) {
-        val returnDataIntent = Intent()
-        returnDataIntent.putExtra(SEARCH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
-        returnDataIntent.putExtra(SEARCH_GROUP_ROLE_SELECTION_RESULT_TAG, role)
-        setResult(RESULT_OK, returnDataIntent)
+        MainDataManager.selectSearchGroup(searchGroupData.uuid!!, role)
         finish()
     }
 

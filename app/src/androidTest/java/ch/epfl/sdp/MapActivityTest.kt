@@ -25,8 +25,8 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.database.dao.MockGroupDao
-import ch.epfl.sdp.database.dao.MockHeatmapDao
-import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.dao.OfflineHeatmapDao
+import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.data.HeatmapPointData
@@ -101,8 +101,8 @@ class MapActivityTest {
 
         // Do not use the real database, only use the offline version on the device
         // Firebase.database.goOffline()
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
+        MarkerRepository.daoProvider = { OfflineMarkerDao() }
         UserRepository.daoProvider = { MockUserDao() }
         SearchGroupRepository.daoProvider = { MockGroupDao() }
 
@@ -189,7 +189,7 @@ class MapActivityTest {
 
     @Test
     fun heatmapPaintersAreGeneratedWhenLaunchingApp() {
-        val heatmapDao = MockHeatmapDao()
+        val heatmapDao = OfflineHeatmapDao()
         val heatmap = HeatmapData(mutableListOf(
                 HeatmapPointData(LatLng(41.0, 10.0), 10.0),
                 HeatmapPointData(LatLng(41.0, 10.0), 8.5)
@@ -213,7 +213,7 @@ class MapActivityTest {
 
         assertThat(mActivityRule.activity.measureHeatmapManager.heatmapPainters.size, equalTo(1))
         //Reset default repo
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
     }
 
     @Test

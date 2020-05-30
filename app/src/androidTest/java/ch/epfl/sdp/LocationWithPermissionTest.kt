@@ -15,8 +15,8 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.database.data.Role
-import ch.epfl.sdp.database.dao.MockHeatmapDao
-import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.dao.OfflineHeatmapDao
+import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.ui.maps.MapActivity
@@ -63,8 +63,8 @@ class LocationWithPermissionTest {
             Auth.loggedIn.value = true
         }
 
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
+        MarkerRepository.daoProvider = { OfflineMarkerDao() }
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
