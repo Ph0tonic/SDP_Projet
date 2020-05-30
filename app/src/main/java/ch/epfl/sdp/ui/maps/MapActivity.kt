@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui.maps
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -100,11 +99,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneFlyingStatusObserver = Observer<Boolean> {
-        findViewById<FloatingActionButton>(R.id.return_home_or_user)!!.visibility = if(it) View.VISIBLE else View.GONE
+        findViewById<FloatingActionButton>(R.id.return_home_or_user)!!.visibility = if (it) View.VISIBLE else View.GONE
     }
 
-    private lateinit var startOrPauseButton : FloatingActionButton
-    private var defaultColor : Int = 0
+    private lateinit var startOrPauseButton: FloatingActionButton
+    private var defaultColor: Int = 0
     private var droneConnectionStatusObserver = Observer<Boolean> {
         startOrPauseButton.colorNormal = if (it) defaultColor else startOrPauseButton.colorDisabled
     }
@@ -289,7 +288,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         }
     }
 
-    fun returnHomeOrUser(v : View){
+    fun returnHomeOrUser(v: View) {
         ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
     }
 

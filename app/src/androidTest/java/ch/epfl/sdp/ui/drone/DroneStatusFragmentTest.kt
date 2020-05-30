@@ -32,7 +32,6 @@ import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager

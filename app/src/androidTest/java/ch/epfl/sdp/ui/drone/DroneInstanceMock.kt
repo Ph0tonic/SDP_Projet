@@ -1,5 +1,6 @@
-package ch.epfl.sdp.drone
+package ch.epfl.sdp.ui.drone
 
+import ch.epfl.sdp.drone.DroneInstanceProvider
 import io.mavsdk.System
 import io.mavsdk.action.Action
 import io.mavsdk.core.Core
@@ -9,6 +10,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 
 object DroneInstanceMock {
     val droneSystem = Mockito.mock(System::class.java)
@@ -22,13 +24,13 @@ object DroneInstanceMock {
             droneSystem
         }
 
-        Mockito.`when`(droneSystem.telemetry)
+        `when`(droneSystem.telemetry)
                 .thenReturn(droneTelemetry)
-        Mockito.`when`(droneSystem.core)
+        `when`(droneSystem.core)
                 .thenReturn(droneCore)
-        Mockito.`when`(droneSystem.mission)
+        `when`(droneSystem.mission)
                 .thenReturn(droneMission)
-        Mockito.`when`(droneSystem.action)
+        `when`(droneSystem.action)
                 .thenReturn(droneAction)
     }
 
@@ -36,70 +38,70 @@ object DroneInstanceMock {
     fun setupDefaultMocks() {
         resetMocks()
         // Telemetry Mocks
-        Mockito.`when`(droneTelemetry.flightMode)
+        `when`(droneTelemetry.flightMode)
                 .thenReturn(Flowable.fromArray(
                         Telemetry.FlightMode.LAND,
                         Telemetry.FlightMode.MISSION,
                         Telemetry.FlightMode.HOLD
                 ))
-        Mockito.`when`(droneTelemetry.armed)
+        `when`(droneTelemetry.armed)
                 .thenReturn(Flowable.fromArray(
                         true
                 ))
-        Mockito.`when`(droneTelemetry.position)
+        `when`(droneTelemetry.position)
                 .thenReturn(Flowable.fromArray(
                         Telemetry.Position(0.0, 0.0, 0.0f, 0.0f)
                 ))
-        Mockito.`when`(droneTelemetry.battery)
+        `when`(droneTelemetry.battery)
                 .thenReturn(Flowable.fromArray(
                         Telemetry.Battery(0.0f, 0.0f)
                 ))
-        Mockito.`when`(droneTelemetry.positionVelocityNed)
+        `when`(droneTelemetry.positionVelocityNed)
                 .thenReturn(Flowable.fromArray(
                         Telemetry.PositionVelocityNed(
                                 Telemetry.PositionNed(0.0f, 0.0f, 0.0f),
                                 Telemetry.VelocityNed(0.0f, 0.0f, 0.0f)
                         )
                 ))
-        Mockito.`when`(droneTelemetry.home)
+        `when`(droneTelemetry.home)
                 .thenReturn(Flowable.fromArray(
                         Telemetry.Position(0.0, 0.0, 0.0f, 0.0f)
                 ))
-        Mockito.`when`(droneTelemetry.inAir)
+        `when`(droneTelemetry.inAir)
                 .thenReturn(Flowable.fromArray(
                         true
                 ))
 
         //Core mocks
-        Mockito.`when`(droneCore.connectionState)
+        `when`(droneCore.connectionState)
                 .thenReturn(Flowable.fromArray(
                         Core.ConnectionState(0L, true)
                 ))
 
         //Mission mocks
-        Mockito.`when`(droneMission.pauseMission())
+        `when`(droneMission.pauseMission())
                 .thenReturn(Completable.complete())
-        Mockito.`when`(droneMission.setReturnToLaunchAfterMission(ArgumentMatchers.anyBoolean()))
+        `when`(droneMission.setReturnToLaunchAfterMission(ArgumentMatchers.anyBoolean()))
                 .thenReturn(Completable.complete())
-        Mockito.`when`(droneMission.uploadMission(ArgumentMatchers.any()))
+        `when`(droneMission.uploadMission(ArgumentMatchers.any()))
                 .thenReturn(Completable.complete())
-        Mockito.`when`(droneMission.startMission())
+        `when`(droneMission.startMission())
                 .thenReturn(Completable.complete())
-        Mockito.`when`(droneMission.clearMission())
+        `when`(droneMission.clearMission())
                 .thenReturn(Completable.complete())
 
         //Action mocks
-        Mockito.`when`(droneAction.arm())
+        `when`(droneAction.arm())
                 .thenReturn(Completable.complete())
-        Mockito.`when`(droneAction.gotoLocation(
+        `when`(droneAction.gotoLocation(
                 ArgumentMatchers.anyDouble(),
                 ArgumentMatchers.anyDouble(),
                 ArgumentMatchers.anyFloat(),
                 ArgumentMatchers.anyFloat()))
                 .thenReturn(Completable.complete())
-        Mockito.`when`(droneAction.returnToLaunch())
+        `when`(droneAction.returnToLaunch())
                 .thenReturn(Completable.complete())
-        Mockito.`when`(droneAction.land())
+        `when`(droneAction.land())
                 .thenReturn(Completable.complete())
     }
 

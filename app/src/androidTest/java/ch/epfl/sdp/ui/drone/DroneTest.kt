@@ -5,25 +5,17 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.DroneInstanceProvider
 import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
-import io.mavsdk.System
-import io.mavsdk.action.Action
-import io.mavsdk.core.Core
-import io.mavsdk.mavsdkserver.MavsdkServer
-import io.mavsdk.mission.Mission
 import io.mavsdk.telemetry.Telemetry
-import io.reactivex.Completable
-import io.reactivex.Flowable
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
-import org.junit.*
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.*
 
 
 @RunWith(AndroidJUnit4::class)
@@ -50,90 +42,10 @@ class DroneTest {
             true,
             false) // Activity is not launched immediately
 
-    private val droneSystem = mock(System::class.java)
-    private val droneTelemetry =   mock(Telemetry::class.java)
-    private val droneCore = mock(Core::class.java)
-    private val droneMission = mock(Mission::class.java)
-    private val droneAction = mock(Action::class.java)
-        
+
     @Before
     fun before() {
-        DroneInstanceProvider.provide = { droneSystem }
-
-        // Telemetry Mocks
-        `when`(droneSystem.telemetry)
-                .thenReturn(droneTelemetry)
-        `when`(droneTelemetry.flightMode)
-                .thenReturn(Flowable.fromArray(
-                        Telemetry.FlightMode.LAND,
-                        Telemetry.FlightMode.MISSION,
-                        Telemetry.FlightMode.HOLD
-                ))
-        `when`(droneTelemetry.armed)
-                .thenReturn(Flowable.fromArray(
-                        true
-                ))
-        `when`(droneTelemetry.position)
-                .thenReturn(Flowable.fromArray(
-                        Telemetry.Position(0.0,0.0,0.0f,0.0f)
-                ))
-        `when`(droneTelemetry.battery)
-                .thenReturn(Flowable.fromArray(
-                        Telemetry.Battery(0.0f, 0.0f)
-                ))
-        `when`(droneTelemetry.positionVelocityNed)
-                .thenReturn(Flowable.fromArray(
-                        Telemetry.PositionVelocityNed(
-                                Telemetry.PositionNed(0.0f, 0.0f, 0.0f),
-                                Telemetry.VelocityNed(0.0f, 0.0f, 0.0f)
-                        )
-                ))
-        `when`(droneTelemetry.home)
-                .thenReturn(Flowable.fromArray(
-                        Telemetry.Position(0.0, 0.0, 0.0f, 0.0f)
-                ))
-        `when`(droneTelemetry.inAir)
-                .thenReturn(Flowable.fromArray(
-                        true
-                ))
-
-        //Core mocks
-        `when`(droneSystem.core)
-                .thenReturn(droneCore)
-        `when`(droneCore.connectionState)
-                .thenReturn(Flowable.fromArray(
-                        Core.ConnectionState(0L, true)
-                ))
-
-        //Mission mocks
-        `when`(droneSystem.mission)
-                .thenReturn(droneMission)
-        `when`(droneMission.pauseMission())
-                .thenReturn(Completable.complete())
-        `when`(droneMission.setReturnToLaunchAfterMission(ArgumentMatchers.anyBoolean()))
-                .thenReturn(Completable.complete())
-        `when`(droneMission.uploadMission(ArgumentMatchers.any()))
-                .thenReturn(Completable.complete())
-        `when`(droneMission.startMission())
-                .thenReturn(Completable.complete())
-        `when`(droneMission.clearMission())
-                .thenReturn(Completable.complete())
-
-        //Action mocks
-        `when`(droneSystem.action)
-                .thenReturn(droneAction)
-        `when`(droneAction.arm())
-                .thenReturn(Completable.complete())
-        `when`(droneAction.gotoLocation(
-                ArgumentMatchers.anyDouble(),
-                ArgumentMatchers.anyDouble(),
-                ArgumentMatchers.anyFloat(),
-                ArgumentMatchers.anyFloat()))
-                .thenReturn(Completable.complete())
-        `when`(droneAction.returnToLaunch())
-                .thenReturn(Completable.complete())
-        `when`(droneAction.land())
-                .thenReturn(Completable.complete())
+        DroneInstanceMock.setupDefaultMocks()
     }
 
     @Test
@@ -225,47 +137,4 @@ class DroneTest {
 
         assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }
-
-    @Test
-    fun canResetMissionIfFailToReturnHome(){
-        val expectedLatLng = LatLng(47.397428, 8.545369) //Position of the drone before take off
-
-        Drone.positionLiveData.value = expectedLatLng
-        Drone.homeLocationLiveData.value =
-                Telemetry.Position(expectedLatLng.latitude, expectedLatLng.longitude, 400f, 50f)
-
-        `when`(droneAction.returnToLaunch())
-                .thenReturn(Completable.error(Throwable("Random Error Message")))
-
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
-
-        assertThat(Drone.missionLiveData.value, `is`(nullValue()))
-    }
-
-    @Test
-    fun canResetMissionStatusIfFailToRestartMission(){
-        Drone.isFlyingLiveData.value = true
-        Drone.isMissionPausedLiveData.value = true
-
-        `when`(droneMission.startMission())
-                .thenReturn(Completable.error(Throwable("Random Error Message")))
-
-        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
-
-        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
-    }
-
-    @Test
-    fun canResetMissionStatusIfFailToPauseMission(){
-        Drone.isFlyingLiveData.value = true
-        Drone.isMissionPausedLiveData.value = false
-
-        `when`(droneMission.startMission())
-                .thenReturn(Completable.error(Throwable("Random Error Message")))
-
-        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
-
-        assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
-    }
-
 }

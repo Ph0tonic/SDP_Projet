@@ -15,7 +15,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.R
-import ch.epfl.sdp.drone.DroneInstanceMock
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.map.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
 import com.mapbox.mapboxsdk.geometry.LatLng

@@ -1,6 +1,5 @@
 package ch.epfl.sdp.drone
 
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
@@ -34,8 +33,8 @@ object Drone {
     val absoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val speedLiveData: MutableLiveData<Float> = MutableLiveData()
     val missionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
-    val isFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData()
     val homeLocationLiveData: MutableLiveData<Telemetry.Position> = MutableLiveData()
+    val isFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMissionPausedLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
 
@@ -122,14 +121,12 @@ object Drone {
      * Pauses the current Mission
      */
     private fun pauseMission(): Disposable {
-        Log.d("DEBUG1", "PAUSE MISSION CALL")
         this.isMissionPausedLiveData.postValue(true)
         return getConnectedInstance()
                 .andThen(instance.mission.pauseMission())
                 .subscribe(
-                        { Log.d("DEBUG1", "PAUSE COMPLETE")
-                            ToastHandler().showToast(R.string.drone_pause_success, Toast.LENGTH_SHORT) },
-                        {Log.d("DEBUG1", "PAUSE ERROR")
+                        { ToastHandler().showToast(R.string.drone_pause_success, Toast.LENGTH_SHORT) },
+                        {
                             this.isMissionPausedLiveData.postValue(false)
                             ToastHandler().showToast(R.string.drone_pause_error, Toast.LENGTH_SHORT)
                         })
