@@ -1,4 +1,4 @@
-package ch.epfl.sdp.ui.maps
+package ch.epfl.sdp.ui.drone
 
 import android.app.AlertDialog
 import android.app.Dialog

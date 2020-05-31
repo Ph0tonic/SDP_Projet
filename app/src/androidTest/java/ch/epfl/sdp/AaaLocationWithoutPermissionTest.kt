@@ -1,10 +1,13 @@
 package ch.epfl.sdp
 
 import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiSelector
+import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.CentralLocationManager
 import org.hamcrest.CoreMatchers.equalTo
@@ -22,8 +25,13 @@ class AaaLocationWithoutPermissionTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+        }
+        DroneInstanceMock.setupDefaultMocks()
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
+
     /*
     @Test
     fun centralLocationManagerDoesNotRequestLocationUpdatesIfItDoesNotHavePermission() {
