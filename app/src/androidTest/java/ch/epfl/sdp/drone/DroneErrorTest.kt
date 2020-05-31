@@ -1,9 +1,7 @@
-package ch.epfl.sdp.ui.drone
+package ch.epfl.sdp.drone
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
-import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.DroneUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable

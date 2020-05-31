@@ -7,6 +7,7 @@ import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.data.HeatmapPointData
 import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.repository.IHeatmapRepository
+import ch.epfl.sdp.utils.Auth
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -23,7 +24,6 @@ class HeatmapDataManagerTest {
         private val DUMMY_LOCATION = LatLng(0.123, 23.1234)
     }
 
-
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -33,6 +33,8 @@ class HeatmapDataManagerTest {
                 HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
         ), DUMMY_HEATMAP_ID)
         val expectedGroupId = DUMMY_GROUP_ID
+
+        Auth.accountId.value = DUMMY_HEATMAP_ID
 
         val repo = Mockito.mock(IHeatmapRepository::class.java)
         Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(MutableLiveData(mutableMapOf()))
@@ -51,6 +53,8 @@ class HeatmapDataManagerTest {
         ), DUMMY_HEATMAP_ID)
         val expectedGroupId = DUMMY_GROUP_ID
         val previousHeatMapData = HeatmapData(mutableListOf(), DUMMY_HEATMAP_ID)
+
+        Auth.accountId.value = DUMMY_HEATMAP_ID
 
         val repo = Mockito.mock(IHeatmapRepository::class.java)
         Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(MutableLiveData(mutableMapOf(Pair(DUMMY_HEATMAP_ID, MutableLiveData(previousHeatMapData)))))
