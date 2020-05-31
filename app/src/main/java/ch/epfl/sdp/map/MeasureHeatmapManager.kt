@@ -8,7 +8,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 
-class MeasureHeatmapManager(val mapView: MapView, val mapboxMap: MapboxMap, val style: Style, val upperLayerId: String): Observer<MutableMap<String, MutableLiveData<HeatmapData>>> {
+class MeasureHeatmapManager(val mapView: MapView, val mapboxMap: MapboxMap, val style: Style, val upperLayerId: String) : Observer<MutableMap<String, MutableLiveData<HeatmapData>>> {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val heatmapPainters = mutableMapOf<String, MapboxHeatmapPainter>()
@@ -23,7 +23,7 @@ class MeasureHeatmapManager(val mapView: MapView, val mapboxMap: MapboxMap, val 
         // Observers for heatmap creation
         heatmaps.filter { !heatmapPainters.containsKey(it.key) }
                 .forEach { (key, value) ->
-                    heatmapPainters[key] = MapboxHeatmapPainter(style, value, upperLayerId)
+                    heatmapPainters[key] = MapboxHeatmapPainter(mapboxMap.style!!, value, upperLayerId)
                 }
 
         // Remove observers on heatmap deletion

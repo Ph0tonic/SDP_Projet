@@ -1,5 +1,6 @@
 package ch.epfl.sdp.drone
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
@@ -13,6 +14,10 @@ import io.mavsdk.mission.Mission
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.math.pow
@@ -119,6 +124,7 @@ object Drone {
                 .toCompletable()
 
         val missionCallBack = { location: LatLng, signalStrength: Double ->
+            Log.w("DRONE", "Mission Callback")
             heatmapDataManager.addMeasureToHeatmap(groupId, location, signalStrength)
         }
 
@@ -133,11 +139,46 @@ object Drone {
                 .andThen(instance.mission.startMission())
                 .subscribe())
 
+        disposables.add(
+                getConnectedInstance()
+                        .andThen(instance.mission.setReturnToLaunchAfterMission(true))
+                        .andThen(instance.mission.uploadMission(missionPlan))
+                        .andThen(instance.action.arm())
+                        .andThen {
+                            onMeasureTakenCallbacks.add(missionCallBack)
+                            Log.w("DRONE", "Add callback")
+                            it.onComplete()
+                        }
+                        .andThen(instance.mission.startMission())
+                        .subscribe(
+                                { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                                { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }
+                        )
+        )
+
+        disposables.add(instance.mission.missionProgress.subscribe { missionProgress ->
+            if (missionProgress.current == missionProgress.total) {
+                Log.w("DRONE", "Remove callback")
+                onMeasureTakenCallbacks.remove(missionCallBack)
+            }
+            Log.w("DRONE", "Mission progress  YEAH !")
+            val missionItem = missionLiveData.value?.getOrNull(missionProgress.current - 1)
+            val location = missionItem?.longitudeDeg?.let { it1 -> LatLng(missionItem.latitudeDeg, it1) }
+            val signal = getSignalStrength()
+            Log.w("DRONE", "Signal strength $signal")
+            Log.w("DRONE", "Location $location")
+            location?.let { it1 -> onMeasureTaken(it1, signal) }
+        })
+        //TODO See what to do with disposables added
     }
 
     private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
-        onMeasureTakenCallbacks.forEach {
-            it(location, signalStrength)
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                onMeasureTakenCallbacks.forEach {
+                    it(location, signalStrength)
+                }
+            }
         }
     }
 
@@ -174,7 +215,25 @@ object Drone {
                             ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
                         }
                 )
+<<<<<<< HEAD
         )
+=======
+    }
+
+    /**
+     * If the drone is not flying, it starts a mission with
+     * @param missionPlan
+     *
+     * If the drone is already flying, but paused, it restarts it
+     * If the drone is already flying and doing a mission, it pauses the mission
+     */
+    fun startOrPauseMission(missionPlan: Mission.MissionPlan, groupId: String) {
+        if (this.isFlyingLiveData.value!!) {
+            disposables.add(if (this.isMissionPausedLiveData.value!!) restartMission() else pauseMission())
+        } else {
+            startMission(missionPlan, groupId)
+        }
+>>>>>>> 54705bc3... Fix issues when new heatmps are added or removed and nothing change on screen
     }
 
     /**
@@ -205,6 +264,10 @@ object Drone {
                                 },
                                 {
                                     ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT)
+<<<<<<< HEAD
+=======
+                                    this.missionLiveData.value = null
+>>>>>>> 54705bc3... Fix issues when new heatmps are added or removed and nothing change on screen
                                 }
                         )
         )
@@ -223,6 +286,7 @@ object Drone {
                         .andThen(instance.mission.clearMission())
                         .andThen(instance.action.gotoLocation(returnLocation.latitude, returnLocation.longitude, 20.0F, 0F))
                         .subscribe(
+<<<<<<< HEAD
                                 {
                                     this.missionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
                                     ToastHandler().showToast(R.string.drone_user_success, Toast.LENGTH_SHORT)
@@ -230,6 +294,10 @@ object Drone {
                                 {
                                     ToastHandler().showToast(R.string.drone_user_error, Toast.LENGTH_SHORT)
                                 }
+=======
+                                { ToastHandler().showToast(R.string.drone_user_success, Toast.LENGTH_SHORT) },
+                                { ToastHandler().showToast(R.string.drone_user_error, Toast.LENGTH_SHORT) }
+>>>>>>> 54705bc3... Fix issues when new heatmps are added or removed and nothing change on screen
                         )
         )
 
