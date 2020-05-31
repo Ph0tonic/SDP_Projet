@@ -20,6 +20,7 @@ import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -51,6 +52,7 @@ class LoginNavFragmentTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        DroneInstanceMock.setupDefaultMocks()
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         runOnUiThread {
             Auth.logout()

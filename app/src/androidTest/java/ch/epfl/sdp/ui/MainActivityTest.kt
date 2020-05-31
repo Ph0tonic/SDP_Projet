@@ -22,7 +22,16 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.dao.MockGroupDao
+import ch.epfl.sdp.database.dao.MockUserDao
+import ch.epfl.sdp.database.dao.OfflineHeatmapDao
+import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.repository.UserRepository
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
@@ -51,9 +60,13 @@ class MainActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
-        runOnUiThread {
-            MainDataManager.goOffline()
-        }
+        DroneInstanceMock.setupDefaultMocks()
+
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
+        MarkerRepository.daoProvider = { OfflineMarkerDao() }
+        UserRepository.daoProvider = { MockUserDao() }
+        SearchGroupRepository.daoProvider = { MockGroupDao() }
+
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 

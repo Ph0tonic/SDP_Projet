@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,6 +41,12 @@ class DroneTest {
             MapActivity::class.java,
             true,
             false) // Activity is not launched immediately
+
+
+    @Before
+    fun before() {
+        DroneInstanceMock.setupDefaultMocks()
+    }
 
     @Test
     fun testSignal() {
@@ -108,5 +115,26 @@ class DroneTest {
         //compare both position
         assertThat(currentLat, closeTo(expectedLatLng.latitude, EPSILON))
         assertThat(currentLong, closeTo(expectedLatLng.longitude, EPSILON))
+    }
+
+    @Test
+    fun canPauseMission() {
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
+    }
+
+    @Test
+    fun canRestartMissionAfterPause() {
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }
 }

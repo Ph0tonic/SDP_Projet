@@ -7,6 +7,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiSelector
 import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.CentralLocationManager
 import org.hamcrest.CoreMatchers.equalTo
@@ -27,6 +28,7 @@ class AaaLocationWithoutPermissionTest {
         runOnUiThread {
             MainDataManager.goOffline()
         }
+        DroneInstanceMock.setupDefaultMocks()
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 

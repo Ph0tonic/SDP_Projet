@@ -18,15 +18,11 @@ import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.dao.MockGroupDao
+import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.dao.OfflineHeatmapDao
 import ch.epfl.sdp.database.dao.OfflineMarkerDao
-import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.MainDataManager
-import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
-import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
-import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
-import ch.epfl.sdp.database.providers.UserRepositoryProvider
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
@@ -77,6 +73,7 @@ class DroneStatusFragmentTest {
     @Throws(Exception::class)
     fun before() {
         MainDataManager.goOffline()
+        DroneInstanceMock.setupDefaultMocks()
 
         //Fake login
         runOnUiThread {
@@ -90,11 +87,6 @@ class DroneStatusFragmentTest {
         HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
         MarkerRepository.daoProvider = { OfflineMarkerDao() }
         UserRepository.daoProvider = { MockUserDao() }
-
-        SearchGroupRepositoryProvider.provide = { SearchGroupRepository() }
-        HeatmapRepositoryProvider.provide = { HeatmapRepository() }
-        MarkerRepositoryProvider.provide = { MarkerRepository() }
-        UserRepositoryProvider.provide = { UserRepository() }
 
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
