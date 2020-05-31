@@ -22,13 +22,13 @@ class FirebaseUserDao : UserDao {
 
     private val groupOperators: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
     private val groupRescuers: MutableMap<String, MutableLiveData<Set<UserData>>> = mutableMapOf()
-    private val userIdGroups: MutableMap<String, MutableLiveData<Set<String>>> = mutableMapOf()
+    private val userIdGroups: MutableMap<String, MutableLiveData<Map<String, Role>>> = mutableMapOf()
 
-    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>> {
+    override fun getGroupIdsOfUserByEmail(email: String): LiveData<Map<String, Role>> {
         if (!userIdGroups.containsKey(email)) {
             //Initialise data
             val myRef = database.getReference(ROOT_PATH)
-            userIdGroups[email] = MutableLiveData(setOf())
+            userIdGroups[email] = MutableLiveData(mapOf())
 
             myRef.addChildEventListener(object : ChildEventListener {
                 override fun onCancelled(p0: DatabaseError) {
@@ -42,7 +42,7 @@ class FirebaseUserDao : UserDao {
                     }.find { it.email == email }
 
                     if (user != null) {
-                        userIdGroups[email]?.value = userIdGroups[email]?.value!!.plus(dataSnapshot.key!!)
+                        userIdGroups[email]?.value = userIdGroups[email]?.value!!.plus(Pair(dataSnapshot.key!!, user.role))
                     } else {
                         userIdGroups[email]?.value = userIdGroups[email]?.value!!.minus(dataSnapshot.key!!)
                     }
@@ -54,7 +54,7 @@ class FirebaseUserDao : UserDao {
                     }.find { it.email == email }
 
                     if (user != null) {
-                        userIdGroups[email]?.value = userIdGroups[email]?.value!!.plus(dataSnapshot.key!!)
+                        userIdGroups[email]?.value = userIdGroups[email]?.value!!.plus(Pair(dataSnapshot.key!!, user.role))
                     }
                 }
 

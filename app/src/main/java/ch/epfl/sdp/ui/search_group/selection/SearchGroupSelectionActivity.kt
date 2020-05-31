@@ -10,21 +10,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 
-class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGroupData>> {
+class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<SearchGroupData, Role>>> {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val searchGroupManager = SearchGroupDataManager()
-
-    companion object {
-        const val SEARH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -40,12 +38,12 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGr
         searchGroupManager.getAllGroups().observe(this, this)
     }
 
-    override fun onChanged(searchGroups: List<SearchGroupData>) {
+    override fun onChanged(searchGroups: List<Pair<SearchGroupData, Role>>) {
         val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
         recyclerView.adapter = SearchGroupRecyclerAdapter(searchGroups,
                 object : OnItemClickListener<SearchGroupData> {
                     override fun onItemClicked(searchGroupData: SearchGroupData) {
-                        joinGroup(searchGroupData)
+                        joinGroup(searchGroupData, searchGroups.find { it.first == searchGroupData }!!.second)
                     }
                 },
                 object : OnItemClickListener<SearchGroupData> {
@@ -55,10 +53,8 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGr
                 })
     }
 
-    private fun joinGroup(searchGroupData: SearchGroupData) {
-        val returnDataIntent = Intent()
-        returnDataIntent.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
-        setResult(RESULT_OK, returnDataIntent)
+    private fun joinGroup(searchGroupData: SearchGroupData, role: Role) {
+        MainDataManager.selectSearchGroup(searchGroupData.uuid!!, role)
         finish()
     }
 
@@ -69,7 +65,12 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<SearchGr
     }
 
     fun addGroup(view: View) {
-        val intent = Intent(this, SearchGroupEditionActivity::class.java)
-        startActivity(intent)
+        val dialog = CreateSearchGroupDialogFragment(object : CreateSearchGroupListener {
+            override fun createGroup(name: String) {
+                val groupId = searchGroupManager.createSearchGroup(name)
+                editGroup(SearchGroupData(uuid = groupId))
+            }
+        })
+        dialog.show(supportFragmentManager, getString(R.string.create_a_search_group))
     }
 }

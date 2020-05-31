@@ -27,16 +27,18 @@ class SearchGroupDataManager {
     }
 
     fun createSearchGroup(name: String): String {
-        val groupId = searchGroupRepository.createGroup(SearchGroupData(null, name))
-        TODO("Not implemented yet need to add new user to search group")
-//        return groupId
+        val groupId = searchGroupRepository.createGroup(SearchGroupData(name = name))
+        userRepository.addUserToSearchGroup(groupId, UserData(Auth.email.value!!, role = Role.OPERATOR))
+        return groupId
     }
 
-    fun getAllGroups(): LiveData<List<SearchGroupData>> {
+    fun getAllGroups(): LiveData<List<Pair<SearchGroupData, Role>>> {
         return Transformations.switchMap(groupIdsOfUser) { ids ->
             Transformations.map(searchGroupRepository.getAllGroups()) { groups ->
                 groups.filter { group ->
-                    ids.contains(group.uuid)
+                    ids.containsKey(group.uuid)
+                }.map { group ->
+                    Pair(group, ids[group.uuid]!!)
                 }
             }
         }
@@ -63,9 +65,7 @@ class SearchGroupDataManager {
         userRepository.removeUserFromSearchGroup(searchGroupId, userId)
     }
 
-    fun addUserToSearchgroup(searchGroupId: String, email: String, role: Role) {
-        val user = UserData(email)
-        user.role = role
-        userRepository.addUserToSearchGroup(searchGroupId, user)
+    fun addUserToSearchGroup(searchGroupId: String, email: String, role: Role) {
+        userRepository.addUserToSearchGroup(searchGroupId, UserData(email, role = role))
     }
 }

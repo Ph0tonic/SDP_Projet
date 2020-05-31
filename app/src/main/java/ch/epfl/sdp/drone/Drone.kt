@@ -9,28 +9,24 @@ import ch.epfl.sdp.ui.toast.ToastHandler
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.System
-import io.mavsdk.mavsdkserver.MavsdkServer
 import io.mavsdk.mission.Mission
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 
 object Drone {
-    private const val USE_REMOTE_BACKEND = true // False for running MavsdkServer locally, True to connect to a remote instance
-    private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" //IP of the remote instance
-    private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
-
     // Maximum distance between passes in the strategy
     const val GROUND_SENSOR_SCOPE: Double = 15.0
-    const val DEFAULT_ALTITUDE: Float = 20.0F
+    const val DEFAULT_ALTITUDE: Float = 10.0F
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
-    private const val WAIT_TIME: Long = 200
+    private const val WAIT_TIME_S: Long = 1
 
     private val heatmapDataManager = HeatmapDataManager()
 
@@ -40,9 +36,10 @@ object Drone {
     val absoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val speedLiveData: MutableLiveData<Float> = MutableLiveData()
     val missionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
-    val isFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData()
     val homeLocationLiveData: MutableLiveData<Telemetry.Position> = MutableLiveData()
+    val isFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isMissionPausedLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
 
     private val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
 
@@ -53,26 +50,20 @@ object Drone {
 
     var getSignalStrength: () -> Double = debugGetSignalStrength
 
-    private val instance: System
+    private val instance: System = DroneInstanceProvider.provide()
 
     init {
-        instance = if (USE_REMOTE_BACKEND) {
-            System(REMOTE_BACKEND_IP_ADDRESS, REMOTE_BACKEND_PORT)
-        } else {
-            // Works for armeabi-v7a and arm64-v8a (not x86 or x86_64)
-            val mavsdkServer = MavsdkServer()
-            val mavsdkServerPort = mavsdkServer.run()
-            System("localhost", mavsdkServerPort)
-        }
-
-        disposables.add(instance.telemetry.flightMode.distinct()
+        disposables.add(instance.telemetry.flightMode
                 .subscribe(
-                        { flightMode -> Timber.d("flight mode: $flightMode") },
+                        { flightMode ->
+                            if (flightMode == Telemetry.FlightMode.HOLD) isMissionPausedLiveData.postValue(true)
+                            if (flightMode == Telemetry.FlightMode.MISSION) isMissionPausedLiveData.postValue(false)
+                        },
                         { error -> Timber.e("Error Flight Mode: $error") }
                 ))
-        disposables.add(instance.telemetry.armed.distinct()
+        disposables.add(instance.telemetry.armed.distinctUntilChanged()
                 .subscribe(
-                        { armed -> Timber.d("armed: $armed") },
+                        { armed -> if (!armed) isMissionPausedLiveData.postValue(true) },
                         { error -> Timber.e("Error Armed : $error") }
                 ))
         disposables.add(instance.telemetry.position
@@ -94,8 +85,9 @@ object Drone {
         disposables.add(instance.telemetry.positionVelocityNed
                 .subscribe(
                         { vector_speed -> speedLiveData.postValue(sqrt(vector_speed.velocity.eastMS.pow(2) + vector_speed.velocity.northMS.pow(2))) },
-                        { error -> Timber.e("Error GroundSpeedNed : $error") }))
-        disposables.add(instance.telemetry.inAir
+                        { error -> Timber.e("Error GroundSpeedNed : $error") }
+                ))
+        disposables.add(instance.telemetry.inAir.distinctUntilChanged()
                 .subscribe(
                         { isFlying -> isFlyingLiveData.postValue(isFlying) },
                         { error -> Timber.e("Error inAir : $error") }
@@ -105,43 +97,33 @@ object Drone {
                         { home -> homeLocationLiveData.postValue(home) },
                         { error -> Timber.e("Error home : $error") }
                 ))
-        disposables.add(instance.core.connectionState
+        disposables.add(instance.core.connectionState.distinctUntilChanged()
                 .subscribe(
                         { state -> isConnectedLiveData.postValue(state.isConnected) },
-                        { error -> Timber.e("Error home : $error") }
+                        { error -> Timber.e("Error connectionState : $error") }
                 ))
     }
 
     fun startMission(missionPlan: Mission.MissionPlan, groupId: String) {
-        Timber.w("startMission Drone")
         this.missionLiveData.value = missionPlan.missionItems
-
-        val isConnectedCompletable = instance.core.connectionState
-                .filter { state -> state.isConnected }
-                .firstOrError()
-                .toCompletable()
+        this.isMissionPausedLiveData.postValue(false)
 
         val missionCallBack = { location: LatLng, signalStrength: Double ->
             heatmapDataManager.addMeasureToHeatmap(groupId, location, signalStrength)
         }
 
-        disposables.add(isConnectedCompletable
-                .andThen(instance.mission.setReturnToLaunchAfterMission(true))
-                .andThen(instance.mission.uploadMission(missionPlan))
-                .andThen(instance.action.arm())
-                .andThen {
-                    onMeasureTakenCallbacks.add(missionCallBack)
-                    Timber.w("Add callback for measure !")
-                }
-                .andThen(instance.mission.startMission())
-                .doOnTerminate {
-                    onMeasureTakenCallbacks.remove(missionCallBack)
-                    Timber.w("On terminate !")
-                }
-                .subscribe(
-                        { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
-                        { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }
-                )
+        disposables.add(
+                getConnectedInstance()
+                        .andThen(instance.mission.setReturnToLaunchAfterMission(true))
+                        .andThen(instance.mission.uploadMission(missionPlan))
+                        .andThen(instance.action.arm())
+                        .andThen { onMeasureTakenCallbacks.add(missionCallBack) }
+                        .andThen(instance.mission.startMission())
+                        .doOnTerminate { onMeasureTakenCallbacks.remove(missionCallBack) }
+                        .subscribe(
+                                { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                                { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }
+                        )
         )
 
         disposables.add(instance.mission.missionProgress.subscribe {
@@ -157,6 +139,51 @@ object Drone {
     private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
         onMeasureTakenCallbacks.forEach {
             it(location, signalStrength)
+        }
+    }
+
+    /**
+     * Pauses the current Mission
+     */
+    private fun pauseMission(): Disposable {
+        this.isMissionPausedLiveData.postValue(true)
+        return getConnectedInstance()
+                .andThen(instance.mission.pauseMission())
+                .subscribe(
+                        { ToastHandler().showToast(R.string.drone_pause_success, Toast.LENGTH_SHORT) },
+                        {
+                            this.isMissionPausedLiveData.postValue(false)
+                            ToastHandler().showToast(R.string.drone_pause_error, Toast.LENGTH_SHORT)
+                        })
+    }
+
+    /**
+     * Restarts the current Mission
+     */
+    private fun restartMission(): Disposable {
+        this.isMissionPausedLiveData.postValue(false)
+        return getConnectedInstance()
+                .andThen(instance.mission.startMission())
+                .subscribe(
+                        { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
+                        {
+                            this.isMissionPausedLiveData.postValue(true)
+                            ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
+                        })
+    }
+
+    /**
+     * If the drone is not flying, it starts a mission with
+     * @param missionPlan
+     *
+     * If the drone is already flying, but paused, it restarts it
+     * If the drone is already flying and doing a mission, it pauses the mission
+     */
+    fun startOrPauseMission(missionPlan: Mission.MissionPlan, groupId: String) {
+        if (this.isFlyingLiveData.value!!) {
+            disposables.add(if (this.isMissionPausedLiveData.value!!) restartMission() else pauseMission())
+        } else {
+            startMission(missionPlan, groupId)
         }
     }
 
@@ -184,7 +211,10 @@ object Drone {
                         .andThen(instance.action.returnToLaunch())
                         .subscribe(
                                 { ToastHandler().showToast(R.string.drone_home_success, Toast.LENGTH_SHORT) },
-                                { ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT) }))
+                                {
+                                    ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT)
+                                    this.missionLiveData.value = null
+                                }))
     }
 
     /**
@@ -209,7 +239,8 @@ object Drone {
                         { pos ->
                             val isRightPos = LatLng(pos.latitudeDeg, pos.longitudeDeg).distanceTo(returnLocation).roundToInt() == 0
                             val isStopped = speedLiveData.value?.roundToInt() == 0
-                            if (isRightPos.and(isStopped)) instance.action.land().blockingAwait()
+                            if (isRightPos.and(isStopped)) instance.action.land().blockingAwait(WAIT_TIME_S, TimeUnit.SECONDS)
+                            this.isMissionPausedLiveData.postValue(true)
                         },
                         { e -> Timber.e("ERROR LANDING : $e") }))
     }

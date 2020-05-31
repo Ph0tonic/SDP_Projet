@@ -11,5 +11,5 @@ interface IUserRepository {
     fun removeUserFromSearchGroup(searchGroupId: String, userId: String)
     fun removeAllUserOfSearchGroup(searchGroupId: String)
     fun addUserToSearchGroup(searchGroupId: String, user: UserData)
-    fun getGroupIdsOfUserByEmail(email: String): LiveData<Set<String>>
+    fun getGroupIdsOfUserByEmail(email: String): LiveData<Map<String, Role>>
 }

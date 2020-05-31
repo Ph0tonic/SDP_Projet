@@ -38,7 +38,7 @@ class HeatmapDataManagerTest {
         Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(MutableLiveData(mutableMapOf()))
 
         HeatmapRepositoryProvider.provide = { repo }
-        HeatmapDataManager().addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
+        HeatmapDataManager().addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
 
         Mockito.verify(repo, Mockito.times(1)).getGroupHeatmaps(expectedGroupId)
         Mockito.verify(repo, Mockito.times(1)).updateHeatmap(expectedGroupId, expectedHeatMapData)
@@ -56,7 +56,7 @@ class HeatmapDataManagerTest {
         Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(MutableLiveData(mutableMapOf(Pair(DUMMY_HEATMAP_ID, MutableLiveData(previousHeatMapData)))))
 
         HeatmapRepositoryProvider.provide = { repo }
-        HeatmapDataManager().addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_HEATMAP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
+        HeatmapDataManager().addMeasureToHeatmap(DUMMY_GROUP_ID, DUMMY_LOCATION, DUMMY_INTENSITY)
 
         Mockito.verify(repo, Mockito.times(1)).getGroupHeatmaps(expectedGroupId)
         Mockito.verify(repo, Mockito.times(1)).updateHeatmap(expectedGroupId, expectedHeatMapData)

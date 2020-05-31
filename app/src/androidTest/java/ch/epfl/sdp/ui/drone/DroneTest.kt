@@ -1,8 +1,9 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.drone
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.ui.maps.MapActivity
@@ -11,6 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,9 +22,10 @@ import org.junit.runner.RunWith
 class DroneTest {
 
     companion object {
-        const val SIGNAL_STRENGTH = 1.0
+        private const val SIGNAL_STRENGTH = 1.0
         private const val EPSILON = 1e-5
         private const val DEFAULT_ALTITUDE = 10f
+        private const val DUMMY_GROUP_ID = "dummy_group_id"
         val someLocationsList = listOf(
                 LatLng(47.398979, 8.543434),
                 LatLng(47.398279, 8.543934),
@@ -40,8 +43,15 @@ class DroneTest {
             true,
             false) // Activity is not launched immediately
 
+
+    @Before
+    fun before() {
+        DroneInstanceMock.setupDefaultMocks()
+    }
+
     @Test
     fun testSignal() {
+        MainDataManager.goOffline()
         Drone.getSignalStrength = { SIGNAL_STRENGTH }
         assertThat(Drone.getSignalStrength(), closeTo(SIGNAL_STRENGTH, EPSILON))
         print(Drone.debugGetSignalStrength)
@@ -52,7 +62,7 @@ class DroneTest {
         Drone.missionLiveData.value = null
         assertThat(Drone.missionLiveData.value, `is`(nullValue()))
 
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
 
         // This assert prevent the app to crash in cash the mission has not been updated
         assertThat(Drone.missionLiveData.value, `is`(notNullValue()))
@@ -66,7 +76,7 @@ class DroneTest {
         Drone.positionLiveData.value = expectedLatLng
         Drone.homeLocationLiveData.value =
                 Telemetry.Position(expectedLatLng.latitude, expectedLatLng.longitude, 400f, 50f)
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
 
         Drone.returnToHomeLocationAndLand()
 
@@ -89,7 +99,7 @@ class DroneTest {
         val expectedLatLng = LatLng(47.297428, 8.445369) //Position near the takeoff
         CentralLocationManager.currentUserPosition.value = expectedLatLng
 
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
 
         assertThat(CentralLocationManager.currentUserPosition.value, `is`(notNullValue()))
         Drone.returnToUserLocationAndLand()
@@ -106,5 +116,26 @@ class DroneTest {
         //compare both position
         assertThat(currentLat, closeTo(expectedLatLng.latitude, EPSILON))
         assertThat(currentLong, closeTo(expectedLatLng.longitude, EPSILON))
+    }
+
+    @Test
+    fun canPauseMission() {
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
+    }
+
+    @Test
+    fun canRestartMissionAfterPause() {
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }
 }
