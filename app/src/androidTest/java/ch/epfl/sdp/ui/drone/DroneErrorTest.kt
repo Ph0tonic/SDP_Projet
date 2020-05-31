@@ -46,7 +46,6 @@ class DroneErrorTest {
                 .thenReturn(Completable.error(Throwable("Error StartMission")))
         `when`(DroneInstanceMock.droneMission.clearMission())
                 .thenReturn(Completable.error(Throwable("Error Clear Mission")))
-
     }
 
     @Test
@@ -71,7 +70,6 @@ class DroneErrorTest {
 
             Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
         }
-
         assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
     }
 

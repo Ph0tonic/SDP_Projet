@@ -34,9 +34,9 @@ object DroneInstanceMock {
                 .thenReturn(droneAction)
     }
 
-
     fun setupDefaultMocks() {
         resetMocks()
+
         // Telemetry Mocks
         `when`(droneTelemetry.flightMode)
                 .thenReturn(Flowable.fromArray(

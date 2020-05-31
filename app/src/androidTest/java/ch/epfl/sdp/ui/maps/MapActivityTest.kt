@@ -38,10 +38,10 @@ import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -493,6 +493,38 @@ class MapActivityTest {
 
         onView(withId(R.id.floating_menu_button)).perform(click())
 
+        onView(withId(R.id.return_home_or_user)).perform(click())
+        onView(withId(R.id.return_home_or_user)).perform(click())
+
+        // Test that the toast is displayed
+        onView(withText(applicationContext().getString(R.string.not_connected_message)))
+                .inRoot(withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
+                .check(matches(isDisplayed()))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = false
+        }
+    }
+
+    @Test
+    fun clickOnStartOrPauseButtonWhenDroneFlyingButNotConnectedShowsToast() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = true
+            Drone.isConnectedLiveData.value = false
+        }
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+
         onView(withId(R.id.start_or_pause_button)).perform(click())
         onView(withId(R.id.start_or_pause_button)).perform(click())
 
@@ -500,6 +532,44 @@ class MapActivityTest {
         onView(withText(applicationContext().getString(R.string.not_connected_message)))
                 .inRoot(withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = false
+        }
+    }
+
+    @Test
+    fun clickOnStartOrPauseButtonWhenDroneFlyingAndConnectedLaunchesMission() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = false
+            Drone.isConnectedLiveData.value = true
+
+            mActivityRule.activity.setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+
+            mActivityRule.activity.onMapClick(LatLng(47.398279, 8.543934))
+            mActivityRule.activity.onMapClick(LatLng(47.397426, 8.544867))
+        }
+
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
+        assertThat(searchAreaBuilder.vertices.size, equalTo(2))
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+
+        val uploadedMission = Drone.missionLiveData.value
+        assertThat(uploadedMission, `is`(notNullValue()))
+        assertThat(uploadedMission!!.size, not(equalTo(0)))
 
         runOnUiThread {
             Drone.isFlyingLiveData.value = false

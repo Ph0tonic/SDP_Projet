@@ -82,6 +82,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var homePainter: MapboxHomePainter
 
+    private lateinit var startOrPauseButton: FloatingActionButton
+    private lateinit var returnHomeOrUserButton: FloatingActionButton
+    private var defaultColor: Int = 0
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var victimSymbolManager: VictimSymbolManager
 
@@ -99,13 +103,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneFlyingStatusObserver = Observer<Boolean> {
-        findViewById<FloatingActionButton>(R.id.return_home_or_user)!!.visibility = if (it) View.VISIBLE else View.GONE
+        returnHomeOrUserButton.visibility = if (it) View.VISIBLE else View.GONE
     }
 
-    private lateinit var startOrPauseButton: FloatingActionButton
-    private var defaultColor: Int = 0
     private var droneConnectionStatusObserver = Observer<Boolean> {
         startOrPauseButton.colorNormal = if (it) defaultColor else startOrPauseButton.colorDisabled
+        returnHomeOrUserButton.colorNormal = if (it) defaultColor else returnHomeOrUserButton.colorDisabled
     }
 
     private var missionStatusObserver = Observer<Boolean> {
@@ -133,6 +136,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
         startOrPauseButton = findViewById(R.id.start_or_pause_button)
+        returnHomeOrUserButton = findViewById(R.id.return_home_or_user)
         defaultColor = startOrPauseButton.colorNormal
 
         if (MainDataManager.role.value == Role.RESCUER) {
@@ -289,7 +293,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     fun returnHomeOrUser(v: View) {
-        ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
+        if (!Drone.isConnectedLiveData.value!!) {
+            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
+        } else {
+            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

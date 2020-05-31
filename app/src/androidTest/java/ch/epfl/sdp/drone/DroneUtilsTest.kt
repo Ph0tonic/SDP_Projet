@@ -15,7 +15,6 @@ class DroneUtilsTest {
         DroneInstanceMock.setupDefaultMocks()
     }
 
-
     @Test
     fun generateMissionItemTest() {
         val n = 100
