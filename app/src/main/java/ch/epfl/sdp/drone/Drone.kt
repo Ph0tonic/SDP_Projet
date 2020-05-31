@@ -1,5 +1,6 @@
 package ch.epfl.sdp.drone
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
@@ -13,6 +14,10 @@ import io.mavsdk.mission.Mission
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.math.pow
@@ -109,6 +114,7 @@ object Drone {
         this.isMissionPausedLiveData.postValue(false)
 
         val missionCallBack = { location: LatLng, signalStrength: Double ->
+            Log.w("DRONE", "Mission Callback")
             heatmapDataManager.addMeasureToHeatmap(groupId, location, signalStrength)
         }
 
@@ -117,28 +123,41 @@ object Drone {
                         .andThen(instance.mission.setReturnToLaunchAfterMission(true))
                         .andThen(instance.mission.uploadMission(missionPlan))
                         .andThen(instance.action.arm())
-                        .andThen { onMeasureTakenCallbacks.add(missionCallBack) }
+                        .andThen {
+                            onMeasureTakenCallbacks.add(missionCallBack)
+                            Log.w("DRONE", "Add callback")
+                            it.onComplete()
+                        }
                         .andThen(instance.mission.startMission())
-                        .doOnTerminate { onMeasureTakenCallbacks.remove(missionCallBack) }
                         .subscribe(
                                 { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
                                 { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }
                         )
         )
 
-        disposables.add(instance.mission.missionProgress.subscribe {
-            Timber.w("Mission progress  YEAH !")
-            val missionItem = missionLiveData.value?.get(it.current)!!
-            val location = LatLng(missionItem.latitudeDeg, missionItem.longitudeDeg)
+        disposables.add(instance.mission.missionProgress.subscribe { missionProgress ->
+            if (missionProgress.current == missionProgress.total) {
+                Log.w("DRONE", "Remove callback")
+                onMeasureTakenCallbacks.remove(missionCallBack)
+            }
+            Log.w("DRONE", "Mission progress  YEAH !")
+            val missionItem = missionLiveData.value?.getOrNull(missionProgress.current - 1)
+            val location = missionItem?.longitudeDeg?.let { it1 -> LatLng(missionItem.latitudeDeg, it1) }
             val signal = getSignalStrength()
-            onMeasureTaken(location, signal)
+            Log.w("DRONE", "Signal strength $signal")
+            Log.w("DRONE", "Location $location")
+            location?.let { it1 -> onMeasureTaken(it1, signal) }
         })
         //TODO See what to do with disposables added
     }
 
     private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
-        onMeasureTakenCallbacks.forEach {
-            it(location, signalStrength)
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                onMeasureTakenCallbacks.forEach {
+                    it(location, signalStrength)
+                }
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import java.util.*
 
 class MapboxHeatmapPainter(val style: Style,
                            val heatmapData: MutableLiveData<HeatmapData>,
@@ -56,7 +57,9 @@ class MapboxHeatmapPainter(val style: Style,
         }
     }
 
-    private val geoJsonSource: GeoJsonSource = GeoJsonSource(heatmapData.value!!.uuid, GeoJsonOptions()
+    private val uuidSource = UUID.randomUUID().toString()
+
+    private val geoJsonSource: GeoJsonSource = GeoJsonSource(uuidSource, GeoJsonOptions()
             .withCluster(true)
             .withClusterProperty("intensities", Expression.literal("+"), Expression.get("intensity"))
             .withClusterMaxZoom(13)
@@ -64,11 +67,10 @@ class MapboxHeatmapPainter(val style: Style,
     private val heatmapRedrawObserver = Observer<HeatmapData> { paint() }
 
     init {
-        val heatmapId = heatmapData.value!!.uuid!!
         style.addSource(geoJsonSource)
         heatmapData.observeForever(heatmapRedrawObserver)
-        unclusteredLayerData(heatmapId, style, belowLayerId)
-        clusteredLayerData(heatmapId, style, belowLayerId)
+        unclusteredLayerData(uuidSource, style, belowLayerId)
+        clusteredLayerData(uuidSource, style, belowLayerId)
 
         // first call is not triggered by observer
         paint()
