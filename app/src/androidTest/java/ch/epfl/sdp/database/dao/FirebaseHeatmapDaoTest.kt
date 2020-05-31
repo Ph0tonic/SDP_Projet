@@ -11,7 +11,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -57,13 +57,32 @@ class FirebaseHeatmapDaoTest {
             if (it.containsKey(DUMMY_HEATMAP_ID) && it[DUMMY_HEATMAP_ID]!!.value != null) {
                 val actualHeatmap = it[DUMMY_HEATMAP_ID]!!.value!!
 
-                MatcherAssert.assertThat(actualHeatmap, equalTo(heatmap))
+                assertThat(actualHeatmap, equalTo(heatmap))
                 called.countDown()
             }
         }
 
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(called.count, equalTo(0L))
+        assertThat(called.count, equalTo(0L))
+    }
+
+    @Test
+    fun removeAllHeatmapsOfSearchGroupRemovesAllHeatmapsOfSearchGroup() {
+        val dao = FirebaseHeatmapDao()
+        val initialHeatmap = HeatmapData(mutableListOf(
+                HeatmapPointData(LatLng(41.0, 10.0), 10.0),
+                HeatmapPointData(LatLng(41.0, 10.0), 8.5)
+        ), DUMMY_HEATMAP_ID)
+
+        //Populate database
+        Firebase.database.getReference("heatmaps/$DUMMY_GROUP_ID/$DUMMY_HEATMAP_ID").setValue(initialHeatmap)
+
+        //Update value
+        dao.updateHeatmap(DUMMY_GROUP_ID, initialHeatmap)
+        dao.removeAllHeatmapsOfSearchGroup(DUMMY_GROUP_ID)
+        val data = dao.getHeatmapsOfSearchGroup(DUMMY_GROUP_ID)
+
+        assertThat(data.value!!.size, equalTo(0))
     }
 
     @Test
@@ -92,7 +111,7 @@ class FirebaseHeatmapDaoTest {
                     // We do not want to compare uuids as they are generated at adding time by firebase
                     actualHeatmap.uuid = dataSnapshot.key
 
-                    MatcherAssert.assertThat(actualHeatmap, equalTo(expectedHeatmap))
+                    assertThat(actualHeatmap, equalTo(expectedHeatmap))
                     called.countDown()
                 } else {
                     initialData = false
@@ -105,7 +124,7 @@ class FirebaseHeatmapDaoTest {
         dao.updateHeatmap(DUMMY_GROUP_ID, expectedHeatmap)
 
         called.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
-        MatcherAssert.assertThat(called.count, equalTo(0L))
+        assertThat(called.count, equalTo(0L))
         ref.removeEventListener(listener)
     }
 }

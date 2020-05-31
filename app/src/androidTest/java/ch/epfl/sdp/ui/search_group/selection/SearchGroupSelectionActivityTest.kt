@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.search_group.selection
 
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +12,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
+import ch.epfl.sdp.MainApplication
+import ch.epfl.sdp.R
 import ch.epfl.sdp.database.dao.MockGroupDao
 import ch.epfl.sdp.database.dao.UserDao
 import ch.epfl.sdp.database.data.Role
@@ -20,7 +22,6 @@ import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.Auth
-import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Before
 import org.junit.Rule
@@ -29,7 +30,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 
 @RunWith(AndroidJUnit4::class)
-class SearchGroupEditionActivityTest {
+class SearchGroupSelectionActivityTest {
 
     @get:Rule
     var mActivityRule = IntentsTestRule(MainActivity::class.java, true, false)

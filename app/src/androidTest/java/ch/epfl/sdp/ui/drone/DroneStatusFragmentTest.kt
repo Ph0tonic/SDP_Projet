@@ -14,16 +14,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.dao.MockGroupDao
-import ch.epfl.sdp.database.dao.MockHeatmapDao
-import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.dao.OfflineHeatmapDao
+import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.dao.MockUserDao
 import ch.epfl.sdp.database.data.Role
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
@@ -44,7 +43,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class DroneStatusFragmentTest {
@@ -78,6 +76,8 @@ class DroneStatusFragmentTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        MainDataManager.goOffline()
+
         //Fake login
         runOnUiThread {
             Auth.accountId.value = FAKE_ACCOUNT_ID
@@ -87,8 +87,8 @@ class DroneStatusFragmentTest {
         // Do not use the real database, only use the offline version on the device
         // Firebase.database.goOffline()
         SearchGroupRepository.daoProvider = { MockGroupDao() }
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
+        MarkerRepository.daoProvider = { OfflineMarkerDao() }
         UserRepository.daoProvider = { MockUserDao() }
 
         SearchGroupRepositoryProvider.provide = { SearchGroupRepository() }

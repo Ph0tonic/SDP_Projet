@@ -4,16 +4,15 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.TableLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.HeatmapDataManager
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.data_manager.MarkerDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
@@ -27,6 +26,7 @@ import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
+import ch.epfl.sdp.ui.drone.ReturnDroneDialogFragment
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -50,18 +50,17 @@ import io.mavsdk.telemetry.Telemetry
  */
 class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLongClickListener, MapboxMap.OnMapClickListener {
 
-    private lateinit var groupId: String
     private var isMapReady = false
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var isCameraFragmentFullScreen = true
 
     private lateinit var mapboxMap: MapboxMap
+
     // Allow to no trigger long click when the event has already been consumed by a painter
     // Mapbox annotation plugin PR has been merged but no released yet
     private var longClickConsumed = false
 
-    private lateinit var role: Role
     private lateinit var currentStrategy: OverflightStrategy
 
     /** Builders */
@@ -113,17 +112,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        requireNotNull(intent.getStringExtra(getString(R.string.intent_key_group_id))) { "MapActivity should be provided with a searchGroupId\n" }
+        require(!MainDataManager.groupId.value.isNullOrEmpty()) { "MapActivity should be provided with a valid searchGroupId\n" }
         require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
         requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
-        requireNotNull(intent.getSerializableExtra(getString(R.string.intent_key_role))) { "MapActivity should be provided with a role" }
+        requireNotNull(MainDataManager.role.value) { "MapActivity should be provided with a role" }
 
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
-
-        groupId = intent.getStringExtra(getString(R.string.intent_key_group_id))!!
-        role = intent.getSerializableExtra(getString(R.string.intent_key_role)) as Role
 
         //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
@@ -132,7 +128,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
 
-        if (role == Role.RESCUER) {
+        if (MainDataManager.role.value == Role.RESCUER) {
             hideOperatorUiComponents()
         }
     }
@@ -186,7 +182,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
-            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, { markerId -> markerManager.removeMarkerForSearchGroup(groupId, markerId) }) { longClickConsumed = true }
+            victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, { markerId -> markerManager.removeMarkerForSearchGroup(MainDataManager.groupId.value!!, markerId) }) { longClickConsumed = true }
             homePainter = MapboxHomePainter(mapView, mapboxMap, style)
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
@@ -203,8 +199,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             setStrategy(loadDefaultStrategyFromPreferences())
 
             // Configure listeners
-            markerManager.getMarkersOfSearchGroup(groupId).observe(this, victimSymbolManager)
-            heatmapManager.getGroupHeatmaps(groupId).observe(this, measureHeatmapManager)
+            markerManager.getMarkersOfSearchGroup(MainDataManager.groupId.value!!).observe(this, victimSymbolManager)
+            heatmapManager.getGroupHeatmaps(MainDataManager.groupId.value!!).observe(this, measureHeatmapManager)
             Drone.positionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
             missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
 
@@ -222,7 +218,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     override fun onMapClick(position: LatLng): Boolean {
-        if (role == Role.OPERATOR) {
+        if (MainDataManager.role.value == Role.OPERATOR) {
             try {
                 searchAreaBuilder.addVertex(position)
             } catch (e: IllegalArgumentException) {
@@ -235,7 +231,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     override fun onMapLongClick(position: LatLng): Boolean {
         // Need mapbox update to remove this test
         if (!longClickConsumed) {
-            markerManager.addMarkerForSearchGroup(groupId, position)
+            markerManager.addMarkerForSearchGroup(MainDataManager.groupId.value!!, position)
         }
         longClickConsumed = false
         return true
@@ -252,7 +248,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapManager.addMeasureToHeatmap(groupId, Auth.accountId.value!!, location, intensity)
+            heatmapManager.addMeasureToHeatmap(MainDataManager.groupId.value!!, Auth.accountId.value!!, location, intensity)
         }
     }
 

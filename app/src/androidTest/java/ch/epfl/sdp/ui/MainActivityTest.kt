@@ -1,11 +1,10 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
 import android.view.Gravity
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -22,7 +21,8 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
-import ch.epfl.sdp.ui.MainActivity
+import ch.epfl.sdp.R
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
@@ -51,6 +51,9 @@ class MainActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+        }
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 
@@ -83,6 +86,7 @@ class MainActivityTest {
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
     }
+
     @Test
     fun canDisplayAMapAndReloadLocation() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext())
@@ -122,9 +126,9 @@ class MainActivityTest {
     }
 
     @Test
-    fun startMissionWithNoGroupShowsToast(){
-        runOnUiThread{
-            mActivityRule.activity.currentGroupId.value = null
+    fun startMissionWithNoGroupShowsToast() {
+        runOnUiThread {
+            MainDataManager.groupId.value = null
         }
         onView(withId(R.id.start_mission_button)).perform(click())
         onView(withText(mActivityRule.activity.getString(R.string.warning_no_group_selected)))

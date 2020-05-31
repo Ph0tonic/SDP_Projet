@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.drone
 
 import android.Manifest
 import android.content.Intent
@@ -18,11 +18,13 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
-import ch.epfl.sdp.ui.maps.ReturnDroneDialogFragment
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -66,6 +68,8 @@ class ReturnDroneDialogFragmentTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        MainDataManager.goOffline()
+
         //Fake login
         UiThreadStatement.runOnUiThread {
             Auth.accountId.value = FAKE_ACCOUNT_ID
