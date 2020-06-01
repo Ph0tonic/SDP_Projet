@@ -173,7 +173,8 @@ object Drone {
                         {
                             this.isMissionPausedLiveData.postValue(false)
                             ToastHandler().showToast(R.string.drone_pause_error, Toast.LENGTH_SHORT)
-                        })
+                        }
+                )
     }
 
     /**
@@ -188,7 +189,8 @@ object Drone {
                         {
                             this.isMissionPausedLiveData.postValue(true)
                             ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
-                        })
+                        }
+                )
     }
 
     /**
@@ -233,7 +235,9 @@ object Drone {
                                 {
                                     ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT)
                                     this.missionLiveData.value = null
-                                }))
+                                }
+                        )
+        )
     }
 
     /**
@@ -251,7 +255,9 @@ object Drone {
                         .andThen(instance.action.gotoLocation(returnLocation.latitude, returnLocation.longitude, 20.0F, 0F))
                         .subscribe(
                                 { ToastHandler().showToast(R.string.drone_user_success, Toast.LENGTH_SHORT) },
-                                { ToastHandler().showToast(R.string.drone_user_error, Toast.LENGTH_SHORT) }))
+                                { ToastHandler().showToast(R.string.drone_user_error, Toast.LENGTH_SHORT) }
+                        )
+        )
 
         disposables.add(
                 instance.telemetry.position.subscribe(
@@ -261,6 +267,8 @@ object Drone {
                             if (isRightPos.and(isStopped)) instance.action.land().blockingAwait(WAIT_TIME_S, TimeUnit.SECONDS)
                             this.isMissionPausedLiveData.postValue(true)
                         },
-                        { e -> Timber.e("ERROR LANDING : $e") }))
+                        { e -> Timber.e("ERROR LANDING : $e") }
+                )
+        )
     }
 }

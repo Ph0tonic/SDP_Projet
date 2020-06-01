@@ -67,10 +67,10 @@ class MapboxHeatmapPainter(val style: Style,
     private val heatmapRedrawObserver = Observer<HeatmapData> { paint() }
 
     init {
-        style.addSource(geoJsonSource)
-        heatmapData.observeForever(heatmapRedrawObserver)
         unclusteredLayerData(uuidSource, style, belowLayerId)
         clusteredLayerData(uuidSource, style, belowLayerId)
+        style.addSource(geoJsonSource)
+        heatmapData.observeForever(heatmapRedrawObserver)
 
         // first call is not triggered by observer
         paint()
@@ -78,6 +78,7 @@ class MapboxHeatmapPainter(val style: Style,
 
     override fun onDestroy() {
         heatmapData.removeObserver(heatmapRedrawObserver)
+        geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(listOf()))
     }
 
     private fun paint() {
