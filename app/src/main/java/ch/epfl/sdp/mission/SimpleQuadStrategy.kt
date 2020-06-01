@@ -1,5 +1,6 @@
 package ch.epfl.sdp.mission
 
+import androidx.annotation.VisibleForTesting
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -14,8 +15,24 @@ import kotlin.math.max
 class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINES) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     companion object {
         const val DEFAULT_DIST_BETWEEN_LINES: Double = 15.0
+
+        fun computeMaxDist(waypoints: List<LatLng>, orientation: Orientation): Double {
+            return if (orientation.isHorizontal()) {
+                maxDistWithIndex(waypoints, 0, 1, 3, 2)
+            } else {
+                maxDistWithIndex(waypoints, 0, 3, 1, 2)
+            }
+        }
+
+        private fun maxDistWithIndex(waypoints: List<LatLng>, side1v1: Int, side1v2: Int, side2v1: Int, side2v2: Int): Double {
+            return max(
+                    waypoints[side1v1].distanceTo(waypoints[side1v2]),
+                    waypoints[side2v1].distanceTo(waypoints[side2v2]))
+        }
     }
 
     init {
@@ -69,18 +86,4 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
     }
 
     private fun numPointsFromDist(dist: Double) = ceil(dist / maxDistBetweenLines).toInt()
-
-    private fun computeMaxDist(waypoints: List<LatLng>, orientation: Orientation): Double {
-        return if (orientation.isHorizontal()) {
-            maxDistWithIndex(waypoints, 0, 1, 3, 2)
-        } else {
-            maxDistWithIndex(waypoints, 0, 3, 1, 2)
-        }
-    }
-
-    private fun maxDistWithIndex(waypoints: List<LatLng>, side1v1: Int, side1v2: Int, side2v1: Int, side2v2: Int): Double {
-        return max(
-                waypoints[side1v1].distanceTo(waypoints[side1v2]),
-                waypoints[side2v1].distanceTo(waypoints[side2v2]))
-    }
 }
