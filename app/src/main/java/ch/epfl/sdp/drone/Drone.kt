@@ -32,9 +32,7 @@ object Drone {
     val batteryLevelLiveData: MutableLiveData<Float> = MutableLiveData()
     val absoluteAltitudeLiveData: MutableLiveData<Float> = MutableLiveData()
     val speedLiveData: MutableLiveData<Float> = MutableLiveData()
-
     val missionLiveData: MutableLiveData<List<Mission.MissionItem>> = MutableLiveData()
-
     val homeLocationLiveData: MutableLiveData<Telemetry.Position> = MutableLiveData()
     val isFlyingLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)

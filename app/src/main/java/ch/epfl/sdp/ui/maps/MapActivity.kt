@@ -52,9 +52,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     private var isMapReady = false
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var isCameraFragmentFullScreen = true
-
     private lateinit var mapboxMap: MapboxMap
 
     // Allow to no trigger long click when the event has already been consumed by a painter
@@ -79,8 +76,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     /* Painters */
     private lateinit var searchAreaPainter: MapboxSearchAreaPainter
-    private lateinit var missionBuildPainter: MapboxMissionPainter
-    private lateinit var missionDronePainter: MapboxMissionPainter
+    private lateinit var buildMissionPainter: MapboxMissionPainter
+    private lateinit var droneMissionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var homePainter: MapboxHomePainter
 
@@ -175,7 +172,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         super.onDestroy()
         if (isMapReady) {
             dronePainter.onDestroy()
-            missionBuildPainter.onDestroy()
+            buildMissionPainter.onDestroy()
             homePainter.onDestroy()
             searchAreaPainter.onDestroy()
             victimSymbolManager.onDestroy()
@@ -193,8 +190,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, { markerId -> markerManager.removeMarkerForSearchGroup(MainDataManager.groupId.value!!, markerId) }) { longClickConsumed = true }
             homePainter = MapboxHomePainter(mapView, mapboxMap, style)
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
-            missionBuildPainter = MapboxMissionPainter(mapView, mapboxMap, style)
-            missionDronePainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            buildMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            droneMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             searchAreaPainter = MapboxSearchAreaPainter(mapView, mapboxMap, style) { longClickConsumed = true }
 
             mapboxMap.addOnMapClickListener(this)
@@ -211,13 +208,13 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             markerManager.getMarkersOfSearchGroup(MainDataManager.groupId.value!!).observe(this, victimSymbolManager)
             heatmapManager.getGroupHeatmaps(MainDataManager.groupId.value!!).observe(this, measureHeatmapManager)
             Drone.positionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
-            missionBuilder.generatedMissionChanged.add { missionBuildPainter.paint(it) }
+            missionBuilder.generatedMissionChanged.add { buildMissionPainter.paint(it) }
             Transformations.map(Drone.missionLiveData) { mission ->
                 return@map mission?.map { item ->
                     LatLng(item.latitudeDeg, item.longitudeDeg)
                 }
             }.observe(this, Observer {
-                missionDronePainter.paint(it)
+                droneMissionPainter.paint(it)
             })
 
             val locationComponent = mapboxMap.locationComponent
