@@ -8,7 +8,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        app:cardBackgroundColor="@color/colorWhite"
+        app:cardBackgroundColor="@android:color/white"
         android:layout_height="wrap_content"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true"
@@ -31,7 +31,7 @@
                 android:id="@+id/remove_user_button"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@color/colorTransparent"
+                android:background="@android:color/transparent"
                 android:drawableEnd="@drawable/ic_delete_black_24dp"
                 android:textAllCaps="false" />
 
