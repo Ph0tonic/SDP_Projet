@@ -72,7 +72,7 @@ class SimpleQuadStrategyTest {
         )
         val res = SimpleQuadStrategy.computeMaxDist(waypoints, SimpleQuadStrategy.Orientation.VERTICAL)
         val theoryRes = max(dist1, dist2)
-        val diff = abs(res-theoryRes)
+        val diff = abs(res - theoryRes)
         assertThat("Wanted $theoryRes, but got: $res", diff < 0.01)
     }
 
