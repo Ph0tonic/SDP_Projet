@@ -213,7 +213,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             Drone.positionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
             missionBuilder.generatedMissionChanged.add { missionBuildPainter.paint(it) }
             Transformations.map(Drone.missionLiveData) { mission ->
-                return@map mission.map { item ->
+                return@map mission?.map { item ->
                     LatLng(item.latitudeDeg, item.longitudeDeg)
                 }
             }.observe(this, Observer {
