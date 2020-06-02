@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
@@ -51,9 +52,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     private var isMapReady = false
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var isCameraFragmentFullScreen = true
-
     private lateinit var mapboxMap: MapboxMap
 
     // Allow to no trigger long click when the event has already been consumed by a painter
@@ -78,7 +76,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     /* Painters */
     private lateinit var searchAreaPainter: MapboxSearchAreaPainter
-    private lateinit var missionPainter: MapboxMissionPainter
+    private lateinit var buildMissionPainter: MapboxMissionPainter
+    private lateinit var droneMissionPainter: MapboxMissionPainter
     private lateinit var dronePainter: MapboxDronePainter
     private lateinit var homePainter: MapboxHomePainter
 
@@ -114,13 +113,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         startOrPauseButton.setIcon(if (it) R.drawable.ic_play_arrow_black_24dp else R.drawable.ic_pause_black_24dp)
     }
 
-    companion object {
-        private const val SCALE_FACTOR = 4
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         require(!MainDataManager.groupId.value.isNullOrEmpty()) { "MapActivity should be provided with a valid searchGroupId\n" }
-        require(Auth.loggedIn.value == true) { "You need to be logged in to access MapActivity" }
         requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
         requireNotNull(MainDataManager.role.value) { "MapActivity should be provided with a role" }
 
@@ -178,7 +172,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         super.onDestroy()
         if (isMapReady) {
             dronePainter.onDestroy()
-            missionPainter.onDestroy()
+            buildMissionPainter.onDestroy()
             homePainter.onDestroy()
             searchAreaPainter.onDestroy()
             victimSymbolManager.onDestroy()
@@ -196,7 +190,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, { markerId -> markerManager.removeMarkerForSearchGroup(MainDataManager.groupId.value!!, markerId) }) { longClickConsumed = true }
             homePainter = MapboxHomePainter(mapView, mapboxMap, style)
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
-            missionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            buildMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
+            droneMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             searchAreaPainter = MapboxSearchAreaPainter(mapView, mapboxMap, style) { longClickConsumed = true }
 
             mapboxMap.addOnMapClickListener(this)
@@ -213,7 +208,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             markerManager.getMarkersOfSearchGroup(MainDataManager.groupId.value!!).observe(this, victimSymbolManager)
             heatmapManager.getGroupHeatmaps(MainDataManager.groupId.value!!).observe(this, measureHeatmapManager)
             Drone.positionLiveData.observe(this, Observer { missionBuilder.withStartingLocation(it) })
-            missionBuilder.generatedMissionChanged.add { missionPainter.paint(it) }
+            missionBuilder.generatedMissionChanged.add { buildMissionPainter.paint(it) }
+            Transformations.map(Drone.missionLiveData) { mission ->
+                return@map mission?.map { item ->
+                    LatLng(item.latitudeDeg, item.longitudeDeg)
+                }
+            }.observe(this, Observer {
+                droneMissionPainter.paint(it)
+            })
 
             val locationComponent = mapboxMap.locationComponent
             locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
@@ -303,6 +305,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
         Drone.startOrPauseMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        searchAreaBuilder.reset()
     }
 
     /**
