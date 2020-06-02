@@ -1,5 +1,6 @@
 package ch.epfl.sdp.mission
 
+import androidx.annotation.VisibleForTesting
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import ch.epfl.sdp.searcharea.SearchArea
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -14,8 +15,24 @@ import kotlin.math.max
 class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINES) : OverflightStrategy {
     private val maxDistBetweenLines: Double
 
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     companion object {
         const val DEFAULT_DIST_BETWEEN_LINES: Double = 15.0
+
+        fun computeMaxDist(waypoints: List<LatLng>, orientation: Orientation): Double {
+            return if (orientation.isHorizontal()) {
+                maxDistWithIndex(waypoints, 0, 1, 3, 2)
+            } else {
+                maxDistWithIndex(waypoints, 0, 3, 1, 2)
+            }
+        }
+
+        private fun maxDistWithIndex(waypoints: List<LatLng>, side1v1: Int, side1v2: Int, side2v1: Int, side2v2: Int): Double {
+            return max(
+                    waypoints[side1v1].distanceTo(waypoints[side1v2]),
+                    waypoints[side2v1].distanceTo(waypoints[side2v2]))
+        }
     }
 
     init {
@@ -29,6 +46,17 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
         return searchArea is QuadrilateralArea
     }
 
+    enum class Orientation {
+        HORIZONTAL {
+            override fun isHorizontal() = true
+        },
+        VERTICAL {
+            override fun isHorizontal() = false
+        };
+
+        abstract fun isHorizontal(): Boolean
+    }
+
     @Throws(IllegalArgumentException::class)
     override fun createFlightPath(startingPoint: LatLng, searchArea: SearchArea): List<LatLng> {
         require(acceptArea(searchArea)) { "This strategy does not accept this type of area" }
@@ -38,12 +66,14 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
         val startingIndex = waypointsCopied.withIndex().minBy { it.value.distanceTo(startingPoint) }!!.index
         Collections.rotate(waypointsCopied, -startingIndex)
 
-        val (numPointsX, numPointsY) = computeMaxDists(waypointsCopied).toList().map { ceil(it / maxDistBetweenLines).toInt() }
+        val numPointsY = numPointsFromDist(computeMaxDist(waypointsCopied, Orientation.VERTICAL))
 
         return (0..numPointsY).flatMap { y ->
             val yPercent = y.toDouble() / numPointsY
             val leftPoint = interpolate(waypointsCopied[0], waypointsCopied[3], yPercent)
             val rightPoint = interpolate(waypointsCopied[1], waypointsCopied[2], yPercent)
+
+            val numPointsX = numPointsFromDist(leftPoint.distanceTo(rightPoint))
             (0..numPointsX).map { x ->
                 val xPercent = x.toDouble() / numPointsX
                 if (y % 2 == 0) {
@@ -55,13 +85,5 @@ class SimpleQuadStrategy(maxDistBetweenLines: Double = DEFAULT_DIST_BETWEEN_LINE
         }
     }
 
-    private fun computeMaxDists(waypoints: List<LatLng>): Pair<Double, Double> {
-        val maxDistX = max(                             // 0-1
-                waypoints[0].distanceTo(waypoints[1]),  //
-                waypoints[3].distanceTo(waypoints[2]))  // 3-2
-        val maxDistY = max(                             // 0 1
-                waypoints[0].distanceTo(waypoints[3]),  // | |
-                waypoints[1].distanceTo(waypoints[2]))  // 3 2
-        return Pair(maxDistX, maxDistY)
-    }
+    private fun numPointsFromDist(dist: Double) = ceil(dist / maxDistBetweenLines).toInt()
 }
