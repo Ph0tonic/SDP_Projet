@@ -86,7 +86,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     private lateinit var startOrPauseButton: FloatingActionButton
     private lateinit var returnHomeOrUserButton: FloatingActionButton
-    private var defaultColor: Int = 0
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var victimSymbolManager: VictimSymbolManager
@@ -109,8 +108,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
-        startOrPauseButton.colorNormal = if (it) defaultColor else startOrPauseButton.colorDisabled
-        returnHomeOrUserButton.colorNormal = if (it) defaultColor else returnHomeOrUserButton.colorDisabled
+        startOrPauseButton.colorNormal = if (it) startOrPauseButton.colorNormal else startOrPauseButton.colorDisabled
+        returnHomeOrUserButton.colorNormal = if (it) startOrPauseButton.colorNormal else returnHomeOrUserButton.colorDisabled
     }
 
     private var missionStatusObserver = Observer<Boolean> {
@@ -134,8 +133,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         actionBar?.hide()
         startOrPauseButton = findViewById(R.id.start_or_pause_button)
         returnHomeOrUserButton = findViewById(R.id.return_home_or_user)
-        defaultColor = startOrPauseButton.colorNormal
-
+        
         if (MainDataManager.role.value == Role.RESCUER) {
             hideOperatorUiComponents()
         }
