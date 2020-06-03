@@ -97,6 +97,7 @@ class MapboxSearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Sty
 
         vertices.forEach {
             val circleOptions = CircleOptions()
+                    .withCircleRadius(10f)
                     .withLatLng(it)
                     .withDraggable(true)
             circleManager.create(circleOptions)
