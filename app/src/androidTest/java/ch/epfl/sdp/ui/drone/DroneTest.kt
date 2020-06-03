@@ -121,7 +121,7 @@ class DroneTest {
     fun canPauseMission() {
         Drone.isFlyingLiveData.value = true
         Drone.isMissionPausedLiveData.value = false
-
+        Thread.sleep(100000)
         Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
 
         assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
