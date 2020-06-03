@@ -12,7 +12,7 @@ class MapboxSearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Sty
 
     companion object {
         private const val REGION_FILL_OPACITY: Float = 0.5F
-        private const val waypointRadius: Float 10f
+        private const val waypointRadius: Float = 10f
     }
 
     val onVertexMoved = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
