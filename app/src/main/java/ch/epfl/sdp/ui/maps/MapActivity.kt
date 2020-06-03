@@ -104,7 +104,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneFlyingStatusObserver = Observer<Boolean> {
-        returnHomeOrUserButton.visibility = if (it) View.VISIBLE else View.GONE
+        returnHomeOrUserButton.visibility = if (it and (MainDataManager.role.value != Role.RESCUER)) View.VISIBLE else View.GONE
     }
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
