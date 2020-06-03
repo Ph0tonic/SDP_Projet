@@ -1,10 +1,13 @@
 package ch.epfl.sdp.ui.maps
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
@@ -217,11 +220,14 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
                 droneMissionPainter.paint(it)
             })
 
-            val locationComponent = mapboxMap.locationComponent
-            locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
-            locationComponent.isLocationComponentEnabled = true
-            locationComponent.cameraMode = CameraMode.TRACKING
-            locationComponent.renderMode = RenderMode.COMPASS
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                val locationComponent = mapboxMap.locationComponent
+                locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(this, style).build())
+                locationComponent.isLocationComponentEnabled = true
+                locationComponent.cameraMode = CameraMode.TRACKING
+                locationComponent.renderMode = RenderMode.COMPASS
+            }
+
 
             isMapReady = true
 
