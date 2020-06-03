@@ -49,6 +49,16 @@ class DroneErrorTest {
     }
 
     @Test
+    fun failToStartMissionResetMission() {
+        runOnUiThread {
+            Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        }
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
+        assertThat(Drone.missionLiveData.value, `is`(nullValue()))
+    }
+
+    @Test
     fun failToReturnHomeResetsMission() {
         val expectedLatLng = LatLng(47.397428, 8.545369) //Position of the drone before take off
 
@@ -68,7 +78,7 @@ class DroneErrorTest {
             Drone.isFlyingLiveData.value = true
             Drone.isMissionPausedLiveData.value = true
 
-            Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+            Drone.restartMission()
         }
         assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
     }
@@ -79,7 +89,7 @@ class DroneErrorTest {
             Drone.isFlyingLiveData.value = true
             Drone.isMissionPausedLiveData.value = false
 
-            Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+            Drone.pauseMission()
         }
         assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }

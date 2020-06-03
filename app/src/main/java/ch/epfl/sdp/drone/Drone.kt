@@ -114,52 +114,40 @@ object Drone {
                         .andThen(instance.mission.startMission())
                         .subscribe(
                                 { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
-                                { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }))
+                                {
+                                    this.missionLiveData.value = null
+                                    this.isMissionPausedLiveData.postValue(true)
+                                    ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }))
     }
 
     /**
      * Pauses the current Mission
      */
-    private fun pauseMission(): Disposable {
+    fun pauseMission() {
         this.isMissionPausedLiveData.postValue(true)
-        return getConnectedInstance()
+        disposables.add(getConnectedInstance()
                 .andThen(instance.mission.pauseMission())
                 .subscribe(
                         { ToastHandler().showToast(R.string.drone_pause_success, Toast.LENGTH_SHORT) },
                         {
                             this.isMissionPausedLiveData.postValue(false)
                             ToastHandler().showToast(R.string.drone_pause_error, Toast.LENGTH_SHORT)
-                        })
+                        }))
     }
 
     /**
      * Restarts the current Mission
      */
-    private fun restartMission(): Disposable {
+    fun restartMission() {
         this.isMissionPausedLiveData.postValue(false)
-        return getConnectedInstance()
+        disposables.add(getConnectedInstance()
                 .andThen(instance.mission.startMission())
                 .subscribe(
                         { ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT) },
                         {
                             this.isMissionPausedLiveData.postValue(true)
                             ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
-                        })
-    }
-
-    /**
-     * If the drone is not flying, it starts a mission with
-     * @param missionPlan
-     *
-     * If the drone is already flying, but paused, it restarts it
-     * If the drone is already flying and doing a mission, it pauses the mission
-     */
-    fun startOrPauseMission(missionPlan: Mission.MissionPlan) {
-        if (this.isFlyingLiveData.value!!) {
-            disposables.add(if (this.isMissionPausedLiveData.value!!) restartMission() else pauseMission())
-        } else {
-            startMission(missionPlan)
-        }
+                        }))
     }
 
     /**
