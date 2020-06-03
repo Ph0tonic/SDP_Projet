@@ -42,7 +42,7 @@
     <string name="search_group_edition_group_name_cannot_be_empty">Le nom du groupe ne peut pas être vide</string>
     <string name="danger_zone">Zone dangereuse</string>
     <string name="delete_this_group">Supprimer ce groupe</string>
-    <string name="enter_a_gmail_address">Entrez une adresse mail</string>
+    <string name="enter_a_mail_address">Entrez une adresse mail</string>
     <string name="add_a_user">Ajouter un utilisateur</string>
     <string name="group_edition_activity_title">Éditer le groupe</string>
     <string name="battery_description_tag">Icône batterie</string>
