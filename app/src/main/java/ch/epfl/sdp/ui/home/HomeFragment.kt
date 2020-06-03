@@ -34,11 +34,11 @@ class HomeFragment : Fragment() {
         updateGroupText()
     }
 
-    private fun updateGroupText(){
+    private fun updateGroupText() {
         val groupId = PreferenceManager
                 .getDefaultSharedPreferences(MainApplication.applicationContext())
                 .getString(MainApplication.applicationContext().getString(R.string.pref_key_current_group_id), null)
-        if (groupId!=null) {
+        if (groupId != null) {
             SearchGroupDataManager().getGroupById(groupId.toString()).observeForever { group ->
                 groupButton.text = group.name
             }
