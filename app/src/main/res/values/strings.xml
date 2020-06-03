@@ -22,6 +22,9 @@
     <string name="pref_key_drone_altitude" translatable="false">drone_altitude</string>
     <string name="pref_key_overflight_strategy" translatable="false">overflight_strategy</string>
 
+    <!-- Dialog general -->
+    <string name="dialog_cancel">Cancel</string>
+
     <!-- Mapbox State -->
     <string name="map_ready" translatable="false">MAP READY</string>
     <string name="map_not_ready" translatable="false">MAP NOT READY</string>
@@ -39,10 +42,10 @@
     <string name="drone_mission_error">Failed to start Mission</string>
     <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
     <string name="switch_video">Switch video</string>
-    <string name="ReturnDroneDialogFragment">Return Drone Home</string>
-    <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ?</string>
-    <string name="ReturnDroneDialogHome">Home</string>
-    <string name="ReturnDroneDialogUser">User</string>
+    <string name="return_drone_dialog">Return Drone Home</string>
+    <string name="return_drone_dialog_title">Do you want to return to user or to take off ?</string>
+    <string name="return_drone_dialog_option_home">Home</string>
+    <string name="return_drone_dialog_option_user">User</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
@@ -84,7 +87,6 @@
     <string name="dialog_message">Download the map region you currently are viewing</string>
     <string name="set_region_name_hint">Enter name</string>
     <string name="dialog_positive_button">Download</string>
-    <string name="dialog_negative_button">Cancel</string>
     <string name="navigate_title">List</string>
     <string name="navigate_positive_button">Navigate To</string>
     <string name="navigate_neutral_button_title">Delete</string>
@@ -113,12 +115,10 @@
     <string name="delete_this_group">Delete this group</string>
     <string name="enter_a_gmail_address">Enter a mail address</string>
     <string name="add_a_user">Add a user</string>
-    <string name="cancel">Cancel</string>
     <string name="group_edition_activity_title">Edit group</string>
     <string name="enter_your_desired_group_name">Enter your desired group name</string>
     <string name="create_a_search_group">Create a search group</string>
     <string name="search_group_name_cannot_be_empty">Search group name cannot be empty.</string>
-
 
     <!-- Drone status display -->
     <string name="battery_description_tag">Battery icon</string>
@@ -126,5 +126,7 @@
     <string name="speed_description_tag">Speed icon</string>
     <string name="distance_to_user_description_tag">Distance to user icon</string>
     <string name="distance_to_home_description_tag">Distance to home icon</string>
+
+    <!-- To be organised -->
 
 </resources>

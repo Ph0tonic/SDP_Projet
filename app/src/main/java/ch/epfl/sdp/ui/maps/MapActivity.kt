@@ -282,7 +282,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         } else if (!Drone.isFlyingLiveData.value!!) {
             launchMission()
         } else {
-            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
+            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.return_drone_dialog))
         }
     }
 
