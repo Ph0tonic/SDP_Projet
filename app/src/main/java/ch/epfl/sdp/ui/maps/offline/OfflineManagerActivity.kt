@@ -33,7 +33,7 @@ import kotlin.math.roundToInt
 class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var downloadButton: Button
-    private lateinit var listButton: Button
+    private lateinit var cancelButton: Button
     private lateinit var offlineManager: OfflineManager
     private lateinit var progressBar: ProgressBar
 
@@ -54,7 +54,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Assign progressBar for later use
         progressBar = findViewById(R.id.progress_bar)
         downloadButton = findViewById(R.id.download_button)
-        listButton = findViewById(R.id.list_button)
+        cancelButton = findViewById(R.id.cancel_download)
 
         // Set up the offlineManager
         offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
@@ -88,7 +88,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
      * and launch the download
      */
     fun prepareAndLaunchDownload(regionName: String) {
-        startProgress(downloadButton, listButton, progressBar)
+        startProgress(downloadButton, cancelButton, progressBar)
         // Create offline definition using the current
         // style and boundaries of visible map area
         mapboxMap.getStyle { style ->
@@ -128,7 +128,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             override fun onStatusChanged(status: OfflineRegionStatus) { // Compute a percentage
                 val percentage = if (status.requiredResourceCount >= 0) 100.0 * status.completedResourceCount / status.requiredResourceCount else 0.0
                 if (status.isComplete) { // Download complete
-                    endProgress(downloadButton, listButton, progressBar)
+                    endProgress(downloadButton, cancelButton, progressBar)
                     mapView.contentDescription = getString(R.string.map_ready)
                     return
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state

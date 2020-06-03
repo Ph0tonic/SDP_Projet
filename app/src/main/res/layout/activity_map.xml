@@ -58,11 +58,10 @@
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/strategy_picker_button"
+            style="@style/FloatingButtonTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="pickStrategy"
-            app:fab_colorNormal="@color/colorPrimary"
-            app:fab_colorPressed="@color/colorLightGray"
             app:fab_icon="@drawable/ic_spiralstrat"
             app:fab_size="normal" />
 
@@ -70,21 +69,27 @@
             android:id="@+id/floating_menu_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:fab_addButtonColorNormal="@color/colorPrimaryDark"
+            app:fab_addButtonColorNormal="@color/colorPrimary"
             app:fab_addButtonColorPressed="@color/colorPrimary"
-            app:fab_addButtonPlusIconColor="@color/colorWhite"
+            app:fab_addButtonPlusIconColor="@android:color/white"
             app:fab_expandDirection="left"
             app:layout_constraintBottom_toBottomOf="parent"
             mapbox:layout_constraintEnd_toEndOf="parent">
 
             <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/start_or_return_button"
+                android:id="@+id/return_home_or_user"
                 style="@style/FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="startMissionOrReturnHome"
-                app:fab_colorNormal="@color/colorWhite"
-                app:fab_colorPressed="@color/colorLightGray"
+                android:onClick="returnHomeOrUser"
+                app:fab_icon="@drawable/ic_return" />
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/start_or_pause_button"
+                style="@style/FloatingButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="startOrPauseMissionButton"
                 app:fab_icon="@drawable/ic_start" />
 
             <com.getbase.floatingactionbutton.FloatingActionButton
@@ -102,14 +107,6 @@
                 android:layout_height="wrap_content"
                 android:onClick="centerCameraOnDrone"
                 app:fab_icon="@drawable/ic_locate" />
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/store_button"
-                style="@style/FloatingButtonTheme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="storeMap"
-                app:fab_icon="@drawable/ic_store" />
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 

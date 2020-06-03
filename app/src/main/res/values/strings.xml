@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Licence keys -->
     <string name="mapbox_access_token">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
     <string name="google_signin_key">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
@@ -30,6 +30,7 @@
     <!-- Map Activity -->
     <string name="intent_key_group_id" translatable="false">group_id</string>
     <string name="intent_key_role" translatable="false">role</string>
+    <string name="intent_key_offline_mode" translatable="false">offline_mode</string>
 
     <string name="drone_home_error">No Home Available</string>
 
@@ -38,6 +39,8 @@
     <string name="drone_home_success">Returning home</string>
     <string name="drone_mission_success">Mission started successfully</string>
     <string name="drone_mission_error">Failed to start Mission</string>
+    <string name="drone_pause_success">Mission Paused</string>
+    <string name="drone_pause_error">Failed to pause Mission</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
@@ -113,7 +116,7 @@
 
     <string name="drone_altitude_header">Default drone altitude</string>
     <string name="overflight_strategy_header">Default Overflight Strategy</string>
-    
+
     <string name="ReturnDroneDialogFragment">Return Home Drone</string>
     <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ? </string>
     <string name="ReturnDroneDialogHome">Home</string>
@@ -130,5 +133,8 @@
     <string name="create_a_search_group">Create a search group</string>
     <string name="search_group_name_cannot_be_empty">Search group name cannot be empty.</string>
     <string name="Camera">Camera</string>
+    <string name="no_offline_map_downloaded_yet">No offline map downloaded yet</string>
+    <string name="offline_maps">Offline maps</string>
+    <string name="download_current_area">Download the current area</string>
 
 </resources>

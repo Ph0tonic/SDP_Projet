@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.utils
 
 import android.content.Context
 import android.content.Intent
@@ -9,19 +9,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.test.annotation.UiThreadTest
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.R
+import ch.epfl.sdp.database.dao.OfflineHeatmapDao
+import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.data.Role
-import ch.epfl.sdp.database.dao.MockHeatmapDao
-import ch.epfl.sdp.database.dao.MockMarkerDao
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.MapActivity
-import ch.epfl.sdp.utils.Auth
-import ch.epfl.sdp.utils.CentralLocationManager
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -57,14 +58,16 @@ class LocationWithPermissionTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        DroneInstanceMock.setupDefaultMocks()
         //Fake logged in
-        UiThreadStatement.runOnUiThread {
+        runOnUiThread {
+            MainDataManager.goOffline()
             Auth.accountId.value = FAKE_ACCOUNT_ID
             Auth.loggedIn.value = true
         }
 
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
+        MarkerRepository.daoProvider = { OfflineMarkerDao() }
         mActivityRule.launchActivity(intentWithGroupAndOperator)
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }

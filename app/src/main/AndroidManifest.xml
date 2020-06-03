@@ -3,10 +3,10 @@
     package="ch.epfl.sdp">
 
     <uses-feature android:name="android.hardware.screen.landscape" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -18,12 +18,12 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.search_group.edition.SearchGroupEditionActivity"
-            android:parentActivityName=".ui.search_group.selection.SearchGroupSelectionActivity"
-            android:label="@string/group_edition_activity_title"/>
+            android:label="@string/group_edition_activity_title"
+            android:parentActivityName=".ui.search_group.selection.SearchGroupSelectionActivity" />
         <activity
             android:name=".ui.search_group.selection.SearchGroupSelectionActivity"
-            android:parentActivityName=".ui.MainActivity"
-            android:label="@string/group_selection_activity_title"/>
+            android:label="@string/group_selection_activity_title"
+            android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
@@ -44,11 +44,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.maps.offline.OfflineManagerActivity"
-            android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="landscape" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.MainActivity" />
     </application>
+
 </manifest>

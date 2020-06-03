@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +32,11 @@ class MapsManagingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
+                view.findViewById<TextView>(R.id.no_offline_map).visibility = if (offlineRegions.isNotEmpty()) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
                 // RecyclerView node initialized here
                 mapSelectionRecyclerview.apply {
                     // set a LinearLayoutManager to handle Android

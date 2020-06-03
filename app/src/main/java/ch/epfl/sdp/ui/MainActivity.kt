@@ -5,29 +5,24 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
-import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity.Companion.SEARH_GROUP_ID_SELECTION_RESULT_TAG
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -39,14 +34,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var snackbar: Snackbar
 
-    companion object {
-        private const val SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE = 7865
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val currentGroupId: MutableLiveData<String?> = MutableLiveData(null)
-    private val currentRole: MutableLiveData<Role> = MutableLiveData(Role.RESCUER)
-
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
@@ -54,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         configureNavigationView()
-        loadActiveGroupFromPrefs()
     }
 
     private fun configureNavigationView() {
@@ -78,25 +64,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadActiveGroupFromPrefs() {
-        currentGroupId.value = PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getString(getString(R.string.pref_key_current_group_id), null)
-        currentGroupId.observe(this, Observer {
-            PreferenceManager
-                    .getDefaultSharedPreferences(this)
-                    .edit()
-                    .putString(getString(R.string.pref_key_current_group_id), it)
-                    .apply()
-        })
-
-        //TODO Get role of current search group
-    }
-
     override fun onStart() {
         super.onStart()
+        MainDataManager.goOnline()
         CentralLocationManager.configure(this)
-        if (currentRole.value == Role.OPERATOR && !Drone.isConnectedLiveData.value!!) {
+        if (MainDataManager.role.value == Role.OPERATOR && !Drone.isConnectedLiveData.value!!) {
             snackbar.show()
         }
     }
@@ -128,7 +100,6 @@ class MainActivity : AppCompatActivity() {
         CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-
     private fun checkConnexion(view: View, action: () -> Unit) {
         if (Auth.loggedIn.value == false) {
             Auth.login(this) { success ->
@@ -144,39 +115,29 @@ class MainActivity : AppCompatActivity() {
     fun goToSearchGroupSelect(view: View) {
         checkConnexion(view) {
             val intent = Intent(this, SearchGroupSelectionActivity::class.java)
-            startActivityForResult(intent, SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE)
+            startActivity(intent)
         }
     }
 
     fun startMission(view: View) {
-        if(currentGroupId.value.isNullOrEmpty()){
-            Toast.makeText(this,getString(R.string.warning_no_group_selected),Toast.LENGTH_LONG).show();
+        if (MainDataManager.groupId.value.isNullOrEmpty()) {
+            Toast.makeText(this, getString(R.string.warning_no_group_selected), Toast.LENGTH_LONG).show()
             return
         }
         checkConnexion(view) {
             val intent = Intent(this, MapActivity::class.java)
-                    .putExtra(getString(R.string.intent_key_group_id), currentGroupId.value)
-                    .putExtra(getString(R.string.intent_key_role), Role.OPERATOR)
             startActivity(intent)
         }
     }
 
     fun workOffline(view: View) {
-        checkConnexion(view) {
-            val intent = Intent(this, MapActivity::class.java)
-                    .putExtra(getString(R.string.intent_key_group_id), "dummy")
-                    .putExtra(getString(R.string.intent_key_role), Role.RESCUER)
-            startActivity(intent)
-        }
+        MainDataManager.goOffline()
+        val intent = Intent(this, MapActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == SEARCH_GROUP_SELECTION_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                currentGroupId.value = data!!.getStringExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG)
-            }
-        }
         Auth.onActivityResult(requestCode, resultCode, data)
     }
 
