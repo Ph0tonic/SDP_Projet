@@ -133,7 +133,7 @@ class DroneTest {
         Drone.isMissionPausedLiveData.value = false
 
         Drone.pauseMission()
-        Drone.restartMission()
+        Drone.resumeMission()
 
         assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }

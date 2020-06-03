@@ -298,7 +298,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         if (!Drone.isConnectedLiveData.value!!) {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
         } else if (Drone.isFlyingLiveData.value!!) {
-            if (Drone.isMissionPausedLiveData.value!!) Drone.restartMission() else Drone.pauseMission()
+            if (Drone.isMissionPausedLiveData.value!!) Drone.resumeMission() else Drone.pauseMission()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
         } else {

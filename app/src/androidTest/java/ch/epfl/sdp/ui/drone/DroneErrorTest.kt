@@ -78,7 +78,7 @@ class DroneErrorTest {
             Drone.isFlyingLiveData.value = true
             Drone.isMissionPausedLiveData.value = true
 
-            Drone.restartMission()
+            Drone.resumeMission()
         }
         assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
     }
