@@ -111,7 +111,7 @@
     <string name="search_group_edition_group_name_cannot_be_empty">The group name cannot be empty</string>
     <string name="danger_zone">Danger zone</string>
     <string name="delete_this_group">Delete this group</string>
-    <string name="enter_a_gmail_address">Enter a gmail address</string>
+    <string name="enter_a_gmail_address">Enter a mail address</string>
     <string name="add_a_user">Add a user</string>
     <string name="cancel">Cancel</string>
     <string name="group_edition_activity_title">Edit group</string>

@@ -28,7 +28,7 @@
     <string name="navigate_neutral_button_title">Supprimer</string>
     <string name="toast_region_deleted">Région supprimée</string>
     <string name="toast_no_regions_yet">Aucune région pour le moment</string>
-    <string name="dialog_toast">Le nom ne peut être vide</string>
+    <string name="dialog_toast">Le nom ne peut pas être vide</string>
     <string name="region_name_error">Nom de région inconnu</string>
     <string name="maps_managing">Gestion des cartes (récupérez les cartes hors-ligne ici)</string>
     <string name="menu_maps_managing">Gestion des cartes</string>
@@ -39,10 +39,10 @@
     <string name="group_edition_operators_label">Opérateurs</string>
     <string name="group_edition_create_button">Créer</string>
     <string name="save_group_changes">Sauvegarder</string>
-    <string name="search_group_edition_group_name_cannot_be_empty">Le nom du groupe ne peut être vide</string>
+    <string name="search_group_edition_group_name_cannot_be_empty">Le nom du groupe ne peut pas être vide</string>
     <string name="danger_zone">Zone dangereuse</string>
     <string name="delete_this_group">Supprimer ce groupe</string>
-    <string name="enter_a_gmail_address">Entrez une adresse gmail</string>
+    <string name="enter_a_gmail_address">Entrez une adresse mail</string>
     <string name="add_a_user">Ajouter un utilisateur</string>
     <string name="cancel">Annuler</string>
     <string name="group_edition_activity_title">Éditer le groupe</string>
