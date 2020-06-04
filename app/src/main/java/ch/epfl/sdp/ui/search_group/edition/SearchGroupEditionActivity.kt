@@ -116,7 +116,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
                 searchGroupManager.addUserToSearchGroup(groupId!!, email, role)
             }
         })
-        dialog.show(supportFragmentManager, getString(R.string.add_a_user))
+        dialog.show(supportFragmentManager, getString(R.string.add_a_rescuer))
     }
 
     fun addOperator(view: View) {
