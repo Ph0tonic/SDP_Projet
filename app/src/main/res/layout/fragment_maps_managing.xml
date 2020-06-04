@@ -52,7 +52,6 @@
         app:fab_colorNormal="@color/colorPrimary"
         app:fab_colorPressed="@color/asbestos"
         app:fab_icon="@drawable/ic_add_white_24dp"
-        app:fab_size="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
