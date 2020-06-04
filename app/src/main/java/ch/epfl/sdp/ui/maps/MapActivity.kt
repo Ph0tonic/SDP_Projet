@@ -109,8 +109,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
-        startOrPauseButton.colorNormal = if (it) ContextCompat.getColor(this, R.color.colorPrimary) else startOrPauseButton.colorDisabled
-        returnHomeOrUserButton.colorNormal = if (it) ContextCompat.getColor(this, R.color.colorPrimary) else returnHomeOrUserButton.colorDisabled
+        startOrPauseButton.isEnabled = it
+        returnHomeOrUserButton.isEnabled = it
     }
 
     private var missionStatusObserver = Observer<Boolean> {
