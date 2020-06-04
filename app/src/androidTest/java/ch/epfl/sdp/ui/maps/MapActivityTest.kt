@@ -520,6 +520,36 @@ class MapActivityTest {
     }
 
     @Test
+    fun clickOnPauseButtonWhenDroneFlyingAndConnectedPausesMission() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = true
+            Drone.isConnectedLiveData.value = true
+            Drone.isMissionPausedLiveData.value = false
+        }
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = false
+        }
+    }
+
+    @Test
     fun clickOnStartOrPauseButtonWhenDroneFlyingAndConnectedLaunchesMission() {
         runOnUiThread {
             MainDataManager.goOffline()

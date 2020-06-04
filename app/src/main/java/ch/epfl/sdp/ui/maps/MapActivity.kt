@@ -187,9 +187,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, { markerId -> markerManager.removeMarkerForSearchGroup(MainDataManager.groupId.value!!, markerId) }) { longClickConsumed = true }
             homePainter = MapboxHomePainter(mapView, mapboxMap, style)
+            dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             buildMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             droneMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
@@ -287,14 +287,22 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     /**
-     * Shows a Toast if the drone is not connected or
-     * if there are not enough waypoints for a mission
-     * If the drone is on ground -> starts mission
-     * If the drone is flying -> shows return dialog
+     * If the drone is not connected, shows a Toast
+     * 
+     * If the drone is connected :
+     *      If the drone is flying :
+     *          If the drone is paused, it restarts it
+     *          If the drone is doing a mission, it pauses it.
+
+     *      If the drone is on ground :
+     *          If there are not enough waypoints for a mission, shows a Toast
+     *          If the mission builder is ready, it starts the mission
      */
     fun startOrPauseMissionButton(v: View) {
         if (!Drone.isConnectedLiveData.value!!) {
             Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
+        } else if (Drone.isFlyingLiveData.value!!) {
+            if (Drone.isMissionPausedLiveData.value!!) Drone.resumeMission() else Drone.pauseMission()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
         } else {
@@ -314,7 +322,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startOrPauseMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
         searchAreaBuilder.reset()
     }
 
