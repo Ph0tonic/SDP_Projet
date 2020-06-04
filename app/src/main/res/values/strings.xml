@@ -134,4 +134,7 @@
     <string name="distance_to_user_description_tag">Distance to user icon</string>
     <string name="distance_to_home_description_tag">Distance to home icon</string>
 
+    <string name="camera">Camera</string>
+    <string name="add">Add</string>
+
 </resources>
