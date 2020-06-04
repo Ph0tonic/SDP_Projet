@@ -136,9 +136,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             val metadata = try {
                 val jsonObject = JSONObject()
                 jsonObject.put(JSON_FIELD_REGION_NAME, regionName)
-                jsonObject.put(JSON_FIELD_REGION_LOCATION_LATITUDE, MapUtils.getLastCameraState().target.latitude)
-                jsonObject.put(JSON_FIELD_REGION_LOCATION_LONGITUDE, MapUtils.getLastCameraState().target.longitude)
-                jsonObject.put(JSON_FIELD_REGION_ZOOM, MapUtils.getLastCameraState().zoom)
+                jsonObject.put(JSON_FIELD_REGION_LOCATION_LATITUDE, mapboxMap.cameraPosition.target.latitude)
+                jsonObject.put(JSON_FIELD_REGION_LOCATION_LONGITUDE, mapboxMap.cameraPosition.target.longitude)
+                jsonObject.put(JSON_FIELD_REGION_ZOOM, mapboxMap.cameraPosition.zoom)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
                 showErrorAndToast("Failed to encode metadata: " + exception.message)
