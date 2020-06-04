@@ -1,6 +1,5 @@
 package ch.epfl.sdp.ui.maps.offline
 
-import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -18,7 +17,6 @@ import ch.epfl.sdp.MainApplication.Companion.applicationContext
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils.getCameraWithParameters
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
-import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
@@ -35,7 +33,7 @@ import java.util.concurrent.TimeUnit
 
 //TODO extract toast tests (now commented)
 @RunWith(AndroidJUnit4::class)
-class OfflineManagerActivityTest  {
+class OfflineManagerActivityTest {
     private lateinit var mUiDevice: UiDevice
     private lateinit var offlineManager: OfflineManager
 
@@ -128,6 +126,7 @@ class OfflineManagerActivityTest  {
                     })
                 }
             }
+
             override fun onError(error: String?) {}
         })
     }
