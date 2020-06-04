@@ -1,9 +1,7 @@
-package ch.epfl.sdp.ui.drone
+package ch.epfl.sdp.drone
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
-import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.DroneUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
@@ -22,6 +20,7 @@ class DroneErrorTest {
 
     companion object {
         private const val DEFAULT_ALTITUDE = 10f
+        private const val DUMMY_GROUP_ID = "dummy_group_id"
         val someLocationsList = listOf(
                 LatLng(47.398979, 8.543434),
                 LatLng(47.398279, 8.543934),
@@ -68,7 +67,7 @@ class DroneErrorTest {
             Drone.isFlyingLiveData.value = true
             Drone.isMissionPausedLiveData.value = true
 
-            Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+            Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
         }
         assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
     }
@@ -79,7 +78,7 @@ class DroneErrorTest {
             Drone.isFlyingLiveData.value = true
             Drone.isMissionPausedLiveData.value = false
 
-            Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+            Drone.startOrPauseMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
         }
         assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }

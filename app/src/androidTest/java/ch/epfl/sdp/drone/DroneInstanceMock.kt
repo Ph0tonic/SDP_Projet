@@ -1,6 +1,5 @@
-package ch.epfl.sdp.ui.drone
+package ch.epfl.sdp.drone
 
-import ch.epfl.sdp.drone.DroneInstanceProvider
 import io.mavsdk.System
 import io.mavsdk.action.Action
 import io.mavsdk.core.Core
@@ -13,11 +12,11 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 
 object DroneInstanceMock {
-    val droneSystem = Mockito.mock(System::class.java)
-    val droneTelemetry = Mockito.mock(Telemetry::class.java)
-    val droneCore = Mockito.mock(Core::class.java)
-    val droneMission = Mockito.mock(Mission::class.java)
-    val droneAction = Mockito.mock(Action::class.java)
+    val droneSystem: System = Mockito.mock(System::class.java)
+    val droneTelemetry: Telemetry = Mockito.mock(Telemetry::class.java)
+    val droneCore: Core = Mockito.mock(Core::class.java)
+    val droneMission: Mission = Mockito.mock(Mission::class.java)
+    val droneAction: Action = Mockito.mock(Action::class.java)
 
     init {
         DroneInstanceProvider.provide = {
@@ -89,6 +88,14 @@ object DroneInstanceMock {
                 .thenReturn(Completable.complete())
         `when`(droneMission.clearMission())
                 .thenReturn(Completable.complete())
+        `when`(droneMission.missionProgress)
+                .thenReturn(Flowable.fromArray(
+                        Mission.MissionProgress(0,4),
+                        Mission.MissionProgress(1, 4),
+                        Mission.MissionProgress(2, 4),
+                        Mission.MissionProgress(3, 4),
+                        Mission.MissionProgress(4, 4)
+                ))
 
         //Action mocks
         `when`(droneAction.arm())

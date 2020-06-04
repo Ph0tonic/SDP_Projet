@@ -271,7 +271,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapManager.addMeasureToHeatmap(MainDataManager.groupId.value!!, Auth.accountId.value!!, location, intensity)
+            heatmapManager.addMeasureToHeatmap(MainDataManager.groupId.value!!, location, intensity)
         }
     }
 
@@ -314,7 +314,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startOrPauseMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        Drone.startOrPauseMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), MainDataManager.groupId.value!!)
         searchAreaBuilder.reset()
     }
 
@@ -358,7 +358,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         }
         findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(strategyIcon)
 
-
         missionBuilder.withStrategy(currentStrategy)
 
         searchAreaBuilder.onSearchAreaChanged.add { missionBuilder.withSearchArea(it) }
@@ -366,5 +365,4 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
         searchAreaPainter.onVertexMoved.add { old, new -> searchAreaBuilder.moveVertex(old, new) }
     }
-
 }

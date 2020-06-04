@@ -41,7 +41,7 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
-import ch.epfl.sdp.ui.drone.DroneInstanceMock
+import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
