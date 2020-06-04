@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -16,7 +15,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.MainDataManager
@@ -29,7 +27,6 @@ import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.mapbox.mapboxsdk.offline.OfflineRegion
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
         snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
-                .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
+//                .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
 
         val navController = findNavController(R.id.nav_host_fragment)
         navView.setupWithNavController(navController)
@@ -148,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.openDrawer(GravityCompat.START)
     }
 
-    fun openMapForOfflineDownload (view: View?) {
+    fun openMapForOfflineDownload(view: View?) {
         startActivity(Intent(this, OfflineManagerActivity::class.java))
     }
 }

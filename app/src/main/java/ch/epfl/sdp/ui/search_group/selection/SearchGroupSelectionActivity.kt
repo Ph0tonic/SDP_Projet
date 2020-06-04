@@ -71,6 +71,6 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
                 editGroup(SearchGroupData(uuid = groupId))
             }
         })
-        dialog.show(supportFragmentManager, getString(R.string.create_a_search_group))
+        dialog.show(supportFragmentManager, getString(R.string.create))
     }
 }

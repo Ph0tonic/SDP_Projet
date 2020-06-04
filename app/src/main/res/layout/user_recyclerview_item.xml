@@ -21,11 +21,11 @@
 
             <TextView
                 android:id="@+id/user_recyclerview_name"
+                style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-
-                android:textSize="18sp" />
+                android:textColor="@color/darkGrey"/>
 
             <Button
                 android:id="@+id/remove_user_button"
