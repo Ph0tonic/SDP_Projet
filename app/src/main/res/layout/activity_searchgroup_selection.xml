@@ -6,35 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".ui.search_group.selection.SearchGroupSelectionActivity">
 
-    <TextView
-        android:id="@+id/selection_activity_title"
-        style="@style/AppTheme.MapManagingOfflineTitle"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="@string/select_a_search_group"
-        android:layout_constraintTop_toTopOf="parent" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchGroupSelectionRecyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/activity_content_margin"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/selection_activity_title" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/create_new_search_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:focusable="true"
         android:onClick="addGroup"
         app:fab_colorNormal="@color/colorPrimary"
         app:fab_colorPressed="@color/asbestos"
         app:fab_icon="@drawable/ic_add_white_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:focusable="true" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
