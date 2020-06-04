@@ -22,7 +22,7 @@
 
     <ImageButton
         android:id="@+id/mainSettingsButton"
-        style="@style/HomeButtonSmall"
+        style="@style/AppTheme.HomeButtonSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="openSettings"
@@ -33,7 +33,7 @@
 
     <ImageButton
         android:id="@+id/mainDrawerButton"
-        style="@style/HomeButtonSmall"
+        style="@style/AppTheme.HomeButtonSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="openDrawer"

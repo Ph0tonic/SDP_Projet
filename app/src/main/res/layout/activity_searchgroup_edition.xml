@@ -62,7 +62,7 @@
 
                 <Button
                     android:id="@+id/group_edit_add_operator_button"
-                    style="@style/SearchGroupEditionAddIcon"
+                    style="@style/AppTheme.SearchGroupEditionAddIcon"
                     android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addOperator"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -101,7 +101,7 @@
 
                 <Button
                     android:id="@+id/group_edit_add_rescuer_button"
-                    style="@style/SearchGroupEditionAddIcon"
+                    style="@style/AppTheme.SearchGroupEditionAddIcon"
                     android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addRescuer"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -143,7 +143,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        style="?android:attr/buttonBarStyle"
+        style="@style/AppTheme.MenuBarButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -154,7 +154,7 @@
 
         <Button
             android:id="@+id/search_group_edition_cancel_button"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/AppTheme.BarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -163,7 +163,7 @@
 
         <Button
             android:id="@+id/search_group_edition_create_or_save_button"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/AppTheme.BarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
