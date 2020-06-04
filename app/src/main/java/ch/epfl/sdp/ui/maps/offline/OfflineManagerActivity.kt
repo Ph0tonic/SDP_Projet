@@ -166,7 +166,6 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
-                // Build a dialog containing the list of regions
                 ListOfflineRegionDialogFragment(offlineRegions, progressBar, mapView)
                         .show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
             }

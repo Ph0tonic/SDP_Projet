@@ -4,14 +4,11 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import ch.epfl.sdp.R
-import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils
 import ch.epfl.sdp.map.offline.OfflineRegionUtils
 import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 
 class ListOfflineRegionDialogFragment(private val offlineRegions: Array<OfflineRegion>,
@@ -21,7 +18,7 @@ class ListOfflineRegionDialogFragment(private val offlineRegions: Array<OfflineR
         return activity.let {
             var regionSelected = 0
             AlertDialog.Builder(it)
-                    .setTitle(getString(R.string.navigate_title))
+                    .setTitle(getString(R.string.delete_this_offline_region))
                     .setPositiveButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
                         // Make progressBar indeterminate and
                         // set it to visible to signal that
