@@ -654,7 +654,33 @@ class MapActivityTest {
     }
 
     @Test
-    fun rescuerDoesNotSeeStartOrReturnButton() {
+    fun rescuerDoesNotSeeReturnHomeButtonWhenDroneFlying() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+            Drone.isFlyingLiveData.value = true
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.return_home_or_user)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeReturnHomeButtonWhenDroneNotFlying() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+            Drone.isFlyingLiveData.value = false
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.return_home_or_user)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeStartOrPauseButton() {
         runOnUiThread {
             MainDataManager.goOffline()
             MainDataManager.groupId.value = DUMMY_GROUP_ID
