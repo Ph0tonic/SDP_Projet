@@ -14,25 +14,15 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 
-class ListOfflineRegionDialogFragment(private val items: Array<CharSequence>,
-                                      private val offlineRegions: Array<OfflineRegion>,
-                                      private val mapboxMap: MapboxMap,
+class ListOfflineRegionDialogFragment(private val offlineRegions: Array<OfflineRegion>,
                                       private val progressBar: ProgressBar,
                                       private val mapView: MapView) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity.let {
             var regionSelected = 0
             AlertDialog.Builder(it)
-                    .setTitle(getString(R.string.navigate_title)).setSingleChoiceItems(items, 0) { _, which -> regionSelected = which }
-                    .setPositiveButton(getString(R.string.navigate_positive_button)) { _, _ ->
-                        Toast.makeText(it, items[regionSelected], Toast.LENGTH_LONG).show()
-                        // Create new camera position
-                        val definition = offlineRegions[regionSelected].definition
-                        mapboxMap.cameraPosition = MapUtils.getCameraWithParameters(
-                                definition.bounds.center,
-                                definition.minZoom)
-                    }
-                    .setNeutralButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
+                    .setTitle(getString(R.string.navigate_title))
+                    .setPositiveButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
                         // Make progressBar indeterminate and
                         // set it to visible to signal that
                         // the deletion process has begun

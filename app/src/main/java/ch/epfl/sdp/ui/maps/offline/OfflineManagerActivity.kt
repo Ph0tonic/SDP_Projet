@@ -47,6 +47,14 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
+
+        val showDelete = intent.getBooleanExtra(getString(R.string.intent_key_show_delete_button), false)
+        if (!showDelete){
+            findViewById<Button>(R.id.delete_offline_map_button).visibility = View.GONE
+        }else{
+            findViewById<Button>(R.id.download_button).visibility = View.GONE
+        }
+
         mapView.getMapAsync(this)
 
         mapView.contentDescription = getString(R.string.map_not_ready)
@@ -54,7 +62,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         // Assign progressBar for later use
         progressBar = findViewById(R.id.progress_bar)
         downloadButton = findViewById(R.id.download_button)
-        cancelButton = findViewById(R.id.cancel_download)
+        cancelButton = findViewById(R.id.delete_offline_map_button)
 
         // Set up the offlineManager
         offlineManager = OfflineManager.getInstance(this@OfflineManagerActivity)
@@ -158,18 +166,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
-                // Add all of the region names to a list
-                val items = offlineRegions
-                        .map { region ->
-                            try {
-                                getRegionName(region)
-                            } catch (exception: java.lang.Exception) {
-                                String.format(getString(R.string.region_name_error), region.id)
-                            }
-                        }
-                        .toTypedArray<CharSequence>()
                 // Build a dialog containing the list of regions
-                ListOfflineRegionDialogFragment(items, offlineRegions, mapboxMap, progressBar, mapView)
+                ListOfflineRegionDialogFragment(offlineRegions, progressBar, mapView)
                         .show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
             }
 

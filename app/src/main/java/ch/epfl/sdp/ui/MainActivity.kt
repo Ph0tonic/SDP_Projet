@@ -149,4 +149,10 @@ class MainActivity : AppCompatActivity() {
     fun openMapForOfflineDownload (view: View?) {
         startActivity(Intent(this, OfflineManagerActivity::class.java))
     }
+
+    fun openExistingOfflineMap (view: View?) {
+        val intent = Intent(this, OfflineManagerActivity::class.java)
+        intent.putExtra(getString(R.string.intent_key_show_delete_button), true)
+        startActivity(intent)
+    }
 }

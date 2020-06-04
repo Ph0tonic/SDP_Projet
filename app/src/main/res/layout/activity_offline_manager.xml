@@ -41,13 +41,13 @@
         mapbox:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:id="@+id/cancel_download"
+            android:id="@+id/delete_offline_map_button"
             style="@style/OfflineDownloadButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="downloadedRegionList"
-            android:text="@string/navigate_title" />
+            android:text="@string/delete_region" />
 
         <Button
             android:id="@+id/download_button"
@@ -145,11 +145,11 @@
         android:id="@+id/offline_download_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/download_current_area"
         android:textColor="@android:color/white"
         mapbox:layout_constraintBottom_toBottomOf="@+id/mapView"
         mapbox:layout_constraintEnd_toEndOf="@+id/overlay_bottom"
         mapbox:layout_constraintStart_toStartOf="@+id/overlay_bottom"
-        mapbox:layout_constraintTop_toTopOf="@+id/overlay_bottom"
-        tools:text="@string/download_current_area" />
+        mapbox:layout_constraintTop_toTopOf="@+id/overlay_bottom" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

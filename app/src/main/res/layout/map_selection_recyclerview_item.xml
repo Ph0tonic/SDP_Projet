@@ -10,7 +10,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="openMapForOfflineDownload"
+        android:onClick="openExistingOfflineMap"
+        android:padding="1dp"
         app:cardBackgroundColor="#FFFFFF"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true"
