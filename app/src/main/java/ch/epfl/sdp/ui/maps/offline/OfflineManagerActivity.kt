@@ -23,6 +23,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
+import kotlin.properties.Delegates
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -36,6 +37,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var cancelButton: Button
     private lateinit var offlineManager: OfflineManager
     private lateinit var progressBar: ProgressBar
+    private var currentOfflineRegionId by Delegates.notNull<Long>()
 
     companion object {
         // JSON encoding/decoding
@@ -54,6 +56,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         }else{
             findViewById<Button>(R.id.download_button).visibility = View.GONE
         }
+        currentOfflineRegionId = intent.getLongExtra(getString(R.string.intent_key_offline_region_id), -1)
 
         mapView.getMapAsync(this)
 
@@ -157,16 +160,17 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
     }
 
-    fun downloadedRegionList(v: View) { // Build a region list when the user clicks the list button
+    fun deleteCurrentRegion(v: View) { // Build a region list when the user clicks the list button
         // Query the DB asynchronously
         offlineManager.listOfflineRegions(object : ListOfflineRegionsCallback {
-            override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
-                // downloaded yet, notify user and return
+            override fun onList(offlineRegions: Array<OfflineRegion>) {
+                // Check result. If no regions have been downloaded yet, notify user and return
                 if (offlineRegions.isEmpty()) {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
-                ListOfflineRegionDialogFragment(offlineRegions, progressBar, mapView)
+                val currentOfflineRegion = offlineRegions.filter { it.id == currentOfflineRegionId }[0]
+                ListOfflineRegionDialogFragment(currentOfflineRegion, progressBar, mapView)
                         .show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
             }
 

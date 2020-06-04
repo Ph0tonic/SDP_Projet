@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
-import ch.epfl.sdp.ui.search_group.OnItemClickListener
+import ch.epfl.sdp.utils.OnItemClickListener
 
 class SearchgroupViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.searchgroup_selection_recyclerview_item, parent, false)) {

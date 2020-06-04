@@ -8,9 +8,9 @@
     android:padding="0px">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/map_selection_item_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="openExistingOfflineMap"
         android:padding="1dp"
         app:cardBackgroundColor="#FFFFFF"
         app:cardElevation="2dp"

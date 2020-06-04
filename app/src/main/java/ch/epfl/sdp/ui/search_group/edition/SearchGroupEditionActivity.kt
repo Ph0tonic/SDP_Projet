@@ -15,7 +15,7 @@ import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
-import ch.epfl.sdp.ui.search_group.OnItemClickListener
+import ch.epfl.sdp.utils.OnItemClickListener
 
 class SearchGroupEditionActivity : AppCompatActivity() {
 

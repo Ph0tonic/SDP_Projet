@@ -1,5 +1,6 @@
 package ch.epfl.sdp.ui.maps.offline
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.offline.OfflineRegionUtils
+import ch.epfl.sdp.utils.OnItemClickListener
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import kotlinx.android.synthetic.main.fragment_maps_managing.*
@@ -43,7 +45,12 @@ class MapsManagingFragment : Fragment() {
                     // RecyclerView behavior
                     layoutManager = LinearLayoutManager(activity)
                     // set the custom adapter to the RecyclerView
-                    adapter = MapSelectionRecyclerViewAdapter(offlineRegions)
+                    adapter = MapSelectionRecyclerViewAdapter(offlineRegions, object : OnItemClickListener<OfflineRegion>{
+                        override fun onItemClicked(offlineRegion: OfflineRegion) {
+                            openExistingRegion(offlineRegion)
+                        }
+
+                    })
                 }
             }
 
@@ -52,5 +59,13 @@ class MapsManagingFragment : Fragment() {
             }
         })
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun openExistingRegion(offlineRegion: OfflineRegion){
+        val context = MainApplication.applicationContext()
+        val intent = Intent(context, OfflineManagerActivity::class.java)
+        intent.putExtra(getString(R.string.intent_key_show_delete_button), true)
+        intent.putExtra(getString(R.string.intent_key_offline_region_id), offlineRegion.id)
+        startActivity(intent)
     }
 }

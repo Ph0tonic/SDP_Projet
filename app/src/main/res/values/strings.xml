@@ -32,6 +32,7 @@
     <string name="intent_key_role" translatable="false">role</string>
     <string name="intent_key_offline_mode" translatable="false">offline_mode</string>
     <string name="intent_key_show_delete_button" translatable="false">show_delete_button</string>
+    <string name="intent_key_offline_region_id">offline_region_id</string>
 
     <string name="drone_home_error">No Home Available</string>
 

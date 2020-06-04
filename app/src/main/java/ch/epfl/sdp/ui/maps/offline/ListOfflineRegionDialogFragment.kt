@@ -11,21 +11,19 @@ import ch.epfl.sdp.map.offline.OfflineRegionUtils
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 
-class ListOfflineRegionDialogFragment(private val offlineRegions: Array<OfflineRegion>,
+class ListOfflineRegionDialogFragment(private val offlineRegion: OfflineRegion,
                                       private val progressBar: ProgressBar,
                                       private val mapView: MapView) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity.let {
-            var regionSelected = 0
             AlertDialog.Builder(it)
                     .setTitle(getString(R.string.delete_this_offline_region))
                     .setPositiveButton(getString(R.string.navigate_neutral_button_title)) { _, _ ->
-                        // Make progressBar indeterminate and
-                        // set it to visible to signal that
+                        // Make progressBar indeterminate and set it to visible to signal that
                         // the deletion process has begun
                         DownloadProgressBarUtils.deletingInProgress(progressBar)
                         // Begin the deletion process
-                        OfflineRegionUtils.deleteOfflineRegion(offlineRegions[regionSelected], progressBar, mapView)
+                        OfflineRegionUtils.deleteOfflineRegion(offlineRegion, progressBar, mapView)
                     }
                     // When the user cancels, don't do anything.
                     // The dialog will automatically close
