@@ -41,7 +41,8 @@ object DroneInstanceMock {
                 .thenReturn(Flowable.fromArray(
                         Telemetry.FlightMode.LAND,
                         Telemetry.FlightMode.MISSION,
-                        Telemetry.FlightMode.HOLD
+                        Telemetry.FlightMode.HOLD,
+                        Telemetry.FlightMode.MISSION
                 ))
         `when`(droneTelemetry.armed)
                 .thenReturn(Flowable.fromArray(
@@ -49,7 +50,10 @@ object DroneInstanceMock {
                 ))
         `when`(droneTelemetry.position)
                 .thenReturn(Flowable.fromArray(
-                        Telemetry.Position(0.0, 0.0, 0.0f, 0.0f)
+                        Telemetry.Position(0.0, 0.0, 0.0f, 0.0f),
+                        Telemetry.Position(0.1, 0.0, 0.0f, 0.0f),
+                        Telemetry.Position(0.2, 0.0, 0.0f, 0.0f),
+                        Telemetry.Position(0.3, 0.0, 0.0f, 0.0f)
                 ))
         `when`(droneTelemetry.battery)
                 .thenReturn(Flowable.fromArray(
@@ -89,7 +93,13 @@ object DroneInstanceMock {
         `when`(droneMission.clearMission())
                 .thenReturn(Completable.complete())
         `when`(droneMission.missionProgress)
-                .thenReturn(Flowable.empty())
+                .thenReturn(Flowable.fromArray(
+                        Mission.MissionProgress(0, 4),
+                        Mission.MissionProgress(1, 4),
+                        Mission.MissionProgress(2, 4),
+                        Mission.MissionProgress(3, 4),
+                        Mission.MissionProgress(4, 4)
+                ))
 
         //Action mocks
         `when`(droneAction.arm())

@@ -16,6 +16,7 @@ import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.HeatmapDataManager
 import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.database.data_manager.MainDataManager.groupId
 import ch.epfl.sdp.database.data_manager.MarkerDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
@@ -272,7 +273,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapManager.addMeasureToHeatmap(groupId, location, intensity)
+            heatmapManager.addMeasureToHeatmap(groupId.value!!, location, intensity)
         }
     }
 
@@ -317,7 +318,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId)
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId.value!!)
         searchAreaBuilder.reset()
     }
 

@@ -18,6 +18,5 @@ class UserViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         //TODO change this to username
         name.text = user.email
         removeUserButton.setOnClickListener { onRemoveListener.onItemClicked(user) }
-
     }
 }

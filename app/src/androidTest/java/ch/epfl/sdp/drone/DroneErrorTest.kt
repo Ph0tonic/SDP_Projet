@@ -1,28 +1,16 @@
 package ch.epfl.sdp.drone
 
-import android.content.Intent
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.intent.rule.IntentsTestRule
-import androidx.test.espresso.matcher.RootMatchers
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
-import ch.epfl.sdp.MainApplication
-import ch.epfl.sdp.R
-import ch.epfl.sdp.drone.Drone
-import ch.epfl.sdp.drone.DroneUtils
-import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
-import org.hamcrest.CoreMatchers
+import io.reactivex.Flowable
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.nullValue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
@@ -34,6 +22,7 @@ class DroneErrorTest {
 
     companion object {
         private const val DEFAULT_ALTITUDE = 10f
+        private const val DUMMY_GROUP_ID = "dummy_group_id"
         val someLocationsList = listOf(
                 LatLng(47.398979, 8.543434),
                 LatLng(47.398279, 8.543934),
@@ -41,12 +30,6 @@ class DroneErrorTest {
                 LatLng(47.397026, 8.543067)
         )
     }
-
-    @get:Rule
-    val mActivityRule = IntentsTestRule(
-            MainActivity::class.java,
-            true,
-            false)
 
     @Before
     fun before() {
@@ -64,12 +47,14 @@ class DroneErrorTest {
                 .thenReturn(Completable.error(Throwable("Error StartMission")))
         `when`(DroneInstanceMock.droneMission.clearMission())
                 .thenReturn(Completable.error(Throwable("Error Clear Mission")))
+        `when`(DroneInstanceMock.droneMission.missionProgress)
+                .thenReturn(Flowable.empty())
     }
 
     @Test
     fun failToStartMissionResetMission() {
         runOnUiThread {
-            Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+            Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
         }
 
         assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
@@ -91,7 +76,7 @@ class DroneErrorTest {
     }
 
     @Test
-    fun failToRestartMissionResetsMissionStatus() {
+    fun failToResumeMissionResetsMissionStatus() {
         runOnUiThread {
             Drone.isFlyingLiveData.value = true
             Drone.isMissionPausedLiveData.value = true
@@ -113,12 +98,7 @@ class DroneErrorTest {
     }
 
     @Test
-    fun failToReturnToUserShowsToast() {
-        runOnUiThread{
-            CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
-        }
-        mActivityRule.launchActivity(Intent())
-
+    fun failToReturnToUserResetMission() {
         Mockito.reset(DroneInstanceMock.droneAction)
 
         //Action mocks
@@ -135,11 +115,10 @@ class DroneErrorTest {
         `when`(DroneInstanceMock.droneAction.land())
                 .thenReturn(Completable.complete())
 
-        Drone.returnToUserLocationAndLand()
-
-        // Test that the toast is displayed
-        Espresso.onView(ViewMatchers.withText(MainApplication.applicationContext().getString(R.string.drone_user_error)))
-                .inRoot(RootMatchers.withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
-                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        runOnUiThread {
+            CentralLocationManager.currentUserPosition.value = LatLng(0.0, 0.0)
+            Drone.returnToUserLocationAndLand()
+        }
+        assertThat(Drone.missionLiveData.value, `is`(nullValue()))
     }
 }
