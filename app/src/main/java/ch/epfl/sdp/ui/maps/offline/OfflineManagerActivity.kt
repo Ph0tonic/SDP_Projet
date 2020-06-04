@@ -1,6 +1,7 @@
 package ch.epfl.sdp.ui.maps.offline
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
@@ -11,6 +12,7 @@ import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.endProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.startProgress
+import ch.epfl.sdp.map.offline.OfflineRegionUtils
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.showErrorAndToast
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -23,7 +25,6 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
-import kotlin.properties.Delegates
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -37,12 +38,15 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
     private lateinit var cancelButton: Button
     private lateinit var offlineManager: OfflineManager
     private lateinit var progressBar: ProgressBar
-    private var currentOfflineRegionId by Delegates.notNull<Long>()
+    private var currentOfflineRegion: OfflineRegion? = null
 
     companion object {
         // JSON encoding/decoding
         const val JSON_CHARSET = "UTF-8"
         const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
+        const val JSON_FIELD_REGION_LOCATION_LATITUDE = "FIELD_REGION_LOCATION_LATITUDE"
+        const val JSON_FIELD_REGION_LOCATION_LONGITUDE = "FIELD_REGION_LOCATION_LONGITUDE"
+        const val JSON_FIELD_REGION_ZOOM = "FIELD_REGION_ZOOM"
         const val MAX_ZOOM = 20.0  //  val maxZoom = map!!.maxZoomLevel //max Zoom is 25.5
     }
 
@@ -50,16 +54,27 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
 
+        //TODO keep only one intent
         val showDelete = intent.getBooleanExtra(getString(R.string.intent_key_show_delete_button), false)
+        val id = intent.getLongExtra(getString(R.string.intent_key_offline_region_id), -1)
         if (!showDelete) {
+            Log.w("OFFLINE", "NEW OFFLINE MAP MODE")
             findViewById<Button>(R.id.delete_offline_map_button).visibility = View.GONE
+            mapView.getMapAsync(this)
         } else {
-            findViewById<TextView>(R.id.offline_maps_activity_title).text = "TODO" //TODO: replace text with map name
+            Log.w("OFFLINE", "EXISTING OFFLINE MAP MODE")
+            OfflineRegionUtils.getRegionById(id) {
+                if (it == null) {
+                    Toast.makeText(this, getString(R.string.offline_region_does_not_exist), Toast.LENGTH_LONG).show()
+                    finish()
+                } else {
+                    currentOfflineRegion = it
+                    findViewById<TextView>(R.id.offline_maps_activity_title).text = OfflineRegionUtils.getRegionName(it)
+                    mapView.getMapAsync(this)
+                }
+            }
             findViewById<Button>(R.id.download_button).visibility = View.GONE
         }
-        currentOfflineRegionId = intent.getLongExtra(getString(R.string.intent_key_offline_region_id), -1)
-
-        mapView.getMapAsync(this)
 
         mapView.contentDescription = getString(R.string.map_not_ready)
 
@@ -74,8 +89,14 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
+        Log.w("OFFLINE", "current offline region: ${currentOfflineRegion?.id}")
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
-            mapboxMap.cameraPosition = MapUtils.getLastCameraState()
+            if(currentOfflineRegion == null){
+                mapboxMap.cameraPosition = MapUtils.getLastCameraState()
+            }else{
+                mapboxMap.cameraPosition = OfflineRegionUtils.getRegionLocation(currentOfflineRegion!!)
+                Log.w("OFFLINE", "current offline position: ${mapboxMap.cameraPosition}")
+            }
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
@@ -113,7 +134,11 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             // convert it into string, and use it to create a metadata variable.
             // The metadata variable will later be passed to createOfflineRegion()
             val metadata = try {
-                val jsonObject = JSONObject().put(JSON_FIELD_REGION_NAME, regionName)
+                val jsonObject = JSONObject()
+                jsonObject.put(JSON_FIELD_REGION_NAME, regionName)
+                jsonObject.put(JSON_FIELD_REGION_LOCATION_LATITUDE, MapUtils.getLastCameraState().target.latitude)
+                jsonObject.put(JSON_FIELD_REGION_LOCATION_LONGITUDE, MapUtils.getLastCameraState().target.longitude)
+                jsonObject.put(JSON_FIELD_REGION_ZOOM, MapUtils.getLastCameraState().zoom)
                 jsonObject.toString().toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
                 showErrorAndToast("Failed to encode metadata: " + exception.message)
@@ -170,7 +195,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
-                val currentOfflineRegion = offlineRegions.filter { it.id == currentOfflineRegionId }[0]
+                val currentOfflineRegion = offlineRegions.filter { it.id == currentOfflineRegion?.id }[0]
                 ListOfflineRegionDialogFragment(currentOfflineRegion, progressBar, mapView)
                         .show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
             }

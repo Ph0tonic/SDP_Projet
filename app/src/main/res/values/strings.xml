@@ -140,5 +140,6 @@
     <string name="offline_maps">Offline maps</string>
     <string name="download_current_area">Download the current area</string>
     <string name="download_this_area_title">Download this area ?</string>
+    <string name="offline_region_does_not_exist">Offline region does not exist</string>
 
 </resources>
