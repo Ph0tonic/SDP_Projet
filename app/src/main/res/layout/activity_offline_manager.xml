@@ -34,13 +34,13 @@
         mapbox:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:id="@+id/cancel_button"
+            android:id="@+id/offline_map_cancel_button"
             style="@style/AppTheme.BarButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="cancel"
-            android:text="@string/cancel" />
+            android:text="@string/close" />
 
         <Button
             android:id="@+id/delete_offline_map_button"

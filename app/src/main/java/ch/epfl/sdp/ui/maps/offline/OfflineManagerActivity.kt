@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui.maps.offline
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
@@ -25,6 +24,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion.OfflineRegionObserver
 import org.json.JSONObject
 import timber.log.Timber
 import kotlin.math.roundToInt
+
 
 /**
  * Download, view, navigate to, and delete an offline region.
@@ -58,11 +58,10 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val showDelete = intent.getBooleanExtra(getString(R.string.intent_key_show_delete_button), false)
         val id = intent.getLongExtra(getString(R.string.intent_key_offline_region_id), -1)
         if (!showDelete) {
-            Log.w("OFFLINE", "NEW OFFLINE MAP MODE")
             findViewById<Button>(R.id.delete_offline_map_button).visibility = View.GONE
+            findViewById<Button>(R.id.offline_map_cancel_button).text = getString(R.string.cancel)
             mapView.getMapAsync(this)
         } else {
-            Log.w("OFFLINE", "EXISTING OFFLINE MAP MODE")
             OfflineRegionUtils.getRegionById(id) {
                 if (it == null) {
                     Toast.makeText(this, getString(R.string.offline_region_does_not_exist), Toast.LENGTH_LONG).show()
@@ -89,17 +88,18 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
-        Log.w("OFFLINE", "current offline region: ${currentOfflineRegion?.id}")
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
             if (currentOfflineRegion == null) {
                 mapboxMap.cameraPosition = MapUtils.getLastCameraState()
             } else {
                 mapboxMap.cameraPosition = OfflineRegionUtils.getRegionLocation(currentOfflineRegion!!)
-                Log.w("OFFLINE", "current offline position: ${mapboxMap.cameraPosition}")
             }
 
             // Used to detect when the map is ready in tests
             mapView.contentDescription = getString(R.string.map_ready)
+
+            val px = resources.getDimension(R.dimen.offline_download_overlay_size).toInt()
+            mapboxMap.uiSettings.setCompassMargins(0, px, px, 0)
         }
     }
 
