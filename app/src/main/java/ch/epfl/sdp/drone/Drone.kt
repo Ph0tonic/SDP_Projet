@@ -48,7 +48,7 @@ object Drone {
     private val instance: System = DroneInstanceProvider.provide()
 
     init {
-        disposables.add(instance.telemetry.flightMode
+        disposables.add(instance.telemetry.flightMode.distinctUntilChanged()
                 .subscribe(
                         { flightMode ->
                             if (flightMode == Telemetry.FlightMode.HOLD) isMissionPausedLiveData.postValue(true)
@@ -63,7 +63,7 @@ object Drone {
                         { error -> Timber.e("Error Armed : $error") }
                 )
         )
-        disposables.add(instance.telemetry.position
+        disposables.add(instance.telemetry.position.distinctUntilChanged()
                 .subscribe(
                         { position ->
                             val latLng = LatLng(position.latitudeDeg, position.longitudeDeg)
@@ -75,13 +75,13 @@ object Drone {
                         { error -> Timber.e("Error Telemetry Position : $error") }
                 )
         )
-        disposables.add(instance.telemetry.battery
+        disposables.add(instance.telemetry.battery.distinctUntilChanged()
                 .subscribe(
                         { battery -> batteryLevelLiveData.postValue(battery.remainingPercent) },
                         { error -> Timber.e("Error Battery : $error") }
                 )
         )
-        disposables.add(instance.telemetry.positionVelocityNed
+        disposables.add(instance.telemetry.positionVelocityNed.distinctUntilChanged()
                 .subscribe(
                         { vector_speed -> speedLiveData.postValue(sqrt(vector_speed.velocity.eastMS.pow(2) + vector_speed.velocity.northMS.pow(2))) },
                         { error -> Timber.e("Error GroundSpeedNed : $error") }
@@ -93,7 +93,7 @@ object Drone {
                         { error -> Timber.e("Error inAir : $error") }
                 )
         )
-        disposables.add(instance.telemetry.home
+        disposables.add(instance.telemetry.home.distinctUntilChanged()
                 .subscribe(
                         { home -> homeLocationLiveData.postValue(home) },
                         { error -> Timber.e("Error home : $error") }

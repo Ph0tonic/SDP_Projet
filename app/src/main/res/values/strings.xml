@@ -95,7 +95,8 @@
     <string name="danger_zone">Danger zone</string>
     <string name="delete_this_group">Delete this group</string>
     <string name="enter_a_gmail_address">Enter a gmail address</string>
-    <string name="add_a_user">Add a user</string>
+    <string name="add_a_rescuer">Add a rescuer</string>
+    <string name="add_an_operator">Add an operator</string>
     <string name="cancel">Cancel</string>
     <string name="group_edition_activity_title">Edit group</string>
 
@@ -143,5 +144,6 @@
     <string name="offline_region_does_not_exist">Offline region does not exist</string>
     <string name="close">Close</string>
     <string name="select_a_search_group">Select a search group</string>
+    <string name="add">Add</string>
 
 </resources>
