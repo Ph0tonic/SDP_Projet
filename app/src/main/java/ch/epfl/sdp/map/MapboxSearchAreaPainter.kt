@@ -12,6 +12,7 @@ class MapboxSearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Sty
 
     companion object {
         private const val REGION_FILL_OPACITY: Float = 0.5F
+        private const val WAYPOINT_RADIUS: Float = 8f
     }
 
     val onVertexMoved = mutableListOf<(old: LatLng, new: LatLng) -> Unit>()
@@ -97,6 +98,7 @@ class MapboxSearchAreaPainter(mapView: MapView, mapboxMap: MapboxMap, style: Sty
 
         vertices.forEach {
             val circleOptions = CircleOptions()
+                    .withCircleRadius(WAYPOINT_RADIUS)
                     .withLatLng(it)
                     .withDraggable(true)
             circleManager.create(circleOptions)

@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.maps
 
 import android.Manifest.permission
 import android.content.Context
@@ -24,13 +24,15 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import ch.epfl.sdp.MainApplication.Companion.applicationContext
+import ch.epfl.sdp.R
 import ch.epfl.sdp.database.dao.MockGroupDao
-import ch.epfl.sdp.database.dao.MockHeatmapDao
-import ch.epfl.sdp.database.dao.MockMarkerDao
 import ch.epfl.sdp.database.dao.MockUserDao
+import ch.epfl.sdp.database.dao.OfflineHeatmapDao
+import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.data.HeatmapData
 import ch.epfl.sdp.database.data.HeatmapPointData
 import ch.epfl.sdp.database.data.Role
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
@@ -39,7 +41,7 @@ import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
-import ch.epfl.sdp.ui.maps.MapActivity
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
@@ -61,7 +63,7 @@ class MapActivityTest {
 
         private const val ZOOM_TEST = 0.9
         private const val MAP_LOADING_TIMEOUT = 1000L
-        private const val EPSILON = 1e-9
+        private const val EPSILON = 1e-8
         private const val DRONE_ALTITUDE = 20.0F
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
@@ -69,13 +71,6 @@ class MapActivityTest {
 
     private lateinit var preferencesEditor: SharedPreferences.Editor
     private lateinit var mUiDevice: UiDevice
-    private val intentWithGroupAndOperator = Intent()
-            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
-            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.OPERATOR)
-
-    private val intentWithGroupAndRescuer = Intent()
-            .putExtra(applicationContext().getString(R.string.intent_key_group_id), DUMMY_GROUP_ID)
-            .putExtra(applicationContext().getString(R.string.intent_key_role), Role.RESCUER)
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -93,6 +88,8 @@ class MapActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        MainDataManager.goOffline()
+        DroneInstanceMock.setupDefaultMocks()
         //Fake login
         runOnUiThread {
             Auth.accountId.value = FAKE_ACCOUNT_ID
@@ -101,8 +98,8 @@ class MapActivityTest {
 
         // Do not use the real database, only use the offline version on the device
         // Firebase.database.goOffline()
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
-        MarkerRepository.daoProvider = { MockMarkerDao() }
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
+        MarkerRepository.daoProvider = { OfflineMarkerDao() }
         UserRepository.daoProvider = { MockUserDao() }
         SearchGroupRepository.daoProvider = { MockGroupDao() }
 
@@ -119,7 +116,13 @@ class MapActivityTest {
                 .apply()
 
         // Launch activity
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -155,7 +158,13 @@ class MapActivityTest {
                 .apply()
 
         // Launch activity after setting preferences
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -169,7 +178,13 @@ class MapActivityTest {
 
     @Test
     fun addPointToHeatmapAddsPointToHeatmap() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -189,15 +204,22 @@ class MapActivityTest {
 
     @Test
     fun heatmapPaintersAreGeneratedWhenLaunchingApp() {
-        val heatmapDao = MockHeatmapDao()
+        val heatmapDao = OfflineHeatmapDao()
         val heatmap = HeatmapData(mutableListOf(
                 HeatmapPointData(LatLng(41.0, 10.0), 10.0),
                 HeatmapPointData(LatLng(41.0, 10.0), 8.5)
-        ), FAKE_ACCOUNT_ID)
-        heatmapDao.updateHeatmap(DUMMY_GROUP_ID, heatmap)
-        HeatmapRepository.daoProvider = { heatmapDao }
+        ), DUMMY_GROUP_ID)
 
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+
+            heatmapDao.updateHeatmap(DUMMY_GROUP_ID, heatmap)
+            HeatmapRepository.daoProvider = { heatmapDao }
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -206,14 +228,14 @@ class MapActivityTest {
         val heatmaps = mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
 
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(2))
+        assertThat(heatmaps.value!![DUMMY_GROUP_ID], `is`(notNullValue()))
+        assertThat(heatmaps.value!![DUMMY_GROUP_ID]!!.value, `is`(notNullValue()))
+        assertThat(heatmaps.value!![DUMMY_GROUP_ID]!!.value!!.dataPoints, `is`(notNullValue()))
+        assertThat(heatmaps.value!![DUMMY_GROUP_ID]!!.value!!.dataPoints.size, equalTo(2))
 
         assertThat(mActivityRule.activity.measureHeatmapManager.heatmapPainters.size, equalTo(1))
         //Reset default repo
-        HeatmapRepository.daoProvider = { MockHeatmapDao() }
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
     }
 
     @Test
@@ -232,19 +254,37 @@ class MapActivityTest {
     @Test
     fun canOnRequestPermissionResult() {
         //TODO Rewrite this test
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 
     @Test
     fun droneStatusIsVisibleForOperator() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         onView(withId(R.id.drone_status_fragment)).check(matches(isDisplayed()))
     }
 
     @Test
     fun longClickOnMapAddAMarker() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -261,7 +301,13 @@ class MapActivityTest {
 
     @Test
     fun clickOnMapInteractWithQuadrilateralSearchArea() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -285,7 +331,13 @@ class MapActivityTest {
 
     @Test
     fun clickOnMapInteractWithCircleSearchArea() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -308,8 +360,14 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnStrategyPickerButtonChangeSpiralStrategyStrategyToSimpleQuadStrategy(){
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+    fun clickOnStrategyPickerButtonChangeSpiralStrategyStrategyToSimpleQuadStrategy() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -324,8 +382,14 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnStrategyPickerButtonChangeSimpleQuadStrategyToSpiralStrategy(){
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+    fun clickOnStrategyPickerButtonChangeSimpleQuadStrategyToSpiralStrategy() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -341,7 +405,13 @@ class MapActivityTest {
 
     @Test
     fun whenExceptionHappenInSearchAreaBuilderAToastIsDisplayed() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -361,7 +431,13 @@ class MapActivityTest {
 
     @Test
     fun deleteButtonRemovesWaypoints() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -381,7 +457,13 @@ class MapActivityTest {
 
     @Test
     fun storeMapButtonIsWorking() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -393,33 +475,109 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnReturnButtonWhenDroneFlyingButNotConnectedShowsToast(){
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+    fun loosingDroneConnectionShowsToast() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         runOnUiThread {
             Drone.isFlyingLiveData.value = true
+            Drone.isConnectedLiveData.value = false
         }
-
-        onView(withId(R.id.floating_menu_button)).perform(click())
-
-        onView(withId(R.id.start_or_return_button)).perform(click())
-        onView(withId(R.id.start_or_return_button)).perform(click())
 
         // Test that the toast is displayed
         onView(withText(applicationContext().getString(R.string.not_connected_message)))
                 .inRoot(withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
 
-        runOnUiThread{
+        runOnUiThread {
             Drone.isFlyingLiveData.value = false
         }
     }
 
     @Test
-    fun returnHomeOrUserButtonShowsDialogWhenClicked(){
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+    fun clickOnPauseButtonWhenDroneFlyingAndConnectedPausesMission() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = true
+            Drone.isConnectedLiveData.value = true
+            Drone.isMissionPausedLiveData.value = false
+        }
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = false
+        }
+    }
+
+    @Test
+    fun clickOnStartOrPauseButtonWhenDroneFlyingAndConnectedResumesMission() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+
+        mActivityRule.launchActivity(Intent())
+        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
+        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = false
+            Drone.isConnectedLiveData.value = true
+
+            mActivityRule.activity.setStrategy(SpiralStrategy(Drone.GROUND_SENSOR_SCOPE))
+
+            mActivityRule.activity.onMapClick(LatLng(47.398279, 8.543934))
+            mActivityRule.activity.onMapClick(LatLng(47.397426, 8.544867))
+        }
+
+        val searchAreaBuilder = mActivityRule.activity.searchAreaBuilder
+        assertThat(searchAreaBuilder.vertices.size, equalTo(2))
+
+        onView(withId(R.id.floating_menu_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+        onView(withId(R.id.start_or_pause_button)).perform(click())
+
+        val uploadedMission = Drone.missionLiveData.value
+        assertThat(uploadedMission, `is`(notNullValue()))
+        assertThat(uploadedMission!!.size, not(equalTo(0)))
+
+        runOnUiThread {
+            Drone.isFlyingLiveData.value = false
+        }
+    }
+
+    @Test
+    fun returnHomeOrUserButtonShowsDialogWhenClicked() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -436,13 +594,13 @@ class MapActivityTest {
 
         }
 
-        onView(withId(R.id.start_or_return_button)).perform(click())
-        onView(withId(R.id.start_or_return_button)).perform(click())
+        onView(withId(R.id.return_home_or_user)).perform(click())
+        onView(withId(R.id.return_home_or_user)).perform(click())
 
         onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
                 .check(matches(isDisplayed()))
 
-        runOnUiThread{
+        runOnUiThread {
             Drone.isFlyingLiveData.value = false
             Drone.isConnectedLiveData.value = false
         }
@@ -451,7 +609,13 @@ class MapActivityTest {
 
     @Test
     fun locateButtonIsWorking() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.OPERATOR
+        }
+        mActivityRule.launchActivity(Intent())
+
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
@@ -471,57 +635,100 @@ class MapActivityTest {
     }
 
     @Test
-    fun resizeButtonIsWorking() {
-        mActivityRule.launchActivity(intentWithGroupAndOperator)
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
+    fun rescuerDoesNotSeeDroneStatus() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+        }
+        mActivityRule.launchActivity(Intent())
 
-        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
-        onView(withId(R.id.resize_button)).perform(click())
-        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(true))
-        onView(withId(R.id.resize_button)).perform(click())
-        assertThat(mActivityRule.activity.isCameraFragmentFullScreen, `is`(false))
-    }
-
-    @Test
-    fun rescuerDoesNotSeeDroneStatus(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
         onView(withId(R.id.drone_status_fragment)).check(matches(not(isDisplayed())))
     }
 
     @Test
-    fun rescuerDoesNotSeeStartOrReturnButton(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
-        onView(withId(R.id.start_or_return_button)).check(matches(not(isDisplayed())))
+    fun rescuerDoesNotSeeReturnHomeButtonWhenDroneFlying() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+            Drone.isFlyingLiveData.value = true
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.return_home_or_user)).check(matches(not(isDisplayed())))
     }
 
     @Test
-    fun rescuerDoesNotSeeClearButton(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+    fun rescuerDoesNotSeeReturnHomeButtonWhenDroneNotFlying() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+            Drone.isFlyingLiveData.value = false
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.return_home_or_user)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeStartOrPauseButton() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.start_or_pause_button)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeClearButton() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+        }
+        mActivityRule.launchActivity(Intent())
+
         onView(withId(R.id.clear_button)).check(matches(not(isDisplayed())))
     }
 
     @Test
-    fun rescuerDoesNotSeeLocateButton(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+    fun rescuerDoesNotSeeLocateButton() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+        }
+        mActivityRule.launchActivity(Intent())
+
         onView(withId(R.id.locate_button)).check(matches(not(isDisplayed())))
     }
 
     @Test
-    fun rescuerDoesNotSeeStrategyPickerButton(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
+    fun rescuerDoesNotSeeStrategyPickerButton() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+        }
+        mActivityRule.launchActivity(Intent())
+
         onView(withId(R.id.strategy_picker_button)).check(matches(not(isDisplayed())))
     }
 
     @Test
-    fun rescuerDoesNotSeeResizeButton(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
-        onView(withId(R.id.resize_button)).check(matches(not(isDisplayed())))
-    }
+    fun rescuerDoesNotSeeCameraFragment() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+        }
+        mActivityRule.launchActivity(Intent())
 
-    @Test
-    fun rescuerDoesNotSeeCameraFragment(){
-        mActivityRule.launchActivity(intentWithGroupAndRescuer)
         onView(withId(R.id.vlc_fragment)).check(matches(not(isDisplayed())))
     }
 }

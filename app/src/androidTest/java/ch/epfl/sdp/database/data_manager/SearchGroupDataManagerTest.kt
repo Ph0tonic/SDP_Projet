@@ -11,13 +11,11 @@ import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
 import ch.epfl.sdp.database.providers.UserRepositoryProvider
-import ch.epfl.sdp.database.repository.IHeatmapRepository
-import ch.epfl.sdp.database.repository.IMarkerRepository
-import ch.epfl.sdp.database.repository.ISearchGroupRepository
-import ch.epfl.sdp.database.repository.IUserRepository
+import ch.epfl.sdp.database.repository.*
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +44,9 @@ class SearchGroupDataManagerTest {
 
     @Before
     fun setup() {
+        Auth.email.value = DUMMY_EMAIL
+        Auth.loggedIn.value = true
+
         mockSearchGroupRepo = Mockito.mock(ISearchGroupRepository::class.java)
         mockHeatmapRepo = Mockito.mock(IHeatmapRepository::class.java)
         mockMarkerRepo = Mockito.mock(IMarkerRepository::class.java)
@@ -55,6 +56,14 @@ class SearchGroupDataManagerTest {
         UserRepositoryProvider.provide = { mockUserRepo }
         MarkerRepositoryProvider.provide = { mockMarkerRepo }
         HeatmapRepositoryProvider.provide = { mockHeatmapRepo }
+    }
+
+    @After
+    fun cleanup() {
+        SearchGroupRepositoryProvider.provide = { SearchGroupRepository() }
+        UserRepositoryProvider.provide = { UserRepository() }
+        MarkerRepositoryProvider.provide = { MarkerRepository() }
+        HeatmapRepositoryProvider.provide = { HeatmapRepository() }
     }
 
     @Test
@@ -73,15 +82,10 @@ class SearchGroupDataManagerTest {
     fun getAllGroupsCallsGetGroupsIdsOfUserByEmailAndGetAllGroups() {
         val dataAvailable = CountDownLatch(1)
 
-        runOnUiThread {
-            Auth.email.value = DUMMY_EMAIL
-            Auth.loggedIn.value = true
-        }
-
         val expectedGroupId = DUMMY_GROUP_ID
         val expectedEmail = DUMMY_EMAIL
         val expectedGroupIds = mapOf(Pair(DUMMY_GROUP_ID, Role.OPERATOR))
-        val expectedGroups = listOf(SearchGroupData(expectedGroupId, DUMMY_GROUP_NAME, null, null))
+        val expectedGroups = listOf(SearchGroupData(expectedGroupId, DUMMY_GROUP_NAME))
         val expectedResults = listOf(Pair(expectedGroups[0], Role.OPERATOR))
 
         Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(expectedEmail)).thenReturn(MutableLiveData(expectedGroupIds))
@@ -142,6 +146,7 @@ class SearchGroupDataManagerTest {
         val expectedData = MutableLiveData(setOf<UserData>())
 
         Mockito.`when`(mockUserRepo.getRescuersOfSearchGroup(expectedGroupId)).thenReturn(expectedData)
+        Mockito.`when`(mockUserRepo.getGroupIdsOfUserByEmail(DUMMY_EMAIL)).thenReturn(MutableLiveData(mapOf()))
 
         assertThat(SearchGroupDataManager().getRescuersOfSearchGroup(expectedGroupId), equalTo(expectedData as LiveData<Set<UserData>>))
         Mockito.verify(mockUserRepo, Mockito.times(1)).getRescuersOfSearchGroup(expectedGroupId)

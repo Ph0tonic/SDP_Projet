@@ -6,9 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.dao.SearchGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
-import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +20,6 @@ class SearchGroupRepositoryTest {
     companion object {
         private const val DUMMY_GROUP_ID = "Dummy_group_id"
         private const val DUMMY_GROUP_NAME = "Dummy_group_name"
-        private val DUMMY_LOCATION = LatLng(0.123, 23.1234)
     }
 
     @get:Rule
@@ -29,7 +28,7 @@ class SearchGroupRepositoryTest {
     @Test
     fun getGroupsCallsGetGroupsFromSearchGroupDao() {
         val expectedData = MutableLiveData(listOf(
-                SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+                SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
         ))
 
         val dao = Mockito.mock(SearchGroupDao::class.java)
@@ -45,7 +44,7 @@ class SearchGroupRepositoryTest {
     @Test
     fun getGroupByIdCallsGetGroupByIdFromSearchGroupDao() {
         val expectedData = MutableLiveData(
-                SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+                SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
         )
         val expectedGroupId = DUMMY_GROUP_ID
 
@@ -60,7 +59,7 @@ class SearchGroupRepositoryTest {
 
     @Test
     fun createGroupCallsCreateGroupDao() {
-        val expectedData = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedData = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
         val expectedGroupId = DUMMY_GROUP_ID
 
         val dao = Mockito.mock(SearchGroupDao::class.java)
@@ -74,7 +73,7 @@ class SearchGroupRepositoryTest {
 
     @Test
     fun updateGroupCallsUpdateGroupDao() {
-        val expectedData = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedData = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
 
         val dao = Mockito.mock(SearchGroupDao::class.java)
 

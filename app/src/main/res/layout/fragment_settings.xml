@@ -16,8 +16,8 @@
         android:text="@string/title_activity_settings"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:textColor="@color/darkGrey"
-        android:background="@color/colorWhite"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimary"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -34,33 +34,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/line_sep_1"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#af252525"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_title"/>
-
-    <View
-        android:id="@+id/line_sep_2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#cfffffff"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/line_sep_1"/>
-
-    <View
-        android:id="@+id/line_sep_3"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/colorWhite"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/line_sep_2"/>
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/settings"
         android:layout_width="0dp"
@@ -71,7 +44,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/line_sep_3">
+        app:layout_constraintTop_toBottomOf="@+id/settings_title" />
 
-    </androidx.fragment.app.FragmentContainerView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
@@ -21,8 +21,23 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.UiDevice
+<<<<<<< HEAD:app/src/androidTest/java/ch/epfl/sdp/MainActivityTest.kt
 import ch.epfl.sdp.ui.MainActivity
 import ch.epfl.sdp.ui.settings.SettingsFragment
+=======
+import ch.epfl.sdp.R
+import ch.epfl.sdp.database.dao.MockGroupDao
+import ch.epfl.sdp.database.dao.MockUserDao
+import ch.epfl.sdp.database.dao.OfflineHeatmapDao
+import ch.epfl.sdp.database.dao.OfflineMarkerDao
+import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.database.repository.HeatmapRepository
+import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.database.repository.SearchGroupRepository
+import ch.epfl.sdp.database.repository.UserRepository
+import ch.epfl.sdp.ui.drone.DroneInstanceMock
+import ch.epfl.sdp.ui.settings.SettingsActivity
+>>>>>>> 150582c3748c2824361c11f93dc5aedc8f643d46:app/src/androidTest/java/ch/epfl/sdp/ui/MainActivityTest.kt
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matchers
@@ -50,6 +65,13 @@ class MainActivityTest {
     @Before
     @Throws(Exception::class)
     fun before() {
+        DroneInstanceMock.setupDefaultMocks()
+
+        HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
+        MarkerRepository.daoProvider = { OfflineMarkerDao() }
+        UserRepository.daoProvider = { MockUserDao() }
+        SearchGroupRepository.daoProvider = { MockGroupDao() }
+
         mUiDevice = UiDevice.getInstance(getInstrumentation())
     }
 
@@ -82,6 +104,7 @@ class MainActivityTest {
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
     }
+
     @Test
     fun canDisplayAMapAndReloadLocation() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext())
@@ -121,9 +144,9 @@ class MainActivityTest {
     }
 
     @Test
-    fun startMissionWithNoGroupShowsToast(){
-        runOnUiThread{
-            mActivityRule.activity.currentGroupId.value = null
+    fun startMissionWithNoGroupShowsToast() {
+        runOnUiThread {
+            MainDataManager.groupId.value = null
         }
         onView(withId(R.id.start_mission_button)).perform(click())
         onView(withText(mActivityRule.activity.getString(R.string.warning_no_group_selected)))

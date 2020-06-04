@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="300">
+        <KeyFrameSet />
+        <OnClick motion:targetId="@+id/vlc_fragment" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/strat_and_menu_container">
+            <CustomAttribute
+                motion:attributeName="translationX"
+                motion:customDimension="0dp"/>
+        </Constraint>
+        <Constraint android:id="@+id/drone_status_fragment">
+            <CustomAttribute
+                motion:attributeName="translationY"
+                motion:customDimension="0dp"/>
+        </Constraint>
+        <Constraint
+            android:id="@+id/cameraTextview">
+            <CustomAttribute
+                motion:attributeName="alpha"
+                motion:customFloatValue="1."/>
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@+id/strat_and_menu_container">
+            <CustomAttribute
+                motion:attributeName="translationX"
+                motion:customDimension="500dp"/>
+        </Constraint>
+        <Constraint
+            android:id="@+id/drone_status_fragment">
+            <CustomAttribute
+                motion:attributeName="translationY"
+                motion:customDimension="-500dp"/>
+        </Constraint>
+        <Constraint
+            android:id="@+id/vlc_fragment"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintLeft_toLeftOf="parent"
+            motion:layout_constraintRight_toRightOf="parent"/>
+        <Constraint
+            android:id="@+id/cameraTextview">
+            <CustomAttribute
+                motion:attributeName="alpha"
+                motion:customFloatValue="0."/>
+        </Constraint>
+    </ConstraintSet>
+</MotionScene>

@@ -6,11 +6,42 @@
     app:startDestination="@+id/nav_home"
     tools:ignore="UnusedNavigation">
 
+    <activity
+        android:id="@+id/searchGroupSelectionActivity"
+        android:name="ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity"
+        android:label="activity_searchgroup_selection"
+        tools:layout="@layout/activity_searchgroup_selection" >
+        <action
+            android:id="@+id/action_searchGroupSelectionActivity_to_searchGroupEditionActivity"
+            app:destination="@id/searchGroupEditionActivity" />
+    </activity>
+    <activity
+        android:id="@+id/searchGroupEditionActivity"
+        android:name="ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity"
+        android:label="activity_searchgroup_edition"
+        tools:layout="@layout/activity_searchgroup_edition">
+        <argument
+            android:name="group_id"
+            app:argType="integer" />
+    </activity>
     <fragment
         android:id="@+id/nav_home"
         android:name="ch.epfl.sdp.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_nav_settings"
+            app:destination="@id/nav_settings" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_maps_managing"
+            app:destination="@id/nav_maps_managing" />
+        <action
+            android:id="@+id/action_nav_home_to_searchGroupSelectionActivity3"
+            app:destination="@id/searchGroupSelectionActivity" />
+        <action
+            android:id="@+id/action_nav_home_to_mapActivity3"
+            app:destination="@id/mapActivity" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_maps_managing"
@@ -23,5 +54,9 @@
         android:name="ch.epfl.sdp.ui.settings.SettingsFragment"
         android:label="@string/action_settings"
         tools:layout="@layout/fragment_settings" />
+    <activity
+        android:id="@+id/mapActivity"
+        android:name="ch.epfl.sdp.ui.maps.MapActivity"
+        android:label="MapActivity" />
 
 </navigation>

@@ -21,12 +21,10 @@ import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.providers.MarkerRepositoryProvider
 import ch.epfl.sdp.database.providers.SearchGroupRepositoryProvider
 import ch.epfl.sdp.database.providers.UserRepositoryProvider
-import ch.epfl.sdp.database.repository.IHeatmapRepository
-import ch.epfl.sdp.database.repository.IMarkerRepository
-import ch.epfl.sdp.database.repository.ISearchGroupRepository
-import ch.epfl.sdp.database.repository.IUserRepository
+import ch.epfl.sdp.database.repository.*
 import ch.epfl.sdp.utils.Auth
 import com.mapbox.mapboxsdk.geometry.LatLng
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,9 +37,6 @@ class SearchGroupEditionActivityTest {
     companion object {
         private const val DUMMY_GROUP_ID = "Dummy_group_id"
         private const val DUMMY_GROUP_NAME = "Dummy_group_name"
-
-        private val DUMMY_BASE_LOCATION = LatLng(0.0, 0.0)
-        private val DUMMY_SEARCH_LOCATION = LatLng(1.0, 1.0)
 
         private const val DUMMY_USER_ID = "Dummy_user_id"
         private const val DUMMY_USER_EMAIL = "dummyuseremail@gmail.com"
@@ -82,11 +77,18 @@ class SearchGroupEditionActivityTest {
         mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
+    @After
+    fun cleanup() {
+        SearchGroupRepositoryProvider.provide = { SearchGroupRepository() }
+        UserRepositoryProvider.provide = { UserRepository() }
+        MarkerRepositoryProvider.provide = { MarkerRepository() }
+        HeatmapRepositoryProvider.provide = { HeatmapRepository() }
+    }
 
     @Test
     fun searchGroupEditionShowsSearchGroupNameWhenEditingAnExistingGroup() {
         val expectedGroupId = DUMMY_GROUP_ID
-        val expectedData = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_BASE_LOCATION, DUMMY_SEARCH_LOCATION))
+        val expectedData = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME))
 
         Mockito.`when`(mockSearchGroupRepo.getGroupById(expectedGroupId)).thenReturn(expectedData)
         Mockito.`when`(mockUserRepo.getOperatorsOfSearchGroup(expectedGroupId)).thenReturn(MutableLiveData(setOf()))
@@ -115,7 +117,7 @@ class SearchGroupEditionActivityTest {
     @Test
     fun addingAnOperatorAddsAnOperator() {
         val expectedGroupId = DUMMY_GROUP_ID
-        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_BASE_LOCATION, DUMMY_SEARCH_LOCATION))
+        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME))
 
         Mockito.`when`(mockSearchGroupRepo.getGroupById(expectedGroupId)).thenReturn(expectedGroup)
         Mockito.`when`(mockUserRepo.getOperatorsOfSearchGroup(expectedGroupId)).thenReturn(MutableLiveData(setOf()))
@@ -138,7 +140,7 @@ class SearchGroupEditionActivityTest {
     @Test
     fun addingARescuerAddsARescuer() {
         val expectedGroupId = DUMMY_GROUP_ID
-        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_BASE_LOCATION, DUMMY_SEARCH_LOCATION))
+        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME))
 
         Mockito.`when`(mockSearchGroupRepo.getGroupById(expectedGroupId)).thenReturn(expectedGroup)
         Mockito.`when`(mockUserRepo.getOperatorsOfSearchGroup(expectedGroupId)).thenReturn(MutableLiveData(setOf()))
@@ -161,7 +163,7 @@ class SearchGroupEditionActivityTest {
     @Test
     fun searchGroupEditShowsCorrectNumberOfOperators() {
         val expectedGroupId = DUMMY_GROUP_ID
-        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_BASE_LOCATION, DUMMY_SEARCH_LOCATION))
+        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME))
         val expectedOperators = MutableLiveData(setOf(UserData(DUMMY_USER_EMAIL, DUMMY_USER_ID, Role.RESCUER)))
 
         Mockito.`when`(mockSearchGroupRepo.getGroupById(expectedGroupId)).thenReturn(expectedGroup)
@@ -176,7 +178,7 @@ class SearchGroupEditionActivityTest {
     @Test
     fun searchGroupEditShowsCorrectNumberOfRescuers() {
         val expectedGroupId = DUMMY_GROUP_ID
-        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_BASE_LOCATION, DUMMY_SEARCH_LOCATION))
+        val expectedGroup = MutableLiveData(SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME))
         val expectedRescuers = MutableLiveData(setOf(UserData(DUMMY_USER_EMAIL, DUMMY_USER_ID, Role.RESCUER)))
 
         Mockito.`when`(mockSearchGroupRepo.getGroupById(expectedGroupId)).thenReturn(expectedGroup)

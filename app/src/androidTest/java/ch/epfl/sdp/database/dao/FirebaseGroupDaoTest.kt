@@ -29,7 +29,6 @@ class FirebaseGroupDaoTest {
         private const val DUMMY_GROUP_ID = "Dummy_group_id"
         private const val DUMMY_GROUP_NAME = "Dummy_group_name"
         private const val DUMMY_GROUP_NAME_2 = "Dummy_group_name2"
-        private val DUMMY_LOCATION = LatLng(0.123, 23.1234)
         private const val ASYNC_CALL_TIMEOUT = 5L
     }
 
@@ -42,7 +41,7 @@ class FirebaseGroupDaoTest {
     @Test
     fun getSearchGroupsReturnsExpectedValues() {
         val dao = FirebaseGroupDao()
-        val expectedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
         val called = CountDownLatch(1)
 
         //Populate database
@@ -68,7 +67,7 @@ class FirebaseGroupDaoTest {
     @Test
     fun getSearchGroupsByIdReturnsExpectedValues() {
         val dao = FirebaseGroupDao()
-        val expectedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
         val called = CountDownLatch(1)
 
         //Populate database
@@ -93,7 +92,7 @@ class FirebaseGroupDaoTest {
     fun createGroupCreatesGroup() {
         val called = CountDownLatch(1)
 
-        val expectedAddedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedAddedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
         lateinit var actualAddedGroup: SearchGroupData
 
         val listener = object : ChildEventListener {
@@ -129,7 +128,7 @@ class FirebaseGroupDaoTest {
         val added = CountDownLatch(1)
         val called = CountDownLatch(1)
 
-        val expectedRemovedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedRemovedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
         lateinit var actualRemovedGroup: SearchGroupData
 
         val listener = object : ChildEventListener {
@@ -173,8 +172,8 @@ class FirebaseGroupDaoTest {
         val added = CountDownLatch(1)
         val called = CountDownLatch(1)
 
-        val expectedAddedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME, DUMMY_LOCATION, DUMMY_LOCATION)
-        val expectedUpdatedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME_2, DUMMY_LOCATION, DUMMY_LOCATION)
+        val expectedAddedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME)
+        val expectedUpdatedGroup = SearchGroupData(DUMMY_GROUP_ID, DUMMY_GROUP_NAME_2)
         lateinit var actualUpdatedGroup: SearchGroupData
 
         val listener = object : ChildEventListener {
