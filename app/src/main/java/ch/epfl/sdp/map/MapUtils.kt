@@ -10,7 +10,7 @@ object MapUtils {
 
     const val DEFAULT_LATITUDE: Double = 47.39778846550371
     const val DEFAULT_LONGITUDE: Double = 8.545970150745575
-    const val DEFAULT_ZOOM: Double = 9.0
+    const val DEFAULT_ZOOM: Double = 17.0
     const val ZOOM_TOLERANCE: Double = 2.0
 
     private fun loadLastMapPositionFromPrefs(): LatLng {
