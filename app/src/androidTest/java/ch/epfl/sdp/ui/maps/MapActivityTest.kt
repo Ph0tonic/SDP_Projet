@@ -456,7 +456,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnReturnButtonWhenDroneFlyingButNotConnectedShowsToast() {
+    fun loosingDroneConnectionShowsToast() {
         runOnUiThread {
             MainDataManager.goOffline()
             MainDataManager.groupId.value = DUMMY_GROUP_ID
@@ -471,43 +471,6 @@ class MapActivityTest {
             Drone.isFlyingLiveData.value = true
             Drone.isConnectedLiveData.value = false
         }
-
-        onView(withId(R.id.floating_menu_button)).perform(click())
-
-        onView(withId(R.id.return_home_or_user)).perform(click())
-        onView(withId(R.id.return_home_or_user)).perform(click())
-
-        // Test that the toast is displayed
-        onView(withText(applicationContext().getString(R.string.not_connected_message)))
-                .inRoot(withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
-                .check(matches(isDisplayed()))
-
-        runOnUiThread {
-            Drone.isFlyingLiveData.value = false
-        }
-    }
-
-    @Test
-    fun clickOnStartOrPauseButtonWhenDroneFlyingButNotConnectedShowsToast() {
-        runOnUiThread {
-            MainDataManager.goOffline()
-            MainDataManager.groupId.value = DUMMY_GROUP_ID
-            MainDataManager.role.value = Role.OPERATOR
-        }
-        mActivityRule.launchActivity(Intent())
-
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
-        runOnUiThread {
-            Drone.isFlyingLiveData.value = true
-            Drone.isConnectedLiveData.value = false
-        }
-
-        onView(withId(R.id.floating_menu_button)).perform(click())
-
-        onView(withId(R.id.start_or_pause_button)).perform(click())
-        onView(withId(R.id.start_or_pause_button)).perform(click())
 
         // Test that the toast is displayed
         onView(withText(applicationContext().getString(R.string.not_connected_message)))
@@ -550,7 +513,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnStartOrPauseButtonWhenDroneFlyingAndConnectedLaunchesMission() {
+    fun clickOnStartOrPauseButtonWhenDroneFlyingAndConnectedResumesMission() {
         runOnUiThread {
             MainDataManager.goOffline()
             MainDataManager.groupId.value = DUMMY_GROUP_ID
