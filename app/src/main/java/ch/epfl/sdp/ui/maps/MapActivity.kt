@@ -108,8 +108,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
-        startOrPauseButton.colorNormal = if (it) startOrPauseButton.colorNormal else startOrPauseButton.colorDisabled
-        returnHomeOrUserButton.colorNormal = if (it) startOrPauseButton.colorNormal else returnHomeOrUserButton.colorDisabled
+        if (!it) {
+            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
+        }
+        startOrPauseButton.isEnabled = it
+        returnHomeOrUserButton.isEnabled = it
     }
 
     private var missionStatusObserver = Observer<Boolean> {
@@ -133,7 +136,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         actionBar?.hide()
         startOrPauseButton = findViewById(R.id.start_or_pause_button)
         returnHomeOrUserButton = findViewById(R.id.return_home_or_user)
-        
+
         if (MainDataManager.role.value == Role.RESCUER) {
             hideOperatorUiComponents()
         }
@@ -284,7 +287,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     /**
      * If the drone is not connected, shows a Toast
-     * 
+     *
      * If the drone is connected :
      *      If the drone is flying :
      *          If the drone is paused, it restarts it
@@ -295,9 +298,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      *          If the mission builder is ready, it starts the mission
      */
     fun startOrPauseMissionButton(v: View) {
-        if (!Drone.isConnectedLiveData.value!!) {
-            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
-        } else if (Drone.isFlyingLiveData.value!!) {
+        if (Drone.isFlyingLiveData.value!!) {
             if (Drone.isMissionPausedLiveData.value!!) Drone.resumeMission() else Drone.pauseMission()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
@@ -307,11 +308,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     fun returnHomeOrUser(v: View) {
-        if (!Drone.isConnectedLiveData.value!!) {
-            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
-        } else {
-            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
-        }
+        ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
