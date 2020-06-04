@@ -19,21 +19,21 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="85dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/tiny_margin"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/offlineRegionName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="36sp"
-                android:textStyle="bold" />
+                style="@style/TextAppearance.AppCompat.Title"/>
 
             <TextView
                 android:id="@+id/offlineRegionProperty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                style="@style/TextAppearance.AppCompat.Subhead"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

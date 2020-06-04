@@ -26,12 +26,10 @@ import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var snackbar: Snackbar
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +43,6 @@ class MainActivity : AppCompatActivity() {
     private fun configureNavigationView() {
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
-        snackbar = Snackbar.make(navView, R.string.not_connected_message, Snackbar.LENGTH_LONG)
-//                .setBackgroundTint(Color.BLACK).setTextColor(Color.WHITE)
 
         val navController = findNavController(R.id.nav_host_fragment)
         navView.setupWithNavController(navController)
@@ -68,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         MainDataManager.goOnline()
         CentralLocationManager.configure(this)
         if (MainDataManager.role.value == Role.OPERATOR && !Drone.isConnectedLiveData.value!!) {
-            snackbar.show()
+            Toast.makeText(this, R.string.not_connected_message, Toast.LENGTH_LONG).show()
         }
     }
 
