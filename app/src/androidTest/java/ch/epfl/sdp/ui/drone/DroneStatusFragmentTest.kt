@@ -48,7 +48,6 @@ class DroneStatusFragmentTest {
         private const val DEFAULT_ALTITUDE_DISPLAY = " 0.0 m"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val DUMMY_GROUP_ID = "DummyGroupId"
-        private const val MAP_LOADING_TIMEOUT = 1000L
     }
 
     private lateinit var preferencesEditor: SharedPreferences.Editor

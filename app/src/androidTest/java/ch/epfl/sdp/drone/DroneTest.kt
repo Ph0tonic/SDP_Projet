@@ -12,15 +12,24 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 
 
 @RunWith(AndroidJUnit4::class)
 class DroneTest {
 
+    private fun <T> any(): T {
+        Mockito.any<T>()
+        return uninitialized()
+    }
+
+    private fun <T> uninitialized(): T = null as T
+
     companion object {
         const val SIGNAL_STRENGTH = 1.0
         private const val EPSILON = 1e-5
         private const val DEFAULT_ALTITUDE = 10f
+        private const val DUMMY_GROUP_ID = "dummy_group_id"
         val someLocationsList = listOf(
                 LatLng(47.398979, 8.543434),
                 LatLng(47.398279, 8.543934),
@@ -46,13 +55,13 @@ class DroneTest {
     }
 
     @Test
-    fun missionTestDoesNotCrash() {
+    fun startMissionUpdatesLiveData() {
         Drone.missionLiveData.value = null
         assertThat(Drone.missionLiveData.value, `is`(nullValue()))
 
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
 
-        // This assert prevent the app to crash in cash the mission has not been updated
+        // This assert prevent the app to crash in case the mission has not been updated
         assertThat(Drone.missionLiveData.value, `is`(notNullValue()))
         assertThat(Drone.missionLiveData.value?.isEmpty(), `is`(false))
     }
@@ -64,7 +73,7 @@ class DroneTest {
         Drone.positionLiveData.value = expectedLatLng
         Drone.homeLocationLiveData.value =
                 Telemetry.Position(expectedLatLng.latitude, expectedLatLng.longitude, 400f, 50f)
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
 
         Drone.returnToHomeLocationAndLand()
 
@@ -87,7 +96,7 @@ class DroneTest {
         val expectedLatLng = LatLng(47.297428, 8.445369) //Position near the takeoff
         CentralLocationManager.currentUserPosition.value = expectedLatLng
 
-        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE))
+        Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
 
         assertThat(CentralLocationManager.currentUserPosition.value, `is`(notNullValue()))
         Drone.returnToUserLocationAndLand()
