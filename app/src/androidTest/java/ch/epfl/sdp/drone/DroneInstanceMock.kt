@@ -89,7 +89,13 @@ object DroneInstanceMock {
         `when`(droneMission.clearMission())
                 .thenReturn(Completable.complete())
         `when`(droneMission.missionProgress)
-                .thenReturn(Flowable.empty())
+                .thenReturn(Flowable.fromArray(
+                        Mission.MissionProgress(0,4),
+                        Mission.MissionProgress(1, 4),
+                        Mission.MissionProgress(2, 4),
+                        Mission.MissionProgress(3, 4),
+                        Mission.MissionProgress(4, 4)
+                ))
 
         //Action mocks
         `when`(droneAction.arm())

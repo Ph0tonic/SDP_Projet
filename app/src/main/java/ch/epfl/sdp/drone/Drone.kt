@@ -114,7 +114,7 @@ object Drone {
         this.isMissionPausedLiveData.postValue(false)
 
         val missionCallBack = { location: LatLng, signalStrength: Double ->
-            Log.w("DRONE", "Mission Callback")
+            Log.w("DRONE_DEBUG", "Mission Callback")
             heatmapDataManager.addMeasureToHeatmap(groupId, location, signalStrength)
         }
 
@@ -125,7 +125,7 @@ object Drone {
                         .andThen(instance.action.arm())
                         .andThen {
                             onMeasureTakenCallbacks.add(missionCallBack)
-                            Log.w("DRONE", "Add callback")
+                            Log.w("DRONE_DEBUG", "Add callback")
                             it.onComplete()
                         }
                         .andThen(instance.mission.startMission())
@@ -135,20 +135,27 @@ object Drone {
                         )
         )
 
-        disposables.add(instance.mission.missionProgress.subscribe { missionProgress ->
-            if (missionProgress.current == missionProgress.total) {
-                Log.w("DRONE", "Remove callback")
-                onMeasureTakenCallbacks.remove(missionCallBack)
-            }
-            Log.w("DRONE", "Mission progress  YEAH !")
-            val missionItem = missionLiveData.value?.getOrNull(missionProgress.current - 1)
-            val location = missionItem?.longitudeDeg?.let { it1 -> LatLng(missionItem.latitudeDeg, it1) }
-            val signal = getSignalStrength()
-            Log.w("DRONE", "Signal strength $signal")
-            Log.w("DRONE", "Location $location")
-            location?.let { it1 -> onMeasureTaken(it1, signal) }
-        })
-        //TODO See what to do with disposables added
+        disposables.add(
+                getConnectedInstance()
+                        .andThen(instance.mission.missionProgress)
+                        .subscribe(
+                                { missionProgress ->
+                                    if (missionProgress.current == missionProgress.total) {
+                                        Log.w("DRONE_DEBUG", "Remove callback")
+                                        onMeasureTakenCallbacks.remove(missionCallBack)
+                                    }
+                                    Log.w("DRONE_DEBUG", "Mission progress  YEAH !")
+                                    val missionItem = missionLiveData.value?.getOrNull(missionProgress.current - 1)
+                                    val location = missionItem?.longitudeDeg?.let { it1 -> LatLng(missionItem.latitudeDeg, it1) }
+                                    val signal = getSignalStrength()
+                                    Log.w("DRONE_DEBUG", "Signal strength $signal")
+                                    Log.w("DRONE_DEBUG", "Location $location")
+                                    location?.let { it1 -> onMeasureTaken(it1, signal) }
+                                },
+                                {}
+                        )
+        )
+       // TODO("See what to do with added disposables")
     }
 
     private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
