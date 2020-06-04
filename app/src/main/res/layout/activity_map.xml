@@ -27,8 +27,8 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/vlc_fragment"
         android:name="ch.epfl.sdp.ui.camera.VlcFragment"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/map_activity_small_camera_width"
+        android:layout_height="@dimen/map_activity_small_camera_height"
         android:layout_margin="@dimen/tiny_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

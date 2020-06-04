@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui.maps
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -30,7 +29,6 @@ import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.drone.ReturnDroneDialogFragment
-import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import ch.epfl.sdp.utils.StrategyUtils.loadDefaultStrategyFromPreferences
@@ -133,7 +131,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         actionBar?.hide()
         startOrPauseButton = findViewById(R.id.start_or_pause_button)
         returnHomeOrUserButton = findViewById(R.id.return_home_or_user)
-        
+
         if (MainDataManager.role.value == Role.RESCUER) {
             hideOperatorUiComponents()
         }
@@ -228,6 +226,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
                 locationComponent.renderMode = RenderMode.COMPASS
             }
 
+            if (MainDataManager.role.value == Role.OPERATOR) {
+                val logoMargin = resources.getDimension(R.dimen.tiny_margin).toInt()
+                val logoOffset = resources.getDimension(R.dimen.map_activity_small_camera_width).toInt() + logoMargin * 2
+                mapboxMap.uiSettings.setAttributionMargins(logoOffset + mapboxMap.uiSettings.attributionMarginLeft, 0, 0, logoMargin)
+                mapboxMap.uiSettings.setLogoMargins(logoOffset, 0, 0, logoMargin)
+            }
 
             isMapReady = true
 

@@ -12,4 +12,6 @@
 
     <dimen name="offline_download_overlay_size">15dp</dimen>
     <dimen name="offline_download_border_size">1.5dp</dimen>
+    <dimen name="map_activity_small_camera_width">100dp</dimen>
+    <dimen name="map_activity_small_camera_height">100dp</dimen>
 </resources>
