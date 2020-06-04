@@ -142,5 +142,6 @@
     <string name="download_this_area_title">Download this area ?</string>
     <string name="offline_region_does_not_exist">Offline region does not exist</string>
     <string name="close">Close</string>
+    <string name="select_a_search_group">Select a search group</string>
 
 </resources>
