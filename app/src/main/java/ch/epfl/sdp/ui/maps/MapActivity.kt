@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
@@ -108,8 +109,8 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
-        startOrPauseButton.colorNormal = if (it) startOrPauseButton.colorNormal else startOrPauseButton.colorDisabled
-        returnHomeOrUserButton.colorNormal = if (it) startOrPauseButton.colorNormal else returnHomeOrUserButton.colorDisabled
+        startOrPauseButton.colorNormal = if (it) ContextCompat.getColor(this, R.color.colorPrimary) else startOrPauseButton.colorDisabled
+        returnHomeOrUserButton.colorNormal = if (it) ContextCompat.getColor(this, R.color.colorPrimary) else returnHomeOrUserButton.colorDisabled
     }
 
     private var missionStatusObserver = Observer<Boolean> {
@@ -133,7 +134,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         actionBar?.hide()
         startOrPauseButton = findViewById(R.id.start_or_pause_button)
         returnHomeOrUserButton = findViewById(R.id.return_home_or_user)
-        
+
         if (MainDataManager.role.value == Role.RESCUER) {
             hideOperatorUiComponents()
         }
