@@ -44,6 +44,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.mavsdk.telemetry.Telemetry
+import kotlin.math.abs
 
 /**
  * Main Activity to display map and create missions.
@@ -281,7 +282,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         val currentZoom = mapboxMap.cameraPosition.zoom
         if (Drone.positionLiveData.value != null) {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Drone.positionLiveData.value!!,
-                    if (currentZoom > DEFAULT_ZOOM - ZOOM_TOLERANCE && currentZoom < DEFAULT_ZOOM + ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
+                    if (abs(currentZoom - DEFAULT_ZOOM) < ZOOM_TOLERANCE) currentZoom else DEFAULT_ZOOM))
         }
     }
 
@@ -365,7 +366,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
             else -> throw java.lang.IllegalArgumentException("setStrategy doesn't support the strategy type of: $strategy")
         }
         findViewById<FloatingActionButton>(R.id.strategy_picker_button).setIcon(strategyIcon)
-
 
         missionBuilder.withStrategy(currentStrategy)
 
