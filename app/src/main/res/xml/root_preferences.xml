@@ -7,6 +7,7 @@
         android:entryValues="@array/gps_refresh_rate_values"
         android:key="@string/pref_key_gps_refresh_rate"
         android:title="@string/gps_refresh_rate_header"
+        android:icon="@drawable/ic_home_black_24dp"
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
@@ -15,6 +16,7 @@
         android:entryValues="@array/drone_altitude_values"
         android:key="@string/pref_key_drone_altitude"
         android:title="@string/drone_altitude_header"
+        android:icon="@drawable/ic_altitude"
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
@@ -23,6 +25,7 @@
         android:entryValues="@array/overflight_strategy_values"
         android:key="@string/pref_key_overflight_strategy"
         android:title="@string/overflight_strategy_header"
+        android:icon="@drawable/ic_quadstrat"
         app:useSimpleSummaryProvider="true" />
 
 </PreferenceScreen>

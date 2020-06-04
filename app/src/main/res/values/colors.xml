@@ -8,6 +8,8 @@
     <color name="wetAsphalt">#34495e</color>
     <color name="asbestos">#7f8c8d</color>
 
+    <color name="darkGrey">#252525</color>
+
     <color name="colorPrimaryDark">#9AADE1</color>
     <color name="colorAccent">#000560</color>
 </resources>

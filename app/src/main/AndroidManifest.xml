@@ -47,7 +47,7 @@
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name=".ui.settings.SettingsFragment"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.MainActivity" />
     </application>

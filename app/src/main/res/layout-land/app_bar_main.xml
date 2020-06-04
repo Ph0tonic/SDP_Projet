@@ -24,7 +24,6 @@
         style="@style/HomeButtonSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openSettings"
         android:src="@drawable/ic_settings_black_32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

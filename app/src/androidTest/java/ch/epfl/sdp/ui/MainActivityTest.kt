@@ -32,7 +32,7 @@ import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.ui.drone.DroneInstanceMock
-import ch.epfl.sdp.ui.settings.SettingsActivity
+import ch.epfl.sdp.ui.settings.SettingsFragment
 import ch.epfl.sdp.utils.Auth
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matchers
@@ -83,7 +83,7 @@ class MainActivityTest {
     @Test
     fun canOpenSettings() {
         onView(withId(R.id.mainSettingsButton)).perform(click())
-        intended(hasComponent(SettingsActivity::class.qualifiedName))
+        intended(hasComponent(SettingsFragment::class.qualifiedName))
     }
 
     @Test

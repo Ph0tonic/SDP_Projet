@@ -25,8 +25,8 @@
         style="@style/HomeButtonSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openSettings"
         android:src="@drawable/ic_settings_black_32dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@string/button_settings_desc" />
