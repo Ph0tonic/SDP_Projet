@@ -3,7 +3,6 @@ package ch.epfl.sdp.ui.maps.offline
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.utils.OnItemClickListener
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 

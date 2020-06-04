@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui.maps.offline
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -14,7 +13,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus
 
 class OfflineMapViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
-        RecyclerView.ViewHolder(inflater.inflate(R.layout.map_selection_recyclerview_item, parent, false)){
+        RecyclerView.ViewHolder(inflater.inflate(R.layout.map_selection_recyclerview_item, parent, false)) {
     private var card: CardView? = itemView.findViewById(R.id.map_selection_item_card)
     private var nameView: TextView? = itemView.findViewById(R.id.offlineRegionName)
     private var propertyView: TextView? = itemView.findViewById(R.id.offlineRegionProperty)
@@ -29,11 +28,11 @@ class OfflineMapViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         }
         this.itemClickListener = itemClickListener
 
-        card?.setOnClickListener{
+        card?.setOnClickListener {
             itemClickListener.onItemClicked(offlineRegion)
         }
 
-        offlineRegion =  region
+        offlineRegion = region
 
         region.getStatus(object : OfflineRegion.OfflineRegionStatusCallback {
             /**
@@ -42,7 +41,7 @@ class OfflineMapViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
              * @param status the offline region status
              */
             override fun onStatus(status: OfflineRegionStatus?) {
-                propertyView?.text =  MainApplication.applicationContext().getString(R.string.offline_region_tiles, status?.completedResourceCount)
+                propertyView?.text = MainApplication.applicationContext().getString(R.string.offline_region_tiles, status?.completedResourceCount)
             }
 
             /**

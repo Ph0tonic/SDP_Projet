@@ -31,10 +31,11 @@ class MapsManagingFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_maps_managing, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onStart() {
+        super.onStart()
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) { // Check result. If no regions have been
-                view.findViewById<TextView>(R.id.no_offline_map).visibility = if (offlineRegions.isNotEmpty()) {
+                view!!.findViewById<TextView>(R.id.no_offline_map)!!.visibility = if (offlineRegions.isNotEmpty()) {
                     View.GONE
                 } else {
                     View.VISIBLE
@@ -45,7 +46,7 @@ class MapsManagingFragment : Fragment() {
                     // RecyclerView behavior
                     layoutManager = LinearLayoutManager(activity)
                     // set the custom adapter to the RecyclerView
-                    adapter = MapSelectionRecyclerViewAdapter(offlineRegions, object : OnItemClickListener<OfflineRegion>{
+                    adapter = MapSelectionRecyclerViewAdapter(offlineRegions, object : OnItemClickListener<OfflineRegion> {
                         override fun onItemClicked(offlineRegion: OfflineRegion) {
                             openExistingRegion(offlineRegion)
                         }
@@ -58,10 +59,9 @@ class MapsManagingFragment : Fragment() {
                 OfflineRegionUtils.showErrorAndToast("Error : $error")
             }
         })
-        super.onViewCreated(view, savedInstanceState)
     }
 
-    private fun openExistingRegion(offlineRegion: OfflineRegion){
+    private fun openExistingRegion(offlineRegion: OfflineRegion) {
         val context = MainApplication.applicationContext()
         val intent = Intent(context, OfflineManagerActivity::class.java)
         intent.putExtra(getString(R.string.intent_key_show_delete_button), true)

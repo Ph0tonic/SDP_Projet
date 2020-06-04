@@ -91,9 +91,9 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
         Log.w("OFFLINE", "current offline region: ${currentOfflineRegion?.id}")
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
-            if(currentOfflineRegion == null){
+            if (currentOfflineRegion == null) {
                 mapboxMap.cameraPosition = MapUtils.getLastCameraState()
-            }else{
+            } else {
                 mapboxMap.cameraPosition = OfflineRegionUtils.getRegionLocation(currentOfflineRegion!!)
                 Log.w("OFFLINE", "current offline position: ${mapboxMap.cameraPosition}")
             }
