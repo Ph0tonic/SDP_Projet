@@ -90,4 +90,5 @@
     <string name="drone_pause_error">Mise en pause de la mission échouée</string>
     <string name="drone_pause_success">Mission mise en pause</string>
     <string name="camera">Caméra</string>
+    <string name="add">Ajouter</string>
 </resources>
