@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Licence keys -->
     <string name="mapbox_access_token" translatable="false">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
     <string name="google_signin_key" translatable="false">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
@@ -34,6 +34,8 @@
     <!-- Map Activity -->
     <string name="intent_key_group_id" translatable="false">group_id</string>
     <string name="intent_key_role" translatable="false">role</string>
+    <string name="intent_key_offline_mode" translatable="false">offline_mode</string>
+
     <string name="drone_home_error">No Home Available</string>
     <string name="drone_user_error">User position not available</string>
     <string name="drone_user_success">Returning to user</string>
@@ -46,6 +48,8 @@
     <string name="return_drone_dialog_title">Do you want to return to user or to take off ?</string>
     <string name="return_drone_dialog_option_home">Home</string>
     <string name="return_drone_dialog_option_user">User</string>
+    <string name="drone_pause_success">Mission Paused</string>
+    <string name="drone_pause_error">Failed to pause Mission</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
@@ -115,6 +119,9 @@
     <string name="delete_this_group">Delete this group</string>
     <string name="enter_a_mail_address">Enter a mail address</string>
     <string name="add_a_user">Add a user</string>
+    <string name="add_a_rescuer">Add a rescuer</string>
+    <string name="add_an_operator">Add an operator</string>
+    <string name="cancel">Cancel</string>
     <string name="group_edition_activity_title">Edit group</string>
     <string name="enter_your_desired_group_name">Enter your desired group name</string>
     <string name="create_a_search_group">Create a search group</string>
@@ -126,7 +133,5 @@
     <string name="speed_description_tag">Speed icon</string>
     <string name="distance_to_user_description_tag">Distance to user icon</string>
     <string name="distance_to_home_description_tag">Distance to home icon</string>
-
-    <!-- To be organised -->
 
 </resources>

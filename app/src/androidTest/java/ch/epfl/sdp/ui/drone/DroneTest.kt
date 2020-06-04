@@ -1,8 +1,9 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.ui.drone
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
 import ch.epfl.sdp.ui.maps.MapActivity
@@ -11,6 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,8 +42,15 @@ class DroneTest {
             true,
             false) // Activity is not launched immediately
 
+
+    @Before
+    fun before() {
+        DroneInstanceMock.setupDefaultMocks()
+    }
+
     @Test
     fun testSignal() {
+        MainDataManager.goOffline()
         Drone.getSignalStrength = { SIGNAL_STRENGTH }
         assertThat(Drone.getSignalStrength(), closeTo(SIGNAL_STRENGTH, EPSILON))
         print(Drone.debugGetSignalStrength)
@@ -106,5 +115,26 @@ class DroneTest {
         //compare both position
         assertThat(currentLat, closeTo(expectedLatLng.latitude, EPSILON))
         assertThat(currentLong, closeTo(expectedLatLng.longitude, EPSILON))
+    }
+
+    @Test
+    fun canPauseMission() {
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.pauseMission()
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
+    }
+
+    @Test
+    fun canRestartMissionAfterPause() {
+        Drone.isFlyingLiveData.value = true
+        Drone.isMissionPausedLiveData.value = false
+
+        Drone.pauseMission()
+        Drone.resumeMission()
+
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(false))
     }
 }

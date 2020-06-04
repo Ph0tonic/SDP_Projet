@@ -84,4 +84,9 @@
     <string name="search_group_name_cannot_be_empty">Le nom du groupe de recherche ne peut être vide</string>
     <string name="display_strategy_zigzag">Zig-zag</string>
     <string name="display_strategy_spiral">Spirale</string>
+    <string name="cancel">Annuler</string>
+    <string name="add_an_operator">Ajouter un opérateur</string>
+    <string name="add_a_rescuer">Ajouter un sauveteur</string>
+    <string name="drone_pause_error">Mise en pause de la mission échouée</string>
+    <string name="drone_pause_success">Mission mise en pause</string>
 </resources>

@@ -1,5 +1,6 @@
 package ch.epfl.sdp.drone
 
+import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.mission.Mission.MissionItem
 import io.mavsdk.mission.Mission.MissionPlan

@@ -8,6 +8,7 @@ import ch.epfl.sdp.database.dao.SearchGroupDao
 import ch.epfl.sdp.database.data.SearchGroupData
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

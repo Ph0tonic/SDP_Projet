@@ -12,6 +12,7 @@ import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
+import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 import ch.epfl.sdp.ui.search_group.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
@@ -22,10 +23,6 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val searchGroupManager = SearchGroupDataManager()
-
-    companion object {
-        const val SEARH_GROUP_ID_SELECTION_RESULT_TAG = "search_group"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -41,12 +38,12 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
         searchGroupManager.getAllGroups().observe(this, this)
     }
 
-    override fun onChanged(searchGroups: List<Pair<SearchGroupData,Role>>) {
+    override fun onChanged(searchGroups: List<Pair<SearchGroupData, Role>>) {
         val recyclerView = findViewById<RecyclerView>(R.id.searchGroupSelectionRecyclerview)
         recyclerView.adapter = SearchGroupRecyclerAdapter(searchGroups,
                 object : OnItemClickListener<SearchGroupData> {
                     override fun onItemClicked(searchGroupData: SearchGroupData) {
-                        joinGroup(searchGroupData)
+                        joinGroup(searchGroupData, searchGroups.find { it.first == searchGroupData }!!.second)
                     }
                 },
                 object : OnItemClickListener<SearchGroupData> {
@@ -56,10 +53,8 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
                 })
     }
 
-    private fun joinGroup(searchGroupData: SearchGroupData) {
-        val returnDataIntent = Intent()
-        returnDataIntent.putExtra(SEARH_GROUP_ID_SELECTION_RESULT_TAG, searchGroupData.uuid)
-        setResult(RESULT_OK, returnDataIntent)
+    private fun joinGroup(searchGroupData: SearchGroupData, role: Role) {
+        MainDataManager.selectSearchGroup(searchGroupData.uuid!!, role)
         finish()
     }
 
