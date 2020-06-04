@@ -139,5 +139,6 @@
     <string name="no_offline_map_downloaded_yet">No offline map downloaded yet</string>
     <string name="offline_maps">Offline maps</string>
     <string name="download_current_area">Download the current area</string>
+    <string name="download_this_area_title">Download this area ?</string>
 
 </resources>

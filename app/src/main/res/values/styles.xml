@@ -19,8 +19,17 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- Main activity themes -->
+    <style name="AppTheme.MapManagingOfflineTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- Display data in Map Activity-->
-    <style name="InformationDisplayTheme">
+    <style name="AppTheme.InformationDisplayTheme">
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textStyle">bold</item>
         <item name="android:text">@string/no_info</item>
@@ -28,7 +37,7 @@
         <item name="android:padding">@dimen/tiny_padding</item>
     </style>
 
-    <style name="HomeButtonTheme">
+    <style name="AppTheme.HomeButton">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">24sp</item>
         <item name="android:textAllCaps">false</item>
@@ -38,28 +47,40 @@
         <item name="android:layout_gravity">center</item>
     </style>
 
-    <style name="HomeButtonTheme.landscape">
+    <style name="AppTheme.HomeButton.landscape">
         <item name="android:layout_width">@dimen/fragment_home_button_size_landscape</item>
         <item name="android:layout_height">@dimen/fragment_home_button_size_landscape</item>
     </style>
 
-    <style name="HomeButtonTheme.portrait">
+    <style name="AppTheme.HomeButton.portrait">
         <item name="android:layout_width">@dimen/fragment_home_button_size_portrait</item>
         <item name="android:layout_height">@dimen/fragment_home_button_size_portrait</item>
     </style>
 
-    <style name="HomeButtonSmall">
-        <item name="android:background">#00FFFFFF</item>
+    <style name="AppTheme.HomeButtonSmall">
+        <item name="android:background">@android:color/transparent</item>
         <item name="android:layout_margin">10dp</item>
     </style>
 
-    <style name="OfflineDownloadButtonTheme" parent="@android:style/Widget.DeviceDefault.Button.Borderless">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">@color/colorPrimary</item>
-        <item name="android:textSize">24sp</item>
+    <style name="AppTheme.BarButton" parent="@android:style/Widget.DeviceDefault.Button">
+        <item name="android:textColor">@color/darkGrey</item>
+        <item name="android:background">@android:color/white</item>
     </style>
 
-    <style name="FloatingButtonTheme">
+    <style name="AppTheme.MenuBarButton">
+        <item name="android:showDividers">middle</item>
+        <item name="android:divider">@drawable/menu_bar_button_divider</item>
+    </style>
+
+    <style name="AppTheme.OfflineMapActivityOverlay">
+        <item name="android:background">@color/transparentDarkGrey</item>
+    </style>
+
+    <style name="AppTheme.OfflineMapActivityBorder">
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppTheme.FloatingButtonTheme">
         <item name="fab_size">mini</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="fab_colorNormal">@color/colorPrimary</item>
@@ -67,7 +88,7 @@
         <item name="fab_colorDisabled">@color/asbestos</item>
     </style>
 
-    <style name="SearchGroupEditionAddIcon">
+    <style name="AppTheme.SearchGroupEditionAddIcon">
         <item name="android:layout_width">32dp</item>
         <item name="android:layout_height">32dp</item>
     </style>

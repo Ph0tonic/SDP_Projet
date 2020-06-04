@@ -11,4 +11,5 @@
     <dimen name="fragment_home_button_size_landscape">150dp</dimen>
 
     <dimen name="offline_download_overlay_size">15dp</dimen>
+    <dimen name="offline_download_border_size">1.5dp</dimen>
 </resources>

@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3498db</color>
+    <!-- Official palet -->
+    <!-- https://flatuicolors.com/palette/defo -->
+    <color name="peterRiver">#3498db</color>
     <color name="clouds">#ecf0f1</color>
-    <color name="transparentClouds">#ccecf0f1</color>
     <color name="belizeHole">#2980b9</color>
     <color name="concrete">#95a5a6</color>
     <color name="wetAsphalt">#34495e</color>
     <color name="asbestos">#7f8c8d</color>
+    <color name="alizarin">#e74c3c</color>
+    <color name="pomegranate">#c0392b</color>
 
-    <color name="colorPrimaryDark">#9AADE1</color>
-    <color name="colorAccent">#000560</color>
+    <!-- Additional color -->
+    <color name="darkGrey">#252525</color>
+
+    <!-- transparent version -->
+    <color name="transparentClouds">#ccecf0f1</color>
+    <color name="transparentDarkGrey">#7F252525</color>
+
+    <!-- Official color theme mapping -->
+    <color name="colorPrimary">@color/peterRiver</color>
+    <color name="colorPrimaryDark">@color/belizeHole</color>
+    <color name="textColorPrimary">@android:color/white</color>
+    <color name="colorAccent">@color/wetAsphalt</color>
 </resources>

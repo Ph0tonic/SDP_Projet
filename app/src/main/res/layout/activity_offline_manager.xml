@@ -6,6 +6,14 @@
     android:layout_height="fill_parent"
     tools:context="ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity">
 
+    <TextView
+        android:id="@+id/offline_maps_activity_title"
+        style="@style/AppTheme.MapManagingOfflineTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/download_this_area_title"
+        mapbox:layout_constraintTop_toTopOf="parent" />
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="0dp"
@@ -13,27 +21,12 @@
         mapbox:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         mapbox:layout_constraintEnd_toEndOf="parent"
         mapbox:layout_constraintStart_toStartOf="parent"
-        mapbox:layout_constraintTop_toTopOf="parent">
+        mapbox:layout_constraintTop_toBottomOf="@id/offline_maps_activity_title">
     </com.mapbox.mapboxsdk.maps.MapView>
-
-    <EditText
-        android:id="@+id/editName"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="28dp"
-        android:background="@color/colorPrimary"
-        android:hint="@string/set_region_name_hint"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:textColor="@android:color/white"
-        android:visibility="invisible"
-        mapbox:layout_constraintBottom_toBottomOf="@+id/overlay_top"
-        mapbox:layout_constraintEnd_toEndOf="parent"
-        mapbox:layout_constraintStart_toStartOf="parent"
-        mapbox:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
+        style="@style/AppTheme.MenuBarButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/colorPrimaryDark"
@@ -42,7 +35,7 @@
 
         <Button
             android:id="@+id/cancel_button"
-            style="@style/OfflineDownloadButtonTheme"
+            style="@style/AppTheme.BarButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -51,7 +44,7 @@
 
         <Button
             android:id="@+id/delete_offline_map_button"
-            style="@style/OfflineDownloadButtonTheme"
+            style="@style/AppTheme.BarButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -60,13 +53,12 @@
 
         <Button
             android:id="@+id/download_button"
-            style="@style/OfflineDownloadButtonTheme"
+            style="@style/AppTheme.BarButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="downloadRegionDialog"
             android:text="@string/dialog_positive_button" />
-
     </LinearLayout>
 
     <ProgressBar
@@ -86,14 +78,14 @@
         android:id="@+id/overlay_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/offline_download_overlay_size"
-        android:background="#7F252525"
-        mapbox:layout_constraintTop_toTopOf="parent" />
+        style="@style/AppTheme.OfflineMapActivityOverlay"
+        mapbox:layout_constraintTop_toBottomOf="@+id/offline_maps_activity_title" />
 
     <View
         android:id="@+id/overlay_left"
         android:layout_width="@dimen/offline_download_overlay_size"
         android:layout_height="0dp"
-        android:background="#7F252525"
+        style="@style/AppTheme.OfflineMapActivityOverlay"
         mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
         mapbox:layout_constraintStart_toStartOf="parent"
         mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
@@ -102,23 +94,23 @@
         android:id="@+id/overlay_right"
         android:layout_width="@dimen/offline_download_overlay_size"
         android:layout_height="0dp"
-        android:background="#7F252525"
+        style="@style/AppTheme.OfflineMapActivityOverlay"
         mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
         mapbox:layout_constraintEnd_toEndOf="parent"
         mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
 
     <View
         android:id="@+id/overlay_bottom"
+        style="@style/AppTheme.OfflineMapActivityOverlay"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="#7F252525"
         mapbox:layout_constraintBottom_toTopOf="@+id/bottom_navigation" />
 
     <View
         android:id="@+id/border_left"
-        android:layout_width="1dp"
+        android:layout_width="@dimen/offline_download_border_size"
         android:layout_height="0dp"
-        android:background="@color/colorPrimary"
+        style="@style/AppTheme.OfflineMapActivityBorder"
         mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
         mapbox:layout_constraintStart_toEndOf="@+id/overlay_left"
         mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
@@ -126,17 +118,17 @@
     <View
         android:id="@+id/border_bottom"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/colorPrimary"
+        android:layout_height="@dimen/offline_download_border_size"
+        style="@style/AppTheme.OfflineMapActivityBorder"
         mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
         mapbox:layout_constraintEnd_toStartOf="@+id/overlay_right"
         mapbox:layout_constraintStart_toEndOf="@+id/overlay_left" />
 
     <View
         android:id="@+id/border_right"
-        android:layout_width="1dp"
+        android:layout_width="@dimen/offline_download_border_size"
         android:layout_height="0dp"
-        android:background="@color/colorPrimary"
+        style="@style/AppTheme.OfflineMapActivityBorder"
         mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
         mapbox:layout_constraintEnd_toStartOf="@+id/overlay_right"
         mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
@@ -144,8 +136,8 @@
     <View
         android:id="@+id/border_top"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/colorPrimary"
+        android:layout_height="@dimen/offline_download_border_size"
+        style="@style/AppTheme.OfflineMapActivityBorder"
         mapbox:layout_constraintEnd_toStartOf="@+id/overlay_right"
         mapbox:layout_constraintStart_toEndOf="@+id/overlay_left"
         mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />

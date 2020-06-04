@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.endProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.startProgress
-import ch.epfl.sdp.map.offline.OfflineRegionUtils.getRegionName
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.showErrorAndToast
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -51,9 +51,10 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         super.initMapView(savedInstanceState, R.layout.activity_offline_manager, R.id.mapView)
 
         val showDelete = intent.getBooleanExtra(getString(R.string.intent_key_show_delete_button), false)
-        if (!showDelete){
+        if (!showDelete) {
             findViewById<Button>(R.id.delete_offline_map_button).visibility = View.GONE
-        }else{
+        } else {
+            findViewById<TextView>(R.id.offline_maps_activity_title).text = "TODO" //TODO: replace text with map name
             findViewById<Button>(R.id.download_button).visibility = View.GONE
         }
         currentOfflineRegionId = intent.getLongExtra(getString(R.string.intent_key_offline_region_id), -1)

@@ -58,7 +58,7 @@
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/strategy_picker_button"
-            style="@style/FloatingButtonTheme"
+            style="@style/AppTheme.FloatingButtonTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="pickStrategy"
@@ -78,7 +78,7 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/return_home_or_user"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="returnHomeOrUser"
@@ -86,7 +86,7 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/start_or_pause_button"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="startOrPauseMissionButton"
@@ -94,7 +94,7 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/clear_button"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="clearWaypoints"
@@ -102,7 +102,7 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/locate_button"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="centerCameraOnDrone"
