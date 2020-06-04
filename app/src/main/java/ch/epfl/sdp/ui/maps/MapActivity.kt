@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
@@ -109,6 +108,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
+        if (!it) {
+            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
+        }
         startOrPauseButton.isEnabled = it
         returnHomeOrUserButton.isEnabled = it
     }
@@ -285,7 +287,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     /**
      * If the drone is not connected, shows a Toast
-     * 
+     *
      * If the drone is connected :
      *      If the drone is flying :
      *          If the drone is paused, it restarts it
@@ -296,9 +298,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      *          If the mission builder is ready, it starts the mission
      */
     fun startOrPauseMissionButton(v: View) {
-        if (!Drone.isConnectedLiveData.value!!) {
-            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
-        } else if (Drone.isFlyingLiveData.value!!) {
+        if (Drone.isFlyingLiveData.value!!) {
             if (Drone.isMissionPausedLiveData.value!!) Drone.resumeMission() else Drone.pauseMission()
         } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
@@ -308,11 +308,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     fun returnHomeOrUser(v: View) {
-        if (!Drone.isConnectedLiveData.value!!) {
-            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
-        } else {
-            ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
-        }
+        ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
