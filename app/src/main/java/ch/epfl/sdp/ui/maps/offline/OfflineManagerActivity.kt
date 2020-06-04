@@ -176,4 +176,8 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
             }
         })
     }
+
+    fun cancel(view: View) {
+        finish()
+    }
 }
