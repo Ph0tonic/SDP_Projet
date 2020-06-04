@@ -189,9 +189,9 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             victimSymbolManager = VictimSymbolManager(mapView, mapboxMap, style, { markerId -> markerManager.removeMarkerForSearchGroup(MainDataManager.groupId.value!!, markerId) }) { longClickConsumed = true }
             homePainter = MapboxHomePainter(mapView, mapboxMap, style)
+            dronePainter = MapboxDronePainter(mapView, mapboxMap, style)
             measureHeatmapManager = MeasureHeatmapManager(mapView, mapboxMap, style, victimSymbolManager.layerId())
             buildMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
             droneMissionPainter = MapboxMissionPainter(mapView, mapboxMap, style)
