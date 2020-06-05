@@ -16,15 +16,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import ch.epfl.sdp.R
-import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.MainDataManager
-import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.ui.search_group.selection.SearchGroupSelectionActivity
 import ch.epfl.sdp.ui.settings.SettingsActivity
 import ch.epfl.sdp.utils.Auth
-import ch.epfl.sdp.utils.CentralLocationManager
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -62,15 +59,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         MainDataManager.goOnline()
-        CentralLocationManager.configure(this)
-        if (MainDataManager.role.value == Role.OPERATOR && !Drone.isConnectedLiveData.value!!) {
-            Toast.makeText(this, R.string.not_connected_message, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        CentralLocationManager.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -87,12 +75,6 @@ class MainActivity : AppCompatActivity() {
 
     fun openSettings(view: View) {
         startActivity(Intent(this, SettingsActivity::class.java))
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        CentralLocationManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun checkConnexion(view: View, action: () -> Unit) {
