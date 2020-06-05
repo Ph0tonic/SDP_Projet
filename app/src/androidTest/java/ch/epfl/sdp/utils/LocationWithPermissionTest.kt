@@ -106,18 +106,4 @@ class LocationWithPermissionTest {
         Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(MIN_DIST), Mockito.any<LocationListener>())
     }
 
-
-    @Test
-    fun canUpdateUserLocation() {
-        //TODO Rewrite this test
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-    }
-
-    @Test
-    fun canUpdateUserLocationTwice() {
-        //TODO Rewrite this test
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-    }
-
 }
