@@ -8,6 +8,8 @@ import ch.epfl.sdp.database.data.HeatmapPointData
 import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.repository.IHeatmapRepository
 import ch.epfl.sdp.utils.Auth
+import ch.epfl.sdp.utils.IdentifierUtils
+import com.google.firebase.iid.FirebaseInstanceId
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -29,12 +31,14 @@ class HeatmapDataManagerTest {
 
     @Test
     fun addMeasureToHeatmapForNewHeatmapCallsUpdateHeatmap() {
+        val deviceId = IdentifierUtils.id()
+        Auth.accountId.value = DUMMY_HEATMAP_ID
+        val expectedHeatmapId = Auth.accountId.value + "__" + deviceId
         val expectedHeatMapData = HeatmapData(mutableListOf(
                 HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
-        ), DUMMY_HEATMAP_ID)
+        ), expectedHeatmapId)
         val expectedGroupId = DUMMY_GROUP_ID
 
-        Auth.accountId.value = DUMMY_HEATMAP_ID
 
         val repo = Mockito.mock(IHeatmapRepository::class.java)
         Mockito.`when`(repo.getGroupHeatmaps(expectedGroupId)).thenReturn(MutableLiveData(mutableMapOf()))
@@ -48,11 +52,15 @@ class HeatmapDataManagerTest {
 
     @Test
     fun addMeasureToHeatmapForExistingHeatmapCallsUpdateHeatmap() {
+        val deviceId = IdentifierUtils.id()
+        Auth.accountId.value = DUMMY_HEATMAP_ID
+        val expectedHeatmapId = Auth.accountId.value + "__" + deviceId
+        val expectedGroupId = DUMMY_GROUP_ID
+
         val expectedHeatMapData = HeatmapData(mutableListOf(
                 HeatmapPointData(DUMMY_LOCATION, DUMMY_INTENSITY)
-        ), DUMMY_HEATMAP_ID)
-        val expectedGroupId = DUMMY_GROUP_ID
-        val previousHeatMapData = HeatmapData(mutableListOf(), DUMMY_HEATMAP_ID)
+        ), expectedHeatmapId)
+        val previousHeatMapData = HeatmapData(mutableListOf(), expectedHeatmapId)
 
         Auth.accountId.value = DUMMY_HEATMAP_ID
 
