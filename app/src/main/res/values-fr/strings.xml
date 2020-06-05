@@ -22,7 +22,7 @@
     <string name="dialog_message">Télécharger la carte de la région actuellement affichée</string>
     <string name="set_region_name_hint">Entrez un nom</string>
     <string name="dialog_positive_button">Télécharger</string>
-    <string name="dialog_cancel">Annuler</string>
+    <string name="cancel">Annuler</string>
     <string name="navigate_title">Liste</string>
     <string name="navigate_positive_button">Naviguer à</string>
     <string name="navigate_neutral_button_title">Supprimer</string>
@@ -43,7 +43,6 @@
     <string name="danger_zone">Zone dangereuse</string>
     <string name="delete_this_group">Supprimer ce groupe</string>
     <string name="enter_a_mail_address">Entrez une adresse mail</string>
-    <string name="add_a_user">Ajouter un utilisateur</string>
     <string name="group_edition_activity_title">Éditer le groupe</string>
     <string name="battery_description_tag">Icône batterie</string>
     <string name="altitude_description_tag">Icône altitude</string>
@@ -90,13 +89,8 @@
     <string name="drone_pause_success">Mission mise en pause</string>
     <string name="camera">Caméra</string>
     <string name="add">Ajouter</string>
-    <string name="delete_region">Supprimer</string>
     <string name="delete_this_offline_region">Supprimer cette région ?</string>
     <string name="offline_region_tiles">Nombre de cases : %1$d</string>
-    <string name="ReturnDroneDialogFragment">Renvoyer le drone à la base</string>
-    <string name="ReturnDroneDialogTitle">Voulez-vous retourner à l\'utilisateur ou décoller ?</string>
-    <string name="ReturnDroneDialogHome">Base</string>
-    <string name="ReturnDroneDialogUser">Utilisateur</string>
     <string name="create">Créer</string>
     <string name="no_offline_map_downloaded_yet">Aucune carte hors-ligne téléchargée pour le moment</string>
     <string name="offline_maps">Cartes hors-ligne</string>
@@ -106,4 +100,5 @@
     <string name="close">Fermer</string>
     <string name="select_a_search_group">Sélectionner un groupe de recherche</string>
     <string name="delete_this_search_group">Supprimer ce groupe de recherche</string>
+    <string name="delete">Supprimer</string>
 </resources>

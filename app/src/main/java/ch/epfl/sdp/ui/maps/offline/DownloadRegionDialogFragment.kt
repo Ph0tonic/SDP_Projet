@@ -37,7 +37,7 @@ class DownloadRegionDialogFragment : DialogFragment() {
                             (activity as OfflineManagerActivity).prepareAndLaunchDownload(regionName)
                         }
                     }
-                    .setNegativeButton(getString(R.string.dialog_cancel)) { dialog, _ -> dialog.cancel() }
+                    .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> dialog.cancel() }
             // Display the dialog
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")

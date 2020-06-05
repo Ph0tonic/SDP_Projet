@@ -49,7 +49,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="deleteCurrentRegion"
-            android:text="@string/delete_region" />
+            android:text="@string/delete" />
 
         <Button
             android:id="@+id/download_button"

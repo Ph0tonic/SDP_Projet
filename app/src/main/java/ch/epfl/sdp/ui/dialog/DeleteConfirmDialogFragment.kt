@@ -16,7 +16,7 @@ class DeleteConfirmDialogFragment(private val title: String, private val onDelet
                     }
                     // When the user cancels, don't do anything.
                     // The dialog will automatically close
-                    .setNegativeButton(getString(R.string.dialog_cancel)) { _, _ -> }.create()
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ -> }.create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 }

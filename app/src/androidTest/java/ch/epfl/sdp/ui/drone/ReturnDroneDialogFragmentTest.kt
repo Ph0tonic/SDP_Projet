@@ -128,7 +128,7 @@ class ReturnDroneDialogFragmentTest {
         ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.return_drone_dialog))
 
         onView(withText(applicationContext()
-                .getString(R.string.dialog_cancel)))
+                .getString(R.string.cancel)))
                 .perform(click())
 
         onView(withText(applicationContext().getString(R.string.return_drone_dialog_title)))
