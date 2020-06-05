@@ -39,9 +39,10 @@ class OfflineMapsManagingTest {
     private lateinit var offlineManager: OfflineManager
 
     companion object {
-        private const val FAKE_MAP_NAME_1 = "RandomName"
+        private const val FAKE_MAP_NAME_1 = "RandomName_1"
+        private const val FAKE_MAP_NAME_2 = "RandomName_2"
         private const val POSITIVE_BUTTON_ID = android.R.id.button1
-        private const val MAP_DOWNLOADING_TIMEOUT = 2000L
+        private const val MAP_DOWNLOADING_TIMEOUT = 4000L
         private const val MAP_LOADING_TIMEOUT = 1000L
     }
 
@@ -145,13 +146,13 @@ class OfflineMapsManagingTest {
 
         //DOWNLOAD Part
         onView(withId(R.id.download_button)).perform(click())
-        onView(withId(R.id.dialog_textfield_id)).perform(typeText(FAKE_MAP_NAME_1))
+        onView(withId(R.id.dialog_textfield_id)).perform(typeText(FAKE_MAP_NAME_2))
         mUiDevice.pressBack()
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
-        mUiDevice.wait(Until.hasObject(By.desc(FAKE_MAP_NAME_1)), MAP_DOWNLOADING_TIMEOUT)
+        mUiDevice.wait(Until.hasObject(By.desc(FAKE_MAP_NAME_2)), MAP_DOWNLOADING_TIMEOUT)
 
-        onView((withText(FAKE_MAP_NAME_1))).perform(click())
+        onView((withText(FAKE_MAP_NAME_2))).perform(click())
 
         mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.delete))), MAP_DOWNLOADING_TIMEOUT)
         onView(withId(R.id.delete_offline_map_button)).perform(click())
