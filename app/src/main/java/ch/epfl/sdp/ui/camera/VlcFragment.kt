@@ -19,7 +19,7 @@ class VlcFragment : Fragment() {
     companion object {
         private const val USE_TEXTURE_VIEW = false
         private const val ENABLE_SUBTITLES = false
-        private const val RTSP_SOURCE = "rtsp://192.168.1.131:8554/live" //must be your IP
+        private const val RTSP_SOURCE = "rtsp://192.168.1.120:8554/live" //must be your IP
         private val libvlcArguments = arrayListOf("-vvv")//, "--live-caching=200")
     }
 
@@ -49,6 +49,7 @@ class VlcFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         mMediaPlayer.attachViews(mVideoLayout, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+        startVideo()
     }
 
     fun switchVideo(v: View) {

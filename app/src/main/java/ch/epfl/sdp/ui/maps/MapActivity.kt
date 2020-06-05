@@ -16,6 +16,7 @@ import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.HeatmapDataManager
 import ch.epfl.sdp.database.data_manager.MainDataManager
+import ch.epfl.sdp.database.data_manager.MainDataManager.groupId
 import ch.epfl.sdp.database.data_manager.MarkerDataManager
 import ch.epfl.sdp.drone.Drone
 import ch.epfl.sdp.drone.DroneUtils
@@ -121,7 +122,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        require(!MainDataManager.groupId.value.isNullOrEmpty()) { "MapActivity should be provided with a valid searchGroupId\n" }
+        require(!groupId.value.isNullOrEmpty()) { "MapActivity should be provided with a valid searchGroupId\n" }
         requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
         requireNotNull(MainDataManager.role.value) { "MapActivity should be provided with a role" }
 
@@ -254,7 +255,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     override fun onMapLongClick(position: LatLng): Boolean {
         // Need mapbox update to remove this test
         if (!longClickConsumed) {
-            markerManager.addMarkerForSearchGroup(MainDataManager.groupId.value!!, position)
+            markerManager.addMarkerForSearchGroup(groupId.value!!, position)
         }
         longClickConsumed = false
         return true
@@ -271,7 +272,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
      */
     fun addPointToHeatMap(location: LatLng, intensity: Double) {
         if (isMapReady) {
-            heatmapManager.addMeasureToHeatmap(MainDataManager.groupId.value!!, Auth.accountId.value!!, location, intensity)
+            heatmapManager.addMeasureToHeatmap(groupId.value!!, location, intensity)
         }
     }
 
@@ -316,7 +317,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun launchMission() {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude))
+        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId.value!!)
         searchAreaBuilder.reset()
     }
 

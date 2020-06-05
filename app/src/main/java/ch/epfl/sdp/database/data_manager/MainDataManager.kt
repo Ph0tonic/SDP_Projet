@@ -10,6 +10,7 @@ import ch.epfl.sdp.database.dao.OfflineMarkerDao
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
+import ch.epfl.sdp.utils.Auth
 
 object MainDataManager {
 
@@ -49,6 +50,9 @@ object MainDataManager {
             MarkerRepository.daoProvider = { offlineMarkerDao }
             cachedUserIdWhileOffline = groupId.value
             cachedUserRoleWhileOffline = role.value!!
+        }
+        if (Auth.accountId.value == null) {
+            Auth.accountId.value = OFFLINE_MODE_USER_ID
         }
         groupId.value = OFFLINE_MODE_USER_ID
         role.value = Role.OPERATOR
