@@ -33,7 +33,10 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textColorHint="@android:color/white"
-        android:textSize="26sp" />
+        android:textSize="26sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"
