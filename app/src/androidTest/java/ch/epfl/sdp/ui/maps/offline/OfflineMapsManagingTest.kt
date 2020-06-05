@@ -24,11 +24,9 @@ import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.ui.MainActivity
-import ch.epfl.sdp.ui.maps.MapActivityTest
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
-import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -77,10 +75,11 @@ class OfflineMapsManagingTest {
     @Test
     fun canLaunchOfflineManagerActivity() {
         openDrawer()
-        onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
-        onView(withId(R.id.store_button))
-                .perform(click())
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
+        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.no_offline_map_downloaded_yet))), MAP_LOADING_TIMEOUT)
+
+        onView(withId(R.id.store_button)).perform(click())
+
         Intents.intended(IntentMatchers.hasComponent(OfflineManagerActivity::class.java.name))
     }
 
@@ -94,13 +93,10 @@ class OfflineMapsManagingTest {
         )
 
         openDrawer()
-        onView(withId(R.id.nav_view))
-                .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
-        onView(withId(R.id.store_button))
-                .perform(click())
+        onView(withId(R.id.nav_view)).perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
+        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.no_offline_map_downloaded_yet))), MAP_LOADING_TIMEOUT)
 
-        //Await twice to avoid some strange behaviour of simulator
-        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.dialog_positive_button))), MAP_LOADING_TIMEOUT)
+        onView(withId(R.id.store_button)).perform(click())
         mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.dialog_positive_button))), MAP_LOADING_TIMEOUT)
 
         //DOWNLOAD Part
@@ -124,6 +120,7 @@ class OfflineMapsManagingTest {
                     })
                 }
             }
+
             override fun onError(error: String?) {}
         })
     }
@@ -140,11 +137,10 @@ class OfflineMapsManagingTest {
         openDrawer()
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
+        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.no_offline_map_downloaded_yet))), MAP_LOADING_TIMEOUT)
+
         onView(withId(R.id.store_button))
                 .perform(click())
-
-        //Await twice to avoid some strange behaviour of simulator
-        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.dialog_positive_button))), MAP_LOADING_TIMEOUT)
         mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.dialog_positive_button))), MAP_LOADING_TIMEOUT)
 
         //DOWNLOAD Part
