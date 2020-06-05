@@ -105,4 +105,5 @@
     <string name="offline_region_does_not_exist">La région hors-ligne n\'existe pas</string>
     <string name="close">Fermer</string>
     <string name="select_a_search_group">Sélectionner un groupe de recherche</string>
+    <string name="delete_this_search_group">Supprimer ce groupe de recherche</string>
 </resources>
