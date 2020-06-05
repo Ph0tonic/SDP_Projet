@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +18,7 @@ import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var groupButton: Button
+    private lateinit var groupText : TextView
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -26,7 +27,7 @@ class HomeFragment : Fragment() {
     ): View? {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        groupButton = view.findViewById(R.id.search_group_selection_button)
+        groupText = view.findViewById(R.id.current_group)
         return view
     }
 
@@ -40,12 +41,12 @@ class HomeFragment : Fragment() {
                 .getDefaultSharedPreferences(MainApplication.applicationContext())
                 .getString(MainApplication.applicationContext().getString(R.string.pref_key_current_group_id), null)
         if (groupId == null) {
-            groupButton.text = R.string.select_search_group.toString()
+            return
         }
         else{
             SearchGroupDataManager().getGroupById(groupId.toString()).observe (this, Observer { group ->
                 if (group !=null) {
-                    groupButton.text = group.name
+                    groupText.text = group.name
                 }
             })
         }
