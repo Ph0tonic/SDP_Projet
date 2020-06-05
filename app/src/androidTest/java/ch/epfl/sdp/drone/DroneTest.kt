@@ -12,18 +12,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 
 
 @RunWith(AndroidJUnit4::class)
 class DroneTest {
-
-    private fun <T> any(): T {
-        Mockito.any<T>()
-        return uninitialized()
-    }
-
-    private fun <T> uninitialized(): T = null as T
 
     companion object {
         const val SIGNAL_STRENGTH = 1.0
