@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import ch.epfl.sdp.MainApplication
@@ -42,11 +43,11 @@ class HomeFragment : Fragment() {
             groupButton.text = R.string.select_search_group.toString()
         }
         else{
-            SearchGroupDataManager().getGroupById(groupId.toString()).observeForever { group ->
+            SearchGroupDataManager().getGroupById(groupId.toString()).observe (this, Observer { group ->
                 if (group !=null) {
                     groupButton.text = group.name
                 }
-            }
+            })
         }
 
     }
