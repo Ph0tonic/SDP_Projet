@@ -239,32 +239,6 @@ class MapActivityTest {
     }
 
     @Test
-    fun canUpdateUserLocation() {
-        //TODO Rewrite this test
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-    }
-
-    @Test
-    fun canUpdateUserLocationTwice() {
-        //TODO Rewrite this test
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-    }
-
-    @Test
-    fun canOnRequestPermissionResult() {
-        //TODO Rewrite this test
-        runOnUiThread {
-            MainDataManager.goOffline()
-            MainDataManager.groupId.value = DUMMY_GROUP_ID
-            MainDataManager.role.value = Role.OPERATOR
-        }
-        mActivityRule.launchActivity(Intent())
-
-        mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
-    }
-
-    @Test
     fun droneStatusIsVisibleForOperator() {
         runOnUiThread {
             MainDataManager.goOffline()

@@ -23,6 +23,8 @@ import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.ui.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.MapActivity
+import ch.epfl.sdp.ui.maps.MapActivityTest
+import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -38,6 +40,7 @@ class LocationWithPermissionTest {
     private var mUiDevice: UiDevice? = null
 
     companion object {
+        private val FAKE_LOCATION_TEST = LatLng(42.125, -30.229)
         private const val DUMMY_GROUP_ID = "DummyGroupId"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val REFRESH_RATE = 500L
@@ -102,4 +105,19 @@ class LocationWithPermissionTest {
         CentralLocationManager.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
         Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(MIN_DIST), Mockito.any<LocationListener>())
     }
+
+
+    @Test
+    fun canUpdateUserLocation() {
+        //TODO Rewrite this test
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
+    }
+
+    @Test
+    fun canUpdateUserLocationTwice() {
+        //TODO Rewrite this test
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
+        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
+    }
+
 }
