@@ -184,7 +184,7 @@ class MapActivityTest {
             MainDataManager.groupId.value = DUMMY_GROUP_ID
             MainDataManager.role.value = Role.OPERATOR
         }
-        val expectedHeatmapId = DUMMY_GROUP_ID + "__" + IdentifierUtils.id()
+        val expectedHeatmapId = Auth.accountId.value + "__" + IdentifierUtils.id()
         mActivityRule.launchActivity(Intent())
 
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
