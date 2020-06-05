@@ -5,45 +5,55 @@
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.search_group.edition.SearchGroupEditionActivity">
+    tools:context=".ui.search_group.edition.SearchGroupEditionActivity"
+    android:background="@color/clouds">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/menu_background_vertical"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/home_background" />
+
+    <EditText
+        style="@style/TextAppearance.AppCompat.Title"
+        android:id="@+id/group_editor_group_name"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimary"
+        android:hint="@string/default_group_name"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
+        android:textSize="26sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
 
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_margin="@dimen/activity_content_margin"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/group_editor_group_name">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp">
-
-            <EditText
-                android:id="@+id/group_editor_group_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/default_group_name"
-                android:importantForAutofill="no"
-                android:inputType="textPersonName"
-                android:textAlignment="center"
-                android:textSize="36sp"
-                android:textStyle="bold" />
-
-            <TableLayout
-                android:id="@+id/search_group_edition_information_table"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
-            </TableLayout>
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -51,24 +61,28 @@
 
                 <TextView
                     android:id="@+id/group_edit_operators"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/group_edition_operators_label"
-                    android:textAlignment="viewEnd"
                     android:textSize="24sp"
+                    android:textColor="@color/darkGrey"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/group_edit_add_operator_button"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
                     android:id="@+id/group_edit_add_operator_button"
-                    style="@style/SearchGroupEditionAddIcon"
+                    style="@style/AppTheme.SearchGroupEditionAddIcon"
                     android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addOperator"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <LinearLayout
                 android:id="@+id/group_edit_operators_linear_layout"
@@ -79,34 +93,38 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/group_edit_operator_recyclerview"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/tiny_margin" />
 
             </LinearLayout>
 
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_marginTop="15dp">
 
                 <TextView
                     android:id="@+id/group_edit_rescuers"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/group_edition_rescuers_label"
-                    android:textAlignment="viewEnd"
                     android:textSize="24sp"
+                    android:textColor="@color/darkGrey"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/group_edit_add_rescuer_button"/>
 
                 <Button
                     android:id="@+id/group_edit_add_rescuer_button"
-                    style="@style/SearchGroupEditionAddIcon"
+                    style="@style/AppTheme.SearchGroupEditionAddIcon"
                     android:background="@drawable/ic_add_black_32dp"
                     android:onClick="addRescuer"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
@@ -118,7 +136,8 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/group_edit_rescuer_recyclerview"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/tiny_margin"/>
             </LinearLayout>
 
             <TextView
@@ -126,18 +145,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/danger_zone"
-                android:textAlignment="viewEnd"
+                android:layout_marginTop="15dp"
                 android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/darkGrey"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-            <Button
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/search_group_remove"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:onClick="onGroupDelete"
+                android:textColor="@color/alizarin"
+                app:strokeColor="@color/alizarin"
+                app:backgroundTint="@android:color/white"
+                app:strokeWidth="2dp"
+                android:textStyle="bold"
+                app:cornerRadius="8dp"
                 android:text="@string/delete_this_group" />
+
         </LinearLayout>
     </ScrollView>
 
@@ -159,7 +189,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onGroupEditCanceled"
-            android:text="@string/dialog_cancel" />
+            android:text="@string/cancel" />
 
         <Button
             android:id="@+id/search_group_edition_create_or_save_button"

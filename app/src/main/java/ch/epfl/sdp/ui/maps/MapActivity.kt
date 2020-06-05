@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui.maps
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -31,7 +30,6 @@ import ch.epfl.sdp.searcharea.CircleBuilder
 import ch.epfl.sdp.searcharea.QuadrilateralBuilder
 import ch.epfl.sdp.searcharea.SearchAreaBuilder
 import ch.epfl.sdp.ui.drone.ReturnDroneDialogFragment
-import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import ch.epfl.sdp.utils.StrategyUtils.loadDefaultStrategyFromPreferences
@@ -130,7 +128,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
-        //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
         mapView.contentDescription = getString(R.string.map_not_ready)
 
@@ -233,6 +230,12 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
                 locationComponent.renderMode = RenderMode.COMPASS
             }
 
+            if (MainDataManager.role.value == Role.OPERATOR) {
+                val logoMargin = resources.getDimension(R.dimen.tiny_margin).toInt()
+                val logoOffset = resources.getDimension(R.dimen.map_activity_small_camera_width).toInt() + logoMargin * 2
+                mapboxMap.uiSettings.setAttributionMargins(logoOffset + mapboxMap.uiSettings.attributionMarginLeft, 0, 0, logoMargin)
+                mapboxMap.uiSettings.setLogoMargins(logoOffset, 0, 0, logoMargin)
+            }
 
             isMapReady = true
 
@@ -302,10 +305,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun startOrPauseMissionButton(v: View) {
         if (Drone.isFlyingLiveData.value!!) {
             if (Drone.isMissionPausedLiveData.value!!) Drone.resumeMission() else Drone.pauseMission()
-        } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
+        } else if (!searchAreaBuilder.isComplete()) {
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
         } else {
-            launchMission()
+            val mission = missionBuilder.build()
+            launchMission(mission)
         }
     }
 
@@ -314,18 +318,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun launchMission() {
+    fun launchMission(mission: List<LatLng>) {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId.value!!)
+        Drone.startMission(DroneUtils.makeDroneMission(mission, altitude), groupId.value!!)
         searchAreaBuilder.reset()
-    }
-
-    /**
-     * Starts OfflineManagerActivity
-     */
-    fun storeMap(v: View) {
-        startActivity(Intent(applicationContext, OfflineManagerActivity::class.java))
     }
 
     /**

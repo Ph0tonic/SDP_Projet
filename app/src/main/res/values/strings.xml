@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Licence keys -->
     <string name="mapbox_access_token" translatable="false">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
     <string name="google_signin_key" translatable="false">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
@@ -23,7 +23,11 @@
     <string name="pref_key_overflight_strategy" translatable="false">overflight_strategy</string>
 
     <!-- Dialog general -->
-    <string name="dialog_cancel">Cancel</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="close">Close</string>
+    <string name="create">Create</string>
+    <string name="add">Add</string>
 
     <!-- Mapbox State -->
     <string name="map_ready" translatable="false">MAP READY</string>
@@ -35,7 +39,10 @@
     <string name="intent_key_group_id" translatable="false">group_id</string>
     <string name="intent_key_role" translatable="false">role</string>
     <string name="intent_key_offline_mode" translatable="false">offline_mode</string>
+    <string name="intent_key_show_delete_button" translatable="false">show_delete_button</string>
+    <string name="intent_key_offline_region_id" translatable="false">offline_region_id</string>
 
+    <string name="camera">Camera</string>
     <string name="drone_home_error">No Home Available</string>
     <string name="drone_user_error">User position not available</string>
     <string name="drone_user_success">Returning to user</string>
@@ -89,8 +96,11 @@
     <string name="end_progress_success">Region successfully downloaded.</string>
     <string name="dialog_title">Name new Region</string>
     <string name="dialog_message">Download the map region you currently are viewing</string>
+    <string name="download_current_area">Download the current area</string>
+    <string name="download_this_area_title">Download this area ?</string>
     <string name="set_region_name_hint">Enter name</string>
     <string name="dialog_positive_button">Download</string>
+    <string name="delete_this_offline_region">Delete region ?</string>
     <string name="navigate_title">List</string>
     <string name="navigate_positive_button">Navigate To</string>
     <string name="navigate_neutral_button_title">Delete</string>
@@ -98,9 +108,13 @@
     <string name="toast_no_regions_yet">No regions yet</string>
     <string name="dialog_toast">Name cannot be empty</string>
     <string name="region_name_error">Unknown Region name</string>
-    <string name="maps_managing">Maps managing (get offline maps here)</string>
-    <string name="download_region_dialog_fragment">Download Region</string>
-    <string name="list_offline_region_dialog_fragment">Offline Region List</string>
+    <string name="offline_region_tiles">Number of tiles : %1$d </string>
+    <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
+    <string name="download_region_dialog_fragment">Download Region Dialog Fragment</string>
+    <string name="list_offline_region_dialog_fragment">List Offline Region Dialog Fragment</string>
+    <string name="offline_maps">Offline maps</string>
+    <string name="no_offline_map_downloaded_yet">No offline map downloaded yet</string>
+    <string name="offline_region_does_not_exist">Offline region does not exist</string>
 
     <!-- Navigation -->
     <string name="menu_home">Home</string>
@@ -118,14 +132,15 @@
     <string name="danger_zone">Danger zone</string>
     <string name="delete_this_group">Delete this group</string>
     <string name="enter_a_mail_address">Enter a mail address</string>
-    <string name="add_a_user">Add a user</string>
     <string name="add_a_rescuer">Add a rescuer</string>
     <string name="add_an_operator">Add an operator</string>
-    <string name="cancel">Cancel</string>
     <string name="group_edition_activity_title">Edit group</string>
     <string name="enter_your_desired_group_name">Enter your desired group name</string>
     <string name="create_a_search_group">Create a search group</string>
+    <string name="select_a_search_group">Select a search group</string>
+    <string name="delete_this_search_group">Delete this search group</string>
     <string name="search_group_name_cannot_be_empty">Search group name cannot be empty.</string>
+    <string name="last_operator_cannot_be_removed">You cannot remove all operators</string>
 
     <!-- Drone status display -->
     <string name="battery_description_tag">Battery icon</string>
@@ -134,10 +149,6 @@
     <string name="distance_to_user_description_tag">Distance to user icon</string>
     <string name="distance_to_home_description_tag">Distance to home icon</string>
 
-    <string name="camera">Camera</string>
-    <string name="add">Add</string>
-
     <!-- Strings automatically added land here, clean them up -->
-    <string name="last_operator_cannot_be_removed">You cannot remove all operators</string>
 
 </resources>

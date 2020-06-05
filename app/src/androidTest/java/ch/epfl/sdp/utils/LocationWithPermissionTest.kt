@@ -23,6 +23,8 @@ import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.MapActivity
+import ch.epfl.sdp.ui.maps.MapActivityTest
+import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -102,4 +104,5 @@ class LocationWithPermissionTest {
         CentralLocationManager.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
         Mockito.verify(manager, Mockito.times(2)).requestLocationUpdates(Mockito.eq(LocationManager.GPS_PROVIDER), Mockito.eq(REFRESH_RATE), Mockito.eq(MIN_DIST), Mockito.any<LocationListener>())
     }
+
 }

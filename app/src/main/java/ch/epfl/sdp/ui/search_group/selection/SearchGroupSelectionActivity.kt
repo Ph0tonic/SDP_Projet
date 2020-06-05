@@ -14,7 +14,7 @@ import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
-import ch.epfl.sdp.ui.search_group.OnItemClickListener
+import ch.epfl.sdp.utils.OnItemClickListener
 import ch.epfl.sdp.ui.search_group.edition.SearchGroupEditionActivity
 
 class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<SearchGroupData, Role>>> {
@@ -71,6 +71,6 @@ class SearchGroupSelectionActivity : AppCompatActivity(), Observer<List<Pair<Sea
                 editGroup(SearchGroupData(uuid = groupId))
             }
         })
-        dialog.show(supportFragmentManager, getString(R.string.create_a_search_group))
+        dialog.show(supportFragmentManager, getString(R.string.create))
     }
 }
