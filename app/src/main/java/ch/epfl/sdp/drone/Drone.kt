@@ -49,7 +49,6 @@ object Drone {
 
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
-//        1000 / positionLiveData.value!!.distanceTo(LatLng(46.303407, 7.528529)).pow(2)
         1000 / positionLiveData.value!!.distanceTo(LatLng(47.301836, 7.156145)).pow(2)
     }
 
@@ -61,7 +60,6 @@ object Drone {
         disposables.add(instance.telemetry.flightMode.distinctUntilChanged()
                 .subscribe(
                         { flightMode ->
-                            Log.d("DEBUG22", "fm : " + flightMode)
                             if (flightMode == Telemetry.FlightMode.HOLD) isMissionPausedLiveData.postValue(true)
                             if (flightMode == Telemetry.FlightMode.MISSION) isMissionPausedLiveData.postValue(false)
                         },
@@ -174,9 +172,7 @@ object Drone {
     private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
-                Log.w("DRONE", "$signalStrength")
                 onMeasureTakenCallbacks.forEach {
-                    Log.w("DRONE", "CALL")
                     it(location, signalStrength)
                 }
             }

@@ -46,7 +46,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.mavsdk.telemetry.Telemetry
 import kotlin.math.abs
-import timber.log.Timber
 
 /**
  * Main Activity to display map and create missions.
@@ -123,7 +122,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        require(!MainDataManager.groupId.value.isNullOrEmpty()) { "MapActivity should be provided with a valid searchGroupId\n" }
+        require(!groupId.value.isNullOrEmpty()) { "MapActivity should be provided with a valid searchGroupId\n" }
         requireNotNull(Auth.accountId.value) { "You need to have an account ID set to access MapActivity" }
         requireNotNull(MainDataManager.role.value) { "MapActivity should be provided with a role" }
 
@@ -256,7 +255,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     override fun onMapLongClick(position: LatLng): Boolean {
         // Need mapbox update to remove this test
         if (!longClickConsumed) {
-            markerManager.addMarkerForSearchGroup(MainDataManager.groupId.value!!, position)
+            markerManager.addMarkerForSearchGroup(groupId.value!!, position)
         }
         longClickConsumed = false
         return true

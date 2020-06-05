@@ -1,31 +1,21 @@
 package ch.epfl.sdp.drone
 
-import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.mavsdk.telemetry.Telemetry
-import io.reactivex.Flowable
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 
 
 @RunWith(AndroidJUnit4::class)
 class DroneTest {
-
-    private fun <T> any(): T {
-        Mockito.any<T>()
-        return uninitialized()
-    }
-
-    private fun <T> uninitialized(): T = null as T
 
     companion object {
         const val SIGNAL_STRENGTH = 1.0
@@ -63,7 +53,7 @@ class DroneTest {
 
         Drone.startMission(DroneUtils.makeDroneMission(someLocationsList, DEFAULT_ALTITUDE), DUMMY_GROUP_ID)
 
-        // This assert prevent the app to crase in cash the mission has not been updated
+        // This assert prevent the app to crash in case the mission has not been updated
         assertThat(Drone.missionLiveData.value, `is`(notNullValue()))
         assertThat(Drone.missionLiveData.value?.isEmpty(), `is`(false))
     }
