@@ -1,7 +1,6 @@
 package ch.epfl.sdp.ui.search_group.edition
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -71,7 +70,7 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
         val userRemovedListener = object : OnItemClickListener<UserData> {
             override fun onItemClicked(user: UserData) {
-                if(user.role == Role.OPERATOR && operatorsRecyclerView.adapter!!.itemCount <= 1){
+                if (user.role == Role.OPERATOR && operatorsRecyclerView.adapter!!.itemCount <= 1) {
                     Toast.makeText(MainApplication.applicationContext(), getString(R.string.last_operator_cannot_be_removed), Toast.LENGTH_LONG).show()
                     return
                 }
