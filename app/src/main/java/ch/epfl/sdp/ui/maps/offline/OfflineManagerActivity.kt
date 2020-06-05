@@ -59,7 +59,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
         val id = intent.getLongExtra(getString(R.string.intent_key_offline_region_id), -1)
         if (!showDelete) {
             findViewById<Button>(R.id.delete_offline_map_button).visibility = View.GONE
-            findViewById<Button>(R.id.offline_map_cancel_button).text = getString(R.string.cancel)
+            findViewById<Button>(R.id.offline_map_cancel_button).text = getString(R.string.dialog_cancel)
             mapView.getMapAsync(this)
         } else {
             OfflineRegionUtils.getRegionById(id) {

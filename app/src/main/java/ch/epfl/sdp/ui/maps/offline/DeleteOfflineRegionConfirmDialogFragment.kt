@@ -27,7 +27,7 @@ class DeleteOfflineRegionConfirmDialogFragment(private val offlineRegion: Offlin
                     }
                     // When the user cancels, don't do anything.
                     // The dialog will automatically close
-                    .setNegativeButton(getString(R.string.dialog_negative_button)) { _, _ -> }.create()
+                    .setNegativeButton(getString(R.string.dialog_cancel)) { _, _ -> }.create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 }

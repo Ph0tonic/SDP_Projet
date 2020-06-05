@@ -38,35 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        style="@style/AppTheme.MenuBarButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2">
 
-        <Button
-            android:id="@+id/search_group_edition_cancel_button"
-            style="@style/AppTheme.BarButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onGroupEditCanceled"
-            android:text="@android:string/cancel" />
-
-        <Button
-            android:id="@+id/search_group_edition_create_or_save_button"
-            style="@style/AppTheme.BarButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onGroupEditSaved"
-            android:text="@string/group_edition_create_button" />
-    </LinearLayout>
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -198,5 +170,35 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2">
+
+        <Button
+            android:id="@+id/search_group_edition_cancel_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onGroupEditCanceled"
+            android:text="@string/dialog_cancel" />
+
+        <Button
+            android:id="@+id/search_group_edition_create_or_save_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onGroupEditSaved"
+            android:text="@string/group_edition_create_button" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

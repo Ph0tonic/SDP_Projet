@@ -313,7 +313,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     fun returnHomeOrUser(v: View) {
-        ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.ReturnDroneDialogFragment))
+        ReturnDroneDialogFragment().show(supportFragmentManager, this.getString(R.string.return_drone_dialog))
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
