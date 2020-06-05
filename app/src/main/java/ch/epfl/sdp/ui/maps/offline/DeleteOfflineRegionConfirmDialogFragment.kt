@@ -11,9 +11,9 @@ import ch.epfl.sdp.map.offline.OfflineRegionUtils
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 
-class ListOfflineRegionDialogFragment(private val offlineRegion: OfflineRegion,
-                                      private val progressBar: ProgressBar,
-                                      private val mapView: MapView) : DialogFragment() {
+class DeleteOfflineRegionConfirmDialogFragment(private val offlineRegion: OfflineRegion,
+                                               private val progressBar: ProgressBar,
+                                               private val mapView: MapView) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity.let {
             AlertDialog.Builder(it)
@@ -27,8 +27,7 @@ class ListOfflineRegionDialogFragment(private val offlineRegion: OfflineRegion,
                     }
                     // When the user cancels, don't do anything.
                     // The dialog will automatically close
-                    .setNegativeButton(getString(R.string.dialog_negative_button)
-                    ) { _, _ -> }.create()
+                    .setNegativeButton(getString(R.string.dialog_negative_button)) { _, _ -> }.create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 }

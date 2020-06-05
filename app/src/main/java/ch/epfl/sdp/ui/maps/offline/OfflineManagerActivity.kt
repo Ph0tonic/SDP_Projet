@@ -196,7 +196,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     return
                 }
                 val currentOfflineRegion = offlineRegions.filter { it.id == currentOfflineRegion?.id }[0]
-                ListOfflineRegionDialogFragment(currentOfflineRegion, progressBar, mapView)
+                DeleteOfflineRegionConfirmDialogFragment(currentOfflineRegion, progressBar, mapView)
                         .show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
             }
 
