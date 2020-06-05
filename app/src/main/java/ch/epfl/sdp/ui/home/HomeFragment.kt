@@ -38,7 +38,9 @@ class HomeFragment : Fragment() {
         val groupId = PreferenceManager
                 .getDefaultSharedPreferences(MainApplication.applicationContext())
                 .getString(MainApplication.applicationContext().getString(R.string.pref_key_current_group_id), null)
-        if (groupId == null) return
+        if (groupId == null) {
+            groupButton.text = R.string.select_search_group.toString()
+        }
         else{
             SearchGroupDataManager().getGroupById(groupId.toString()).observeForever { group ->
                 if (group !=null) {
