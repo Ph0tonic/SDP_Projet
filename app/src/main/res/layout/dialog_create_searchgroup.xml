@@ -9,11 +9,10 @@
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:gravity="center_vertical"
-        android:textAlignment="center"
-        android:text="@string/create_a_search_group"
         android:background="@color/colorPrimary"
-        android:textColor="@android:color/white"/>
+        android:gravity="center"
+        android:text="@string/create_a_search_group"
+        android:textColor="@android:color/white" />
 
     <EditText
         android:id="@+id/create_search_group_name"
