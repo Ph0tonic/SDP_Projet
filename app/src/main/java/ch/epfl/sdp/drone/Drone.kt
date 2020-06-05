@@ -26,7 +26,7 @@ import kotlin.math.sqrt
 
 object Drone {
     // Maximum distance between passes in the strategy
-    const val GROUND_SENSOR_SCOPE: Double = 5.0
+    const val GROUND_SENSOR_SCOPE: Double = 7.5
     const val DEFAULT_ALTITUDE: Float = 10.0F
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
@@ -50,7 +50,7 @@ object Drone {
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
 //        1000 / positionLiveData.value!!.distanceTo(LatLng(46.303407, 7.528529)).pow(2)
-        1000 / positionLiveData.value!!.distanceTo(LatLng(47.303584, 7.159724)).pow(2)
+        1000 / positionLiveData.value!!.distanceTo(LatLng(47.301836, 7.156145)).pow(2)
     }
 
     private val instance: System = DroneInstanceProvider.provide()
@@ -116,6 +116,7 @@ object Drone {
                         { error -> Timber.e("Error connectionState : $error") }
                 )
         )
+        setupMeasureTracking()
     }
 
     /**
@@ -141,27 +142,29 @@ object Drone {
                                     this.missionLiveData.postValue(missionPlan.missionItems)
                                     this.isMissionPausedLiveData.postValue(false)
                                     ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT)
-                                    takeMeasure(missionCallBack)
                                 },
-                                { ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT) }
+                                {
+                                    ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
+                                    onMeasureTakenCallbacks.clear()
+                                }
                         )
         )
         // TODO("See what to do with added disposables")
     }
 
-    private fun takeMeasure(missionCallBack: (LatLng, Double) -> Unit) {
+    private fun setupMeasureTracking() {
         disposables.add(
                 getConnectedInstance()
                         .andThen(instance.mission.missionProgress)
                         .subscribe(
                                 { missionProgress ->
-                                    if (missionProgress.current == missionProgress.total) {
-                                        onMeasureTakenCallbacks.remove(missionCallBack)
-                                    }
                                     val missionItem = missionLiveData.value?.getOrNull(missionProgress.current - 1)
                                     val location = missionItem?.longitudeDeg?.let { it1 -> LatLng(missionItem.latitudeDeg, it1) }
                                     val signal = getSignalStrength()
                                     location?.let { it1 -> onMeasureTaken(it1, signal) }
+                                    if (missionProgress.current == missionProgress.total) {
+                                        onMeasureTakenCallbacks.clear()
+                                    }
                                 },
                                 {}
                         )
