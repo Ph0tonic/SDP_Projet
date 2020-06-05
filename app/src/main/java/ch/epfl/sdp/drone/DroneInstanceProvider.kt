@@ -4,7 +4,7 @@ import io.mavsdk.System
 import io.mavsdk.mavsdkserver.MavsdkServer
 
 object DroneInstanceProvider {
-    private const val USE_REMOTE_BACKEND = true // False for running MavsdkServer locally, True to connect to a remote instance
+    private const val USE_REMOTE_BACKEND = false // False for running MavsdkServer locally, True to connect to a remote instance
     private const val REMOTE_BACKEND_IP_ADDRESS = "10.0.2.2" //IP of the remote instance
     private const val REMOTE_BACKEND_PORT = 50051 // Port of the remote instance
 
