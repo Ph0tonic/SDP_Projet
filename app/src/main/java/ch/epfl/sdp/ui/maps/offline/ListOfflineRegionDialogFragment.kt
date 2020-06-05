@@ -42,7 +42,7 @@ class ListOfflineRegionDialogFragment(private val items: Array<CharSequence>,
                     }
                     // When the user cancels, don't do anything.
                     // The dialog will automatically close
-                    .setNegativeButton(getString(R.string.dialog_negative_button)
+                    .setNegativeButton(getString(R.string.dialog_cancel)
                     ) { _, _ -> }.create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }

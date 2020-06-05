@@ -475,7 +475,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnReturnButtonWhenDroneFlyingButNotConnectedShowsToast() {
+    fun loosingDroneConnectionShowsToast() {
         runOnUiThread {
             MainDataManager.goOffline()
             MainDataManager.groupId.value = DUMMY_GROUP_ID
@@ -491,11 +491,6 @@ class MapActivityTest {
             Drone.isConnectedLiveData.value = false
         }
 
-        onView(withId(R.id.floating_menu_button)).perform(click())
-
-        onView(withId(R.id.return_home_or_user)).perform(click())
-        onView(withId(R.id.return_home_or_user)).perform(click())
-
         // Test that the toast is displayed
         onView(withText(applicationContext().getString(R.string.not_connected_message)))
                 .inRoot(withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
@@ -507,7 +502,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnStartOrPauseButtonWhenDroneFlyingButNotConnectedShowsToast() {
+    fun clickOnPauseButtonWhenDroneFlyingAndConnectedPausesMission() {
         runOnUiThread {
             MainDataManager.goOffline()
             MainDataManager.groupId.value = DUMMY_GROUP_ID
@@ -520,7 +515,8 @@ class MapActivityTest {
 
         runOnUiThread {
             Drone.isFlyingLiveData.value = true
-            Drone.isConnectedLiveData.value = false
+            Drone.isConnectedLiveData.value = true
+            Drone.isMissionPausedLiveData.value = false
         }
 
         onView(withId(R.id.floating_menu_button)).perform(click())
@@ -528,10 +524,7 @@ class MapActivityTest {
         onView(withId(R.id.start_or_pause_button)).perform(click())
         onView(withId(R.id.start_or_pause_button)).perform(click())
 
-        // Test that the toast is displayed
-        onView(withText(applicationContext().getString(R.string.not_connected_message)))
-                .inRoot(withDecorView(CoreMatchers.not(mActivityRule.activity.window.decorView)))
-                .check(matches(isDisplayed()))
+        assertThat(Drone.isMissionPausedLiveData.value, `is`(true))
 
         runOnUiThread {
             Drone.isFlyingLiveData.value = false
@@ -539,7 +532,7 @@ class MapActivityTest {
     }
 
     @Test
-    fun clickOnStartOrPauseButtonWhenDroneFlyingAndConnectedLaunchesMission() {
+    fun clickOnStartOrPauseButtonWhenDroneFlyingAndConnectedResumesMission() {
         runOnUiThread {
             MainDataManager.goOffline()
             MainDataManager.groupId.value = DUMMY_GROUP_ID
@@ -604,7 +597,7 @@ class MapActivityTest {
         onView(withId(R.id.return_home_or_user)).perform(click())
         onView(withId(R.id.return_home_or_user)).perform(click())
 
-        onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
+        onView(withText(applicationContext().getString(R.string.return_drone_dialog_title)))
                 .check(matches(isDisplayed()))
 
         runOnUiThread {
@@ -654,7 +647,33 @@ class MapActivityTest {
     }
 
     @Test
-    fun rescuerDoesNotSeeStartOrReturnButton() {
+    fun rescuerDoesNotSeeReturnHomeButtonWhenDroneFlying() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+            Drone.isFlyingLiveData.value = true
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.return_home_or_user)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeReturnHomeButtonWhenDroneNotFlying() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+            Drone.isFlyingLiveData.value = false
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.return_home_or_user)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun rescuerDoesNotSeeStartOrPauseButton() {
         runOnUiThread {
             MainDataManager.goOffline()
             MainDataManager.groupId.value = DUMMY_GROUP_ID

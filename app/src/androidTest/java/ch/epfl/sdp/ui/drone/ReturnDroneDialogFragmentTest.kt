@@ -110,9 +110,9 @@ class ReturnDroneDialogFragmentTest {
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), Matchers.equalTo(true))
 
-        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
+        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.return_drone_dialog))
 
-        onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
+        onView(withText(applicationContext().getString(R.string.return_drone_dialog_title)))
                 .check(matches(isDisplayed()))
     }
 
@@ -124,13 +124,13 @@ class ReturnDroneDialogFragmentTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), Matchers.equalTo(true))
 
         // Show Dialog
-        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
+        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.return_drone_dialog))
 
         onView(withText(applicationContext()
-                .getString(R.string.dialog_negative_button)))
+                .getString(R.string.dialog_cancel)))
                 .perform(click())
 
-        onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
+        onView(withText(applicationContext().getString(R.string.return_drone_dialog_title)))
                 .check(doesNotExist())
     }
 
@@ -142,13 +142,13 @@ class ReturnDroneDialogFragmentTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), Matchers.equalTo(true))
 
         // Show Dialog
-        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
+        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.return_drone_dialog))
 
         Drone.homeLocationLiveData.value = null
 
         // Click on return home
         onView(withText(MainApplication.applicationContext()
-                .getString(R.string.ReturnDroneDialogHome)))
+                .getString(R.string.return_drone_dialog_option_home)))
                 .perform(click())
 
         // Test that the toast is displayed
@@ -165,7 +165,7 @@ class ReturnDroneDialogFragmentTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), Matchers.equalTo(true))
 
         // Show Dialog
-        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
+        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.return_drone_dialog))
 
         runOnUiThread {
             Drone.homeLocationLiveData.value = Telemetry.Position(0.0, 0.0, 0.0f, 0.0f)
@@ -174,7 +174,7 @@ class ReturnDroneDialogFragmentTest {
 
         // Click on return user
         onView(withText(MainApplication.applicationContext()
-                .getString(R.string.ReturnDroneDialogUser)))
+                .getString(R.string.return_drone_dialog_option_user)))
                 .perform(click())
 
         // Test that the toast is displayed
@@ -192,7 +192,7 @@ class ReturnDroneDialogFragmentTest {
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), Matchers.equalTo(true))
 
         // Show Dialog
-        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.ReturnDroneDialogFragment))
+        ReturnDroneDialogFragment().show(mActivityRule.activity.supportFragmentManager, mActivityRule.activity.getString(R.string.return_drone_dialog))
 
         runOnUiThread {
             CentralLocationManager.currentUserPosition.value = expectedLatLng
@@ -200,7 +200,7 @@ class ReturnDroneDialogFragmentTest {
 
         // Click on return user
         onView(withText(MainApplication.applicationContext()
-                .getString(R.string.ReturnDroneDialogUser)))
+                .getString(R.string.return_drone_dialog_option_user)))
                 .perform(click())
 
         assertThat(Drone.missionLiveData.value?.isEmpty(), Matchers.`is`(false))
