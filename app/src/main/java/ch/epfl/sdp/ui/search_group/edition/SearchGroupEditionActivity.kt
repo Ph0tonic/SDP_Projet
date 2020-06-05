@@ -1,6 +1,7 @@
 package ch.epfl.sdp.ui.search_group.edition
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
@@ -69,6 +71,10 @@ class SearchGroupEditionActivity : AppCompatActivity() {
 
         val userRemovedListener = object : OnItemClickListener<UserData> {
             override fun onItemClicked(user: UserData) {
+                if(user.role == Role.OPERATOR && operatorsRecyclerView.adapter!!.itemCount <= 1){
+                    Toast.makeText(MainApplication.applicationContext(), getString(R.string.last_operator_cannot_be_removed), Toast.LENGTH_LONG).show()
+                    return
+                }
                 searchGroupManager.removeUserOfSearchGroup(groupId!!, user.uuid!!)
             }
         }
