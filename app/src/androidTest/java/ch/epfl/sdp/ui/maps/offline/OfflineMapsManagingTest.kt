@@ -86,7 +86,7 @@ class OfflineMapsManagingTest {
     }
 
     @Test
-    fun canLaunchOfflineManagerActivityDownloadMapAndNavigateToMap() {
+    fun canNavigateToDownloadedMap() {
         MapUtils.saveCameraPositionAndZoomToPrefs(
                 MapUtils.getCameraWithParameters(
                         LatLng(0.0, 0.0),
@@ -125,5 +125,39 @@ class OfflineMapsManagingTest {
             }
             override fun onError(error: String?) {}
         })
+    }
+
+    @Test
+    fun canDeleteDownloadedMap() {
+        MapUtils.saveCameraPositionAndZoomToPrefs(
+                MapUtils.getCameraWithParameters(
+                        LatLng(0.0, 0.0),
+                        20.0
+                )
+        )
+
+        openDrawer()
+        onView(withId(R.id.nav_view))
+                .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
+        onView(withId(R.id.store_button))
+                .perform(click())
+
+        //DOWNLOAD Part
+        onView(withId(R.id.download_button)).perform(click())
+        onView(withId(R.id.dialog_textfield_id)).perform(typeText(FAKE_MAP_NAME_1))
+        mUiDevice.pressBack()
+
+        onView(withId(POSITIVE_BUTTON_ID)).perform(click())
+        mUiDevice.wait(Until.hasObject(By.desc(FAKE_MAP_NAME_1)), MAP_DOWNLOADING_TIMEOUT)
+
+        onView((withText(FAKE_MAP_NAME_1))).perform(click())
+
+        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.delete))), MAP_DOWNLOADING_TIMEOUT)
+        onView(withId(R.id.delete_offline_map_button)).perform(click())
+        onView(withText(R.string.delete)).perform(click())
+
+        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.no_offline_map_downloaded_yet))), MAP_DOWNLOADING_TIMEOUT)
+        onView(withText(R.string.no_offline_map_downloaded_yet)).check(matches(isDisplayed()))
+
     }
 }
