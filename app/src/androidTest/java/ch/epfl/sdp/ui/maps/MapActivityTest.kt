@@ -38,13 +38,14 @@ import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
-import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
+import ch.epfl.sdp.utils.IdentifierUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
@@ -179,6 +180,7 @@ class MapActivityTest {
             MainDataManager.groupId.value = DUMMY_GROUP_ID
             MainDataManager.role.value = Role.OPERATOR
         }
+        val expectedHeatmapId = Auth.accountId.value + "__" + IdentifierUtils.id()
         mActivityRule.launchActivity(Intent())
 
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
@@ -192,10 +194,10 @@ class MapActivityTest {
         val heatmaps = mActivityRule.activity.heatmapManager.getGroupHeatmaps(DUMMY_GROUP_ID)
         assertThat(heatmaps.value, `is`(notNullValue()))
 
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID], `is`(notNullValue()))
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value, `is`(notNullValue()))
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints, `is`(notNullValue()))
-        assertThat(heatmaps.value!![FAKE_ACCOUNT_ID]!!.value!!.dataPoints.size, equalTo(1))
+        assertThat(heatmaps.value!![expectedHeatmapId], `is`(notNullValue()))
+        assertThat(heatmaps.value!![expectedHeatmapId]!!.value, `is`(notNullValue()))
+        assertThat(heatmaps.value!![expectedHeatmapId]!!.value!!.dataPoints, `is`(notNullValue()))
+        assertThat(heatmaps.value!![expectedHeatmapId]!!.value!!.dataPoints.size, equalTo(1))
     }
 
     @Test

@@ -1,7 +1,6 @@
 package ch.epfl.sdp.searcharea
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import ch.epfl.sdp.utils.IntersectionUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers
@@ -9,7 +8,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Rule
 import org.junit.Test
-import timber.log.Timber
 import kotlin.random.Random
 
 class QuadrilateralBuilderTest {
