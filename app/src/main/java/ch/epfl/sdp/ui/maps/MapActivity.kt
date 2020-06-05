@@ -128,7 +128,6 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
         super.initMapView(savedInstanceState, R.layout.activity_map, R.id.mapView)
         mapView.getMapAsync(this)
 
-        //TODO: Give user location if current drone position is not available
         CentralLocationManager.configure(this)
         mapView.contentDescription = getString(R.string.map_not_ready)
 
@@ -306,10 +305,11 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun startOrPauseMissionButton(v: View) {
         if (Drone.isFlyingLiveData.value!!) {
             if (Drone.isMissionPausedLiveData.value!!) Drone.resumeMission() else Drone.pauseMission()
-        } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
+        } else if (!searchAreaBuilder.isComplete()) {
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
         } else {
-            launchMission()
+            val mission = missionBuilder.build()
+            launchMission(mission)
         }
     }
 
@@ -318,10 +318,10 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun launchMission() {
+    fun launchMission(mission: List<LatLng>) {
         val altitude = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(this.getString(R.string.pref_key_drone_altitude), Drone.DEFAULT_ALTITUDE.toString()).toString().toFloat()
-        Drone.startMission(DroneUtils.makeDroneMission(missionBuilder.build(), altitude), groupId.value!!)
+        Drone.startMission(DroneUtils.makeDroneMission(mission, altitude), groupId.value!!)
         searchAreaBuilder.reset()
     }
 
