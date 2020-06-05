@@ -597,7 +597,7 @@ class MapActivityTest {
         onView(withId(R.id.return_home_or_user)).perform(click())
         onView(withId(R.id.return_home_or_user)).perform(click())
 
-        onView(withText(applicationContext().getString(R.string.ReturnDroneDialogTitle)))
+        onView(withText(applicationContext().getString(R.string.return_drone_dialog_title)))
                 .check(matches(isDisplayed()))
 
         runOnUiThread {

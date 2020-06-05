@@ -159,7 +159,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onGroupEditCanceled"
-            android:text="@android:string/cancel" />
+            android:text="@string/dialog_cancel" />
 
         <Button
             android:id="@+id/search_group_edition_create_or_save_button"

@@ -1,16 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Licence keys -->
-    <string name="mapbox_access_token">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
-    <string name="google_signin_key">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1IjoiZmx5MmZpbmQiLCJhIjoiY2s3cXFhNnluMDVveTNwcGw3ZWoyZmp4OCJ9.RRN64w-4PhTGkUGM_74mnQ</string>
+    <string name="google_signin_key" translatable="false">272117878019-uf5rlbbkl6vhvkkmin8cumueil5ummfs.apps.googleusercontent.com</string>
 
     <!-- App name -->
-    <string name="app_name">Fly2Find</string>
+    <string name="app_name" translatable="false">Fly2Find</string>
 
     <!-- Auth system -->
     <string name="auth_signin">Sign in</string>
     <string name="auth_signout">Sign out</string>
     <string name="sign_in_error">Could not sign in</string>
     <string name="sign_out_success">Sign out successful</string>
+    <string name="invalid_email_address">Invalid email address</string>
 
     <!-- Preferences keys -->
     <string name="pref_key_latitude" translatable="false">latitude</string>
@@ -20,6 +21,9 @@
     <string name="pref_key_current_group_id" translatable="false">current_group_id</string>
     <string name="pref_key_drone_altitude" translatable="false">drone_altitude</string>
     <string name="pref_key_overflight_strategy" translatable="false">overflight_strategy</string>
+
+    <!-- Dialog general -->
+    <string name="dialog_cancel">Cancel</string>
 
     <!-- Mapbox State -->
     <string name="map_ready" translatable="false">MAP READY</string>
@@ -33,12 +37,17 @@
     <string name="intent_key_offline_mode" translatable="false">offline_mode</string>
 
     <string name="drone_home_error">No Home Available</string>
-
     <string name="drone_user_error">User position not available</string>
     <string name="drone_user_success">Returning to user</string>
     <string name="drone_home_success">Returning home</string>
     <string name="drone_mission_success">Mission started successfully</string>
     <string name="drone_mission_error">Failed to start Mission</string>
+    <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
+    <string name="switch_video">Switch video</string>
+    <string name="return_drone_dialog">Return Drone Home</string>
+    <string name="return_drone_dialog_title">Do you want to return to user or to take off ?</string>
+    <string name="return_drone_dialog_option_home">Home</string>
+    <string name="return_drone_dialog_option_user">User</string>
     <string name="drone_pause_success">Mission Paused</string>
     <string name="drone_pause_error">Failed to pause Mission</string>
 
@@ -46,14 +55,35 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
     <string name="gps_refresh_rate_header">GPS refresh rate</string>
-    <string name="pref_value_strategy_zigzag">Zigzag</string>
-    <string name="pref_value_strategy_spiral">Spiral</string>
+    <string name="pref_value_strategy_zigzag" translatable="false">Zigzag</string>
+    <string name="pref_value_strategy_spiral" translatable="false">Spiral</string>
+    <string name="display_strategy_zigzag">Zigzag</string>
+    <string name="display_strategy_spiral">Spiral</string>
+    <string name="altitude_6m">6 meters</string>
+    <string name="altitude_8m">8 meters</string>
+    <string name="altitude_10m">10 meters</string>
+    <string name="altitude_12m">12 meters</string>
+    <string name="altitude_14m">14 meters</string>
+    <string name="rate_100ms">100 ms</string>
+    <string name="rate_200ms">200 ms</string>
+    <string name="rate_500ms">500 ms</string>
+    <string name="rate_750ms">750 ms</string>
+    <string name="rate_1000ms">1000 ms</string>
+    <string name="drone_altitude_header">Default drone altitude</string>
+    <string name="overflight_strategy_header">Default Overflight Strategy</string>
 
     <!-- Main Activity -->
     <string name="select_search_group">Search group</string>
     <string name="start_mission">Start mission</string>
     <string name="work_offline">Work offline</string>
     <string name="warning_no_group_selected">You must select a group to start a mission</string>
+    <string name="no_info">No data</string>
+    <string name="not_connected_message">You are currently not connected to the drone</string>
+    <string name="button_settings_desc">Settings button</string>
+    <string name="button_menu_desc">Open side menu</string>
+    <string name="home_background">home background</string>
+    <string name="fly2find_logo_desc">Fly2Find logo</string>
+    <string name="search_group_deleted">Search group deleted successfully</string>
 
     <!-- Offline map -->
     <string name="end_progress_success">Region successfully downloaded.</string>
@@ -61,7 +91,6 @@
     <string name="dialog_message">Download the map region you currently are viewing</string>
     <string name="set_region_name_hint">Enter name</string>
     <string name="dialog_positive_button">Download</string>
-    <string name="dialog_negative_button">Cancel</string>
     <string name="navigate_title">List</string>
     <string name="navigate_positive_button">Navigate To</string>
     <string name="navigate_neutral_button_title">Delete</string>
@@ -69,18 +98,16 @@
     <string name="toast_no_regions_yet">No regions yet</string>
     <string name="dialog_toast">Name cannot be empty</string>
     <string name="region_name_error">Unknown Region name</string>
-    <string name="maps_managing">Maps managing fragment\n(get offline maps here)</string>
-    <string name="download_region_dialog_fragment">Download Region Dialog Fragment</string>
-    <string name="list_offline_region_dialog_fragment">List Offline Region Dialog Fragment</string>
+    <string name="maps_managing">Maps managing (get offline maps here)</string>
+    <string name="download_region_dialog_fragment">Download Region</string>
+    <string name="list_offline_region_dialog_fragment">Offline Region List</string>
 
     <!-- Navigation -->
     <string name="menu_home">Home</string>
     <string name="menu_maps_managing">Maps managing</string>
 
-    <!-- search group selection-->
+    <!-- Search Group -->
     <string name="group_selection_activity_title">Select group</string>
-
-    <!-- Search group edition -->
     <string name="default_group_name">Group Name</string>
     <string name="base_location_label">Base Location</string>
     <string name="group_edition_rescuers_label">Rescuers</string>
@@ -90,49 +117,24 @@
     <string name="search_group_edition_group_name_cannot_be_empty">The group name cannot be empty</string>
     <string name="danger_zone">Danger zone</string>
     <string name="delete_this_group">Delete this group</string>
-    <string name="enter_a_gmail_address">Enter a gmail address</string>
+    <string name="enter_a_mail_address">Enter a mail address</string>
+    <string name="add_a_user">Add a user</string>
     <string name="add_a_rescuer">Add a rescuer</string>
     <string name="add_an_operator">Add an operator</string>
     <string name="cancel">Cancel</string>
     <string name="group_edition_activity_title">Edit group</string>
+    <string name="enter_your_desired_group_name">Enter your desired group name</string>
+    <string name="create_a_search_group">Create a search group</string>
+    <string name="search_group_name_cannot_be_empty">Search group name cannot be empty.</string>
 
-
-    <!-- Dronew status display -->
+    <!-- Drone status display -->
     <string name="battery_description_tag">Battery icon</string>
     <string name="altitude_description_tag">Altitude icon</string>
     <string name="speed_description_tag">Speed icon</string>
     <string name="distance_to_user_description_tag">Distance to user icon</string>
     <string name="distance_to_home_description_tag">Distance to home icon</string>
 
-    <!-- TODO reorganize strings -->
-    <!-- Preference Titles -->
-
-    <string name="not_connected_message">You are currently not connected to the drone</string>
-    <string name="not_enough_waypoints_message">You do not have enough waypoints to launch a mission</string>
-
-    <string name="switch_video">Switch video</string>
-
-    <string name="no_info">No data</string>
-
-    <string name="drone_altitude_header">Default drone altitude</string>
-    <string name="overflight_strategy_header">Default Overflight Strategy</string>
-
-    <string name="ReturnDroneDialogFragment">Return Home Drone</string>
-    <string name="ReturnDroneDialogTitle">Do you want to return to user or to take off ? </string>
-    <string name="ReturnDroneDialogHome">Home</string>
-    <string name="ReturnDroneDialogUser">User</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="button_settings_desc">Settings button</string>
-    <string name="button_menu_desc">Open side menu</string>
-    <string name="home_background">home background</string>
-    <string name="fly2find_logo_desc">Fly2Find logo</string>
-    <string name="invalid_email_address">Invalid email address</string>
-    <string name="search_group_deleted">Search group deleted successfully</string>
-    <string name="enter_your_desired_group_name">Enter your desired group name</string>
-    <string name="create_a_search_group">Create a search group</string>
-    <string name="search_group_name_cannot_be_empty">Search group name cannot be empty.</string>
-    <string name="Camera">Camera</string>
+    <string name="camera">Camera</string>
     <string name="add">Add</string>
 
 </resources>
