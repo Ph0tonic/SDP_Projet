@@ -111,7 +111,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
 
     private var droneConnectionStatusObserver = Observer<Boolean> {
         if (!it) {
-//            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.not_connected_message), Toast.LENGTH_SHORT).show()
         }
         startOrPauseButton.isEnabled = it
         returnHomeOrUserButton.isEnabled = it
