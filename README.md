@@ -37,9 +37,10 @@ The app stores the preferences of the users that can be changes in the settings 
 It also stores the last map attributes such as the zoom or the position.
 
 ### Offline mode: 
-OFFLINE FIREBASE TO ADD
 We can download parts of the map so that it stays on the phone and we can use them while beeing offline.
 
 ### Testing:
 We testes most of our methods and have a current code coverage of [![Test Coverage](https://api.codeclimate.com/v1/badges/198be56409634587df0f/test_coverage)](https://codeclimate.com/github/Ph0tonic/SDP_Projet/test_coverage)
 
+## Working without a drone
+To be  able to use our application without having a drone, the user must download a simulator as well as other usefull tools, all of it is explained in our [wiki](https://github.com/Ph0tonic/SDP_Projet/wiki)
