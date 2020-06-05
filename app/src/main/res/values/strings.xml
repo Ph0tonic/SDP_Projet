@@ -140,6 +140,7 @@
     <string name="select_a_search_group">Select a search group</string>
     <string name="delete_this_search_group">Delete this search group</string>
     <string name="search_group_name_cannot_be_empty">Search group name cannot be empty.</string>
+    <string name="last_operator_cannot_be_removed">You cannot remove all operators</string>
 
     <!-- Drone status display -->
     <string name="battery_description_tag">Battery icon</string>
@@ -148,6 +149,6 @@
     <string name="distance_to_user_description_tag">Distance to user icon</string>
     <string name="distance_to_home_description_tag">Distance to home icon</string>
 
-    <!-- To be cleaned -->
+    <!-- Strings automatically added land here, clean them up -->
 
 </resources>

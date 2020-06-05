@@ -91,7 +91,6 @@ class OfflineManagerActivityTest {
         checkedIfEmpty.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
         assertThat(checkedIfEmpty.count, equalTo(0L))
 
-
         //DOWNLOAD part
         onView(withId(R.id.download_button)).perform(click())
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(FAKE_MAP_NAME_1))

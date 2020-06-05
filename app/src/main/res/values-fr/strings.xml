@@ -101,4 +101,5 @@
     <string name="select_a_search_group">Sélectionner un groupe de recherche</string>
     <string name="delete_this_search_group">Supprimer ce groupe de recherche</string>
     <string name="delete">Supprimer</string>
+    <string name="last_operator_cannot_be_removed">Impossible d\'enlever tous les opérateurs</string>
 </resources>
