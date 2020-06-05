@@ -137,4 +137,7 @@
     <string name="camera">Camera</string>
     <string name="add">Add</string>
 
+    <!-- Strings automatically added land here, clean them up -->
+    <string name="last_operator_cannot_be_removed">You cannot remove all operators</string>
+
 </resources>
