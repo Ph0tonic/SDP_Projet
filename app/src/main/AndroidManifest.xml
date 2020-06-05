@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="landscape"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".ui.search_group.edition.SearchGroupEditionActivity"
             android:label="@string/group_edition_activity_title"
@@ -40,16 +40,13 @@
         <activity
             android:name=".ui.maps.MapActivity"
             android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.maps.offline.OfflineManagerActivity"
-            android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="landscape" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.MainActivity" />
     </application>
-
 </manifest>

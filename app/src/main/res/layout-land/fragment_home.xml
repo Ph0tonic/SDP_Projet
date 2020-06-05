@@ -45,7 +45,7 @@
 
                 <Button
                     android:id="@+id/search_group_selection_button"
-                    style="@style/HomeButtonTheme.landscape"
+                    style="@style/AppTheme.HomeButton.landscape"
                     android:drawableTop="@drawable/ic_search_group"
                     android:onClick="goToSearchGroupSelect"
                     android:text="@string/select_search_group" />
@@ -57,7 +57,7 @@
 
                 <Button
                     android:id="@+id/start_mission_button"
-                    style="@style/HomeButtonTheme.landscape"
+                    style="@style/AppTheme.HomeButton.landscape"
                     android:drawableTop="@drawable/ic_start_mission"
                     android:onClick="startMission"
                     android:text="@string/start_mission" />
@@ -69,7 +69,7 @@
 
                 <Button
                     android:id="@+id/work_offline_button"
-                    style="@style/HomeButtonTheme.landscape"
+                    style="@style/AppTheme.HomeButton.landscape"
                     android:drawableTop="@drawable/ic_work_offline"
                     android:onClick="workOffline"
                     android:text="@string/work_offline" />

@@ -16,7 +16,8 @@ import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data.SearchGroupData
 import ch.epfl.sdp.database.data.UserData
 import ch.epfl.sdp.database.data_manager.SearchGroupDataManager
-import ch.epfl.sdp.ui.search_group.OnItemClickListener
+import ch.epfl.sdp.ui.dialog.DeleteConfirmDialogFragment
+import ch.epfl.sdp.utils.OnItemClickListener
 
 class SearchGroupEditionActivity : AppCompatActivity() {
 
@@ -87,10 +88,12 @@ class SearchGroupEditionActivity : AppCompatActivity() {
     }
 
     fun onGroupDelete(view: View) {
-        //TODO: Ask for confirmation
-        searchGroupManager.deleteSearchGroup(groupId!!)
-        finish()
-        Toast.makeText(this, getString(R.string.search_group_deleted), Toast.LENGTH_SHORT).show()
+        val dialog = DeleteConfirmDialogFragment(getString(R.string.delete_this_search_group)) {
+            searchGroupManager.deleteSearchGroup(groupId!!)
+            finish()
+            Toast.makeText(this, getString(R.string.search_group_deleted), Toast.LENGTH_SHORT).show()
+        }
+        dialog.show(supportFragmentManager, getString(R.string.delete_this_search_group))
     }
 
     fun onGroupEditCanceled(view: View) {

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.database.data.UserData
-import ch.epfl.sdp.ui.search_group.OnItemClickListener
+import ch.epfl.sdp.utils.OnItemClickListener
 
 class UserRecyclerAdapter(
         private val list: List<UserData>,

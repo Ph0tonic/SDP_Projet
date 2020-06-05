@@ -1,68 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     tools:context="ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity">
+
+    <TextView
+        android:id="@+id/offline_maps_activity_title"
+        style="@style/AppTheme.MapManagingOfflineTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/download_this_area_title"
+        mapbox:layout_constraintTop_toTopOf="parent" />
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        mapbox:mapbox_cameraZoom="15.27"
-        mapbox:mapbox_cameraZoomMin="10" />
-
-    <EditText
-        android:id="@+id/editName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="@string/set_region_name_hint"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:background="@color/colorPrimary"
-        android:textColor="@android:color/white"
-        android:visibility="invisible" />
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
-        android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        android:visibility="gone" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        mapbox:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintTop_toBottomOf="@id/offline_maps_activity_title">
+    </com.mapbox.mapboxsdk.maps.MapView>
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
-        style="?android:attr/buttonBarStyle"
+        style="@style/AppTheme.MenuBarButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_alignParentBottom="true"
         android:background="@color/colorPrimaryDark"
+        android:orientation="horizontal"
+        mapbox:layout_constraintBottom_toBottomOf="parent">
 
-        android:orientation="horizontal">
+        <Button
+            android:id="@+id/offline_map_cancel_button"
+            style="@style/AppTheme.BarButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="cancel"
+            android:text="@string/close" />
+
+        <Button
+            android:id="@+id/delete_offline_map_button"
+            style="@style/AppTheme.BarButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="deleteCurrentRegion"
+            android:text="@string/delete" />
 
         <Button
             android:id="@+id/download_button"
-            style="@style/OfflineDownloadButtonTheme"
+            style="@style/AppTheme.BarButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/dialog_positive_button"
-            android:onClick="downloadRegionDialog"/>
-
-        <Button
-            android:id="@+id/list_button"
-            style="@style/OfflineDownloadButtonTheme"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/navigate_title"
-            android:onClick="downloadedRegionList"/>
-
+            android:onClick="downloadRegionDialog"
+            android:text="@string/dialog_positive_button" />
     </LinearLayout>
 
-</RelativeLayout>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
+        android:layout_centerVertical="true"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:visibility="gone"
+        mapbox:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/overlay_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/offline_download_overlay_size"
+        style="@style/AppTheme.OfflineMapActivityOverlay"
+        mapbox:layout_constraintTop_toBottomOf="@+id/offline_maps_activity_title" />
+
+    <View
+        android:id="@+id/overlay_left"
+        android:layout_width="@dimen/offline_download_overlay_size"
+        android:layout_height="0dp"
+        style="@style/AppTheme.OfflineMapActivityOverlay"
+        mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
+
+    <View
+        android:id="@+id/overlay_right"
+        android:layout_width="@dimen/offline_download_overlay_size"
+        android:layout_height="0dp"
+        style="@style/AppTheme.OfflineMapActivityOverlay"
+        mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
+
+    <View
+        android:id="@+id/overlay_bottom"
+        style="@style/AppTheme.OfflineMapActivityOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        mapbox:layout_constraintBottom_toTopOf="@+id/bottom_navigation" />
+
+    <View
+        android:id="@+id/border_left"
+        android:layout_width="@dimen/offline_download_border_size"
+        android:layout_height="0dp"
+        style="@style/AppTheme.OfflineMapActivityBorder"
+        mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
+        mapbox:layout_constraintStart_toEndOf="@+id/overlay_left"
+        mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
+
+    <View
+        android:id="@+id/border_bottom"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/offline_download_border_size"
+        style="@style/AppTheme.OfflineMapActivityBorder"
+        mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
+        mapbox:layout_constraintEnd_toStartOf="@+id/overlay_right"
+        mapbox:layout_constraintStart_toEndOf="@+id/overlay_left" />
+
+    <View
+        android:id="@+id/border_right"
+        android:layout_width="@dimen/offline_download_border_size"
+        android:layout_height="0dp"
+        style="@style/AppTheme.OfflineMapActivityBorder"
+        mapbox:layout_constraintBottom_toTopOf="@+id/overlay_bottom"
+        mapbox:layout_constraintEnd_toStartOf="@+id/overlay_right"
+        mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
+
+    <View
+        android:id="@+id/border_top"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/offline_download_border_size"
+        style="@style/AppTheme.OfflineMapActivityBorder"
+        mapbox:layout_constraintEnd_toStartOf="@+id/overlay_right"
+        mapbox:layout_constraintStart_toEndOf="@+id/overlay_left"
+        mapbox:layout_constraintTop_toBottomOf="@+id/overlay_top" />
+
+    <TextView
+        android:id="@+id/offline_download_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/download_current_area"
+        android:textColor="@android:color/white"
+        mapbox:layout_constraintBottom_toBottomOf="@+id/mapView"
+        mapbox:layout_constraintEnd_toEndOf="@+id/overlay_bottom"
+        mapbox:layout_constraintStart_toStartOf="@+id/overlay_bottom"
+        mapbox:layout_constraintTop_toTopOf="@+id/overlay_bottom" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

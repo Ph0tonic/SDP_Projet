@@ -126,7 +126,6 @@ class MapActivityTest {
 
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
         runOnUiThread {
             val searchArea = QuadrilateralArea(arrayListOf(
                     LatLng(47.397026, 8.543067), //we consider the closest point to the drone
@@ -134,16 +133,13 @@ class MapActivityTest {
                     LatLng(47.398279, 8.543934),
                     LatLng(47.397426, 8.544867)
             ))
-            mActivityRule.activity.missionBuilder
+            val mission = mActivityRule.activity.missionBuilder
                     .withSearchArea(searchArea)
                     .withStartingLocation(LatLng(47.397026, 8.543067))
-                    .withStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
+                    .withStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)).build()
+            mActivityRule.activity.launchMission(mission)
         }
 
-        // Then start mission officially
-        runOnUiThread {
-            mActivityRule.activity.launchMission()
-        }
 
         val uploadedMission = Drone.missionLiveData.value
         assertThat(uploadedMission, `is`(notNullValue()))
@@ -238,32 +234,6 @@ class MapActivityTest {
         assertThat(mActivityRule.activity.measureHeatmapManager.heatmapPainters.size, equalTo(1))
         //Reset default repo
         HeatmapRepository.daoProvider = { OfflineHeatmapDao() }
-    }
-
-    @Test
-    fun canUpdateUserLocation() {
-        //TODO Rewrite this test
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-    }
-
-    @Test
-    fun canUpdateUserLocationTwice() {
-        //TODO Rewrite this test
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-        CentralLocationManager.currentUserPosition.postValue(FAKE_LOCATION_TEST)
-    }
-
-    @Test
-    fun canOnRequestPermissionResult() {
-        //TODO Rewrite this test
-        runOnUiThread {
-            MainDataManager.goOffline()
-            MainDataManager.groupId.value = DUMMY_GROUP_ID
-            MainDataManager.role.value = Role.OPERATOR
-        }
-        mActivityRule.launchActivity(Intent())
-
-        mActivityRule.activity.onRequestPermissionsResult(1011, Array(0) { "" }, IntArray(0))
     }
 
     @Test
@@ -455,25 +425,6 @@ class MapActivityTest {
         runOnUiThread {
             assertThat(mActivityRule.activity.searchAreaBuilder.vertices.isEmpty(), equalTo(true))
         }
-    }
-
-    @Test
-    fun storeMapButtonIsWorking() {
-        runOnUiThread {
-            MainDataManager.goOffline()
-            MainDataManager.groupId.value = DUMMY_GROUP_ID
-            MainDataManager.role.value = Role.OPERATOR
-        }
-        mActivityRule.launchActivity(Intent())
-
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
-        onView(withId(R.id.floating_menu_button)).perform(click())
-        onView(withId(R.id.store_button)).perform(click())
-        onView(withId(R.id.store_button)).perform(click())
-
-        intended(hasComponent(OfflineManagerActivity::class.java.name))
     }
 
     @Test

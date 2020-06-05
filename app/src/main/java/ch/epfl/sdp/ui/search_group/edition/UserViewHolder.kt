@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.epfl.sdp.R
 import ch.epfl.sdp.database.data.UserData
-import ch.epfl.sdp.ui.search_group.OnItemClickListener
+import ch.epfl.sdp.utils.OnItemClickListener
 
 class UserViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.user_recyclerview_item, parent, false)) {
