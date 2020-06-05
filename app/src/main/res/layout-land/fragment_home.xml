@@ -84,21 +84,21 @@
 
             <TextView
                 android:id="@+id/current_group"
-                android:layout_width="151dp"
-                android:layout_height="23dp"
-                android:layout_marginTop="164dp"
+                android:layout_width="147dp"
+                android:layout_height="27dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:text=""
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.086"
+                app:layout_constraintHorizontal_bias="0.089"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/linearLayout4"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
     </LinearLayout>
