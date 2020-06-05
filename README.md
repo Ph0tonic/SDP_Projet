@@ -52,9 +52,9 @@ To be  able to use our application without having a drone, the user must downloa
 * Open a map with usefull widgets used for the mission building such as launching the mission, removing all the waypoints or downloading the current map.
 
     ![widgets](images/MapWithWidgets.PNG)
-* Change the current mission strategy, either a circle or a quadrilateral
+* Change the current mission strategy, to either a circle or a quadrilateral
 
-    ![strategycircle](images/strategies.PNG)
+    ![strategies](images/strategies.PNG)
 * The language of the app changes with the language of the user's phone
 * Show the live camera of the drone (Unfortunately, it doesn't work well with the simulator)
 * Build a live heatmap of the signals received by the drone
