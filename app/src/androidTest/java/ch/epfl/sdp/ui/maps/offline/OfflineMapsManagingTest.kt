@@ -1,9 +1,7 @@
 package ch.epfl.sdp.ui.maps.offline
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.Intent
 import android.view.Gravity
-import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -16,7 +14,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
@@ -27,7 +24,6 @@ import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.ui.MainActivity
-import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
@@ -35,8 +31,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class OfflineMapsManagingTest {
@@ -46,7 +40,7 @@ class OfflineMapsManagingTest {
 
     private val FAKE_MAP_NAME_1 = "RandomName"
     private val POSITIVE_BUTTON_ID: Int = android.R.id.button1
-    private val MAP_DOWNLOADING_TIMEOUT: Long = 1000L
+    private val MAP_DOWNLOADING_TIMEOUT: Long = 2000L
 
     @Rule
     @JvmField
@@ -88,8 +82,14 @@ class OfflineMapsManagingTest {
 
     @Test
     fun canLaunchOfflineManagerActivityDownloadMapAndNavigateToMap() {
+        MapUtils.saveCameraPositionAndZoomToPrefs(
+                MapUtils.getCameraWithParameters(
+                        LatLng(0.0, 0.0),
+                        20.0
+                )
+        )
+
         openDrawer()
-        val mapUtilsMock = mock(MapUtils::class.java)
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
         onView(withId(R.id.store_button))
@@ -99,12 +99,6 @@ class OfflineMapsManagingTest {
         onView(withId(R.id.download_button)).perform(click())
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(FAKE_MAP_NAME_1))
         mUiDevice.pressBack()
-
-        Mockito.`when`(mapUtilsMock.getLastCameraState())
-                .thenReturn(CameraPosition.Builder()
-                        .zoom(28.0)
-                        .build()
-                )
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
         mUiDevice.wait(Until.hasObject(By.desc(FAKE_MAP_NAME_1)), MAP_DOWNLOADING_TIMEOUT)
