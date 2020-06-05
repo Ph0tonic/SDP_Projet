@@ -91,4 +91,5 @@
     <string name="drone_pause_success">Mission mise en pause</string>
     <string name="camera">Caméra</string>
     <string name="add">Ajouter</string>
+    <string name="last_operator_cannot_be_removed">Impossible d\'enlever tous les opérateurs</string>
 </resources>
