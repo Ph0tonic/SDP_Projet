@@ -84,7 +84,7 @@
 
             <TextView
                 android:id="@+id/current_group"
-                android:layout_width="147dp"
+                android:layout_width="161dp"
                 android:layout_height="27dp"
                 android:layout_marginTop="16dp"
                 android:gravity="center"
@@ -93,7 +93,7 @@
                 android:textColor="#ffffff"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.089"
+                app:layout_constraintHorizontal_bias="0.071"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
