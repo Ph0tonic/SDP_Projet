@@ -60,4 +60,4 @@ To be  able to use our application without having a drone, the user must downloa
 * Build a live heatmap of the signals received by the drone
   
 ## License
-Since our app is meant to be used, we decided to license it with the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)
+Since our app is meant to be used, we decided to license it with the [GNU Affero General Public License v3.0](https://github.com/Ph0tonic/SDP_Projet/blob/master/LICENSE)
