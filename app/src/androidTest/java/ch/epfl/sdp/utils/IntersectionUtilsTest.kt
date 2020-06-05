@@ -1,4 +1,4 @@
-package ch.epfl.sdp
+package ch.epfl.sdp.utils
 
 import ch.epfl.sdp.utils.IntersectionUtils
 import com.mapbox.mapboxsdk.geometry.LatLng
