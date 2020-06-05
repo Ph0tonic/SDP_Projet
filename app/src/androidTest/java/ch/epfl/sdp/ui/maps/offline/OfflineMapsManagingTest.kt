@@ -130,7 +130,7 @@ class OfflineMapsManagingTest {
     fun canDeleteDownloadedMap() {
         MapUtils.saveCameraPositionAndZoomToPrefs(
                 MapUtils.getCameraWithParameters(
-                        LatLng(0.0, 0.0),
+                        LatLng(1.0, 1.0),
                         20.0
                 )
         )
