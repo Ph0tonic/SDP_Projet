@@ -44,3 +44,13 @@ We testes most of our methods and have a current code coverage of [![Test Covera
 
 ## Working without a drone
 To be  able to use our application without having a drone, the user must download a simulator as well as other usefull tools, all of it is explained in our [wiki](https://github.com/Ph0tonic/SDP_Projet/wiki)
+
+## Features:
+* Connect through google sign-in
+* Join/Create/Edit search groups from the application
+* Modify settings which are then cached
+* Open a map with usefull widgets used for the mission building such as launching the mission, removing all the waypoints or downloading the current map.
+![widgets](images/MapWithWidgets.PNG)
+* Change the current mission strategy, either a circle or a quadrilateral
+![strategycircle](images/strategies.PNG)
+* 
