@@ -1,9 +1,11 @@
 package ch.epfl.sdp.drone
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
+import ch.epfl.sdp.database.data_manager.HeatmapDataManager
 import ch.epfl.sdp.ui.toast.ToastHandler
 import ch.epfl.sdp.utils.CentralLocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -12,20 +14,25 @@ import io.mavsdk.mission.Mission
 import io.mavsdk.telemetry.Telemetry
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-
 object Drone {
     // Maximum distance between passes in the strategy
-    const val GROUND_SENSOR_SCOPE: Double = 15.0
+    const val GROUND_SENSOR_SCOPE: Double = 7.5
     const val DEFAULT_ALTITUDE: Float = 10.0F
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
     private const val WAIT_TIME_S: Long = 1
+
+    private val heatmapDataManager = HeatmapDataManager()
 
     private val disposables: MutableList<Disposable> = ArrayList()
     val positionLiveData: MutableLiveData<LatLng> = MutableLiveData()
@@ -38,14 +45,16 @@ object Drone {
     val isConnectedLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMissionPausedLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
 
-    lateinit var getSignalStrength: () -> Double
+    private val onMeasureTakenCallbacks = mutableListOf<(LatLng, Double) -> Unit>()
 
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
-        positionLiveData.value?.distanceTo(LatLng(47.3975, 8.5445)) ?: 0.0
+        1000 / positionLiveData.value!!.distanceTo(LatLng(47.301836, 7.156145)).pow(2)
     }
 
     private val instance: System = DroneInstanceProvider.provide()
+    var getSignalStrength: () -> Double = debugGetSignalStrength
+
 
     init {
         disposables.add(instance.telemetry.flightMode.distinctUntilChanged()
@@ -105,29 +114,69 @@ object Drone {
                         { error -> Timber.e("Error connectionState : $error") }
                 )
         )
+        setupMeasureTracking()
     }
 
     /**
      * @param missionPlan : the MissionPlan the drone will follow
      */
-    fun startMission(missionPlan: Mission.MissionPlan) {
+    fun startMission(missionPlan: Mission.MissionPlan, groupId: String) {
+        val missionCallBack = { location: LatLng, signalStrength: Double ->
+            heatmapDataManager.addMeasureToHeatmap(groupId, location, signalStrength)
+        }
+
         disposables.add(
                 getConnectedInstance()
                         .andThen(instance.mission.setReturnToLaunchAfterMission(true))
                         .andThen(instance.mission.uploadMission(missionPlan))
                         .andThen(instance.action.arm())
+                        .andThen {
+                            onMeasureTakenCallbacks.add(missionCallBack)
+                            it.onComplete()
+                        }
                         .andThen(instance.mission.startMission())
                         .subscribe(
                                 {
-                                    this.missionLiveData.value = missionPlan.missionItems
+                                    this.missionLiveData.postValue(missionPlan.missionItems)
                                     this.isMissionPausedLiveData.postValue(false)
                                     ToastHandler().showToast(R.string.drone_mission_success, Toast.LENGTH_SHORT)
                                 },
                                 {
                                     ToastHandler().showToast(R.string.drone_mission_error, Toast.LENGTH_SHORT)
+                                    onMeasureTakenCallbacks.clear()
                                 }
                         )
         )
+        // TODO("See what to do with added disposables")
+    }
+
+    private fun setupMeasureTracking() {
+        disposables.add(
+                getConnectedInstance()
+                        .andThen(instance.mission.missionProgress)
+                        .subscribe(
+                                { missionProgress ->
+                                    val missionItem = missionLiveData.value?.getOrNull(missionProgress.current - 1)
+                                    val location = missionItem?.longitudeDeg?.let { it1 -> LatLng(missionItem.latitudeDeg, it1) }
+                                    val signal = getSignalStrength()
+                                    location?.let { it1 -> onMeasureTaken(it1, signal) }
+                                    if (missionProgress.current == missionProgress.total) {
+                                        onMeasureTakenCallbacks.clear()
+                                    }
+                                },
+                                {}
+                        )
+        )
+    }
+
+    private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                onMeasureTakenCallbacks.forEach {
+                    it(location, signalStrength)
+                }
+            }
+        }
     }
 
     /**
@@ -189,10 +238,11 @@ object Drone {
                         .andThen(instance.action.returnToLaunch())
                         .subscribe(
                                 {
-                                    this.missionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
+                                    this.missionLiveData.postValue(listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat())))
                                     ToastHandler().showToast(R.string.drone_home_success, Toast.LENGTH_SHORT)
                                 },
                                 {
+                                    this.missionLiveData.postValue(null)
                                     ToastHandler().showToast(R.string.drone_home_error, Toast.LENGTH_SHORT)
                                 }
                         )
@@ -213,10 +263,11 @@ object Drone {
                         .andThen(instance.action.gotoLocation(returnLocation.latitude, returnLocation.longitude, 20.0F, 0F))
                         .subscribe(
                                 {
-                                    this.missionLiveData.value = listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat()))
+                                    this.missionLiveData.postValue(listOf(DroneUtils.generateMissionItem(returnLocation.latitude, returnLocation.longitude, returnLocation.altitude.toFloat())))
                                     ToastHandler().showToast(R.string.drone_user_success, Toast.LENGTH_SHORT)
                                 },
                                 {
+                                    this.missionLiveData.postValue(null)
                                     ToastHandler().showToast(R.string.drone_user_error, Toast.LENGTH_SHORT)
                                 }
                         )

@@ -21,7 +21,7 @@ import ch.epfl.sdp.database.data.Role
 import ch.epfl.sdp.database.data_manager.MainDataManager
 import ch.epfl.sdp.database.repository.HeatmapRepository
 import ch.epfl.sdp.database.repository.MarkerRepository
-import ch.epfl.sdp.ui.drone.DroneInstanceMock
+import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.MapActivity
 import ch.epfl.sdp.ui.maps.MapActivityTest
 import com.mapbox.mapboxsdk.geometry.LatLng
