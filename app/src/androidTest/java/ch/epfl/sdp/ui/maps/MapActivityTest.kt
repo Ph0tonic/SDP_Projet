@@ -38,10 +38,10 @@ import ch.epfl.sdp.database.repository.MarkerRepository
 import ch.epfl.sdp.database.repository.SearchGroupRepository
 import ch.epfl.sdp.database.repository.UserRepository
 import ch.epfl.sdp.drone.Drone
+import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.mission.SimpleQuadStrategy
 import ch.epfl.sdp.mission.SpiralStrategy
 import ch.epfl.sdp.searcharea.QuadrilateralArea
-import ch.epfl.sdp.drone.DroneInstanceMock
 import ch.epfl.sdp.ui.maps.offline.OfflineManagerActivity
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
