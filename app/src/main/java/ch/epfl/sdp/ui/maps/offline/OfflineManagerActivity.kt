@@ -169,7 +169,7 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                 if (status.isComplete) { // Download complete
                     endProgress(downloadButton, cancelButton, progressBar)
                     mapView.contentDescription = getString(R.string.map_ready)
-                    return
+                    finish()
                 } else if (status.isRequiredResourceCountPrecise) { // Switch to determinate state
                     downloadingInProgress(percentage.roundToInt(), progressBar)
                 }
