@@ -28,7 +28,7 @@ class ReturnDroneDialogFragment : DialogFragment() {
                             tryReturnHome(it)
                         }
                     }
-                    .setNegativeButton(getString(R.string.dialog_cancel)) { dialog, _ -> dialog.cancel() }
+                    .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> dialog.cancel() }
             // Display the dialog
             // Create the AlertDialog object and return it
             builder.create()

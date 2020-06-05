@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -14,7 +13,6 @@
     tools:layout_constraintTop_creator="1">
 
     <TableRow>
-
         <ImageView
             android:id="@+id/battery_level_icon"
             android:layout_width="wrap_content"
@@ -25,11 +23,10 @@
 
         <TextView
             android:id="@+id/battery_level"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/AppTheme.InformationDisplayTheme" />
     </TableRow>
 
     <TableRow>
-
         <ImageView
             android:id="@+id/imageView4"
             android:layout_width="21dp"
@@ -39,11 +36,10 @@
 
         <TextView
             android:id="@+id/altitude"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/AppTheme.InformationDisplayTheme" />
     </TableRow>
 
     <TableRow>
-
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="18dp"
@@ -51,14 +47,12 @@
             android:contentDescription="@string/speed_description_tag"
             app:srcCompat="@drawable/ic_speed" />
 
-
         <TextView
             android:id="@+id/speed"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/AppTheme.InformationDisplayTheme" />
     </TableRow>
 
     <TableRow>
-
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="wrap_content"
@@ -68,11 +62,10 @@
 
         <TextView
             android:id="@+id/distance_to_user"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/AppTheme.InformationDisplayTheme" />
     </TableRow>
 
     <TableRow>
-
         <ImageView
             android:id="@+id/imageView5"
             android:layout_width="wrap_content"
@@ -83,6 +76,6 @@
         <TextView
             android:id="@+id/distance_to_home"
             android:text="@string/no_info"
-            android:theme="@style/InformationDisplayTheme" />
+            android:theme="@style/AppTheme.InformationDisplayTheme" />
     </TableRow>
 </TableLayout>

@@ -27,8 +27,8 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/vlc_fragment"
         android:name="ch.epfl.sdp.ui.camera.VlcFragment"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/map_activity_small_camera_width"
+        android:layout_height="@dimen/map_activity_small_camera_height"
         android:layout_margin="@dimen/tiny_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -58,7 +58,7 @@
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/strategy_picker_button"
-            style="@style/FloatingButtonTheme"
+            style="@style/AppTheme.FloatingButtonTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="pickStrategy"
@@ -78,7 +78,7 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/return_home_or_user"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="returnHomeOrUser"
@@ -86,7 +86,7 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/start_or_pause_button"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="startOrPauseMissionButton"
@@ -94,7 +94,7 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/clear_button"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="clearWaypoints"
@@ -102,19 +102,11 @@
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/locate_button"
-                style="@style/FloatingButtonTheme"
+                style="@style/AppTheme.FloatingButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="centerCameraOnDrone"
                 app:fab_icon="@drawable/ic_locate" />
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/store_button"
-                style="@style/FloatingButtonTheme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="storeMap"
-                app:fab_icon="@drawable/ic_store" />
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 

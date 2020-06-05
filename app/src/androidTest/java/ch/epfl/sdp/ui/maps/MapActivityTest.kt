@@ -428,25 +428,6 @@ class MapActivityTest {
     }
 
     @Test
-    fun storeMapButtonIsWorking() {
-        runOnUiThread {
-            MainDataManager.goOffline()
-            MainDataManager.groupId.value = DUMMY_GROUP_ID
-            MainDataManager.role.value = Role.OPERATOR
-        }
-        mActivityRule.launchActivity(Intent())
-
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
-        onView(withId(R.id.floating_menu_button)).perform(click())
-        onView(withId(R.id.store_button)).perform(click())
-        onView(withId(R.id.store_button)).perform(click())
-
-        intended(hasComponent(OfflineManagerActivity::class.java.name))
-    }
-
-    @Test
     fun loosingDroneConnectionShowsToast() {
         runOnUiThread {
             MainDataManager.goOffline()

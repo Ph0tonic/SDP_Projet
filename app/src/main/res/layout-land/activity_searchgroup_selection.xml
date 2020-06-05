@@ -4,55 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.maps.offline.MapsManagingFragment">
+    tools:context=".ui.search_group.selection.SearchGroupSelectionActivity">
 
-    <TextView
-    android:id="@+id/no_offline_map"
-    style="@style/TextAppearance.AppCompat.Headline"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:text="@string/no_offline_map_downloaded_yet"
-    android:textColor="@android:color/white"
-    android:visibility="gone"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/offline_maps_title"
-        style="@style/TextAppearance.AppCompat.Headline"
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="@string/offline_maps"
-        android:textColor="@android:color/white"
+        android:scaleType="centerCrop"
+        android:src="@drawable/menu_background_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/home_background" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchGroupSelectionRecyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/activity_content_margin"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/mapSelectionRecyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="8dp"
-        android:scrollbars="vertical"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/offline_maps_title" />
-
     <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/store_button"
+        android:id="@+id/create_new_search_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openMapForOfflineDownload"
+        android:focusable="true"
+        android:onClick="addGroup"
         app:fab_colorNormal="@color/colorPrimary"
         app:fab_colorPressed="@color/asbestos"
         app:fab_icon="@drawable/ic_add_white_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
