@@ -24,9 +24,11 @@ import ch.epfl.sdp.MainApplication
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
 import ch.epfl.sdp.ui.MainActivity
+import ch.epfl.sdp.ui.maps.MapActivityTest
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
+import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,9 +40,12 @@ class OfflineMapsManagingTest {
     private lateinit var mUiDevice: UiDevice
     private lateinit var offlineManager: OfflineManager
 
-    private val FAKE_MAP_NAME_1 = "RandomName"
-    private val POSITIVE_BUTTON_ID: Int = android.R.id.button1
-    private val MAP_DOWNLOADING_TIMEOUT: Long = 2000L
+    companion object {
+        private const val FAKE_MAP_NAME_1 = "RandomName"
+        private const val POSITIVE_BUTTON_ID = android.R.id.button1
+        private const val MAP_DOWNLOADING_TIMEOUT = 2000L
+        private const val MAP_LOADING_TIMEOUT = 1000L
+    }
 
     @Rule
     @JvmField
@@ -94,6 +99,8 @@ class OfflineMapsManagingTest {
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
         onView(withId(R.id.store_button))
                 .perform(click())
+
+        mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
 
         //DOWNLOAD Part
         onView(withId(R.id.download_button)).perform(click())
