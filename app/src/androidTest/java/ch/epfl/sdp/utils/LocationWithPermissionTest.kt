@@ -40,7 +40,6 @@ class LocationWithPermissionTest {
     private var mUiDevice: UiDevice? = null
 
     companion object {
-        private val FAKE_LOCATION_TEST = LatLng(42.125, -30.229)
         private const val DUMMY_GROUP_ID = "DummyGroupId"
         private const val FAKE_ACCOUNT_ID = "fake_account_id"
         private const val REFRESH_RATE = 500L
