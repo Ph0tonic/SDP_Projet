@@ -1,5 +1,6 @@
 package ch.epfl.sdp.ui.maps.offline
 
+import android.util.Log
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -82,24 +83,33 @@ class OfflineManagerActivityTest {
         val checkedIfEmpty = CountDownLatch(1)
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>) {
-                assertThat(offlineRegions.isEmpty(), equalTo(true))
+                val emptiedLatch = CountDownLatch(offlineRegions.size)
+                offlineRegions.forEach {
+                    it.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+                        override fun onDelete() {
+                            emptiedLatch.countDown()
+                        }
+
+                        override fun onError(error: String?) {}
+                    })
+                }
+                emptiedLatch.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+                assertThat(emptiedLatch.count, equalTo(0L))
+
                 checkedIfEmpty.countDown()
             }
 
             override fun onError(error: String) {} //left intentionally empty
         })
-        checkedIfEmpty.await(ASYNC_CALL_TIMEOUT, TimeUnit.SECONDS)
+        checkedIfEmpty.await(ASYNC_CALL_TIMEOUT * 2, TimeUnit.SECONDS)
         assertThat(checkedIfEmpty.count, equalTo(0L))
-
+        Log.w("TEST", "DOWNLOAD PART")
         //DOWNLOAD part
         onView(withId(R.id.download_button)).perform(click())
         onView(withId(R.id.dialog_textfield_id)).perform(typeText(FAKE_MAP_NAME_1))
         mUiDevice.pressBack()
 
         onView(withId(POSITIVE_BUTTON_ID)).perform(click())
-
-        mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT * 30)
-        assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
 
         val calledList = CountDownLatch(1)
         offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
