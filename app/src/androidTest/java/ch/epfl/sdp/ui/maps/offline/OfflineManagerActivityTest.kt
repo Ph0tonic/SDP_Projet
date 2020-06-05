@@ -31,8 +31,6 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-
-//TODO extract toast tests (now commented)
 @RunWith(AndroidJUnit4::class)
 class OfflineManagerActivityTest {
     private lateinit var mUiDevice: UiDevice
