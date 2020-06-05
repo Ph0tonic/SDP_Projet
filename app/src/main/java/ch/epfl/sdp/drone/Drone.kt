@@ -26,7 +26,7 @@ import kotlin.math.sqrt
 
 object Drone {
     // Maximum distance between passes in the strategy
-    const val GROUND_SENSOR_SCOPE: Double = 15.0
+    const val GROUND_SENSOR_SCOPE: Double = 5.0
     const val DEFAULT_ALTITUDE: Float = 10.0F
     const val MAX_DISTANCE_BETWEEN_POINTS_IN_AREA = 1000 //meters
 
@@ -49,7 +49,8 @@ object Drone {
 
     /*Will be useful later on*/
     val debugGetSignalStrength: () -> Double = {
-        positionLiveData.value!!.distanceTo(LatLng(46.303407, 7.528529))
+//        1000 / positionLiveData.value!!.distanceTo(LatLng(46.303407, 7.528529)).pow(2)
+        1000 / positionLiveData.value!!.distanceTo(LatLng(47.303584, 7.159724)).pow(2)
     }
 
     private val instance: System = DroneInstanceProvider.provide()
@@ -148,7 +149,7 @@ object Drone {
         // TODO("See what to do with added disposables")
     }
 
-    private fun takeMeasure(missionCallBack : (LatLng, Double) -> Unit){
+    private fun takeMeasure(missionCallBack: (LatLng, Double) -> Unit) {
         disposables.add(
                 getConnectedInstance()
                         .andThen(instance.mission.missionProgress)
@@ -170,7 +171,9 @@ object Drone {
     private fun onMeasureTaken(location: LatLng, signalStrength: Double) {
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
+                Log.w("DRONE", "$signalStrength")
                 onMeasureTakenCallbacks.forEach {
+                    Log.w("DRONE", "CALL")
                     it(location, signalStrength)
                 }
             }
