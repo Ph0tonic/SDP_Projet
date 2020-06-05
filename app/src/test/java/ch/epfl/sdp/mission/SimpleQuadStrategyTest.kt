@@ -2,8 +2,8 @@ package ch.epfl.sdp.mission
 
 import ch.epfl.sdp.searcharea.QuadrilateralArea
 import com.mapbox.mapboxsdk.geometry.LatLng
+import net.mastrgamr.mbmapboxutils.SphericalUtil.computeOffset
 import org.hamcrest.CoreMatchers.equalTo
-import net.mastrgamr.mbmapboxutils.SphericalUtil.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.lang.Double.max
@@ -76,5 +76,21 @@ class SimpleQuadStrategyTest {
         assertThat("Wanted $theoryRes, but got: $res", diff < 0.01)
     }
 
-    //TODO test that starting location is taken into account.
+    @Test
+    fun missionStartsWithClosestPoint() {
+        val waypoints = arrayListOf(
+                LatLng(47.397026, 8.543067), //we consider the closest point to the drone
+                LatLng(47.398979, 8.543434),
+                LatLng(47.398279, 8.543934),
+                LatLng(47.397426, 8.544867)
+        )
+
+        val searchArea = QuadrilateralArea(waypoints
+        )
+        val dronePos = LatLng(47.4, 8.6)
+        val strategy = SimpleQuadStrategy(20.0)
+        val path = strategy.createFlightPath(dronePos, searchArea)
+        val orderedSearchArea = waypoints.sortedBy { it.distanceTo(dronePos) }
+        assertThat(path[0], equalTo(orderedSearchArea[0]))
+    }
 }
