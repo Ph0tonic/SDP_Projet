@@ -301,7 +301,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     fun startOrPauseMissionButton(v: View) {
         if (Drone.isFlyingLiveData.value!!) {
             if (Drone.isMissionPausedLiveData.value!!) Drone.resumeMission() else Drone.pauseMission()
-        } else if (!searchAreaBuilder.isComplete()) { //TODO add missionBuilder isComplete method
+        } else if (!searchAreaBuilder.isComplete()) {
             Toast.makeText(this, getString(R.string.not_enough_waypoints_message), Toast.LENGTH_SHORT).show()
         } else {
             val mission = missionBuilder.build()
