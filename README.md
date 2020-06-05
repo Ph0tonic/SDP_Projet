@@ -16,23 +16,30 @@ The application works as follows: Once you are in a search group, the operators 
 The organization of the group went as follows:
 
 We had a [scrum board](https://github.com/Ph0tonic/SDP_Projet/projects/1) were we would write issues of the app or potential features to be added and each week we would assign ourself to tasks to have an estimated working time of 8 hours per week. Once a task would be assigned, it would be moved in the `Sprint tasks` meaning that somebody is working on it and once the task would be completed and merged on the master branch, it would be moved in the `Done` column of the corresponding week. We had in total 13 weeks to complete our app. We also had one or two more meetings per week to each discuss of our progression and potiential roadblocks.
-Once a team member had finished his task, he had to create a pull request so that other team members could see what he did and accept his merge request or ask for changes
+Once a team member had finished his task, he had to create a pull request so that other team members could see what he did and accept his merge request or ask for changes.
 
 Since the developpement of our app was part of a course at EPFL, we had to meet some requirements that were:
 
-### Correctness:
-
-### Utility: 
+### Correctness & Utility:
+Our app has many user-friendly features implemented as well as a nice UI to easily understand how to use the app.
 
 ### Split app model: 
+We used Google Firebase to create the searching teams and each team has its own members stored in the firebase, once the heatmap is created, it is also stored in the firebase.
 
 ### Sensor usage:
+Once you first open the app, it asks you if you allow it to use your location service. If you do so, the app locates you and puts a pinpoint of your location on the map. It also uses the sensor of the drone to locate it and to get the signal strength of the victim.
 
 ### User support:
+We used the built-in Google authentication so that the user has to connect to a google account to be able to join a search group.
 
 ### Local cache:
+The app stores the preferences of the users that can be changes in the settings such as the default altitude of the drone or the default language of the app.
+It also stores the last map attributes such as the zoom or the position.
 
 ### Offline mode: 
+OFFLINE FIREBASE TO ADD
+We can download parts of the map so that it stays on the phone and we can use them while beeing offline.
 
-### Testing: 
+### Testing:
+We testes most of our methods and have a current code coverage of [![Test Coverage](https://api.codeclimate.com/v1/badges/198be56409634587df0f/test_coverage)](https://codeclimate.com/github/Ph0tonic/SDP_Projet/test_coverage)
 
