@@ -8,11 +8,13 @@ import android.widget.TextView
 import android.widget.Toast
 import ch.epfl.sdp.R
 import ch.epfl.sdp.map.MapUtils
+import ch.epfl.sdp.map.offline.DownloadProgressBarUtils
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.downloadingInProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.endProgress
 import ch.epfl.sdp.map.offline.DownloadProgressBarUtils.startProgress
 import ch.epfl.sdp.map.offline.OfflineRegionUtils
 import ch.epfl.sdp.map.offline.OfflineRegionUtils.showErrorAndToast
+import ch.epfl.sdp.ui.dialog.DeleteConfirmDialogFragment
 import ch.epfl.sdp.ui.maps.MapViewBaseActivity
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -195,9 +197,19 @@ class OfflineManagerActivity : MapViewBaseActivity(), OnMapReadyCallback {
                     Toast.makeText(applicationContext, getString(R.string.toast_no_regions_yet), Toast.LENGTH_SHORT).show()
                     return
                 }
-                val currentOfflineRegion = offlineRegions.filter { it.id == currentOfflineRegion?.id }[0]
-                DeleteOfflineRegionConfirmDialogFragment(currentOfflineRegion, progressBar, mapView)
-                        .show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
+                val offlineRegion = offlineRegions.filter { it.id == currentOfflineRegion?.id }[0]
+
+                // Make progressBar indeterminate and set it to visible to signal that
+                // the deletion process has begun
+                DownloadProgressBarUtils.deletingInProgress(progressBar)
+                // Begin the deletion process
+                DeleteConfirmDialogFragment(getString(R.string.delete_this_offline_region)) {
+                    // Make progressBar indeterminate and set it to visible to signal that the deletion process has begun
+                    DownloadProgressBarUtils.deletingInProgress(progressBar)
+                    // Begin the deletion process
+                    OfflineRegionUtils.deleteOfflineRegion(offlineRegion, progressBar, mapView)
+                    finish()
+                }.show(supportFragmentManager, applicationContext.getString(R.string.list_offline_region_dialog_fragment))
             }
 
             override fun onError(error: String) {

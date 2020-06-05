@@ -152,5 +152,6 @@
     <string name="select_a_search_group">Select a search group</string>
     <string name="camera">Camera</string>
     <string name="add">Add</string>
+    <string name="delete_this_search_group">Delete this search group</string>
 
 </resources>
