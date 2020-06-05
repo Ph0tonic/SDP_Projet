@@ -9,7 +9,7 @@
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/add_a_user"
+        android:text="@string/add_an_operator"
         android:textAlignment="center" />
 
     <EditText
@@ -20,7 +20,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
-        android:hint="@string/enter_a_gmail_address"
+        android:hint="@string/enter_a_mail_address"
         android:inputType="textEmailAddress"
         android:importantForAutofill="no" />
 
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <Button
-            android:text="@string/cancel"
+            android:text="@string/dialog_cancel"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog" />
 
         <Button
-            android:text="@string/add_a_user"
+            android:text="@string/add"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

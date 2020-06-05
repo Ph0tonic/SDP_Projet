@@ -41,7 +41,7 @@
         android:id="@+id/cameraTextview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/Camera"
+        android:text="@string/camera"
         android:textColor="@color/clouds"
         app:layout_constraintBottom_toBottomOf="@+id/vlc_fragment"
         app:layout_constraintLeft_toLeftOf="@+id/vlc_fragment"

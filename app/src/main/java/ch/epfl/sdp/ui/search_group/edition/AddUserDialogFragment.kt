@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import ch.epfl.sdp.R
@@ -23,6 +24,8 @@ class AddUserDialogFragment(private val role: Role, private val userAddListener:
             val inflater = requireActivity().layoutInflater
 
             val view = inflater.inflate(R.layout.dialog_add_user, null)
+            val stringId = if (role == Role.OPERATOR) R.string.add_an_operator else R.string.add_a_rescuer
+            view.findViewById<TextView>(R.id.add_user_dialog_title).text = getString(stringId)
             builder.setView(view)
 
             view.findViewById<Button>(R.id.dialog_add_user).setOnClickListener {
