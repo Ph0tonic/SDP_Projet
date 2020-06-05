@@ -125,7 +125,6 @@ class MapActivityTest {
 
         mUiDevice.wait(Until.hasObject(By.desc(applicationContext().getString(R.string.map_ready))), MAP_LOADING_TIMEOUT)
         assertThat(mActivityRule.activity.mapView.contentDescription == applicationContext().getString(R.string.map_ready), equalTo(true))
-
         runOnUiThread {
             val searchArea = QuadrilateralArea(arrayListOf(
                     LatLng(47.397026, 8.543067), //we consider the closest point to the drone
@@ -133,16 +132,13 @@ class MapActivityTest {
                     LatLng(47.398279, 8.543934),
                     LatLng(47.397426, 8.544867)
             ))
-            mActivityRule.activity.missionBuilder
+            val mission = mActivityRule.activity.missionBuilder
                     .withSearchArea(searchArea)
                     .withStartingLocation(LatLng(47.397026, 8.543067))
-                    .withStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE))
+                    .withStrategy(SimpleQuadStrategy(Drone.GROUND_SENSOR_SCOPE)).build()
+            mActivityRule.activity.launchMission(mission)
         }
 
-        // Then start mission officially
-        runOnUiThread {
-            mActivityRule.activity.launchMission()
-        }
 
         val uploadedMission = Drone.missionLiveData.value
         assertThat(uploadedMission, `is`(notNullValue()))
