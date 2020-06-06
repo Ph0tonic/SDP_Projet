@@ -674,6 +674,18 @@ class MapActivityTest {
     }
 
     @Test
+    fun rescuerDoesNotSeeFloatingMenuButton() {
+        runOnUiThread {
+            MainDataManager.goOffline()
+            MainDataManager.groupId.value = DUMMY_GROUP_ID
+            MainDataManager.role.value = Role.RESCUER
+        }
+        mActivityRule.launchActivity(Intent())
+
+        onView(withId(R.id.floating_menu_button)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
     fun rescuerDoesNotSeeCameraFragment() {
         runOnUiThread {
             MainDataManager.goOffline()
