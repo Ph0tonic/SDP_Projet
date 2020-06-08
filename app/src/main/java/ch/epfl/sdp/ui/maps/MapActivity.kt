@@ -34,6 +34,7 @@ import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.CentralLocationManager
 import ch.epfl.sdp.utils.StrategyUtils.loadDefaultStrategyFromPreferences
 import com.getbase.floatingactionbutton.FloatingActionButton
+import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -142,6 +143,7 @@ class MapActivity : MapViewBaseActivity(), OnMapReadyCallback, MapboxMap.OnMapLo
     }
 
     private fun hideOperatorUiComponents() {
+        findViewById<FloatingActionsMenu>(R.id.floating_menu_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.start_or_pause_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.clear_button)!!.visibility = View.GONE
         findViewById<FloatingActionButton>(R.id.locate_button)!!.visibility = View.GONE
