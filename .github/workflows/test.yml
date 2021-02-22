@@ -1,0 +1,42 @@
+name: Android Workflow
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Build with Gradle
+      run: ./gradlew build
+      
+    - name: Run unit tests
+      run: ./gradlew assembleDebugAndroidTest
+    
+    - name: Prepare CodeClimate
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        chmod +x ./cc-test-reporter
+        ./cc-test-reporter before-build
+    
+    - name: Run instrumented tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 28
+        script: ./gradlew connectedCheck jacocoTestReport
+
+    - name: Configure code climate
+      run: |
+        export JACOCO_SOURCE_PATH=app/src/main/java
+        ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco
+    
+   # GitHub does not expose git branch name and commit SHA
+   # Therefore we cannot use this package: paambaati/codeclimate-action@v2.7.5
+   # and we need to set the env variable manually.   
+   # More here: https://stackoverflow.com/questions/58033366/how-to-get-current-branch-within-github-actions
+    - name: Expose env variables
+      run: GIT_BRANCH=$GITHUB_HEAD_REF GIT_COMMIT_SHA=$(git rev-parse --short "$GITHUB_SHA") #./cc-test-reporter after-build -t jacoco --exit-code $?
+      
+    - name: Upload code climate report
+      run: ./cc-test-reporter upload-coverage -r ${{secrets.CODE_CLIMATE_REPORT_ID}}
