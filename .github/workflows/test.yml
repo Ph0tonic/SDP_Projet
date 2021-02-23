@@ -17,17 +17,15 @@ jobs:
         chmod +x ./cc-test-reporter
         ./cc-test-reporter before-build
     
-    - name: Disable animations
-      run: |
-        adb shell settings put global window_animation_scale 0.0
-        adb shell settings put global transition_animation_scale 0.0
-        adb shell settings put global animator_duration_scale 0.0
-    
     - name: Run instrumented tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 28
-        script: ./gradlew connectedCheck jacocoTestReport
+        script: |
+        adb shell settings put global window_animation_scale 0.0
+        adb shell settings put global transition_animation_scale 0.0
+        adb shell settings put global animator_duration_scale 0.0
+        ./gradlew connectedCheck jacocoTestReport
 
     - name: Configure code climate
       run: |
