@@ -7,11 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      
-    - name: Build with Gradle
-      run: ./gradlew build
-      
-    - name: Run unit tests
+
+    - name: Build
       run: ./gradlew assembleDebugAndroidTest
     
     - name: Prepare CodeClimate
