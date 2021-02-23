@@ -9,7 +9,6 @@ import ch.epfl.sdp.database.providers.HeatmapRepositoryProvider
 import ch.epfl.sdp.database.repository.IHeatmapRepository
 import ch.epfl.sdp.utils.Auth
 import ch.epfl.sdp.utils.IdentifierUtils
-import com.google.firebase.iid.FirebaseInstanceId
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
