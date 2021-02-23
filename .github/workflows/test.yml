@@ -4,16 +4,23 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
+    strategy:
+      matrix:
+        EMULATOR_API: [28]
+        EMULATOR_ARCH: [x86_64]
     steps:
     - uses: actions/checkout@v2
+    - uses: fwilhe2/setup-kotlin@main
+      with:
+        install-native: true
 
     - name: Build
       run: ./gradlew assembleDebugAndroidTest
     
     - name: Prepare CodeClimate
       run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter
         chmod +x ./cc-test-reporter
         ./cc-test-reporter before-build
     
@@ -22,11 +29,8 @@ jobs:
       with:
         api-level: 28
         emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-        script: |
-          adb shell settings put global window_animation_scale 0.0
-          adb shell settings put global transition_animation_scale 0.0
-          adb shell settings put global animator_duration_scale 0.0
-          ./gradlew connectedCheck jacocoTestReport
+        disable-animations: true
+        script: ./gradlew connectedCheck jacocoTestReport
 
     - name: Configure code climate
       run: |
