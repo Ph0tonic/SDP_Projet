@@ -2,7 +2,7 @@ connected_check_task:
   name: Run Android instrumented tests
   env:
     API_LEVEL: 30
-    TARGET: default
+    TARGET: google_apis
     ARCH: x86
     CC_TEST_REPORTER_ID: ENCRYPTED[437c27bfb64040626acf7f420701b9391f80e46bcdc9b1a11f5a8a8ed35ee5f66576f7289bb71ff7e18c822219e8a620]
     GRADLE_OPTS: -Dkotlin.compiler.execution.strategy=in-process
