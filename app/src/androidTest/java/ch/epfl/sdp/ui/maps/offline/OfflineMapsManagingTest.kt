@@ -66,12 +66,12 @@ class OfflineMapsManagingTest {
                 .perform(DrawerActions.open())
     }
 
-    @Test
+    /*@Test
     fun canNavigateToMapsManaging() {
         openDrawer()
         onView(withId(R.id.nav_view))
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
-    }
+    }*/
 
     @Test
     fun canLaunchOfflineManagerActivity() {
@@ -84,7 +84,7 @@ class OfflineMapsManagingTest {
         Intents.intended(IntentMatchers.hasComponent(OfflineManagerActivity::class.java.name))
     }
 
-    @Test
+    /*@Test
     fun canNavigateToDownloadedMap() {
         MapUtils.saveCameraPositionAndZoomToPrefs(
                 MapUtils.getCameraWithParameters(
@@ -124,7 +124,7 @@ class OfflineMapsManagingTest {
 
             override fun onError(error: String?) {}
         })
-    }
+    }*/
 
     /*@Test
     fun canDeleteDownloadedMap() {
