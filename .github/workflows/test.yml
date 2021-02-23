@@ -36,7 +36,7 @@ jobs:
       run: |
         export JACOCO_SOURCE_PATH=app/src/main/java
         ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco
-    
+
    # GitHub does not expose git branch name and commit SHA
    # Therefore we cannot use this package: paambaati/codeclimate-action@v2.7.5
    # and we need to set the env variable manually.   
