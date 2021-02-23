@@ -11,10 +11,6 @@ connected_check_task:
     kvm: true
     cpu: 8
     memory: 24G
-  create_mavsdk_server_script:
-    - curl -L https://github.com/mavlink/MAVSDK/releases/download/v0.26.0/mavsdk_server_manylinux2010-x64 > ./mavsdk_server_manylinux1-x64
-    - chmod +x ./mavsdk_server_manylinux1-x64
-    - ./mavsdk_server_manylinux1-x64 -p 50051 &
   create_device_script:
     echo no | avdmanager create avd --force --name "api-${API_LEVEL}" --abi "${TARGET}/${ARCH}" --package "system-images;android-${API_LEVEL};${TARGET};${ARCH}"
   start_emulator_background_script:
