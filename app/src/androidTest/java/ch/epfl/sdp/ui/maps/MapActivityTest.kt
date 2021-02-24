@@ -248,7 +248,7 @@ class MapActivityTest {
         onView(withId(R.id.drone_status_fragment)).check(matches(isDisplayed()))
     }
 
-    @Test
+    /*@Test
     fun longClickOnMapAddAMarker() {
         runOnUiThread {
             MainDataManager.goOffline()
@@ -269,7 +269,7 @@ class MapActivityTest {
         runOnUiThread {
             assertThat(mActivityRule.activity.victimSymbolManager.markers.size, equalTo(0))
         }
-    }
+    }*/
 
     @Test
     fun clickOnMapInteractWithQuadrilateralSearchArea() {

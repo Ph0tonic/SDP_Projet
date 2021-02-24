@@ -84,7 +84,7 @@ class OfflineMapsManagingTest {
         Intents.intended(IntentMatchers.hasComponent(OfflineManagerActivity::class.java.name))
     }
 
-    @Test
+    /*@Test
     fun canNavigateToDownloadedMap() {
         MapUtils.saveCameraPositionAndZoomToPrefs(
                 MapUtils.getCameraWithParameters(
@@ -124,7 +124,7 @@ class OfflineMapsManagingTest {
 
             override fun onError(error: String?) {}
         })
-    }
+    }*/
 
     /*@Test
     fun canDeleteDownloadedMap() {
