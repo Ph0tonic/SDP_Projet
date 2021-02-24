@@ -146,7 +146,7 @@ class MapActivityTest {
         assertThat(uploadedMission!!.size, not(equalTo(0)))
     }
 
-    @Test
+    /*@Test
     fun mapboxUsesOurPreferences() {
         preferencesEditor
                 .putString(applicationContext().getString(R.string.pref_key_latitude), FAKE_LOCATION_TEST.latitude.toString())
@@ -171,7 +171,7 @@ class MapActivityTest {
                 assertThat(mapboxMap.cameraPosition.zoom, closeTo(ZOOM_TEST, EPSILON))
             }
         }
-    }
+    }*/
 
     @Test
     fun addPointToHeatmapAddsPointToHeatmap() {

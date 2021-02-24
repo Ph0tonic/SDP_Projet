@@ -59,6 +59,7 @@ class AaaLocationWithoutPermissionTest {
          */
     }
     */
+    /*
     @Test
     fun configureWithoutPermissionsOpensDialog() {
         CentralLocationManager.configure(mActivityRule.activity)
@@ -66,5 +67,5 @@ class AaaLocationWithoutPermissionTest {
         val allowPermissions: UiObject = mUiDevice.findObject(UiSelector().textMatches("(?i)deny"))
         assertThat(allowPermissions.exists(), equalTo(true))
         allowPermissions.click()
-    }
+    }*/
 }
