@@ -100,7 +100,7 @@ class MainActivityTest {
                 .perform(NavigationViewActions.navigateTo(R.id.nav_maps_managing))
     }
 
-    @Test
+    /*@Test
     fun canDisplayAMapAndReloadLocation() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext())
 
@@ -129,7 +129,7 @@ class MainActivityTest {
         assertThat(latitude, `is`(notNullValue()))
         assertThat(longitude, `is`(notNullValue()))
         assertThat(zoom, `is`(notNullValue()))
-    }
+    }*/
 
     @Test
     fun clickingTheHamburgerOpensTheDrawer() {
