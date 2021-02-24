@@ -1,13 +1,13 @@
 connected_check_task:
   name: Run Android instrumented tests
   env:
-    API_LEVEL: 28
+    API_LEVEL: 29
     TARGET: default
     ARCH: x86
     CC_TEST_REPORTER_ID: ENCRYPTED[437c27bfb64040626acf7f420701b9391f80e46bcdc9b1a11f5a8a8ed35ee5f66576f7289bb71ff7e18c822219e8a620]
     GRADLE_OPTS: -Dkotlin.compiler.execution.strategy=in-process
   container:
-    image: reactivecircus/android-emulator-28:latest
+    image: reactivecircus/android-emulator-29:latest
     kvm: true
     cpu: 8
     memory: 24G
@@ -18,12 +18,12 @@ connected_check_task:
   create_device_script:
     echo no | avdmanager create avd --force --name "api-${API_LEVEL}" --abi "${TARGET}/${ARCH}" --package "system-images;android-${API_LEVEL};${TARGET};${ARCH}"
   start_emulator_background_script:
-    $ANDROID_HOME/emulator/emulator -avd "api-${API_LEVEL}" -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+    $ANDROID_HOME/emulator -avd "api-${API_LEVEL}" -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
   assemble_instrumented_tests_script:
     ./gradlew assembleDebugAndroidTest
-  wait_for_emulator_script:
-    - adb wait-for-device
-    - adb shell input keyevent 82
+  wait_for_emulator_script: |
+    adb wait-for-device
+    adb shell input keyevent 82
   disable_animations_script: |
     adb shell settings put global window_animation_scale 0.0
     adb shell settings put global transition_animation_scale 0.0
