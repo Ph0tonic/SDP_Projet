@@ -126,7 +126,7 @@ class OfflineMapsManagingTest {
         })
     }
 
-    @Test
+    /*@Test
     fun canDeleteDownloadedMap() {
         MapUtils.saveCameraPositionAndZoomToPrefs(
                 MapUtils.getCameraWithParameters(
@@ -160,5 +160,5 @@ class OfflineMapsManagingTest {
 
         mUiDevice.wait(Until.hasObject(By.desc(MainApplication.applicationContext().getString(R.string.no_offline_map_downloaded_yet))), MAP_DOWNLOADING_TIMEOUT)
         onView(withText(R.string.no_offline_map_downloaded_yet)).check(matches(isDisplayed()))
-    }
+    }*/
 }
