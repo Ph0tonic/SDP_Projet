@@ -88,7 +88,7 @@ class LoginNavFragmentTest {
         mUiDevice.pressBack()
     }
 
-    @Test
+    /*@Test
     fun whenAuthValuesAreUpdatedInterfaceShouldBeUpdated() {
         runOnUiThread {
             Auth.logout()
@@ -116,5 +116,5 @@ class LoginNavFragmentTest {
 
         openDrawer()
         onView(withId(R.id.nav_signin_button)).check(matches(isDisplayed()))
-    }
+    }*/
 }
