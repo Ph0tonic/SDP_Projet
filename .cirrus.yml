@@ -21,8 +21,6 @@ connected_check_task:
     $ANDROID_SDK_ROOT/emulator/emulator -avd "api-${API_LEVEL}" -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
   assemble_instrumented_tests_script:
     ./gradlew assembleDebugAndroidTest
-  check_script:
-    ./gradlew check
   wait_for_emulator_script: |
     adb wait-for-device
     adb shell input keyevent 82
@@ -35,7 +33,7 @@ connected_check_task:
     - chmod +x ./cc-test-reporter
     - ./cc-test-reporter before-build
   run_instrumented_tests_script:
-    ./gradlew connectedCheck jacocoTestReport
+    ./gradlew check connectedCheck jacocoTestReport
   report_codeclimate_script:
     # Report test coverage to Code Climate
     - export JACOCO_SOURCE_PATH=app/src/main/java/
