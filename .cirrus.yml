@@ -21,6 +21,8 @@ connected_check_task:
     $ANDROID_SDK_ROOT/emulator/emulator -avd "api-${API_LEVEL}" -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
   assemble_instrumented_tests_script:
     ./gradlew assembleDebugAndroidTest
+  check_script:
+    ./gradlew check
   wait_for_emulator_script: |
     adb wait-for-device
     adb shell input keyevent 82
