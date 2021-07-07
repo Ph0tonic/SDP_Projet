@@ -48,10 +48,16 @@
                     android:onClick="goToSearchGroupSelect"
                     android:text="@string/select_search_group" />
 
-                <Space
+                <TextView
+                    android:id="@+id/current_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2" />
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text=""
+                    android:textAllCaps="false"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/start_mission_button"
